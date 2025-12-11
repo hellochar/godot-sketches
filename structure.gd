@@ -10,6 +10,7 @@ static func generate_random_producer() -> Structure:
   var rand_basic: Item = ItemLibrary.get_by_tier(Item.ETier.Basic).pick_random()
   structure.production[rand_basic] = randi_range(1, 3)
   structure.production_time = randi_range(1, 3)
+  structure.autoset_name_override()
   structure.description = structure.describe()
   structure.tier = Item.ETier.Basic
   structure.tags.push_back(Item.ETag.Structure)
@@ -27,6 +28,7 @@ static func generate_random_transformer_sametier(in_tier: Item.ETier) -> Structu
   var rand_advanced: Item = ItemLibrary.get_by_tier(in_tier).pick_random()
   structure.production[rand_advanced] = sum_ingredients
   structure.production_time = randi_range(2, 4)
+  structure.autoset_name_override()
   structure.description = structure.describe()
   structure.tier = in_tier
   structure.tags.push_back(Item.ETag.Structure)
@@ -42,21 +44,29 @@ static func generate_random_upgrader(base_tier: Item.ETier, upgraded_tier: Item.
   var rand_futuristic: Item = ItemLibrary.get_by_tier(upgraded_tier).pick_random()
   structure.production[rand_futuristic] = 1
   structure.production_time = randi_range(7, 10)
+  structure.autoset_name_override()
   structure.description = structure.describe()
   structure.tier = base_tier
   structure.tags.push_back(Item.ETag.Structure)
   return structure
 
+func autoset_name_override() -> void:
+  if ingredients.size() > 0:
+    name_override = "Transformer"
+  else:
+    name_override = "Producer"
+
 func describe() -> String:
   var out := ""
   if ingredients.size() > 0:
-    out += "Transformer: "
+    out += "Converts "
     for res in ingredients.keys():
-      out += "%s x%d, " % [res.name, ingredients[res]]
+      out += "%d %s, " % [ingredients[res], res.name]
     out = out.substr(0, out.length() - 2)
-    out += " -> "
+    out += " into "
   else:
-    out += "Producer: "
+    out += "+"
   
-  out += ", ".join(production.keys().map(func(r): return "%s x%d" % [r.name, production[r]]))
+  out += ", ".join(production.keys().map(func(r): return "%d %s" % [production[r], r.name]))
+  out += " every %d turns" % production_time
   return out
