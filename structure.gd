@@ -15,6 +15,23 @@ static func generate_random_producer() -> Structure:
   structure.tags.push_back(Item.ETag.Structure)
   return structure
 
+static func generate_random_transformer_sametier(in_tier: Item.ETier) -> Structure:
+  var structure = Structure.new()
+  var inputs = ItemLibrary.get_by_tier(in_tier)
+  inputs.shuffle()
+  var rand_basic_inputs: Array[Item] = inputs.slice(0, 2)
+  var sum_ingredients = 0
+  for res in rand_basic_inputs:
+    structure.ingredients[res] = randi_range(1, 2)
+    sum_ingredients += structure.ingredients[res]
+  var rand_advanced: Item = ItemLibrary.get_by_tier(in_tier).pick_random()
+  structure.production[rand_advanced] = sum_ingredients - 1
+  structure.production_time = randf_range(10, 15)
+  structure.description = structure.describe()
+  structure.tier = in_tier
+  structure.tags.push_back(Item.ETag.Structure)
+  return structure
+
 func describe() -> String:
   var out := ""
   if ingredients.size() > 0:
@@ -26,5 +43,5 @@ func describe() -> String:
   else:
     out += "Producer: "
   
-  out += ", ".join(production.keys().map(func(r): return r.name))
+  out += ", ".join(production.keys().map(func(r): return "%s x%d" % [r.name, production[r]]))
   return out
