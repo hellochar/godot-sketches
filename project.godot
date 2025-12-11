@@ -11,9 +11,10 @@ config_version=5
 [application]
 
 config/name="dec-7-2025"
+run/main_scene="uid://2sywl1e23v72"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
-ResLibrary="*res://res_library.gd"
+ItemLibrary="*res://item_library.gd"
