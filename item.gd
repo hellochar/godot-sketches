@@ -8,14 +8,18 @@ enum ETier {
 }
 
 enum ETag {
-  Structure
+  Structure,
+  Living,
+  Waste,
 }
 
 @export var name: String:
   get:
     var str: String = ""
     if resource_path == "":
-      str = description
+      str = name_override
+      if name_override == "":
+        str = "???"
     else:
       str = resource_path.get_file().get_basename().capitalize()
     if ETag.Structure not in tags:
@@ -25,6 +29,7 @@ enum ETag {
         str = "[color=purple]" + str + "[/color]"
     return str
 
+@export var name_override: String
 @export var description: String
 @export var icon: Texture2D
 @export var tier: ETier
