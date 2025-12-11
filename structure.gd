@@ -3,13 +3,13 @@ class_name Structure
 
 @export var ingredients: Dictionary[Item, int] = {}
 @export var production: Dictionary[Item, int] = {}
-@export var production_time: float = 0
+@export var production_time: int = 0 # in ticks
 
 static func generate_random_producer() -> Structure:
   var structure = Structure.new()
   var rand_basic: Item = ItemLibrary.get_by_tier(Item.ETier.Basic).pick_random()
-  structure.production[rand_basic] = randi_range(3, 5)
-  structure.production_time = randf_range(5, 10)
+  structure.production[rand_basic] = randi_range(1, 3)
+  structure.production_time = randi_range(1, 3)
   structure.description = structure.describe()
   structure.tier = Item.ETier.Basic
   structure.tags.push_back(Item.ETag.Structure)
@@ -25,8 +25,8 @@ static func generate_random_transformer_sametier(in_tier: Item.ETier) -> Structu
     structure.ingredients[res] = randi_range(1, 2)
     sum_ingredients += structure.ingredients[res]
   var rand_advanced: Item = ItemLibrary.get_by_tier(in_tier).pick_random()
-  structure.production[rand_advanced] = sum_ingredients - 1
-  structure.production_time = randf_range(10, 15)
+  structure.production[rand_advanced] = sum_ingredients
+  structure.production_time = randi_range(2, 4)
   structure.description = structure.describe()
   structure.tier = in_tier
   structure.tags.push_back(Item.ETag.Structure)
@@ -41,7 +41,7 @@ static func generate_random_upgrader(base_tier: Item.ETier, upgraded_tier: Item.
     structure.ingredients[res] = randi_range(3, 5)
   var rand_futuristic: Item = ItemLibrary.get_by_tier(upgraded_tier).pick_random()
   structure.production[rand_futuristic] = 1
-  structure.production_time = randf_range(15, 20)
+  structure.production_time = randi_range(7, 10)
   structure.description = structure.describe()
   structure.tier = base_tier
   structure.tags.push_back(Item.ETag.Structure)

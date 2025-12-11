@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="Res" load_steps=2 format=3 uid="uid://7dy8nw3tmyvj"]
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://7dy8nw3tmyvj"]
 
-[ext_resource type="Script" uid="uid://cdhbuu2d1xlss" path="res://res.gd" id="1_m67xc"]
+[ext_resource type="Script" uid="uid://bllfebw3pn4wx" path="res://items/basic/peasants.gd" id="1_mv2qe"]
 
 [resource]
-script = ExtResource("1_m67xc")
+script = ExtResource("1_mv2qe")
 metadata/_custom_type_script = "uid://cdhbuu2d1xlss"

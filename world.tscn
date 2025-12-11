@@ -17,22 +17,40 @@ offset_right = 1440.0
 offset_bottom = 810.0
 theme_override_constants/separation = 20
 
-[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer"]
+[node name="HBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MainInventory" type="RichTextLabel" parent="HBoxContainer/PanelContainer"]
+[node name="MainInventory" type="RichTextLabel" parent="HBoxContainer/HBoxContainer/PanelContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 32
 bbcode_enabled = true
 text = "Inventory (cap 30):
 x30 Grass
-x1 Producer: Livestock x4
-x1 Producer: Grass x3
-x1 Transformer: Livestock x2, Wood x1 -> Peasants x2
-x1 Transformer: Cloth x5, Livestock x4 -> [color=orange]Marble[/color] x1
-x1 Transformer: [color=orange]Horses[/color] x5, [color=orange]Marble[/color] x4 -> [color=purple]Nanofiber[/color] x1
+"
+fit_content = true
+
+[node name="PanelContainer2" type="PanelContainer" parent="HBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Blueprints" type="RichTextLabel" parent="HBoxContainer/HBoxContainer/PanelContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 32
+bbcode_enabled = true
+text = "Blueprints:
+
+1 - Producer: Livestock x4
+2 - Producer: Grass x3
+3 - Transformer: Livestock x2, Wood x1 -> Peasants x2
+4 - Transformer: Cloth x5, Livestock x4 -> [color=orange]Marble[/color] x1
+5 - Transformer: [color=orange]Horses[/color] x5, [color=orange]Marble[/color] x4 -> [color=purple]Nanofiber[/color] x1
 "
 fit_content = true
 

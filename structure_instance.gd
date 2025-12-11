@@ -2,24 +2,32 @@ extends RichTextLabel
 class_name StructureInstance
 
 var type: Structure
-var inventory: World.Inventory = World.Inventory.new(5)
-var production_timer: float = 0.0
+# var inventory: World.Inventory = World.Inventory.new(5)
+var production_timer: int = 0 # in ticks
+
+var inventory: World.Inventory:
+  get:
+    return World.main.inventory
 
 func render() -> void:
-  text = "[b]%s[/b]\n" % type.name
-  text += "%s\n" % type.description
-  text += inventory.to_string()
-  text += "Production progress: %.2f / %.2f\n" % [production_timer, type.production_time]
+  text = "%s\n" % type.description
+  # text += inventory.to_string()
+  if !can_produce():
+    text += "[color=red]Waiting for ingredients...[/color]\n"
+  else:
+    text += "[color=green]Producing...[/color] %d / %d\n" % [production_timer, type.production_time]
 
 func _process(delta: float) -> void:
+  render()
+
+func tick(ticks: int) -> void:
   if can_produce():
-    production_timer += delta
+    production_timer += ticks
     if production_timer >= type.production_time:
       produce()
-      production_timer = 0.0
-  else:
-    take(World.main.inventory)
-  render()
+      production_timer = 0
+  # else:
+  #   take(World.main.inventory)
 
 func take(source: World.Inventory) -> void:
   for res in type.ingredients.keys():
