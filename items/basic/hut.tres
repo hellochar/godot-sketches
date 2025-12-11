@@ -1,7 +1,16 @@
-[gd_resource type="Resource" script_class="Item" load_steps=2 format=3 uid="uid://d1nw8fqm3m83l"]
+[gd_resource type="Resource" script_class="Item" load_steps=4 format=3 uid="uid://d1nw8fqm3m83l"]
 
 [ext_resource type="Script" uid="uid://cdhbuu2d1xlss" path="res://item.gd" id="1_b85op"]
 
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_b85op"]
+load_path = "res://.godot/imported/icon_atlas.png-8ac5fc0cdf230613c0cf6203a3100554.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_63lyv"]
+atlas = SubResource("CompressedTexture2D_b85op")
+region = Rect2(40, 368, 288, 288)
+
 [resource]
 script = ExtResource("1_b85op")
+description = "Provides housing for two peasants."
+icon = SubResource("AtlasTexture_63lyv")
 metadata/_custom_type_script = "uid://cdhbuu2d1xlss"
