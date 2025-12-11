@@ -25,9 +25,9 @@ func refresh() -> void:
     button.custom_minimum_size = Vector2(150, 40)
     var amount = inventory.dict[item]
     if amount <= 1:
-      button.text = item.name
+      button.text = item.name + " " + item.description
     else:
-      button.text = "%s (x%d)" % [item.name, amount]
+      button.text = "%s (x%d)" % [item.name + " " + item.description, amount]
     button.pressed.connect(func(): _on_item_clicked(item, amount))
     container.add_child(button)
   
