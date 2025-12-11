@@ -28,35 +28,36 @@ func tick(inventory: World.Inventory, peasants: int, ticks: int) -> Dictionary[I
 
   var changes: Dictionary[Item, int] = {}
   
+  const HOUSING_PER_HUT = 2
   var huts = inventory.num(HUT)
-  var housed = min(peasants, huts * 2)
+  var housed = min(peasants, huts * HOUSING_PER_HUT)
   var unhoused = peasants - housed
   print ("Peasants: %d (Housed: %d, Unhoused: %d)" % [peasants, housed, unhoused])
   
   var food = inventory.num(FOOD)
-  var livestock_count = inventory.num(LIVESTOCK)
+  # var livestock_count = inventory.num(LIVESTOCK)
   var stone = inventory.num(STONE)
   var wood = inventory.num(WOOD)
   
-  var new_huts_desired = int(ceil(unhoused / 2.0))
-  var huts_to_build = min(new_huts_desired, stone, wood)
+  var new_huts_desired = int(ceil(unhoused / float(HOUSING_PER_HUT)))
+  var huts_to_build = 0 # min(new_huts_desired, stone, wood)
   changes[HUT] = changes.get(HUT, 0) + huts_to_build
   changes[STONE] = changes.get(STONE, 0) - huts_to_build
   changes[WOOD] = changes.get(WOOD, 0) - huts_to_build
   huts += huts_to_build
-  housed = min(peasants, huts * 2)
+  housed = min(peasants, huts * HOUSING_PER_HUT)
   unhoused = peasants - housed
   print ("Wanted %d huts, Built %d huts, now %d housed, %d unhoused" % [new_huts_desired, huts_to_build, housed, unhoused])
   
   var num_hungry = max(0, peasants - (food * 5))
 
-  if livestock_count > 0:
-    var to_slaughter = min(livestock_count, int(ceil(num_hungry / 5.0)))
-    changes[LIVESTOCK] = changes.get(LIVESTOCK, 0) - to_slaughter
-    changes[FOOD] = changes.get(FOOD, 0) + to_slaughter * 5
-    food += to_slaughter * 5
-    num_hungry = max(0, peasants - (food * 5))
-    print ("Slaughtered %d livestock for %d food" % [to_slaughter, to_slaughter * 5])
+  # if livestock_count > 0:
+  #   var to_slaughter = min(livestock_count, int(ceil(num_hungry / 5.0)))
+  #   changes[LIVESTOCK] = changes.get(LIVESTOCK, 0) - to_slaughter
+  #   changes[FOOD] = changes.get(FOOD, 0) + to_slaughter * 5
+  #   food += to_slaughter * 5
+  #   num_hungry = max(0, peasants - (food * 5))
+  #   print ("Slaughtered %d livestock for %d food" % [to_slaughter, to_slaughter * 5])
   
   print ("Num hungry: %d" % num_hungry)
 
