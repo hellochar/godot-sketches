@@ -1,5 +1,5 @@
 extends Resource
-class_name Res
+class_name Item
 
 enum ETier {
   Basic,
@@ -8,6 +8,7 @@ enum ETier {
 }
 
 enum ETag {
+  Structure
 }
 
 @export var name: String:
@@ -18,6 +19,3 @@ enum ETag {
 @export var icon: Texture2D
 @export var tier: ETier
 @export var tags: Array[ETag]
-
-func _process(amount: int, delta: float) -> void:
-  pass
