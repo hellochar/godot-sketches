@@ -30,5 +30,5 @@ enum ETag {
 @export var tier: ETier
 @export var tags: Array[ETag] = []
 
-func _process(inventory: World.Inventory, amount: int, delta: float) -> void:
-  pass
+func tick(inventory: World.Inventory, amount: int, ticks: int) -> Dictionary[Item, int]:
+  return {}

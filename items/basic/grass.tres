@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="Res" load_steps=2 format=3 uid="uid://mnjj8all4e1w"]
+[gd_resource type="Resource" script_class="Grass" load_steps=2 format=3 uid="uid://mnjj8all4e1w"]
 
-[ext_resource type="Script" uid="uid://cdhbuu2d1xlss" path="res://res.gd" id="1_8llt2"]
+[ext_resource type="Script" uid="uid://cf3h6rao1p7j1" path="res://items/basic/grass.gd" id="1_xenjs"]
 
 [resource]
-script = ExtResource("1_8llt2")
+script = ExtResource("1_xenjs")
 name = "Wood"
 metadata/_custom_type_script = "uid://cdhbuu2d1xlss"
