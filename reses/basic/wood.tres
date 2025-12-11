@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="Res" load_steps=2 format=3 uid="uid://dgvaaxdutuvei"]
+
+[ext_resource type="Script" uid="uid://cdhbuu2d1xlss" path="res://res.gd" id="1_f251j"]
+
+[resource]
+script = ExtResource("1_f251j")
+metadata/_custom_type_script = "uid://cdhbuu2d1xlss"
