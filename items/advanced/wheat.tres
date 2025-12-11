@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="Item" load_steps=2 format=3 uid="uid://c2b3d4e5f6g7h"]
+
+[ext_resource type="Script" uid="uid://cdhbuu2d1xlss" path="res://item.gd" id="1_wheat"]
+
+[resource]
+script = ExtResource("1_wheat")
+tier = 1
