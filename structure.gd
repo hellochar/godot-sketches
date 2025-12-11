@@ -3,13 +3,15 @@ class_name Structure
 
 @export var ingredients: Dictionary[Item, int] = {}
 @export var production: Dictionary[Item, int] = {}
-@export var production_time: int = 0 # in ticks
+@export var production_time: int = 0
+@export var workers_needed: int = 1
 
 static func generate_random_producer() -> Structure:
   var structure = Structure.new()
   var rand_basic: Item = ItemLibrary.get_by_tier(Item.ETier.Basic).pick_random()
-  structure.production[rand_basic] = randi_range(1, 3)
-  structure.production_time = randi_range(1, 3)
+  structure.production[rand_basic] = 1 # randi_range(1, 3)
+  structure.production_time = 1 # randi_range(1, 3)
+  structure.workers_needed = 1
   structure.autoset_name_override()
   structure.description = structure.describe()
   structure.tier = Item.ETier.Basic
@@ -23,11 +25,12 @@ static func generate_random_transformer_sametier(in_tier: Item.ETier) -> Structu
   var rand_basic_inputs: Array[Item] = inputs.slice(0, 2)
   var sum_ingredients = 0
   for res in rand_basic_inputs:
-    structure.ingredients[res] = randi_range(1, 2)
+    structure.ingredients[res] = 1 # randi_range(1, 2)
     sum_ingredients += structure.ingredients[res]
   var rand_advanced: Item = ItemLibrary.get_by_tier(in_tier).pick_random()
-  structure.production[rand_advanced] = sum_ingredients
-  structure.production_time = randi_range(2, 4)
+  structure.production[rand_advanced] = 1
+  structure.production_time = 1 # randi_range(2, 4)
+  structure.workers_needed = 2 # randi_range(1, 2)
   structure.autoset_name_override()
   structure.description = structure.describe()
   structure.tier = in_tier
@@ -40,10 +43,11 @@ static func generate_random_upgrader(base_tier: Item.ETier, upgraded_tier: Item.
   inputs.shuffle()
   var rand_advanced_inputs: Array[Item] = inputs.slice(0, 2)
   for res in rand_advanced_inputs:
-    structure.ingredients[res] = randi_range(3, 5)
+    structure.ingredients[res] = 2 # randi_range(3, 5)
   var rand_futuristic: Item = ItemLibrary.get_by_tier(upgraded_tier).pick_random()
   structure.production[rand_futuristic] = 1
-  structure.production_time = randi_range(7, 10)
+  structure.production_time = 1 # randi_range(7, 10)
+  structure.workers_needed = 5 # randi_range(2, 3)
   structure.autoset_name_override()
   structure.description = structure.describe()
   structure.tier = base_tier
@@ -68,5 +72,8 @@ func describe() -> String:
     out += "+"
   
   out += ", ".join(production.keys().map(func(r): return "%d %s" % [production[r], r.name]))
-  out += " every %d turns" % production_time
+  if production_time > 1:
+    out += " every %d turns" % production_time
+  if workers_needed > 1:
+    out += " (needs %d workers)" % workers_needed
   return out

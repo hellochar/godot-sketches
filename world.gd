@@ -46,6 +46,7 @@ func _ready() -> void:
   _process(0)
 
 func tick(ticks: int) -> void:
+  assign_workers()
   inventory.tick(ticks)
   for structure_instance in board:
     structure_instance.tick(ticks)
@@ -85,6 +86,18 @@ func _input(event: InputEvent) -> void:
 const STRUCTURE_INSTANCE = preload("res://structure_instance.tscn")
 const PICKER_SCENE = preload("res://picker.tscn")
 
+func assign_workers() -> void:
+  var PEASANTS = preload("res://items/basic/peasants.tres")
+  var available_peasants = inventory.num(PEASANTS)
+  
+  for structure_instance in board:
+    var needed = structure_instance.type.workers_needed
+    if available_peasants >= needed:
+      structure_instance.is_working = true
+      available_peasants -= needed
+    else:
+      structure_instance.is_working = false
+
 func place(structure: Structure) -> void:
   var instance := STRUCTURE_INSTANCE.instantiate()
   instance.type = structure
@@ -93,19 +106,26 @@ func place(structure: Structure) -> void:
 
 func create_reward() -> void:
   reward_inventory.dict.clear()
-  
-  for i in range(1):
-    var reward_type = randi() % 2
-    var reward: Item
-    if reward_type == 0:
-      reward = Structure.generate_random_producer()
-      reward_inventory.add(reward, 1)
-    elif reward_type == 1:
-      reward = Structure.generate_random_transformer_sametier(Item.ETier.Basic)
-      reward_inventory.add(reward, 1)
-    else:
-      reward = ItemLibrary.get_by_tier(Item.ETier.Basic).pick_random()
-      reward_inventory.add(reward, 10)
+
+  var rng = RandomNumberGenerator.new()
+  var reward_funcs = {
+    (func(): reward_inventory.add(Structure.generate_random_producer(), 1))
+      : 100,
+    (func(): reward_inventory.add(Structure.generate_random_transformer_sametier(Item.ETier.Basic), 1))
+      : 100,
+    # (func(): reward_inventory.add(ItemLibrary.get_by_tier(Item.ETier.Basic).pick_random(), 10))
+    #   : 20,
+    (func(): reward_inventory.add(Structure.generate_random_upgrader(Item.ETier.Basic, Item.ETier.Advanced), 1))
+      : 20,
+    (func(): reward_inventory.add(Structure.generate_random_upgrader(Item.ETier.Advanced, Item.ETier.Futuristic), 1))
+      : 5,
+  }
+
+  for i in range(3):
+    var funcs = reward_funcs.keys()
+    var weights = reward_funcs.values()
+    var index = rng.rand_weighted(weights)
+    funcs[index].call()
   
   var picker = PICKER_SCENE.instantiate()
   add_child(picker)
