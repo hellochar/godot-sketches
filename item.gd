@@ -18,4 +18,4 @@ enum ETag {
 @export var description: String
 @export var icon: Texture2D
 @export var tier: ETier
-@export var tags: Array[ETag]
+@export var tags: Array[ETag] = []
