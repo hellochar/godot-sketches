@@ -23,6 +23,8 @@ func _ready() -> void:
   inventory.add(Structure.generate_random_producer(), 1)
   inventory.add(Structure.generate_random_producer(), 1)
   inventory.add(Structure.generate_random_transformer_sametier(Item.ETier.Basic), 1)
+  inventory.add(Structure.generate_random_upgrader(Item.ETier.Basic, Item.ETier.Advanced), 1)
+  inventory.add(Structure.generate_random_upgrader(Item.ETier.Advanced, Item.ETier.Futuristic), 1)
 
 func _process(delta: float) -> void:
   inventory._process(delta)

@@ -32,6 +32,21 @@ static func generate_random_transformer_sametier(in_tier: Item.ETier) -> Structu
   structure.tags.push_back(Item.ETag.Structure)
   return structure
 
+static func generate_random_upgrader(base_tier: Item.ETier, upgraded_tier: Item.ETier) -> Structure:
+  var structure = Structure.new()
+  var inputs = ItemLibrary.get_by_tier(base_tier)
+  inputs.shuffle()
+  var rand_advanced_inputs: Array[Item] = inputs.slice(0, 2)
+  for res in rand_advanced_inputs:
+    structure.ingredients[res] = randi_range(3, 5)
+  var rand_futuristic: Item = ItemLibrary.get_by_tier(upgraded_tier).pick_random()
+  structure.production[rand_futuristic] = 1
+  structure.production_time = randf_range(15, 20)
+  structure.description = structure.describe()
+  structure.tier = base_tier
+  structure.tags.push_back(Item.ETag.Structure)
+  return structure
+
 func describe() -> String:
   var out := ""
   if ingredients.size() > 0:

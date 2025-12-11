@@ -18,3 +18,8 @@ config/icon="res://icon.svg"
 [autoload]
 
 ItemLibrary="*res://item_library.gd"
+
+[display]
+
+window/size/viewport_width=1440
+window/size/viewport_height=810
