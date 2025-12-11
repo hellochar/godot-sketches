@@ -13,9 +13,17 @@ enum ETag {
 
 @export var name: String:
   get:
+    var str: String = ""
     if resource_path == "":
-      return description
-    return resource_path.get_file().get_basename().capitalize()
+      str = description
+    else:
+      str = resource_path.get_file().get_basename().capitalize()
+    if ETag.Structure not in tags:
+      if tier == ETier.Advanced:
+        str = "[color=orange]" + str + "[/color]"
+      elif tier == ETier.Futuristic:
+        str = "[color=purple]" + str + "[/color]"
+    return str
 
 @export var description: String
 @export var icon: Texture2D

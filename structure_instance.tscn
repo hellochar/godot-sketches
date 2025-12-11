@@ -3,10 +3,12 @@
 [ext_resource type="Script" uid="uid://cugyrdataebg1" path="res://structure_instance.gd" id="1_abc12"]
 
 [node name="RichTextLabel" type="RichTextLabel"]
+offset_right = 859.0
+offset_bottom = 135.0
 theme_override_font_sizes/normal_font_size = 32
 bbcode_enabled = true
 text = "Provider:
-foo
+[color=orange]foo[/color]
 123 / 3939"
 fit_content = true
 script = ExtResource("1_abc12")
