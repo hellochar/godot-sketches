@@ -11,7 +11,7 @@ region = Rect2(40, 40, 288, 288)
 
 [resource]
 script = ExtResource("1_mv2qe")
-description = "Needs food and housing."
+description = "Eat 1 food per 5 peasants. Housed (2 per hut) have 1/20 death rate, 1/5 birth rate. Unhoused have 1/5 death rate, 1/10 birth rate. No births if starvation exceeds 5%. Dead become bones."
 icon = SubResource("AtlasTexture_fase5")
 tags = Array[int]([1])
 metadata/_custom_type_script = "uid://cdhbuu2d1xlss"
