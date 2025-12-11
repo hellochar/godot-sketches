@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://2sywl1e23v72"]
+
+[ext_resource type="Script" uid="uid://bv1p8onqeho4n" path="res://world.gd" id="1_f3sb7"]
+
+[node name="World" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 936.0
+offset_bottom = 716.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_f3sb7")

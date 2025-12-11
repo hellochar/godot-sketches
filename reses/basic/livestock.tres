@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="Res" load_steps=2 format=3 uid="uid://d15trh8oav0ky"]
+
+[ext_resource type="Script" uid="uid://cdhbuu2d1xlss" path="res://res.gd" id="1_u1bwp"]
+
+[resource]
+script = ExtResource("1_u1bwp")
+name = "Wood"
+metadata/_custom_type_script = "uid://cdhbuu2d1xlss"
