@@ -8,7 +8,7 @@ class_name World
 
 static var main: World
 
-var inventory: Inventory = Inventory.new(30, "Inventory")
+var inventory: Inventory = Inventory.new(-1, "Inventory")
 var blueprints: Inventory = Inventory.new(1, "Blueprints")
 var board: Array[StructureInstance] = []
 var turn_count: int = 0
@@ -19,7 +19,9 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
   # # add three basic random resources
-  # var basic_resources = ItemLibrary.get_by_tier(Item.ETier.Basic)
+  var basic_resources = ItemLibrary.get_by_tier(Item.ETier.Basic).filter(
+    func(i: Item): return not (i is Structure or Item.ETag.Waste in i.tags)
+  )
   # for i in range(3):
   #   var res = basic_resources.pick_random()
   #   inventory.add(res, 10)
@@ -30,11 +32,16 @@ func _ready() -> void:
   inventory.add(preload("res://items/basic/livestock.tres"), 3)
 
   blueprints.prefix = true
-  blueprints.add(Structure.generate_random_producer(), 1)
-  blueprints.add(Structure.generate_random_producer(), 1)
-  blueprints.add(Structure.generate_random_transformer_sametier(Item.ETier.Basic), 1)
-  blueprints.add(Structure.generate_random_upgrader(Item.ETier.Basic, Item.ETier.Advanced), 1)
-  blueprints.add(Structure.generate_random_upgrader(Item.ETier.Advanced, Item.ETier.Futuristic), 1)
+  # blueprints.add(Structure.generate_random_producer(), 1)
+  # blueprints.add(Structure.generate_random_producer(), 1)
+  # blueprints.add(Structure.generate_random_transformer_sametier(Item.ETier.Basic), 1)
+  # blueprints.add(Structure.generate_random_upgrader(Item.ETier.Basic, Item.ETier.Advanced), 1)
+  # blueprints.add(Structure.generate_random_upgrader(Item.ETier.Advanced, Item.ETier.Futuristic), 1)
+
+  if %InventoryUI:
+    %InventoryUI.set_inventory(inventory)
+  if %BlueprintsUI:
+    %BlueprintsUI.set_inventory(blueprints)
 
   _process(0)
 
@@ -50,6 +57,10 @@ func tick(ticks: int) -> void:
 func _process(delta: float) -> void:
   %MainInventory.text = inventory._to_string()
   %Blueprints.text = blueprints._to_string()
+  if %InventoryUI:
+    %InventoryUI.refresh()
+  if %BlueprintsUI:
+    %BlueprintsUI.refresh()
 
 func _input(event: InputEvent) -> void:
   if event is InputEventKey and event.pressed and not event.echo:
@@ -83,8 +94,8 @@ func place(structure: Structure) -> void:
 func create_reward() -> void:
   reward_inventory.dict.clear()
   
-  for i in range(3):
-    var reward_type = randi() % 3
+  for i in range(1):
+    var reward_type = randi() % 2
     var reward: Item
     if reward_type == 0:
       reward = Structure.generate_random_producer()
@@ -99,14 +110,14 @@ func create_reward() -> void:
   var picker = PICKER_SCENE.instantiate()
   add_child(picker)
   picker.set_inventory(reward_inventory)
-  picker.item_selected.connect(_on_reward_selected.bind(picker))
-
-func _on_reward_selected(item: Item, amount: int, picker: Node) -> void:
-  if item is Structure:
-    blueprints.add(item, amount)
-  else:
-    inventory.add(item, amount)
-  picker.queue_free()
+  picker.item_selected.connect(func(item: Item, amount: int) -> void:
+    if item is Structure:
+      place(item as Structure)
+      # blueprints.add(item, amount)
+    else:
+      inventory.add(item, amount)
+    picker.queue_free()
+  )
 
 static func dict_add_all(me: Dictionary, other: Dictionary) -> void:
   for key in other.keys():
@@ -139,7 +150,7 @@ class Inventory:
     for item in dict.keys():
       var line: String = "%d - " % index if prefix else ""
       index += 1
-      if cap > 1:
+      if cap != 1:
         line += "x%d %s\n" % [dict[item], item.name]
       else:
         line += "%s\n" % item.name
@@ -154,7 +165,11 @@ class Inventory:
     add_all(total_diff)
 
   func add(item: Item, amount: int) -> void:
-    dict[item] = clamp(num(item) + amount, 0, cap)
+    var new_value = num(item) + amount
+    if cap == -1:
+      dict[item] = max(new_value, 0)
+    else:
+      dict[item] = clamp(new_value, 0, cap)
     if dict[item] == 0:
       dict.erase(item)
   
