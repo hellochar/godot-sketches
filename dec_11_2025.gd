@@ -4,11 +4,15 @@ extends Control
 @export var grid_size: int = 5
 @export var cell_size: float = 80.0
 @export var mana_spread_rate: float = 0.1
+@export var mana_constant_flow: float = 0.5
 @export var mana_decay_rate: float = 0.01
+@export var simulations_per_tick: int = 5
 @export var overheat_threshold: float = 50.0
 
 @export_group("Component Stats")
 @export var generator_output: float = 2.0
+@export var pulse_generator_amount: float = 5.0
+@export var pulse_generator_interval: float = 2.0
 @export var converter_consumption: float = 1.0
 @export var converter_points_mult: float = 10.0
 @export var amplifier_consumption: float = 0.5
@@ -47,6 +51,7 @@ var explosion_particles: Array = []
 enum ComponentType {
   NONE,
   MANA_GENERATOR,
+  PULSE_GENERATOR,
   POINT_CONVERTER,
   MANA_AMPLIFIER,
   WALL
@@ -63,6 +68,7 @@ class Component:
   var type: int
   var grid_pos: Vector2i
   var port_direction: int
+  var timer: float = 0.0
 
   func _init(t: int, pos: Vector2i, dir: int):
     type = t
@@ -94,7 +100,8 @@ func _init_grid():
     mana_grid.append(mana_col)
 
 func _process(delta):
-  _simulate_mana(delta)
+  for i in range(simulations_per_tick):
+    _simulate_mana(delta / simulations_per_tick)
   _process_components(delta)
   _check_overheat()
   _update_vfx(delta)
@@ -193,11 +200,15 @@ func _simulate_mana(delta):
         var ny = neighbor.y
         var neighbor_mana = mana_grid[nx][ny]
 
-        # Mana flows from high to low
         var diff = current_mana - neighbor_mana
-        var flow = diff * mana_spread_rate * delta
-        new_mana[x][y] -= flow
-        new_mana[nx][ny] += flow
+        if diff <= 0:
+          continue
+        var proportional_flow = diff * mana_spread_rate * delta
+        var constant_flow = mana_constant_flow * delta
+        var total_flow = proportional_flow + constant_flow
+        total_flow = min(total_flow, diff * 0.5)
+        new_mana[x][y] -= total_flow
+        new_mana[nx][ny] += total_flow
 
       # Apply decay
       new_mana[x][y] = max(0.0, new_mana[x][y] - mana_decay_rate * delta)
@@ -240,6 +251,12 @@ func _process_components(delta):
       ComponentType.MANA_GENERATOR:
         mana_grid[target_pos.x][target_pos.y] += generator_output * delta
 
+      ComponentType.PULSE_GENERATOR:
+        comp.timer += delta
+        if comp.timer >= pulse_generator_interval:
+          comp.timer -= pulse_generator_interval
+          mana_grid[target_pos.x][target_pos.y] += pulse_generator_amount
+
       ComponentType.POINT_CONVERTER:
         var available = mana_grid[target_pos.x][target_pos.y]
         var consumed = min(available, converter_consumption * delta)
@@ -274,12 +291,11 @@ func _draw():
 
   draw_string(ThemeDB.fallback_font, Vector2(20, 30), "Points: %.0f  (+%.1f/s)  |  Mana: %.1f / %.0f" % [points, points_per_second, total_mana, overheat_threshold], HORIZONTAL_ALIGNMENT_LEFT, -1, 24, mana_color)
 
-  # Draw component selection
-  var comp_names = ["Empty", "Generator", "Converter", "Amplifier", "Wall"]
-  for i in range(5):
-    var x = 20 + i * 100
+  var comp_names = ["Empty", "Gen", "Pulse", "Conv", "Amp", "Wall"]
+  for i in range(6):
+    var x = 20 + i * 80
     var color = Color.GREEN if i == selected_component_type else Color.GRAY
-    draw_rect(Rect2(x, 50, 90, 30), color, false, 2.0)
+    draw_rect(Rect2(x, 50, 70, 30), color, false, 2.0)
     draw_string(ThemeDB.fallback_font, Vector2(x + 5, 72), "%d: %s" % [i + 1, comp_names[i]], HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color)
 
   # Draw rotation indicator
@@ -338,6 +354,9 @@ func _draw_component(comp: Component, origin: Vector2):
   match comp.type:
     ComponentType.MANA_GENERATOR:
       color = Color.BLUE
+    ComponentType.PULSE_GENERATOR:
+      var pulse_progress = comp.timer / pulse_generator_interval
+      color = Color.CYAN.lerp(Color.WHITE, pulse_progress)
     ComponentType.POINT_CONVERTER:
       color = Color.GOLD
     ComponentType.MANA_AMPLIFIER:
@@ -365,10 +384,10 @@ func _draw_component(comp: Component, origin: Vector2):
   draw_line(arrow_end, arrow_end - arrow_dir * 10 + perp * 6, Color.WHITE, 2.0)
   draw_line(arrow_end, arrow_end - arrow_dir * 10 - perp * 6, Color.WHITE, 2.0)
 
-  # Type label
   var label: String
   match comp.type:
     ComponentType.MANA_GENERATOR: label = "GEN"
+    ComponentType.PULSE_GENERATOR: label = "PLS"
     ComponentType.POINT_CONVERTER: label = "PTS"
     ComponentType.MANA_AMPLIFIER: label = "AMP"
   draw_string(ThemeDB.fallback_font, center - Vector2(15, -5), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)
@@ -400,6 +419,7 @@ func _input(event):
       KEY_3: selected_component_type = 2
       KEY_4: selected_component_type = 3
       KEY_5: selected_component_type = 4
+      KEY_6: selected_component_type = 5
       KEY_R: placement_rotation = (placement_rotation + 1) % 4
       KEY_BACKSLASH: get_tree().reload_current_scene()
 
