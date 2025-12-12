@@ -10,7 +10,9 @@ extends Control
 var grid: Array = []  # 2D array of cells
 var mana_grid: Array = []  # 2D array of floats (mana amounts in empty spaces)
 var components: Array = []  # List of placed components
-var points: int = 0
+var points: float = 0.0
+var points_per_second: float = 0.0
+var points_last_frame: float = 0.0
 var selected_component_type: int = 0
 
 # Component types
@@ -60,7 +62,9 @@ func _init_grid():
 	grid.clear()
 	mana_grid.clear()
 	components.clear()
-	points = 0
+	points = 0.0
+	points_per_second = 0.0
+	points_last_frame = 0.0
 
 	for x in range(grid_size):
 		var col = []
@@ -74,6 +78,12 @@ func _init_grid():
 func _process(delta):
 	_simulate_mana(delta)
 	_process_components(delta)
+
+	# Calculate points rate (smoothed)
+	var current_rate = (points - points_last_frame) / delta
+	points_per_second = lerp(points_per_second, current_rate, 5.0 * delta)
+	points_last_frame = points
+
 	queue_redraw()
 
 func _simulate_mana(delta):
@@ -152,20 +162,21 @@ func _process_components(delta):
 				var available = mana_grid[target_pos.x][target_pos.y]
 				var consumed = min(available, comp.mana_consumption * delta)
 				mana_grid[target_pos.x][target_pos.y] -= consumed
-				points += int(consumed * 10)
+				points += consumed * 10.0
 
 			ComponentType.MANA_AMPLIFIER:
-				# Consume mana, output more mana (needs adjacent empty for output)
-				var available = mana_grid[target_pos.x][target_pos.y]
+				var back_dir = (comp.port_direction + 2) % 4
+				var back_offset = _get_port_offset(back_dir)
+				var back_pos = comp.grid_pos + back_offset
+				if back_pos.x < 0 or back_pos.x >= grid_size or back_pos.y < 0 or back_pos.y >= grid_size:
+					continue
+				if grid[back_pos.x][back_pos.y] != ComponentType.NONE:
+					continue
+				var available = mana_grid[back_pos.x][back_pos.y]
 				var consumed = min(available, comp.mana_consumption * delta)
-				mana_grid[target_pos.x][target_pos.y] -= consumed
-				# Output to opposite side
-				var output_dir = (comp.port_direction + 2) % 4
-				var output_offset = _get_port_offset(output_dir)
-				var output_pos = comp.grid_pos + output_offset
-				if output_pos.x >= 0 and output_pos.x < grid_size and output_pos.y >= 0 and output_pos.y < grid_size:
-					if grid[output_pos.x][output_pos.y] == ComponentType.NONE:
-						mana_grid[output_pos.x][output_pos.y] += consumed * 3.0
+				mana_grid[back_pos.x][back_pos.y] -= consumed
+				if grid[target_pos.x][target_pos.y] == ComponentType.NONE:
+					mana_grid[target_pos.x][target_pos.y] += consumed * 3.0
 
 func _get_grid_origin() -> Vector2:
 	var total_size = grid_size * cell_size
@@ -175,7 +186,7 @@ func _draw():
 	var origin = _get_grid_origin()
 
 	# Draw title and UI
-	draw_string(ThemeDB.fallback_font, Vector2(20, 30), "Mana Grid - Points: %d" % points, HORIZONTAL_ALIGNMENT_LEFT, -1, 24, Color.WHITE)
+	draw_string(ThemeDB.fallback_font, Vector2(20, 30), "Mana Grid - Points: %.0f  (+%.1f/s)" % [points, points_per_second], HORIZONTAL_ALIGNMENT_LEFT, -1, 24, Color.WHITE)
 
 	# Draw component selection
 	var comp_names = ["Empty", "Generator", "Converter", "Amplifier", "Wall"]
@@ -290,10 +301,12 @@ func _input(event):
 			KEY_4: selected_component_type = 3
 			KEY_5: selected_component_type = 4
 			KEY_R: placement_rotation = (placement_rotation + 1) % 4
-			KEY_SPACE: _init_grid()  # Reset
+			KEY_BACKSLASH: get_tree().reload_current_scene()
 
 func _place_component(pos: Vector2i):
+	# Empty mode removes components
 	if selected_component_type == ComponentType.NONE:
+		_remove_component(pos)
 		return
 
 	# Check if cell is already occupied
