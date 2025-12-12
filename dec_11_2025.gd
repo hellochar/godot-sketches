@@ -7,6 +7,24 @@ extends Control
 @export var mana_decay_rate: float = 0.01
 @export var overheat_threshold: float = 50.0
 
+@export_group("Component Stats")
+@export var generator_output: float = 2.0
+@export var converter_consumption: float = 1.0
+@export var converter_points_mult: float = 10.0
+@export var amplifier_consumption: float = 0.5
+@export var amplifier_mult: float = 3.0
+
+@export_group("VFX")
+@export var shake_intensity: float = 10.0
+@export var shake_decay: float = 3.0
+@export var flash_decay: float = 4.0
+@export var explosion_mana_remain: float = 0.5
+@export var particles_per_component: int = 8
+@export var particles_per_mana_cell: int = 3
+@export var particle_speed_min: float = 50.0
+@export var particle_speed_max: float = 300.0
+@export var particle_drag: float = 0.95
+
 # Game state
 var grid: Array = []  # 2D array of cells
 var mana_grid: Array = []  # 2D array of floats (mana amounts in empty spaces)
@@ -40,22 +58,12 @@ enum Direction {
 class Component:
   var type: int
   var grid_pos: Vector2i
-  var port_direction: int  # Direction the port faces
-  var mana_output: float = 0.0
-  var mana_consumption: float = 0.0
+  var port_direction: int
 
   func _init(t: int, pos: Vector2i, dir: int):
     type = t
     grid_pos = pos
     port_direction = dir
-    match type:
-      ComponentType.MANA_GENERATOR:
-        mana_output = 2.0
-      ComponentType.POINT_CONVERTER:
-        mana_consumption = 1.0
-      ComponentType.MANA_AMPLIFIER:
-        mana_consumption = 0.5
-        mana_output = 1.5
 
 # UI state
 var hovered_cell: Vector2i = Vector2i(-1, -1)
@@ -110,9 +118,9 @@ func _trigger_explosion():
   for comp in components:
     var cell_pos = origin + Vector2(comp.grid_pos.x * cell_size, comp.grid_pos.y * cell_size)
     var center = cell_pos + Vector2(cell_size / 2, cell_size / 2)
-    for i in range(8):
+    for i in range(particles_per_component):
       var angle = randf() * TAU
-      var speed = randf_range(100, 300)
+      var speed = randf_range(particle_speed_min * 2, particle_speed_max)
       explosion_particles.append({
         "pos": center,
         "vel": Vector2(cos(angle), sin(angle)) * speed,
@@ -125,9 +133,9 @@ func _trigger_explosion():
       if mana_grid[x][y] > 0.1:
         var cell_pos = origin + Vector2(x * cell_size, y * cell_size)
         var center = cell_pos + Vector2(cell_size / 2, cell_size / 2)
-        for i in range(3):
+        for i in range(particles_per_mana_cell):
           var angle = randf() * TAU
-          var speed = randf_range(50, 150)
+          var speed = randf_range(particle_speed_min, particle_speed_max * 0.5)
           explosion_particles.append({
             "pos": center,
             "vel": Vector2(cos(angle), sin(angle)) * speed,
@@ -141,19 +149,19 @@ func _trigger_explosion():
 
   for x in range(grid_size):
     for y in range(grid_size):
-      mana_grid[x][y] *= 0.5
+      mana_grid[x][y] *= explosion_mana_remain
 
   screen_shake = 1.0
   flash_alpha = 1.0
 
 func _update_vfx(delta):
-  screen_shake = max(0.0, screen_shake - delta * 3.0)
-  flash_alpha = max(0.0, flash_alpha - delta * 4.0)
+  screen_shake = max(0.0, screen_shake - delta * shake_decay)
+  flash_alpha = max(0.0, flash_alpha - delta * flash_decay)
 
   for i in range(explosion_particles.size() - 1, -1, -1):
     var p = explosion_particles[i]
     p.pos += p.vel * delta
-    p.vel *= 0.95
+    p.vel *= particle_drag
     p.life -= delta
     if p.life <= 0:
       explosion_particles.remove_at(i)
@@ -184,8 +192,6 @@ func _simulate_mana(delta):
         # Mana flows from high to low
         var diff = current_mana - neighbor_mana
         var flow = diff * mana_spread_rate * delta
-        if flow > diff / 2:
-          flow = diff / 2  # Prevent overshooting
         new_mana[x][y] -= flow
         new_mana[nx][ny] += flow
 
@@ -228,15 +234,13 @@ func _process_components(delta):
 
     match comp.type:
       ComponentType.MANA_GENERATOR:
-        # Output mana to the port direction
-        mana_grid[target_pos.x][target_pos.y] += comp.mana_output * delta
+        mana_grid[target_pos.x][target_pos.y] += generator_output * delta
 
       ComponentType.POINT_CONVERTER:
-        # Consume mana from port direction, generate points
         var available = mana_grid[target_pos.x][target_pos.y]
-        var consumed = min(available, comp.mana_consumption * delta)
+        var consumed = min(available, converter_consumption * delta)
         mana_grid[target_pos.x][target_pos.y] -= consumed
-        points += consumed * 10.0
+        points += consumed * converter_points_mult
 
       ComponentType.MANA_AMPLIFIER:
         var back_dir = (comp.port_direction + 2) % 4
@@ -247,17 +251,17 @@ func _process_components(delta):
         if grid[back_pos.x][back_pos.y] != ComponentType.NONE:
           continue
         var available = mana_grid[back_pos.x][back_pos.y]
-        var consumed = min(available, comp.mana_consumption * delta)
+        var consumed = min(available, amplifier_consumption * delta)
         mana_grid[back_pos.x][back_pos.y] -= consumed
         if grid[target_pos.x][target_pos.y] == ComponentType.NONE:
-          mana_grid[target_pos.x][target_pos.y] += consumed * 3.0
+          mana_grid[target_pos.x][target_pos.y] += consumed * amplifier_mult
 
 func _get_grid_origin() -> Vector2:
   var total_size = grid_size * cell_size
   return (size - Vector2(total_size, total_size)) / 2 + Vector2(0, 40)
 
 func _draw():
-  var shake_offset = Vector2(randf_range(-1, 1), randf_range(-1, 1)) * screen_shake * 10.0
+  var shake_offset = Vector2(randf_range(-1, 1), randf_range(-1, 1)) * screen_shake * shake_intensity
   var origin = _get_grid_origin() + shake_offset
 
   var total_mana = _get_total_mana()
