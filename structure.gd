@@ -28,7 +28,7 @@ static func generate_random_transformer_sametier(in_tier: Item.ETier) -> Structu
     structure.ingredients[res] = 1 # randi_range(1, 2)
     sum_ingredients += structure.ingredients[res]
   var rand_advanced: Item = ItemLibrary.get_by_tier(in_tier).pick_random()
-  structure.production[rand_advanced] = 1
+  structure.production[rand_advanced] = sum_ingredients
   structure.production_time = 1 # randi_range(2, 4)
   structure.workers_needed = 2 # randi_range(1, 2)
   structure.autoset_name_override()
@@ -56,18 +56,18 @@ static func generate_random_upgrader(base_tier: Item.ETier, upgraded_tier: Item.
 
 func autoset_name_override() -> void:
   if ingredients.size() > 0:
-    name_override = "Transformer"
+    name_override = " " #"Transformer"
   else:
     name_override = "Producer"
 
 func describe() -> String:
   var out := ""
   if ingredients.size() > 0:
-    out += "Converts "
+    out += ""
     for res in ingredients.keys():
-      out += "%d %s, " % [ingredients[res], res.name]
-    out = out.substr(0, out.length() - 2)
-    out += " into "
+      out += "%d %s + " % [ingredients[res], res.name]
+    out = out.substr(0, out.length() - 3)
+    out += " ️→ "
   else:
     out += "+"
   
