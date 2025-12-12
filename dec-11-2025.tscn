@@ -11,3 +11,4 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ulu0a")
 mana_spread_rate = 1.0
+mana_decay_rate = 1.0
