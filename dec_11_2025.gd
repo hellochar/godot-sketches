@@ -14,6 +14,10 @@ extends Control
 @export var amplifier_consumption: float = 0.5
 @export var amplifier_mult: float = 3.0
 
+@export_group("Visuals")
+@export var mana_gradient: Gradient
+@export var mana_color_scale: float = 10.0
+
 @export_group("VFX")
 @export var shake_intensity: float = 10.0
 @export var shake_decay: float = 3.0
@@ -287,9 +291,12 @@ func _draw():
     for y in range(grid_size):
       var cell_rect = Rect2(origin + Vector2(x * cell_size, y * cell_size), Vector2(cell_size, cell_size))
 
-      # Background based on mana level
       var mana_level = mana_grid[x][y]
-      var bg_color = Color(0.1, 0.1, 0.3 + min(mana_level * 0.1, 0.5))
+      var bg_color: Color
+      if mana_gradient:
+        bg_color = mana_gradient.sample(clamp(mana_level / mana_color_scale, 0.0, 1.0))
+      else:
+        bg_color = Color(0.1, 0.1, 0.3 + min(mana_level * 0.1, 0.5))
       draw_rect(cell_rect, bg_color)
 
       # Draw mana amount if empty
