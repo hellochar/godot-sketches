@@ -5,6 +5,7 @@ extends Control
 @export var cell_size: float = 80.0
 @export var mana_spread_rate: float = 0.1
 @export var mana_decay_rate: float = 0.01
+@export var overheat_threshold: float = 50.0
 
 # Game state
 var grid: Array = []  # 2D array of cells
@@ -14,6 +15,11 @@ var points: float = 0.0
 var points_per_second: float = 0.0
 var points_last_frame: float = 0.0
 var selected_component_type: int = 0
+
+# VFX state
+var screen_shake: float = 0.0
+var flash_alpha: float = 0.0
+var explosion_particles: Array = []
 
 # Component types
 enum ComponentType {
@@ -78,13 +84,79 @@ func _init_grid():
 func _process(delta):
 	_simulate_mana(delta)
 	_process_components(delta)
+	_check_overheat()
+	_update_vfx(delta)
 
-	# Calculate points rate (smoothed)
 	var current_rate = (points - points_last_frame) / delta
 	points_per_second = lerp(points_per_second, current_rate, 5.0 * delta)
 	points_last_frame = points
 
 	queue_redraw()
+
+func _get_total_mana() -> float:
+	var total: float = 0.0
+	for x in range(grid_size):
+		for y in range(grid_size):
+			total += mana_grid[x][y]
+	return total
+
+func _check_overheat():
+	if _get_total_mana() >= overheat_threshold:
+		_trigger_explosion()
+
+func _trigger_explosion():
+	var origin = _get_grid_origin()
+
+	for comp in components:
+		var cell_pos = origin + Vector2(comp.grid_pos.x * cell_size, comp.grid_pos.y * cell_size)
+		var center = cell_pos + Vector2(cell_size / 2, cell_size / 2)
+		for i in range(8):
+			var angle = randf() * TAU
+			var speed = randf_range(100, 300)
+			explosion_particles.append({
+				"pos": center,
+				"vel": Vector2(cos(angle), sin(angle)) * speed,
+				"life": 1.0,
+				"color": Color.ORANGE
+			})
+
+	for x in range(grid_size):
+		for y in range(grid_size):
+			if mana_grid[x][y] > 0.1:
+				var cell_pos = origin + Vector2(x * cell_size, y * cell_size)
+				var center = cell_pos + Vector2(cell_size / 2, cell_size / 2)
+				for i in range(3):
+					var angle = randf() * TAU
+					var speed = randf_range(50, 150)
+					explosion_particles.append({
+						"pos": center,
+						"vel": Vector2(cos(angle), sin(angle)) * speed,
+						"life": 0.8,
+						"color": Color.CYAN
+					})
+
+	for comp in components:
+		grid[comp.grid_pos.x][comp.grid_pos.y] = ComponentType.NONE
+	components.clear()
+
+	for x in range(grid_size):
+		for y in range(grid_size):
+			mana_grid[x][y] *= 0.5
+
+	screen_shake = 1.0
+	flash_alpha = 1.0
+
+func _update_vfx(delta):
+	screen_shake = max(0.0, screen_shake - delta * 3.0)
+	flash_alpha = max(0.0, flash_alpha - delta * 4.0)
+
+	for i in range(explosion_particles.size() - 1, -1, -1):
+		var p = explosion_particles[i]
+		p.pos += p.vel * delta
+		p.vel *= 0.95
+		p.life -= delta
+		if p.life <= 0:
+			explosion_particles.remove_at(i)
 
 func _simulate_mana(delta):
 	# Create a copy for calculations
@@ -112,6 +184,8 @@ func _simulate_mana(delta):
 				# Mana flows from high to low
 				var diff = current_mana - neighbor_mana
 				var flow = diff * mana_spread_rate * delta
+				if flow > diff / 2:
+					flow = diff / 2  # Prevent overshooting
 				new_mana[x][y] -= flow
 				new_mana[nx][ny] += flow
 
@@ -183,10 +257,14 @@ func _get_grid_origin() -> Vector2:
 	return (size - Vector2(total_size, total_size)) / 2 + Vector2(0, 40)
 
 func _draw():
-	var origin = _get_grid_origin()
+	var shake_offset = Vector2(randf_range(-1, 1), randf_range(-1, 1)) * screen_shake * 10.0
+	var origin = _get_grid_origin() + shake_offset
 
-	# Draw title and UI
-	draw_string(ThemeDB.fallback_font, Vector2(20, 30), "Mana Grid - Points: %.0f  (+%.1f/s)" % [points, points_per_second], HORIZONTAL_ALIGNMENT_LEFT, -1, 24, Color.WHITE)
+	var total_mana = _get_total_mana()
+	var mana_ratio = total_mana / overheat_threshold
+	var mana_color = Color.WHITE.lerp(Color.RED, clamp(mana_ratio, 0, 1))
+
+	draw_string(ThemeDB.fallback_font, Vector2(20, 30), "Points: %.0f  (+%.1f/s)  |  Mana: %.1f / %.0f" % [points, points_per_second, total_mana, overheat_threshold], HORIZONTAL_ALIGNMENT_LEFT, -1, 24, mana_color)
 
 	# Draw component selection
 	var comp_names = ["Empty", "Generator", "Converter", "Amplifier", "Wall"]
@@ -225,6 +303,17 @@ func _draw():
 	# Draw components
 	for comp in components:
 		_draw_component(comp, origin)
+
+	# Draw particles
+	for p in explosion_particles:
+		var alpha = p.life
+		var particle_color = p.color
+		particle_color.a = alpha
+		draw_circle(p.pos + shake_offset, 4 + (1.0 - alpha) * 6, particle_color)
+
+	# Draw flash overlay
+	if flash_alpha > 0:
+		draw_rect(Rect2(Vector2.ZERO, size), Color(1, 1, 1, flash_alpha * 0.5))
 
 func _draw_component(comp: Component, origin: Vector2):
 	var cell_pos = origin + Vector2(comp.grid_pos.x * cell_size, comp.grid_pos.y * cell_size)
