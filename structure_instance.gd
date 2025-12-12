@@ -3,20 +3,32 @@ class_name StructureInstance
 
 var type: Structure
 var production_timer: int = 0
-var is_working: bool = false
+var workers_assigned: int = 0
+
+var is_working: bool:
+  get:
+    return workers_assigned >= type.workers_needed
 
 var inventory: World.Inventory:
   get:
     return World.main.inventory
 
 func render() -> void:
-  text = "%s\n" % type.description
+  text = "%s " % type.description
   if !is_working:
-    text += "[color=red]No workers assigned[/color]\n"
+    text += "[color=red]Need %d workers[/color]" % (type.workers_needed - workers_assigned)
   elif !can_produce():
-    text += "[color=red]Waiting for ingredients...[/color]\n"
+    var missing: Array[String] = []
+    for res in type.ingredients.keys():
+      var have = inventory.dict.get(res, 0)
+      var need = type.ingredients[res]
+      if have < need:
+        missing.append("%d %s" % [need - have, res.name])
+    text += "[color=red]Need %s[/color]" % ", ".join(missing)
   else:
-    text += "[color=green]Producing...[/color] %d / %d\n" % [production_timer, type.production_time]
+    text += "[color=green]Producing...[/color]"
+    if type.production_time > 1:
+      text += " %d / %d" % [production_timer, type.production_time]
 
 func _process(delta: float) -> void:
   render()

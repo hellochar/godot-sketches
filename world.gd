@@ -44,6 +44,7 @@ func _ready() -> void:
     %BlueprintsUI.set_inventory(blueprints)
 
   _process(0)
+  create_reward()
 
 func tick(ticks: int) -> void:
   assign_workers()
@@ -52,10 +53,11 @@ func tick(ticks: int) -> void:
     structure_instance.tick(ticks)
   
   turn_count += ticks
-  # if turn_count % 5 == 0:
-  #   create_reward()
+  if turn_count % 5 == 0:
+    create_reward()
 
 func _process(delta: float) -> void:
+  %TurnCounter.text = "Turn: %d" % turn_count
   %MainInventory.text = inventory._to_string()
   %Blueprints.text = blueprints._to_string()
   if %InventoryUI:
@@ -93,16 +95,18 @@ func assign_workers() -> void:
   for structure_instance in board:
     var needed = structure_instance.type.workers_needed
     if available_peasants >= needed:
-      structure_instance.is_working = true
+      structure_instance.workers_assigned = needed
       available_peasants -= needed
     else:
-      structure_instance.is_working = false
+      structure_instance.workers_assigned = available_peasants
+      available_peasants = 0
 
 func place(structure: Structure) -> void:
   var instance := STRUCTURE_INSTANCE.instantiate()
   instance.type = structure
   %StructuresContainer.add_child(instance)
   board.append(instance)
+  assign_workers()
 
 func create_reward() -> void:
   reward_inventory.dict.clear()

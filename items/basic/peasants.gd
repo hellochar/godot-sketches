@@ -9,7 +9,23 @@ const STONE = preload("res://items/basic/stone.tres")
 const WOOD = preload("res://items/basic/wood.tres")
 const LIVESTOCK = preload("res://items/basic/livestock.tres")
 
-func tick(inventory: World.Inventory, peasants: int, ticks: int) -> Dictionary[Item, int]:
+func tick(inventory: World.Inventory, amount: int, ticks: int) -> Dictionary[Item, int]:
+  var changes: Dictionary[Item, int] = {}
+  # iteration 2: eat one food per five peasants. Gain 1 peasant if fully fed.
+  # Lose 1 peasant if not.
+  
+  var food = inventory.num(FOOD)
+  var peasants = inventory.num(self as Item)
+  var food_needed = int(ceil(peasants / 5.0))
+  changes[FOOD] = -food_needed
+  if food >= food_needed:
+    changes[self as Item] = 1
+  else:
+    changes[self as Item] = -1
+    changes[BONES] = 1
+  return changes
+
+func tickv1(inventory: World.Inventory, peasants: int, ticks: int) -> Dictionary[Item, int]:
   # separate peasants into housed and unhoused:
   # housed = min(peasants, huts * 2)
   # unhoused = peasants - housed

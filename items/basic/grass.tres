@@ -11,6 +11,6 @@ region = Rect2(696, 368, 288, 288)
 
 [resource]
 script = ExtResource("1_xenjs")
-description = "Every 5 grass produces 1 food and 1 grass."
+description = "Every 10 grass produces 1 grass."
 icon = SubResource("AtlasTexture_8w5dt")
 metadata/_custom_type_script = "uid://cdhbuu2d1xlss"
