@@ -19,7 +19,7 @@ var game_state: EGameState = EGameState.AtHome
 var player: Unit
 var homebase_inventory: World.Inventory = World.Inventory.new(15, "Homebase", 10)
 
-var adventuring_inventory: World.Inventory = World.Inventory.new(5, "Backpack", 7)
+var backpack: World.Inventory = World.Inventory.new(30, "Backpack", 7)
 
 var wilderness: World.Inventory = World.Inventory.new(-1, "Wilderness")
 var adventure_depth: int = 0
@@ -31,16 +31,51 @@ func on_enemies_defeated() -> void:
 
 func _ready() -> void:
   main = self
+  player = Unit.new()
+  player.name_override = "Player"
+  player.base_max_health = 50
+  player.health = player.base_max_health
+
   %PlayerCard.set_item(player, 1)
   %HomebaseInventory.set_inventory(homebase_inventory)
-  %AdventuringInventory.set_inventory(adventuring_inventory)
+  %AdventuringInventory.set_inventory(backpack)
+  homebase_inventory.add(Armor.new(5), 1)
+  homebase_inventory.add(Food.new(2), 1)
+  homebase_inventory.add(Food.new(2), 1)
+  backpack.add(Attack.new(6), 30)
 
-func _on_go_home_pressed() -> void:
-  # transfer all items from current inventory to homebase
-  homebase_inventory.take_all_from(adventuring_inventory)
+func begin_adventure() -> void:
+  game_state = EGameState.Adventuring
+  # backpack.take_from(homebase_inventory, PortalHome.new(), 1)
+  start_depth(1)
+
+func start_depth(depth: int) -> void:
+  adventure_depth = depth
+  # generate some enemies
+  var enemy_count = 2 + adventure_depth
+  for i in range(enemy_count):
+    var enemy = Enemy.new()
+    enemy.name_override = "Goblin Lv.%d" % adventure_depth
+    enemy.base_max_health = 10 + adventure_depth * 5
+    enemy.health = enemy.base_max_health
+    enemy.damage_min = 2 + adventure_depth
+    enemy.damage_max = 4 + adventure_depth * 2
+    wilderness.add(enemy, 1)
+
+func go_home() -> void:
+  game_state = EGameState.AtHome
+  homebase_inventory.take_all_from(backpack)
   wilderness.clear()
+  adventure_depth = 0
+
+func is_in_danger() -> bool:
+  for item in wilderness.dict.keys():
+    if item is Enemy:
+      return true
+  return false
 
 func _process(delta: float) -> void:
+  player.description = "HP: %d/%d" % [player.health, player.max_health]
   refresh_ui()
 
 func refresh_ui() -> void:
@@ -50,13 +85,14 @@ func refresh_ui() -> void:
   if game_state == EGameState.AtHome:
     %HomebaseInventory.visible = true
     %AdventuringInventory.visible = true
-    %BeginAdventureButton.visible = true
+    %BeginAdventure.visible = true
     %AdventurePanel.visible = false
   else:
     %HomebaseInventory.visible = false
     %AdventuringInventory.visible = true
-    %BeginAdventureButton.visible = false
+    %BeginAdventure.visible = false
     %AdventurePanel.visible = true
+  %GoDeeper.visible = not is_in_danger()
 
 class Attack extends Item:
   @export var damage: int
@@ -72,6 +108,7 @@ class Attack extends Item:
     ).front() as Enemy
     if first_enemy:
       first_enemy.take_damage(damage)
+    # inventory.remove(self, 1)
 
 class Defend extends Item:
   @export var block: int
@@ -85,7 +122,14 @@ class Defend extends Item:
 
 class Unit extends Item:
   var health: int
-  var max_health: int
+  var base_max_health: int
+  var max_health: int:
+    get:
+      var bonus = 0
+      for item in Dec_14_2025.main.backpack.dict.keys():
+        if item is Armor:
+          bonus += item.hp_bonus * Dec_14_2025.main.backpack.dict[item]
+      return base_max_health + bonus
   var damage_min: int
   var damage_max: int
 
@@ -109,6 +153,12 @@ class Enemy extends Unit:
   func _init() -> void:
     name_override = "Enemy"
     description = "Attacks for %d-%d damage." % [damage_min, damage_max]
+  
+  func attack_player() -> void:
+    if Dec_14_2025.main.player:
+      var dmg = randi() % (damage_max - damage_min + 1) + damage_min
+      Dec_14_2025.main.player.health -= dmg
+      print("%s attacks Player for %d damage!" % [name, dmg])
 
   func die() -> void:
     super.die()
@@ -118,6 +168,8 @@ class Enemy extends Unit:
       )
       if basic_items.size() > 0:
         Dec_14_2025.main.wilderness.add(basic_items.pick_random(), 1)
+    if not Dec_14_2025.main.is_in_danger():
+      Dec_14_2025.main.on_enemies_defeated()
 
   func tick(inventory: World.Inventory, amount: int, ticks: int) -> Dictionary[Item, int]:
     # attack player
@@ -133,7 +185,34 @@ class PortalHome extends Item:
     description = "Use to return home safely."
 
   func use(_inventory: World.Inventory, _amount: int) -> void:
-    Dec_14_2025.main.game_state = Dec_14_2025.EGameState.AtHome
-    Dec_14_2025.main.homebase_inventory.take_all_from(Dec_14_2025.main.adventuring_inventory)
-    Dec_14_2025.main.wilderness.clear()
-    Dec_14_2025.main.adventure_depth = 0
+    Dec_14_2025.main.go_home()
+
+class Armor extends Item:
+  var hp_bonus: int
+
+  func _init(_hp_bonus: int = 10) -> void:
+    hp_bonus = _hp_bonus
+    name_override = "Armor +%d" % hp_bonus
+    description = "+%d max HP while in backpack." % hp_bonus
+
+class Food extends Item:
+  var heal_amount: int
+
+  func _init(_heal_amount: int = 5) -> void:
+    heal_amount = _heal_amount
+    # name_override = "Food +%d" % heal_amount
+    if heal_amount < 3:
+      name_override = "Berry"
+    elif heal_amount < 7:
+      name_override = "Meat"
+    else:
+      name_override = "Food +%d" % heal_amount
+    description = "Heals %d HP." % heal_amount
+
+  func use(_inventory: World.Inventory, _amount: int) -> void:
+    if Dec_14_2025.main.player:
+      Dec_14_2025.main.player.health = mini(
+        Dec_14_2025.main.player.health + heal_amount,
+        Dec_14_2025.main.player.max_health
+      )
+      _inventory.remove(self, 1)
