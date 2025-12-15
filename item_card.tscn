@@ -82,3 +82,9 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "x10"
 horizontal_alignment = 2
+
+[node name="UseButton" type="Button" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Use"

@@ -7,14 +7,31 @@ class_name ItemCard
 @onready var tags_label: Label = %Tags
 @onready var description_label: Label = %Description
 @onready var amount_label: Label = %Amount
+@onready var use_button: Button = %UseButton
 
 var item: Item
 var amount: int = 0
+var source_inventory: World.Inventory
+
+func _get_drag_data(_pos: Vector2) -> Variant:
+  if not item or not source_inventory:
+    return null
+  var preview = duplicate(0)
+  preview.modulate.a = 0.7
+  set_drag_preview(preview)
+  return {"item": item, "amount": amount, "source": source_inventory}
+
+func _ready() -> void:
+  use_button.pressed.connect(_on_use_pressed)
 
 func set_item(new_item: Item, new_amount: int = 0) -> void:
   item = new_item
   amount = new_amount
   refresh()
+
+func _on_use_pressed() -> void:
+  if item and item.usable:
+    item.use(source_inventory, amount)
 
 func _process(delta: float) -> void:
   refresh()
@@ -55,3 +72,5 @@ func refresh() -> void:
     icon_rect.show()
   else:
     icon_rect.hide()
+
+  use_button.visible = item.usable
