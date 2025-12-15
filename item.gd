@@ -35,5 +35,9 @@ enum ETag {
 @export var tier: ETier
 @export var tags: Array[ETag] = []
 
+@export var usable: bool:
+  get:
+    return has_method("use")
+
 func tick(inventory: World.Inventory, amount: int, ticks: int) -> Dictionary[Item, int]:
   return {}
