@@ -8,13 +8,23 @@ const ITEM_CARD = preload("res://item_card.tscn")
 
 var inventory: World.Inventory
 
+var needs_refresh: bool = false
+
 func set_inventory(inv: World.Inventory) -> void:
   inventory = inv
   if title_label:
     title_label.text = inventory.name
+  inv.on_changed.connect(func() -> void:
+    needs_refresh = true
+  )
   refresh()
 
+func _process(_delta: float) -> void:
+  if needs_refresh:
+    refresh()
+
 func refresh() -> void:
+  needs_refresh = false
   if not cards_container:
     return
   
