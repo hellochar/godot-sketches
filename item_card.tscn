@@ -88,3 +88,9 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 text = "Use"
+
+[node name="PickupButton" type="Button" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Pick Up"

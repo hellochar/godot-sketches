@@ -39,5 +39,7 @@ enum ETag {
   get:
     return has_method("use")
 
+@export var pickupable: bool = true
+
 func tick(inventory: World.Inventory, amount: int, ticks: int) -> Dictionary[Item, int]:
   return {}
