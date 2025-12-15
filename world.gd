@@ -160,13 +160,18 @@ class Inventory:
   var dict: Dictionary[Item, int] = {} # Resource and its amount
   var cap: int
   var prefix: bool = false
+  var max_entries: int = -1
+  signal on_changed()
 
-  func _init(_cap: int, _name: String = "Inventory") -> void:
+  func _init(_cap: int, _name: String = "Inventory", _max_entries: int = -1) -> void:
     cap = _cap
     name = _name
+    max_entries = _max_entries
 
   func _to_string() -> String:
     var out := name
+    if max_entries != -1:
+      out += "%d/%d" % [dict.size(), max_entries]
     if cap > 1:
       out += " (cap %d)" % cap
     out += "\n"
@@ -188,14 +193,22 @@ class Inventory:
       World.dict_add_all(total_diff, diff)
     add_all(total_diff)
 
-  func add(item: Item, amount: int) -> void:
+  # return how much was actually added
+  func add(item: Item, amount: int) -> int:
+    var prev := num(item)
     var new_value = num(item) + amount
+    
+    if max_entries != -1 and not dict.has(item) and dict.size() >= max_entries:
+      return num(item) - prev
+    
     if cap == -1:
       dict[item] = max(new_value, 0)
     else:
       dict[item] = clamp(new_value, 0, cap)
     if dict[item] == 0:
       dict.erase(item)
+    on_changed.emit()
+    return num(item) - prev
   
   func add_all(other: Variant) -> void:
     var other_dict: Dictionary[Item, int]
@@ -205,6 +218,17 @@ class Inventory:
       other_dict = other.dict
     for item in other_dict.keys():
       add(item, other_dict[item])
+
+  func take_from(other: Inventory, item: Item, amount: int) -> void:
+    var available = other.num(item)
+    var to_take = min(available, amount)
+    var added := add(item, to_take)
+    other.remove(item, added)
+  
+  func take_all_from(other: Inventory) -> void:
+    var other_dict = other.dict
+    for item in other_dict.keys():
+      take_from(other, item, other_dict[item])
   
   func num(item: Item) -> int:
     return dict.get(item, 0)

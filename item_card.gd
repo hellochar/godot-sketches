@@ -16,6 +16,9 @@ func set_item(new_item: Item, new_amount: int = 0) -> void:
   amount = new_amount
   refresh()
 
+func _process(delta: float) -> void:
+  refresh()
+
 func refresh() -> void:
   if not item:
     return
