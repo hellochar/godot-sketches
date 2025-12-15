@@ -2,7 +2,7 @@ extends VBoxContainer
 class_name InventoryUI
 
 @onready var title_label: Label = %Title
-@onready var cards_container: GridContainer = %CardsContainer
+@onready var cards_container: FlowContainer = %CardsContainer
 
 const ITEM_CARD = preload("res://item_card.tscn")
 

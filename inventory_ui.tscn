@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dql4rkolmq8ud"]
 
-[ext_resource type="Script" path="res://inventory_ui.gd" id="1_invui"]
+[ext_resource type="Script" uid="uid://bn5ivjy7vrw5c" path="res://inventory_ui.gd" id="1_invui"]
 
 [node name="InventoryUI" type="VBoxContainer"]
 offset_right = 600.0
@@ -21,10 +21,9 @@ layout_mode = 2
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="CardsContainer" type="GridContainer" parent="ScrollContainer"]
+[node name="CardsContainer" type="FlowContainer" parent="ScrollContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/h_separation = 10
 theme_override_constants/v_separation = 10
-columns = 3
