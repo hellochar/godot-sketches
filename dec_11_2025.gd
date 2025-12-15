@@ -3,8 +3,8 @@ extends Control
 # Configuration
 @export var grid_size: int = 5
 @export var cell_size: float = 80.0
-@export var mana_spread_rate: float = 0.1
-@export var mana_constant_flow: float = 0.5
+@export var wave_stiffness: float = 50.0
+@export var wave_damping: float = 0.5
 @export var mana_decay_rate: float = 0.01
 @export var simulations_per_tick: int = 5
 @export var overheat_threshold: float = 50.0
@@ -35,7 +35,8 @@ extends Control
 
 # Game state
 var grid: Array = []  # 2D array of cells
-var mana_grid: Array = []  # 2D array of floats (mana amounts in empty spaces)
+var mana_grid: Array = []  # 2D array of floats (mana amount / displacement)
+var velocity_grid: Array = []  # 2D array of floats (mana velocity)
 var components: Array = []  # List of placed components
 var points: float = 0.0
 var points_per_second: float = 0.0
@@ -85,6 +86,7 @@ func _ready():
 func _init_grid():
   grid.clear()
   mana_grid.clear()
+  velocity_grid.clear()
   components.clear()
   points = 0.0
   points_per_second = 0.0
@@ -93,11 +95,14 @@ func _init_grid():
   for x in range(grid_size):
     var col = []
     var mana_col = []
+    var vel_col = []
     for y in range(grid_size):
       col.append(ComponentType.NONE)
       mana_col.append(0.0)
+      vel_col.append(0.0)
     grid.append(col)
     mana_grid.append(mana_col)
+    velocity_grid.append(vel_col)
 
 func _process(delta):
   for i in range(simulations_per_tick):
@@ -116,7 +121,7 @@ func _get_total_mana() -> float:
   var total: float = 0.0
   for x in range(grid_size):
     for y in range(grid_size):
-      total += mana_grid[x][y]
+      total += abs(mana_grid[x][y])
   return total
 
 func _check_overheat():
@@ -161,6 +166,7 @@ func _trigger_explosion():
   for x in range(grid_size):
     for y in range(grid_size):
       mana_grid[x][y] *= explosion_mana_remain
+      velocity_grid[x][y] = 0.0
 
   screen_shake = 1.0
   flash_alpha = 1.0
@@ -178,42 +184,45 @@ func _update_vfx(delta):
       explosion_particles.remove_at(i)
 
 func _simulate_mana(delta):
-  # Create a copy for calculations
-  var new_mana: Array = []
+  # Step 1: Compute acceleration for each cell
+  var accel: Array = []
   for x in range(grid_size):
     var col = []
     for y in range(grid_size):
-      col.append(mana_grid[x][y])
-    new_mana.append(col)
+      col.append(0.0)
+    accel.append(col)
 
-  # Spread mana between adjacent empty cells
   for x in range(grid_size):
     for y in range(grid_size):
       if grid[x][y] != ComponentType.NONE:
-        continue  # Skip cells with components
+        continue
 
-      var current_mana = mana_grid[x][y]
+      var current = mana_grid[x][y]
+      var current_vel = velocity_grid[x][y]
       var neighbors = _get_empty_neighbors(x, y)
 
+      if neighbors.size() == 0:
+        continue
+
+      var neighbor_sum = 0.0
       for neighbor in neighbors:
-        var nx = neighbor.x
-        var ny = neighbor.y
-        var neighbor_mana = mana_grid[nx][ny]
+        neighbor_sum += mana_grid[neighbor.x][neighbor.y]
+      var neighbor_avg = neighbor_sum / neighbors.size()
 
-        var diff = current_mana - neighbor_mana
-        if diff <= 0:
-          continue
-        var proportional_flow = diff * mana_spread_rate * delta
-        var constant_flow = mana_constant_flow * delta
-        var total_flow = proportional_flow + constant_flow
-        total_flow = min(total_flow, diff * 0.5)
-        new_mana[x][y] -= total_flow
-        new_mana[nx][ny] += total_flow
+      var spring_force = wave_stiffness * (neighbor_avg - current)
+      var damping_force = -wave_damping * current_vel
+      accel[x][y] = spring_force + damping_force
 
-      # Apply decay
-      new_mana[x][y] = max(0.0, new_mana[x][y] - mana_decay_rate * delta)
+  # Step 2: Apply acceleration to velocity, velocity to position (semi-implicit Euler)
+  for x in range(grid_size):
+    for y in range(grid_size):
+      if grid[x][y] != ComponentType.NONE:
+        continue
 
-  mana_grid = new_mana
+      velocity_grid[x][y] += accel[x][y] * delta
+      mana_grid[x][y] += velocity_grid[x][y] * delta
+
+      velocity_grid[x][y] -= velocity_grid[x][y] * mana_decay_rate * delta
 
 func _get_empty_neighbors(x: int, y: int) -> Array:
   var neighbors = []
@@ -308,16 +317,18 @@ func _draw():
       var cell_rect = Rect2(origin + Vector2(x * cell_size, y * cell_size), Vector2(cell_size, cell_size))
 
       var mana_level = mana_grid[x][y]
+      var mana_abs = abs(mana_level)
       var bg_color: Color
       if mana_gradient:
-        bg_color = mana_gradient.sample(clamp(mana_level / mana_color_scale, 0.0, 1.0))
+        bg_color = mana_gradient.sample(clamp(mana_abs / mana_color_scale, 0.0, 1.0))
       else:
-        bg_color = Color(0.1, 0.1, 0.3 + min(mana_level * 0.1, 0.5))
+        bg_color = Color(0.1, 0.1, 0.3 + min(mana_abs * 0.1, 0.5))
+      if mana_level < 0:
+        bg_color = bg_color.lerp(Color.RED, 0.3)
       draw_rect(cell_rect, bg_color)
 
-      # Draw mana amount if empty
       if grid[x][y] == ComponentType.NONE:
-        if mana_level > 0.01:
+        if mana_abs > 0.01:
           draw_string(ThemeDB.fallback_font, cell_rect.position + Vector2(5, 50), "%.1f" % mana_level, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(0.5, 0.5, 1.0))
 
       # Grid lines
