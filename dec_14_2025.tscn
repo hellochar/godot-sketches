@@ -94,6 +94,6 @@ layout_mode = 2
 size_flags_vertical = 8
 text = "Go Deeper"
 
-[connection signal="pressed" from="HBoxContainer/BeginAdventure" to="." method="_on_go_home_pressed"]
-[connection signal="pressed" from="HBoxContainer/AdventurePanel/BoxContainer/GoHome" to="." method="_on_go_home_pressed"]
-[connection signal="pressed" from="HBoxContainer/AdventurePanel/BoxContainer/GoDeeper" to="." method="_on_go_home_pressed"]
+[connection signal="pressed" from="HBoxContainer/BeginAdventure" to="." method="begin_adventure"]
+[connection signal="pressed" from="HBoxContainer/AdventurePanel/BoxContainer/GoHome" to="." method="go_home"]
+[connection signal="pressed" from="HBoxContainer/AdventurePanel/BoxContainer/GoDeeper" to="." method="go_deeper"]
