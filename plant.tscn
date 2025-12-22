@@ -25,3 +25,5 @@ position = Vector2(8, 8)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
 shape = SubResource("CircleShape2D_4oa58")
+
+[connection signal="interacted" from="Area2D" to="." method="harvest"]
