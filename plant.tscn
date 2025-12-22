@@ -1,13 +1,27 @@
-[gd_scene load_steps=4 format=3 uid="uid://c8l4s74n3ubwu"]
+[gd_scene load_steps=6 format=3 uid="uid://c8l4s74n3ubwu"]
 
-[ext_resource type="Texture2D" uid="uid://d1o8wghdifppx" path="res://assets/pr4nta_pixelascii.png" id="1_mbetm"]
 [ext_resource type="Script" uid="uid://c2m6k7ksedx3g" path="res://plant.gd" id="1_plant"]
+[ext_resource type="Texture2D" uid="uid://b5lgiyo7wu2qk" path="res://assets/plant.png" id="2_4oa58"]
+[ext_resource type="Script" uid="uid://d03r0a2gs15ra" path="res://interactable.gd" id="3_qljma"]
+[ext_resource type="Material" uid="uid://bc64ytr0g15uo" path="res://outline_shader_material.tres" id="4_4oa58"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_qljma"]
-atlas = ExtResource("1_mbetm")
-region = Rect2(144, 32, 16, 16)
+[sub_resource type="CircleShape2D" id="CircleShape2D_4oa58"]
+radius = 4.0
 
 [node name="Plant" type="Sprite2D"]
-texture = SubResource("AtlasTexture_qljma")
+texture = ExtResource("2_4oa58")
 centered = false
 script = ExtResource("1_plant")
+
+[node name="Area2D" type="Area2D" parent="."]
+position = Vector2(8, 8)
+script = ExtResource("3_qljma")
+interaction_radius = 26.0
+target_sprite = NodePath("..")
+highlight_shader = ExtResource("4_4oa58")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2(8, 8)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource("CircleShape2D_4oa58")
