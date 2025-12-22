@@ -50,6 +50,7 @@ grow_vertical = 2
 script = ExtResource("1_0okp5")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
+visible = false
 color = Color(0.07088823, 0.071998216, 0.083354495, 1)
 
 [node name="GroundLayer" type="TileMapLayer" parent="."]
@@ -134,6 +135,7 @@ sprite_frames = SubResource("SpriteFrames_7we1r")
 shape = SubResource("CircleShape2D_ui3wy")
 
 [node name="PointLight2D" type="PointLight2D" parent="Player"]
+visible = false
 blend_mode = 2
 shadow_enabled = true
 shadow_filter = 1
