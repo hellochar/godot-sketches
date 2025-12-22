@@ -4,6 +4,9 @@ extends CharacterBody2D
 
 @export var plants: int = 0
 
+func add_plants(amount: int) -> void:
+  plants += amount
+
 func _physics_process(delta):
   var direction = Vector2.ZERO
   

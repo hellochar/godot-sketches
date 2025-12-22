@@ -45,4 +45,7 @@ func spawn_at(pos: Vector2i) -> void:
   multiplied.emit(new_plant)
 
 func harvest() -> void:
+  var player = get_tree().get_first_node_in_group("player")
+  if player and player.has_method("add_plants"):
+    player.add_plants(1)
   queue_free()
