@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=4 uid="uid://dtogs63iitiv8"]
+[gd_scene load_steps=14 format=4 uid="uid://dtogs63iitiv8"]
 
 [ext_resource type="Script" uid="uid://dvrktk3sifnl0" path="res://dec_21_2025.gd" id="1_0okp5"]
 [ext_resource type="TileSet" uid="uid://l77dh6fyg31k" path="res://tileset_pr4nta_pixelascii.tres" id="2_ampl0"]
@@ -26,6 +26,17 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_ui3wy"]
 radius = 6.0
 
+[sub_resource type="Gradient" id="Gradient_fog"]
+offsets = PackedFloat32Array(0, 0.606264, 0.696868)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_fog"]
+gradient = SubResource("Gradient_fog")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
 [sub_resource type="LabelSettings" id="LabelSettings_1ao0h"]
 font_size = 32
 
@@ -37,6 +48,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_0okp5")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color(0.0812, 0.08903999, 0.14, 1)
 
 [node name="GroundLayer" type="TileMapLayer" parent="."]
 unique_name_in_owner = true
@@ -118,6 +132,10 @@ sprite_frames = SubResource("SpriteFrames_7we1r")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
 shape = SubResource("CircleShape2D_ui3wy")
+
+[node name="PointLight2D" type="PointLight2D" parent="Player"]
+texture = SubResource("GradientTexture2D_fog")
+texture_scale = 0.72
 
 [node name="HUD" type="CanvasLayer" parent="." node_paths=PackedStringArray("player")]
 script = ExtResource("5_hud")
