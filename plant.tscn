@@ -1,0 +1,13 @@
+[gd_scene load_steps=4 format=3 uid="uid://c8l4s74n3ubwu"]
+
+[ext_resource type="Texture2D" uid="uid://d1o8wghdifppx" path="res://assets/pr4nta_pixelascii.png" id="1_mbetm"]
+[ext_resource type="Script" uid="uid://c2m6k7ksedx3g" path="res://plant.gd" id="1_plant"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qljma"]
+atlas = ExtResource("1_mbetm")
+region = Rect2(144, 32, 16, 16)
+
+[node name="Plant" type="Sprite2D"]
+texture = SubResource("AtlasTexture_qljma")
+centered = false
+script = ExtResource("1_plant")
