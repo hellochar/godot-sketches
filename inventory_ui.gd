@@ -15,8 +15,6 @@ var drop_filter: Callable
 
 func set_inventory(inv: World.Inventory) -> void:
   inventory = inv
-  if title_label:
-    title_label.text = inventory.name
   inv.on_changed.connect(func() -> void:
     needs_refresh = true
   )
@@ -36,6 +34,10 @@ func refresh() -> void:
 
   if not inventory:
     return
+
+  if title_label:
+    inventory.compute_name()
+    title_label.text = inventory.name
 
   for item in inventory.dict.keys():
     var card = ITEM_CARD.instantiate()

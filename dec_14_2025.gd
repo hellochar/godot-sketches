@@ -38,9 +38,9 @@ func _ready() -> void:
   %HomebaseInventory.set_inventory(homebase_inventory)
   %AdventuringInventory.set_inventory(backpack)
   %EnemiesUI.set_inventory(wilderness)
-  homebase_inventory.add(Armor.new(5), 1)
-  homebase_inventory.add(Food.new(2), 1)
-  homebase_inventory.add(Food.new(2), 1)
+  backpack.add(Armor.new(5), 1)
+  backpack.add(Food.new(2), 1)
+  backpack.add(Food.new(2), 1)
   backpack.add(Attack.new(6), 30)
 
 func begin_adventure() -> void:
@@ -50,13 +50,15 @@ func begin_adventure() -> void:
 
 func start_depth(depth: int) -> void:
   adventure_depth = depth
+  %AdventureTitle.text = "Adventuring - Depth %d" % adventure_depth
   # generate some enemies
-  var enemy_count = 1 + adventure_depth / 2
+  var enemy_count = 1 + adventure_depth / 3
   for i in range(enemy_count):
-    var enemy = Enemy.new(10 + adventure_depth * 5)
+    var enemy = Enemy.new(9 + adventure_depth * 3)
     enemy.name_override = "Goblin Lv.%d" % adventure_depth
-    enemy.damage_min = 2 + adventure_depth
-    enemy.damage_max = 2 + adventure_depth * 2
+    enemy.damage_min = adventure_depth
+    enemy.damage_max = int(1 + adventure_depth * 1.3)
+    enemy.update_description()
     wilderness.add(enemy, 1)
 
 func go_home() -> void:
@@ -64,6 +66,7 @@ func go_home() -> void:
   homebase_inventory.take_all_from(backpack)
   wilderness.clear()
   adventure_depth = 0
+  player.health = player.max_health
 
 func go_deeper() -> void:
   wilderness.clear()
@@ -167,6 +170,8 @@ class Enemy extends Unit:
   func _init(hp: int) -> void:
     super._init(hp)
     name_override = "Enemy"
+  
+  func update_description() -> void:
     description_base = "Attacks for %d-%d damage." % [damage_min, damage_max]
   
   func process(delta):
@@ -185,7 +190,7 @@ class Enemy extends Unit:
         func(i: Item): return i.pickupable
       )
       if basic_items.size() > 0:
-        Dec_14_2025.main.wilderness.add(basic_items.pick_random(), 1)
+        Dec_14_2025.main.wilderness.add(basic_items.pick_random(), randi_range(1, 3))
     if not Dec_14_2025.main.is_in_danger():
       Dec_14_2025.main.on_enemies_defeated()
 
@@ -199,6 +204,7 @@ class Enemy extends Unit:
 
 class PortalHome extends Item:
   func _init() -> void:
+    pickupable = false
     name_override = "Portal Home"
     description = "Use to return home safely."
 
