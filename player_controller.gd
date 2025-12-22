@@ -2,6 +2,8 @@ extends CharacterBody2D
 
 @export var move_speed: float = 200.0
 
+@export var plants: int = 0
+
 func _physics_process(delta):
   var direction = Vector2.ZERO
   
