@@ -1,8 +1,28 @@
-[gd_scene load_steps=4 format=4 uid="uid://dtogs63iitiv8"]
+[gd_scene load_steps=10 format=4 uid="uid://dtogs63iitiv8"]
 
 [ext_resource type="Script" uid="uid://dvrktk3sifnl0" path="res://dec_21_2025.gd" id="1_0okp5"]
 [ext_resource type="TileSet" uid="uid://l77dh6fyg31k" path="res://tileset_pr4nta_pixelascii.tres" id="2_ampl0"]
-[ext_resource type="Script" uid="uid://xf6wl2jknrnn" path="res://camera_pan.gd" id="2_xb3h7"]
+[ext_resource type="Script" uid="uid://68d242dd8bry" path="res://camera_follow_target.gd" id="3_khtp6"]
+[ext_resource type="PackedScene" uid="uid://c8l4s74n3ubwu" path="res://plant.tscn" id="4_7we1r"]
+[ext_resource type="Script" uid="uid://d0x0psvmx81uc" path="res://player_controller.gd" id="4_khtp6"]
+[ext_resource type="Texture2D" uid="uid://f8jsqgv44ymr" path="res://assets/hexanys_roguelike_tiles_0.3.0/Tilesheets/Transparent/creatures_transparent.png" id="4_ui3wy"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_khtp6"]
+atlas = ExtResource("4_ui3wy")
+region = Rect2(80, 0, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_7we1r"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_khtp6")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ui3wy"]
 
 [node name="Dec-21-2025" type="Control"]
 layout_mode = 3
@@ -12,14 +32,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_0okp5")
-
-[node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(5.14, 5.14)
-process_callback = 0
-position_smoothing_enabled = true
-position_smoothing_speed = 12.0
-script = ExtResource("2_xb3h7")
-pan_speed = 100.0
 
 [node name="GroundLayer" type="TileMapLayer" parent="."]
 unique_name_in_owner = true
@@ -42,3 +54,29 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/normal_font_size = 32
 text = "hello"
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(6.4, 6.4)
+process_callback = 0
+position_smoothing_speed = 12.0
+script = ExtResource("3_khtp6")
+target = NodePath("../Player")
+lerp_speed = 4.0
+chase_speed = 2.0
+
+[node name="Plant" parent="." node_paths=PackedStringArray("object_layer") instance=ExtResource("4_7we1r")]
+z_index = 1
+y_sort_enabled = true
+position = Vector2(176, 0)
+object_layer = NodePath("../ObjectLayer")
+
+[node name="Player" type="CharacterBody2D" parent="."]
+z_index = 2
+script = ExtResource("4_khtp6")
+move_speed = 40.0
+
+[node name="PlayerSprite" type="AnimatedSprite2D" parent="Player"]
+sprite_frames = SubResource("SpriteFrames_7we1r")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource("CircleShape2D_ui3wy")
