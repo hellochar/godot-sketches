@@ -167,14 +167,17 @@ class Inventory:
     cap = _cap
     name = _name
     max_entries = _max_entries
-
-  func _to_string() -> String:
+  
+  func compute_name() -> String:
     var out := name
     if max_entries != -1:
       out += "%d/%d" % [dict.size(), max_entries]
     if cap > 1:
       out += " (cap %d)" % cap
-    out += "\n"
+    return out
+
+  func _to_string() -> String:
+    var out := compute_name() + "\n"
     var index = 1
     for item in dict.keys():
       var line: String = "%d - " % index if prefix else ""

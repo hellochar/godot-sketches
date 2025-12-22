@@ -68,7 +68,8 @@ text = "Turn: 0"
 fit_content = true
 horizontal_alignment = 1
 
-[node name="Title" type="RichTextLabel" parent="HBoxContainer/AdventurePanel/BoxContainer"]
+[node name="AdventureTitle" type="RichTextLabel" parent="HBoxContainer/AdventurePanel/BoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 48
 bbcode_enabled = true
