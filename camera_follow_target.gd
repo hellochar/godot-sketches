@@ -14,6 +14,7 @@ var target_node: Node2D
 func _ready():
   if target:
     target_node = get_node(target)
+    global_position = target_node.global_position
 
   var default_zoom = zoom.x
   min_zoom = default_zoom * 0.5
