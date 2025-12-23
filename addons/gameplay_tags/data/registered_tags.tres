@@ -1,0 +1,71 @@
+[gd_resource type="Resource" format=3 uid="uid://dqnk1p5x6yvtq"]
+
+[resource]
+metadata/tags = {
+"Character": {
+"description": "Base tag for all character types"
+},
+"Character.Player": {
+"description": "Player controlled characters"
+},
+"Character.Enemy": {
+"description": "Enemy characters"
+},
+"Character.Enemy.Melee": {
+"description": "Melee enemy characters"
+},
+"Character.Enemy.Ranged": {
+"description": "Ranged enemy characters"
+},
+"Character.NPC": {
+"description": "Non-player characters"
+},
+"Status": {
+"description": "Status effects and states"
+},
+"Status.Buff": {
+"description": "Positive status effects"
+},
+"Status.Buff.SpeedBoost": {
+"description": "Increased movement speed"
+},
+"Status.Buff.DamageBoost": {
+"description": "Increased damage output"
+},
+"Status.Debuff": {
+"description": "Negative status effects"
+},
+"Status.Debuff.Slow": {
+"description": "Reduced movement speed"
+},
+"Status.Debuff.Poison": {
+"description": "Taking damage over time"
+},
+"Ability": {
+"description": "Character abilities"
+},
+"Ability.Attack": {
+"description": "Attack abilities"
+},
+"Ability.Attack.Melee": {
+"description": "Melee attack abilities"
+},
+"Ability.Attack.Ranged": {
+"description": "Ranged attack abilities"
+},
+"Ability.Defense": {
+"description": "Defensive abilities"
+},
+"Faction": {
+"description": "Faction/team affiliations"
+},
+"Faction.Friendly": {
+"description": "Friendly faction"
+},
+"Faction.Hostile": {
+"description": "Hostile faction"
+},
+"Faction.Neutral": {
+"description": "Neutral faction"
+}
+}
