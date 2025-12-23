@@ -6,8 +6,8 @@ func _can_handle(object: Object) -> bool:
 
 func _parse_property(object: Object, type: Variant.Type, name: String, hint_type: PropertyHint, hint_string: String, usage_flags: int, wide: bool) -> bool:
 	# Check if this property should use our custom editor
-	# Match properties with "GameplayTag" hint or names ending in "_tags" or "gameplay_tags"
-	if hint_string == "GameplayTag" or name.ends_with("_tags") or name == "gameplay_tags":
+	# Match properties with "HierarchicalTag" hint or names ending in "_tags" or "hierarchical_tags"
+	if hint_string == "HierarchicalTag" or name.ends_with("_tags") or name == "hierarchical_tags":
 		if type == TYPE_ARRAY or type == TYPE_PACKED_STRING_ARRAY:
 			var editor = TagArrayEditor.new()
 			add_property_editor(name, editor)

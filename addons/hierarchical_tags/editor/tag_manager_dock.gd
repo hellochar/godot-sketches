@@ -12,8 +12,8 @@ func _ready() -> void:
 
 	# Connect to tag system changes
 	await get_tree().process_frame
-	if GameplayTags:
-		GameplayTags.tags_changed.connect(_refresh_tree)
+	if HierarchicalTags:
+		HierarchicalTags.tags_changed.connect(_refresh_tree)
 
 func _build_ui() -> void:
 	var vbox = VBoxContainer.new()
@@ -26,7 +26,7 @@ func _build_ui() -> void:
 	vbox.add_child(header)
 
 	var label = Label.new()
-	label.text = "Gameplay Tags"
+	label.text = "Hierarchical Tags"
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(label)
 
@@ -72,11 +72,11 @@ func _refresh_tree() -> void:
 	var root = tree.create_item()
 	tree.hide_root = true
 
-	if not GameplayTags:
+	if not HierarchicalTags:
 		return
 
 	var filter = search_box.text.to_lower() if search_box else ""
-	var tags = GameplayTags.get_all_tags()
+	var tags = HierarchicalTags.get_all_tags()
 
 	# Build tree structure
 	var items: Dictionary = {}
@@ -106,8 +106,8 @@ func _refresh_tree() -> void:
 				item.set_tooltip_text(0, current_path)
 
 				# Style registered tags differently
-				if GameplayTags.is_registered(current_path):
-					var desc = GameplayTags.get_tag_description(current_path)
+				if HierarchicalTags.is_registered(current_path):
+					var desc = HierarchicalTags.get_tag_description(current_path)
 					if desc:
 						item.set_tooltip_text(0, current_path + "\n" + desc)
 
@@ -116,7 +116,7 @@ func _refresh_tree() -> void:
 
 func _on_add_pressed() -> void:
 	var dialog = AcceptDialog.new()
-	dialog.title = "Add Gameplay Tag"
+	dialog.title = "Add Hierarchical Tag"
 	dialog.ok_button_text = "Add"
 
 	var vbox = VBoxContainer.new()
@@ -142,8 +142,8 @@ func _on_add_pressed() -> void:
 
 	dialog.confirmed.connect(func():
 		var tag = tag_input.text.strip_edges()
-		if tag and GameplayTags:
-			GameplayTags.register_tag(tag, desc_input.text.strip_edges())
+		if tag and HierarchicalTags:
+			HierarchicalTags.register_tag(tag, desc_input.text.strip_edges())
 	)
 
 	dialog.canceled.connect(func():
@@ -166,8 +166,8 @@ func _on_remove_pressed() -> void:
 	dialog.title = "Remove Tag"
 	dialog.dialog_text = "Remove '%s' and all child tags?" % tag
 	dialog.confirmed.connect(func():
-		if GameplayTags:
-			GameplayTags.unregister_tag(tag)
+		if HierarchicalTags:
+			HierarchicalTags.unregister_tag(tag)
 		dialog.queue_free()
 	)
 	dialog.canceled.connect(func():

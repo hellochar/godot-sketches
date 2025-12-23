@@ -9,8 +9,8 @@ var search: LineEdit
 var selected_label: Label
 
 func _init() -> void:
-	title = "Select Gameplay Tag"
-	size = Vector2i(350, 450)
+	title = "Select Hierarchical Tag"
+	min_size = Vector2i(800, 800)
 	transient = true
 	exclusive = true
 
@@ -46,7 +46,7 @@ func _init() -> void:
 	# Selected tag display
 	selected_label = Label.new()
 	selected_label.text = "Selected: (none)"
-	selected_label.add_theme_font_size_override("font_size", 12)
+	# selected_label.add_theme_font_size_override("font_size", 12)
 	vbox.add_child(selected_label)
 
 	# Buttons
@@ -82,14 +82,14 @@ func _refresh_tree() -> void:
 	var root = tree.create_item()
 	tree.hide_root = true
 
-	if not GameplayTags:
+	if not HierarchicalTags:
 		var item = tree.create_item(root)
-		item.set_text(0, "(GameplayTags not loaded)")
+		item.set_text(0, "(HierarchicalTags not loaded)")
 		return
 
 	var filter = search.text.to_lower()
 	var items: Dictionary = {}
-	var all_tags = GameplayTags.get_all_tags()
+	var all_tags = HierarchicalTags.get_all_tags()
 
 	if all_tags.is_empty():
 		var item = tree.create_item(root)

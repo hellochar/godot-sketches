@@ -18,6 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 ItemLibrary="*res://item_library.gd"
+HierarchicalTags="*res://addons/hierarchical_tags/autoload/hierarchical_tag_system.gd"
 
 [display]
 
@@ -28,7 +29,7 @@ window/vsync/vsync_mode=0
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/gameplay_tags/plugin.cfg")
+enabled=PackedStringArray("res://addons/hierarchical_tags/plugin.cfg")
 
 [global_group]
 
