@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://c4xqm8vhpwqte"]
 
-[ext_resource type="Script" path="res://addons/gameplay_tags/editor/tag_manager_dock.gd" id="1_dock"]
+[ext_resource type="Script" path="res://addons/hierarchical_tags/editor/tag_manager_dock.gd" id="1_dock"]
 
 [node name="TagManagerDock" type="Control"]
 custom_minimum_size = Vector2(200, 300)

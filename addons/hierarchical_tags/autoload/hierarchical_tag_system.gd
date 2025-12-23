@@ -1,8 +1,8 @@
 @tool
-class_name GameplayTagSystem
+class_name HierarchicalTagSystem
 extends Node
 
-const TAGS_PATH = "res://addons/gameplay_tags/data/registered_tags.tres"
+const TAGS_PATH = "res://addons/hierarchical_tags/data/registered_tags.tres"
 
 var _registered_tags: Dictionary = {}  # tag -> metadata
 var _tag_tree: Dictionary = {}  # Hierarchical structure for UI
@@ -102,8 +102,8 @@ func filter_by_tag(nodes: Array[Node], tag: String) -> Array[Node]:
 	## Filter an array of nodes by those that have a matching tag
 	var result: Array[Node] = []
 	for node in nodes:
-		if node.has_method("get_gameplay_tags"):
-			if has_tag_parent(node.get_gameplay_tags(), tag):
+		if node.has_method("get_hierarchical_tags"):
+			if has_tag_parent(node.get_hierarchical_tags(), tag):
 				result.append(node)
 	return result
 
