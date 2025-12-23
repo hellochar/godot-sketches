@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=4 uid="uid://dtogs63iitiv8"]
+[gd_scene load_steps=15 format=4 uid="uid://dtogs63iitiv8"]
 
 [ext_resource type="Script" uid="uid://dvrktk3sifnl0" path="res://dec_21_2025.gd" id="1_0okp5"]
 [ext_resource type="TileSet" uid="uid://l77dh6fyg31k" path="res://tileset_pr4nta_pixelascii.tres" id="2_ampl0"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://d0x0psvmx81uc" path="res://player_controller.gd" id="4_khtp6"]
 [ext_resource type="Texture2D" uid="uid://f8jsqgv44ymr" path="res://assets/hexanys_roguelike_tiles_0.3.0/Tilesheets/Transparent/creatures_transparent.png" id="4_ui3wy"]
 [ext_resource type="Script" uid="uid://cqcb0v661ue1q" path="res://hud.gd" id="5_hud"]
+[ext_resource type="Script" uid="uid://mukfihgxpuwj" path="res://fog_of_war.gd" id="6_fog"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_khtp6"]
 atlas = ExtResource("4_ui3wy")
@@ -141,6 +142,13 @@ shadow_enabled = true
 shadow_filter = 1
 texture = SubResource("GradientTexture2D_fog")
 texture_scale = 0.72
+
+[node name="FogOfWar" type="TileMapLayer" parent="." node_paths=PackedStringArray("player", "occluder_layer")]
+tile_set = ExtResource("2_ampl0")
+script = ExtResource("6_fog")
+player = NodePath("../Player")
+vision_range = 12
+occluder_layer = NodePath("../ObjectLayer")
 
 [node name="HUD" type="CanvasLayer" parent="." node_paths=PackedStringArray("player")]
 script = ExtResource("5_hud")

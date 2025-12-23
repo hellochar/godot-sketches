@@ -14,11 +14,14 @@ var grid_pos: Vector2i:
   set(value):
     global_position = object_layer.to_global(object_layer.map_to_local(value))
 
+func _ready() -> void:
+  multiply_interval = randf_range(7.0, 20.0)
+
 func _process(delta: float) -> void:
   multiply_timer += delta
   if multiply_timer >= multiply_interval:
     multiply_timer = 0.0
-    # try_multiply()
+    try_multiply()
 
 func try_multiply() -> void:
   var directions: Array[Vector2i] = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
