@@ -34,6 +34,8 @@ enum ETag {
 @export var icon: Texture2D
 @export var tier: ETier
 @export var tags: Array[ETag] = []
+@export var htags: PackedStringArray = []
+
 
 @export var usable: bool:
   get:
