@@ -9,7 +9,7 @@ var search: LineEdit
 var selected_label: Label
 
 func _init() -> void:
-	title = "Select Hierarchical Tag"
+	title = "Select HTag"
 	min_size = Vector2i(800, 800)
 	transient = true
 	exclusive = true
@@ -82,14 +82,14 @@ func _refresh_tree() -> void:
 	var root = tree.create_item()
 	tree.hide_root = true
 
-	if not HierarchicalTags:
+	if not HTags:
 		var item = tree.create_item(root)
-		item.set_text(0, "(HierarchicalTags not loaded)")
+		item.set_text(0, "(HTags not loaded)")
 		return
 
 	var filter = search.text.to_lower()
 	var items: Dictionary = {}
-	var all_tags = HierarchicalTags.get_all_tags()
+	var all_tags = HTags.get_all_tags()
 
 	if all_tags.is_empty():
 		var item = tree.create_item(root)

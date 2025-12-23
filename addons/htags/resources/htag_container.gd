@@ -1,17 +1,17 @@
 @tool
-class_name HierarchicalTagContainer
+class_name HTagContainer
 extends Resource
 
-## A resource that holds a collection of hierarchical tags.
+## A resource that holds a collection of tags.
 ## Can be used as an @export property for better editor integration.
 
 @export var tags: Array[String] = []
 
 func has(tag: String) -> bool:
 	## Check if this container has the tag or any child of it
-	if not HierarchicalTags:
+	if not HTags:
 		return tag in tags
-	return HierarchicalTags.has_tag_parent(tags, tag)
+	return HTags.has_tag_parent(tags, tag)
 
 func has_exact(tag: String) -> bool:
 	## Check if this container has the exact tag
@@ -19,21 +19,21 @@ func has_exact(tag: String) -> bool:
 
 func has_any(check_tags: Array[String]) -> bool:
 	## Check if this container has any of the specified tags
-	if not HierarchicalTags:
+	if not HTags:
 		for t in check_tags:
 			if t in tags:
 				return true
 		return false
-	return HierarchicalTags.has_any(tags, check_tags)
+	return HTags.has_any(tags, check_tags)
 
 func has_all(check_tags: Array[String]) -> bool:
 	## Check if this container has all of the specified tags
-	if not HierarchicalTags:
+	if not HTags:
 		for t in check_tags:
 			if t not in tags:
 				return false
 		return true
-	return HierarchicalTags.has_all(tags, check_tags)
+	return HTags.has_all(tags, check_tags)
 
 func add_tag(tag: String) -> void:
 	if tag not in tags:
