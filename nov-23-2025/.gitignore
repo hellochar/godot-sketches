@@ -1,0 +1,8 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+*.mp3
+*.wav
+
+Nikko Hunt's Sound Design Essentials/
