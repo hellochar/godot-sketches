@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://cf3h6rao1p7j1" path="res://items/basic/grass.gd" id="1_xenjs"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_xenjs"]
-load_path = "res://.godot/imported/icon_atlas.png-8ac5fc0cdf230613c0cf6203a3100554.ctex"
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8w5dt"]
 atlas = SubResource("CompressedTexture2D_xenjs")

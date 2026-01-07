@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="Word" load_steps=2 format=3 uid="uid://drss8apkpt1ec"]
+
+[ext_resource type="Script" uid="uid://dcqiq68f4h8mb" path="res://dec_22_2025/word.gd" id="1_hwb6v"]
+
+[resource]
+script = ExtResource("1_hwb6v")
