@@ -1,0 +1,57 @@
+[gd_scene load_steps=9 format=3 uid="uid://cg6rwlew8bhs7"]
+
+[ext_resource type="Material" uid="uid://rjtoefm7ly6a" path="res://blue_material.material" id="1_a202f"]
+[ext_resource type="Material" uid="uid://dy118ki5ryfst" path="res://visual_shader_material.material" id="2_noarx"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4xowi"]
+
+[sub_resource type="Sky" id="Sky_a202f"]
+sky_material = SubResource("ProceduralSkyMaterial_4xowi")
+
+[sub_resource type="Environment" id="Environment_noarx"]
+background_mode = 2
+sky = SubResource("Sky_a202f")
+
+[sub_resource type="MeshLibrary" id="MeshLibrary_4xowi"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_a202f"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_noarx"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="PopupPanel" type="PopupPanel" parent="."]
+title = "asdf"
+visible = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.877583, -0.229849, 0.420736, 0, 0.877583, 0.479426, -0.479426, -0.420736, 0.770151, 1.68294, 1.9177, 3.0806)
+environment = SubResource("Environment_noarx")
+
+[node name="GridMap" type="GridMap" parent="."]
+mesh_library = SubResource("MeshLibrary_4xowi")
+cell_size = Vector3(1, 1, 1)
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+material_override = ExtResource("1_a202f")
+
+[node name="CSGSphere3D" type="CSGSphere3D" parent="CSGBox3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.821904, 0)
+
+[node name="Ground" type="CSGBox3D" parent="."]
+size = Vector3(10, 0.01, 10)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.776023, 0.447125, -0.444823, 0, 0.705279, 0.70893, 0.630705, -0.550146, 0.547313, -1.80432, 4.89758, 1.93231)
+shadow_enabled = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.934136, -0.907065, 0.0396304, 0.356917, 2.374, -0.103722, 0, 0.283939, 0.993816, 1.80745, 0.895236, -0.853996)
+material_override = ExtResource("2_noarx")
+mesh = SubResource("BoxMesh_a202f")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.934136, -0.907065, 0.0396304, 0.356917, 2.374, -0.103722, 0, 0.283939, 0.993816, -2.26971, 0.207629, 0.105261)
+material_override = ExtResource("1_a202f")
+mesh = SubResource("PlaneMesh_noarx")

@@ -1,0 +1,118 @@
+[gd_scene load_steps=16 format=3 uid="uid://d4hx2opanvdu2"]
+
+[ext_resource type="Material" uid="uid://rjtoefm7ly6a" path="res://blue_material.material" id="1_sge3k"]
+[ext_resource type="ArrayMesh" uid="uid://c4c7bhek7xhd6" path="res://new_array_mesh.tres" id="2_0f1g3"]
+[ext_resource type="Shader" uid="uid://bvn2icgnf34dy" path="res://fractal_ground.tres" id="3_vvs6j"]
+[ext_resource type="Shader" uid="uid://nxqw2p2k2lhx" path="res://water.gdshader" id="4_water"]
+[ext_resource type="Texture2D" uid="uid://cgctpwkg11l5w" path="res://assets/water_normal1.jpeg" id="5_fnrh4"]
+[ext_resource type="Texture2D" uid="uid://d2uxuf6w8lkxa" path="res://assets/water_normal2.jpg" id="6_by2jp"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4xowi"]
+
+[sub_resource type="Sky" id="Sky_a202f"]
+sky_material = SubResource("ProceduralSkyMaterial_4xowi")
+
+[sub_resource type="Environment" id="Environment_noarx"]
+background_mode = 2
+sky = SubResource("Sky_a202f")
+ssao_enabled = true
+ssao_intensity = 13.76
+fog_light_color = Color(0.8, 0.9, 1, 1)
+fog_light_energy = 0.25
+fog_sun_scatter = 0.15
+fog_height = 4.0
+fog_height_density = 1.5308
+fog_depth_begin = 0.0
+fog_depth_end = 25.0
+volumetric_fog_density = 0.0671
+volumetric_fog_length = 103.38
+volumetric_fog_detail_spread = 3.1058
+
+[sub_resource type="Gradient" id="Gradient_vvs6j"]
+interpolation_color_space = 1
+offsets = PackedFloat32Array(0, 0.148515, 0.168317, 0.25, 0.522277, 0.685644, 1)
+colors = PackedColorArray(0.0416744, 0, 0.550516, 1, 0.0391354, 0.291154, 0.647952, 1, 0.0484, 0.22, 0.1771, 1, 0.0228, 0.76, 0.108807, 1, 0.224358, 0.150659, 0.00966189, 1, 0.5, 0.48775, 0.465, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_0f1g3"]
+gradient = SubResource("Gradient_vvs6j")
+use_hdr = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0f1g3"]
+render_priority = 0
+shader = ExtResource("3_vvs6j")
+shader_parameter/HeightScale = 10.0
+shader_parameter/Gradient = SubResource("GradientTexture1D_0f1g3")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_sge3k"]
+material = SubResource("ShaderMaterial_0f1g3")
+size = Vector2(25, 25)
+subdivide_width = 1024
+subdivide_depth = 1024
+
+[sub_resource type="ShaderMaterial" id="WaterMaterial"]
+render_priority = 0
+shader = ExtResource("4_water")
+shader_parameter/shallow_color = Color(0.12, 0.45, 0.7, 1)
+shader_parameter/deep_color = Color(0.02, 0.12, 0.25, 1)
+shader_parameter/amplitude = 0.15
+shader_parameter/frequency = 6.0
+shader_parameter/speed = 1.2
+shader_parameter/metallic_factor = 0.0
+shader_parameter/smoothness = 0.85
+shader_parameter/water_level = 0.55
+shader_parameter/base_alpha = 0.7
+shader_parameter/fresnel_opacity = 0.35
+shader_parameter/normal_map_1 = ExtResource("5_fnrh4")
+shader_parameter/normal_map_2 = ExtResource("6_by2jp")
+shader_parameter/normal1_uv_scale = Vector2(2, 2)
+shader_parameter/normal2_uv_scale = Vector2(4, 4)
+shader_parameter/normal1_scroll_dir = Vector2(0.1, 0)
+shader_parameter/normal2_scroll_dir = Vector2(-0.05, 0.07)
+shader_parameter/normal1_speed = 0.6
+shader_parameter/normal2_speed = 0.9
+shader_parameter/normal1_strength = 0.6
+shader_parameter/normal2_strength = 0.7
+shader_parameter/normal_mix = 0.85
+shader_parameter/foam_color = Vector3(1, 1, 1)
+shader_parameter/foam_intensity = 0.8
+shader_parameter/foam_edge_width = 0.02
+shader_parameter/foam_softness = 0.05
+shader_parameter/foam_alpha_boost = 0.15
+
+[sub_resource type="PlaneMesh" id="WaterPlane"]
+material = SubResource("WaterMaterial")
+size = Vector2(25, 25)
+subdivide_width = 200
+subdivide_depth = 200
+
+[node name="Node3D" type="Node3D"]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.656059, -0.502548, 0.563057, 0, 0.746058, 0.665882, -0.75471, -0.436858, 0.489458, 4.98158, 11.6208, 7.34056)
+environment = SubResource("Environment_noarx")
+
+[node name="CSGCombiner3D" type="CSGCombiner3D" parent="."]
+
+[node name="CSGSphere3D" type="CSGSphere3D" parent="CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.215, 0)
+
+[node name="CSGBox3D" type="CSGBox3D" parent="CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 0.277347, 0.394134, 0, -0.11894, 0.919053, 0, 1.1612, 0.0233698)
+material_override = ExtResource("1_sge3k")
+operation = 2
+
+[node name="CSGBakedMeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.87974, 0.5, 1.45406)
+mesh = ExtResource("2_0f1g3")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.776023, 0.447125, -0.444823, 0.237348, 0.446402, 0.862781, 0.584341, -0.775116, 0.240294, -1.80432, 7.75666, 2.89426)
+
+[node name="ground" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.354697, 0.558678, 1.09967)
+mesh = SubResource("PlaneMesh_sge3k")
+
+[node name="Water" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.19131, 0)
+visible = false
+mesh = SubResource("WaterPlane")

@@ -1,0 +1,173 @@
+[gd_scene load_steps=9 format=3 uid="uid://cp1a8mhk5q4te"]
+
+[sub_resource type="Gradient" id="Gradient_vp5vx"]
+colors = PackedColorArray(0, 0, 0, 0, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_vp5vx"]
+gradient = SubResource("Gradient_vp5vx")
+fill_from = Vector2(0.282051, 0.645299)
+fill_to = Vector2(0.773504, 0.461538)
+
+[sub_resource type="Curve" id="Curve_2lv5n"]
+_limits = [-360.0, 360.0, 0.0, 1.0]
+_data = [Vector2(0, -360), 0.0, 0.0, 0, 0, Vector2(0.495595, 239.201), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_nvyhp"]
+gradient = SubResource("Gradient_vp5vx")
+fill = 1
+fill_from = Vector2(0.482906, 0.512821)
+fill_to = Vector2(0.777778, 0.401709)
+repeat = 2
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_2lv5n"]
+gradient = SubResource("Gradient_vp5vx")
+fill = 1
+fill_from = Vector2(0.482906, 0.512821)
+fill_to = Vector2(0.777778, 0.401709)
+repeat = 2
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_31ihc"]
+gradient = SubResource("Gradient_vp5vx")
+fill = 1
+fill_from = Vector2(0.482906, 0.512821)
+fill_to = Vector2(0.777778, 0.401709)
+repeat = 2
+
+[sub_resource type="Gradient" id="Gradient_nvyhp"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_u6lh8"]
+gradient = SubResource("Gradient_nvyhp")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.478632, 0.474359)
+
+[node name="Node3D" type="Node2D"]
+
+[node name="cool1" type="CPUParticles2D" parent="."]
+position = Vector2(503, 78)
+emitting = false
+amount = 400
+texture = SubResource("GradientTexture2D_vp5vx")
+lifetime = 10.0
+emission_shape = 5
+emission_points = PackedVector2Array(50, 0, -50, 0)
+emission_normals = PackedVector2Array(0, 0)
+emission_colors = PackedColorArray(0.96, 0.1536, 0.1536, 1, 0, 0, 0, 1)
+particle_flag_align_y = true
+direction = Vector2(0, 0)
+gravity = Vector2(0, 0)
+initial_velocity_min = 250.0
+initial_velocity_max = 250.0
+angular_velocity_min = 250.0
+angular_velocity_max = 20000.0
+angular_velocity_curve = SubResource("Curve_2lv5n")
+orbit_velocity_min = 1.0
+orbit_velocity_max = 1.0
+
+[node name="cool2" type="CPUParticles2D" parent="."]
+position = Vector2(-1083, -149)
+emitting = false
+amount = 400
+texture = SubResource("GradientTexture2D_nvyhp")
+lifetime = 10.0
+emission_shape = 5
+emission_points = PackedVector2Array(50, 0, 0, 120)
+emission_normals = PackedVector2Array(0, 0)
+emission_colors = PackedColorArray(0.156855, 0.957756, 0.93433, 1, 0.116401, 0.347266, 0.00799177, 1)
+particle_flag_align_y = true
+direction = Vector2(0, 0)
+gravity = Vector2(0, 0)
+initial_velocity_min = 250.0
+initial_velocity_max = 250.0
+angular_velocity_min = 250.0
+angular_velocity_max = 20000.0
+angular_velocity_curve = SubResource("Curve_2lv5n")
+orbit_velocity_min = -1.0
+orbit_velocity_max = 1.0
+
+[node name="cool3" type="CPUParticles2D" parent="."]
+position = Vector2(-2480, 1398)
+emitting = false
+amount = 4000
+texture = SubResource("GradientTexture2D_2lv5n")
+lifetime = 3.0
+emission_shape = 5
+emission_points = PackedVector2Array(0, 120)
+emission_normals = PackedVector2Array(0, 0)
+emission_colors = PackedColorArray(0.156855, 0.957756, 0.93433, 1, 0.116401, 0.347266, 0.00799177, 1)
+particle_flag_align_y = true
+direction = Vector2(0, 0)
+gravity = Vector2(0, 0)
+initial_velocity_min = 250.0
+initial_velocity_max = 250.0
+angular_velocity_min = 250.0
+angular_velocity_max = 20000.0
+angular_velocity_curve = SubResource("Curve_2lv5n")
+orbit_velocity_min = -1.0
+orbit_velocity_max = 1.0
+
+[node name="cool4" type="CPUParticles2D" parent="."]
+position = Vector2(131, 1887)
+emitting = false
+amount = 4000
+texture = SubResource("GradientTexture2D_31ihc")
+lifetime = 3.0
+emission_shape = 5
+emission_points = PackedVector2Array(0, 120)
+emission_normals = PackedVector2Array(0, 0)
+emission_colors = PackedColorArray(0.156855, 0.957756, 0.93433, 1, 0.116401, 0.347266, 0.00799177, 1)
+particle_flag_align_y = true
+direction = Vector2(0, 0)
+initial_velocity_min = 250.0
+initial_velocity_max = 250.0
+angular_velocity_min = 250.0
+angular_velocity_max = 20000.0
+angular_velocity_curve = SubResource("Curve_2lv5n")
+orbit_velocity_min = -1.0
+orbit_velocity_max = 1.0
+
+[node name="cool5" type="CPUParticles2D" parent="."]
+position = Vector2(-1458, 2938)
+emitting = false
+amount = 40000
+texture = SubResource("GradientTexture2D_u6lh8")
+lifetime = 5.0
+lifetime_randomness = 1.0
+emission_shape = 5
+emission_points = PackedVector2Array(0, 0)
+emission_normals = PackedVector2Array(1, 0)
+emission_colors = PackedColorArray(0.156855, 0.957756, 0.93433, 1)
+particle_flag_align_y = true
+direction = Vector2(0, 0)
+spread = 180.0
+initial_velocity_min = 50.0
+initial_velocity_max = 50.0
+angular_velocity_curve = SubResource("Curve_2lv5n")
+orbit_velocity_min = 1.0
+orbit_velocity_max = 1.0
+linear_accel_min = 2000.0
+linear_accel_max = 2000.0
+
+[node name="cool6" type="CPUParticles2D" parent="."]
+position = Vector2(1037, 2798)
+amount = 40
+texture = SubResource("GradientTexture2D_u6lh8")
+lifetime = 5.0
+preprocess = 120.0
+lifetime_randomness = 1.0
+emission_shape = 3
+emission_rect_extents = Vector2(800, 0)
+particle_flag_align_y = true
+direction = Vector2(0, -1)
+spread = 12.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 500.0
+initial_velocity_max = 500.0
+angular_velocity_curve = SubResource("Curve_2lv5n")
+damping_min = 75.0
+damping_max = 500.0
+angle_min = -180.0
+angle_max = 180.0
