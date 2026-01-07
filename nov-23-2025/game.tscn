@@ -1,0 +1,101 @@
+[gd_scene load_steps=11 format=3 uid="uid://nmpbm4g3jim4"]
+
+[ext_resource type="Script" uid="uid://bigcfyacvshrd" path="res://addons/type_writer_label/classes/type_writer_label.gd" id="1_80nbo"]
+[ext_resource type="Script" uid="uid://dcgixhll7ycus" path="res://stage.gd" id="1_e2o6t"]
+[ext_resource type="AudioStream" uid="uid://cwwp1in3oe0jt" path="res://mp3_English_en-US-EmmaNeural.mp3" id="3_feb5d"]
+[ext_resource type="AudioStream" uid="uid://vu3pp2mg7l0b" path="res://clack-85854.mp3" id="4_fc0e3"]
+[ext_resource type="Texture2D" uid="uid://dbit13o6pcei4" path="res://ChatGPT Image Nov 23, 2025, 11_37_31 AM.png" id="4_ryrav"]
+[ext_resource type="AudioStream" uid="uid://casiu1mosafn3" path="res://synthy ambient atmospheric.mp3" id="5_7jktm"]
+[ext_resource type="AudioStream" uid="uid://bc7fxyh271cw8" path="res://Nikko Hunt's Sound Design Essentials/Nature/Jungles of Sarawak - Nature - (Nikko Hunt's S.D.Essentials).wav" id="7_eow3j"]
+[ext_resource type="AudioStream" uid="uid://cyfjuu5aukea1" path="res://Nikko Hunt's Sound Design Essentials/Sweeps/Dry - Sweeps - (Nikko Hunt's S.D.Essentials).wav" id="8_j5wjh"]
+[ext_resource type="PackedScene" uid="uid://bb6pclx1od245" path="res://intro_cinematic.tscn" id="9_vef74"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_80nbo"]
+bg_color = Color(0, 0, 0, 1)
+
+[node name="Node2D" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_e2o6t")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="TextureRect" type="TextureRect" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4_ryrav")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="Dialogue" type="RichTextLabel" parent="UI" node_paths=PackedStringArray("typing_sound_player")]
+unique_name_in_owner = true
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -135.5
+offset_top = -123.0
+offset_right = 135.5
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+text = "The sun was setting slowly, casting long shadows across the empty field."
+context_menu_enabled = true
+script = ExtResource("1_80nbo")
+typing_speed = 20.0
+typing_sound_player = NodePath("../../Clack-85854")
+wait_before_start = 4.0
+
+[node name="Overlay" type="Panel" parent="UI"]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_80nbo")
+
+[node name="audio" type="AudioStreamPlayer" parent="UI"]
+unique_name_in_owner = true
+stream = ExtResource("3_feb5d")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="UI"]
+position = Vector2(576, 324)
+amount = 100
+lifetime = 8.0
+emission_shape = 3
+emission_rect_extents = Vector2(600, 400)
+gravity = Vector2(0, 20)
+initial_velocity_min = 10.0
+initial_velocity_max = 30.0
+scale_amount_min = 2.0
+scale_amount_max = 5.0
+color = Color(1, 1, 1, 0.3)
+
+[node name="Clack-85854" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_fc0e3")
+volume_db = -12.0
+pitch_scale = 4.0
+
+[node name="SynthyAmbientAtmospheric" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_7jktm")
+volume_db = -80.0
+autoplay = true
+parameters/looping = true
+
+[node name="Node" type="Node" parent="."]
+
+[node name="jungles-of-sarawak" type="AudioStreamPlayer" parent="Node"]
+stream = ExtResource("7_eow3j")
+volume_db = -80.0
+autoplay = true
+
+[node name="dry-sweep" type="AudioStreamPlayer" parent="Node"]
+stream = ExtResource("8_j5wjh")
+volume_db = -12.0
+
+[node name="intro-cinematic" parent="." instance=ExtResource("9_vef74")]

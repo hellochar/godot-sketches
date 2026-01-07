@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://casiu1mosafn3"
+path="res://.godot/imported/synthy ambient atmospheric.mp3-fef9b83400f41b7cbc477de91aa93270.mp3str"
+
+[deps]
+
+source_file="res://synthy ambient atmospheric.mp3"
+dest_files=["res://.godot/imported/synthy ambient atmospheric.mp3-fef9b83400f41b7cbc477de91aa93270.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
