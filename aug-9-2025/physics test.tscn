@@ -1,0 +1,125 @@
+[gd_scene load_steps=19 format=3 uid="uid://bab56bfaev6sw"]
+
+[ext_resource type="Texture2D" uid="uid://poaabv1n0dnx" path="res://noise_texture_2d.tres" id="1_a7pph"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_usria"]
+size = Vector3(0.5, 0.5, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i6xdm"]
+metallic = 1.0
+metallic_texture = ExtResource("1_a7pph")
+
+[sub_resource type="BoxMesh" id="BoxMesh_usria"]
+material = SubResource("StandardMaterial3D_i6xdm")
+size = Vector3(0.5, 0.5, 0.5)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_usria"]
+size = Vector2(10, 50)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_a7pph"]
+size = Vector3(10, 0.01, 10)
+
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_usria"]
+energy_multiplier = 5.0
+
+[sub_resource type="Sky" id="Sky_usria"]
+sky_material = SubResource("PhysicalSkyMaterial_usria")
+
+[sub_resource type="Environment" id="Environment_usria"]
+background_mode = 2
+sky = SubResource("Sky_usria")
+ssr_enabled = true
+ssil_enabled = true
+ssil_intensity = 50.0
+sdfgi_enabled = true
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_a7pph"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a7pph"]
+emission_enabled = true
+emission = Color(0.759472, 0.572064, 0.12554, 1)
+emission_energy_multiplier = 5.86
+
+[sub_resource type="SphereMesh" id="SphereMesh_i6xdm"]
+material = SubResource("StandardMaterial3D_a7pph")
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_i6xdm"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ixmm0"]
+emission = Color(0.759472, 0.572064, 0.12554, 1)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="SphereMesh" id="SphereMesh_y65nn"]
+material = SubResource("StandardMaterial3D_ixmm0")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y65nn"]
+metallic = 1.0
+roughness = 0.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_a7pph"]
+material = SubResource("StandardMaterial3D_y65nn")
+size = Vector2(5, 5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_i6xdm"]
+size = Vector3(5, 5, 0.01)
+
+[node name="Node3D" type="Node3D"]
+
+[node name="Square1" type="RigidBody3D" parent="."]
+transform = Transform3D(0.754366, 6.89889e-08, -0.656454, -0.499172, 0.649448, -0.573624, 0.426333, 0.760406, 0.489922, 0.401382, 2.76971, 0.680335)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Square1"]
+shape = SubResource("BoxShape3D_usria")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Square1"]
+mesh = SubResource("BoxMesh_usria")
+
+[node name="Plane" type="StaticBody3D" parent="."]
+
+[node name="PlaneMesh" type="MeshInstance3D" parent="Plane"]
+mesh = SubResource("PlaneMesh_usria")
+skeleton = NodePath("../../root/@EditorNode@21272/@Panel@14/@VBoxContainer@15/DockHSplitLeftL/DockHSplitLeftR/DockHSplitMain/@VBoxContainer@26/DockVSplitCenter/@VSplitContainer@54/@VBoxContainer@55/@EditorMainScreen@102/MainScreen/@CanvasItemEditor@11482/@VSplitContainer@11134/@HSplitContainer@11136/@HSplitContainer@11138/@Control@11139/@SubViewportContainer@11140/@SubViewport@11141/Node3D")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Plane"]
+shape = SubResource("BoxShape3D_a7pph")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.877583, -0.229849, 0.420735, 0, 0.877583, 0.479426, -0.479426, -0.420736, 0.770151, 2.49722, 2.84556, 4.57112)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_usria")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.00243689, -0.645525, -0.763735, -0.975916, -0.165064, 0.142629, -0.218136, 0.745689, -0.629575, 0, 4.2079, -1.79592)
+light_energy = 0.1
+shadow_enabled = true
+directional_shadow_mode = 0
+
+[node name="Sphere1" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.953601, 0.461401)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Sphere1"]
+shape = SubResource("SphereShape3D_a7pph")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Sphere1"]
+mesh = SubResource("SphereMesh_i6xdm")
+
+[node name="SphereRim" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.24564, 4.70248, 0.101075)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SphereRim"]
+shape = SubResource("SphereShape3D_i6xdm")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SphereRim"]
+mesh = SubResource("SphereMesh_y65nn")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+
+[node name="Mirror" type="MeshInstance3D" parent="StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4646, -2.2446)
+mesh = SubResource("QuadMesh_a7pph")
+skeleton = NodePath("../../root/@EditorNode@21272/@Panel@14/@VBoxContainer@15/DockHSplitLeftL/DockHSplitLeftR/DockHSplitMain/@VBoxContainer@26/DockVSplitCenter/@VSplitContainer@54/@VBoxContainer@55/@EditorMainScreen@102/MainScreen/@CanvasItemEditor@11482/@VSplitContainer@11134/@HSplitContainer@11136/@HSplitContainer@11138/@Control@11139/@SubViewportContainer@11140/@SubViewport@11141/Node3D")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4646, -2.2446)
+shape = SubResource("BoxShape3D_i6xdm")
