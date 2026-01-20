@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://dpicker123456"]
 
-[ext_resource type="Script" uid="uid://b6xp88qys52of" path="res://picker.gd" id="1_picker"]
+[ext_resource type="Script" uid="uid://b6xp88qys52of" path="res://dec-7-2025/picker.gd" id="1_picker"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nbr10"]
 bg_color = Color(0, 0.24553636, 0.19105443, 1)

@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://2yq0ne3dvbba"]
 
-[ext_resource type="Script" uid="uid://dnd74ka7hb6pe" path="res://item_card.gd" id="1_itemcard"]
+[ext_resource type="Script" uid="uid://dnd74ka7hb6pe" path="res://dec-7-2025/item_card.gd" id="1_itemcard"]
 [ext_resource type="Texture2D" uid="uid://d20xr7os4xido" path="res://assets/icon_atlas.png" id="2_6kc0x"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_rouse"]

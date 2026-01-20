@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dql4rkolmq8ud"]
 
-[ext_resource type="Script" uid="uid://bn5ivjy7vrw5c" path="res://inventory_ui.gd" id="1_invui"]
+[ext_resource type="Script" uid="uid://bn5ivjy7vrw5c" path="res://dec-7-2025/inventory_ui.gd" id="1_invui"]
 
 [node name="InventoryUI" type="VBoxContainer"]
 offset_right = 600.0
