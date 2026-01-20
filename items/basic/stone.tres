@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="Item" load_steps=4 format=3 uid="uid://dg6nmkwadmh61"]
 
-[ext_resource type="Script" uid="uid://cdhbuu2d1xlss" path="res://item.gd" id="1_i85se"]
+[ext_resource type="Script" uid="uid://cdhbuu2d1xlss" path="res://dec-7-2025/item.gd" id="1_i85se"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_0xmf6"]
 load_path = "res://.godot/imported/icon_atlas.png-8ac5fc0cdf230613c0cf6203a3100554.ctex"

@@ -85,8 +85,8 @@ func _input(event: InputEvent) -> void:
     if event.keycode == KEY_SPACE:
       tick(1)
 
-const STRUCTURE_INSTANCE = preload("res://structure_instance.tscn")
-const PICKER_SCENE = preload("res://picker.tscn")
+const STRUCTURE_INSTANCE = preload("res://dec-7-2025/structure_instance.tscn")
+const PICKER_SCENE = preload("res://dec-7-2025/picker.tscn")
 
 func assign_workers() -> void:
   var PEASANTS = preload("res://items/basic/peasants.tres")
