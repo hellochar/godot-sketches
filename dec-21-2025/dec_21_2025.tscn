@@ -1,13 +1,13 @@
 [gd_scene load_steps=15 format=4 uid="uid://dtogs63iitiv8"]
 
-[ext_resource type="Script" uid="uid://dvrktk3sifnl0" path="res://dec_21_2025.gd" id="1_0okp5"]
-[ext_resource type="TileSet" uid="uid://l77dh6fyg31k" path="res://tileset_pr4nta_pixelascii.tres" id="2_ampl0"]
-[ext_resource type="Script" uid="uid://68d242dd8bry" path="res://camera_follow_target.gd" id="3_khtp6"]
-[ext_resource type="PackedScene" uid="uid://c8l4s74n3ubwu" path="res://plant.tscn" id="4_7we1r"]
-[ext_resource type="Script" uid="uid://d0x0psvmx81uc" path="res://player_controller.gd" id="4_khtp6"]
+[ext_resource type="Script" uid="uid://dffm6nsm4o15f" path="res://dec-21-2025/dec_21_2025.gd" id="1_0okp5"]
+[ext_resource type="TileSet" uid="uid://l77dh6fyg31k" path="res://dec-21-2025/tileset_pr4nta_pixelascii.tres" id="2_ampl0"]
+[ext_resource type="Script" uid="uid://0c4wsehmyh4o" path="res://dec-21-2025/camera_follow_target.gd" id="3_khtp6"]
+[ext_resource type="PackedScene" uid="uid://c8l4s74n3ubwu" path="res://dec-21-2025/plant.tscn" id="4_7we1r"]
+[ext_resource type="Script" uid="uid://b0e85na0msy1a" path="res://dec-21-2025/player_controller.gd" id="4_khtp6"]
 [ext_resource type="Texture2D" uid="uid://f8jsqgv44ymr" path="res://assets/hexanys_roguelike_tiles_0.3.0/Tilesheets/Transparent/creatures_transparent.png" id="4_ui3wy"]
-[ext_resource type="Script" uid="uid://cqcb0v661ue1q" path="res://hud.gd" id="5_hud"]
-[ext_resource type="Script" uid="uid://mukfihgxpuwj" path="res://fog_of_war.gd" id="6_fog"]
+[ext_resource type="Script" uid="uid://dfjbrnqv6o03q" path="res://dec-21-2025/hud.gd" id="5_hud"]
+[ext_resource type="Script" uid="uid://cbtxtj038b1xq" path="res://dec-21-2025/fog_of_war.gd" id="6_fog"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_khtp6"]
 atlas = ExtResource("4_ui3wy")
