@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://d00c7ej1vqdl1"
+path="res://.godot/imported/Dark Waves - Soundscapes - (Nikko Hunt's S.D.Essentials).wav-cbd5ab04c412079e12129462e7d91269.sample"
+
+[deps]
+
+source_file="res://assets/Nikko Hunt's Sound Design Essentials/Soundscapes/Dark Waves - Soundscapes - (Nikko Hunt's S.D.Essentials).wav"
+dest_files=["res://.godot/imported/Dark Waves - Soundscapes - (Nikko Hunt's S.D.Essentials).wav-cbd5ab04c412079e12129462e7d91269.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

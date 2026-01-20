@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://crlij8k4pgn84"
+path="res://.godot/imported/Formula 1 - Whoosh - (Nikko Hunt's S.D.Essentials).wav-62e988e3457bd84a93a2a785b2d8a8eb.sample"
+
+[deps]
+
+source_file="res://assets/Nikko Hunt's Sound Design Essentials/Whooshs/Formula 1 - Whoosh - (Nikko Hunt's S.D.Essentials).wav"
+dest_files=["res://.godot/imported/Formula 1 - Whoosh - (Nikko Hunt's S.D.Essentials).wav-62e988e3457bd84a93a2a785b2d8a8eb.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

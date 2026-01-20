@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://ddc2o887birgw"
+path="res://.godot/imported/Sub Bass - Whoosh - (Nikko Hunt's S.D.Essentials).wav-a85547d19a45d20b2296502f7f283721.sample"
+
+[deps]
+
+source_file="res://assets/Nikko Hunt's Sound Design Essentials/Whooshs/Sub Bass - Whoosh - (Nikko Hunt's S.D.Essentials).wav"
+dest_files=["res://.godot/imported/Sub Bass - Whoosh - (Nikko Hunt's S.D.Essentials).wav-a85547d19a45d20b2296502f7f283721.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

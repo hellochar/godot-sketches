@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://cs2q16k2ip0pr"
+path="res://.godot/imported/Footsteps In Fake Versace Sliders - Foley_Humans - (Nikko Hunt's S.D.Essentials).wav-522d4da900e22d7f7f2a829948c68d41.sample"
+
+[deps]
+
+source_file="res://assets/Nikko Hunt's Sound Design Essentials/Foley_Humans/Footsteps In Fake Versace Sliders - Foley_Humans - (Nikko Hunt's S.D.Essentials).wav"
+dest_files=["res://.godot/imported/Footsteps In Fake Versace Sliders - Foley_Humans - (Nikko Hunt's S.D.Essentials).wav-522d4da900e22d7f7f2a829948c68d41.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

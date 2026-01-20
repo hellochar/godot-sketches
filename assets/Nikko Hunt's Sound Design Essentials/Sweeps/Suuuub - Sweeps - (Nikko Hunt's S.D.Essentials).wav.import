@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://cy0a64w48yoyj"
+path="res://.godot/imported/Suuuub - Sweeps - (Nikko Hunt's S.D.Essentials).wav-61c38cccdcea9498d58934628c6d2e03.sample"
+
+[deps]
+
+source_file="res://assets/Nikko Hunt's Sound Design Essentials/Sweeps/Suuuub - Sweeps - (Nikko Hunt's S.D.Essentials).wav"
+dest_files=["res://.godot/imported/Suuuub - Sweeps - (Nikko Hunt's S.D.Essentials).wav-61c38cccdcea9498d58934628c6d2e03.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2
