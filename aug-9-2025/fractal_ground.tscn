@@ -1,11 +1,9 @@
-[gd_scene load_steps=16 format=3 uid="uid://d4hx2opanvdu2"]
+[gd_scene load_steps=13 format=3 uid="uid://d4hx2opanvdu2"]
 
 [ext_resource type="Material" uid="uid://rjtoefm7ly6a" path="res://aug-9-2025/blue_material.material" id="1_sge3k"]
 [ext_resource type="ArrayMesh" uid="uid://c4c7bhek7xhd6" path="res://aug-9-2025/new_array_mesh.tres" id="2_0f1g3"]
 [ext_resource type="Shader" uid="uid://bvn2icgnf34dy" path="res://aug-9-2025/fractal_ground.tres" id="3_vvs6j"]
-[ext_resource type="Shader" uid="uid://nxqw2p2k2lhx" path="res://aug-9-2025/water.gdshader" id="4_water"]
-[ext_resource type="Texture2D" uid="uid://dqql8x0tqpnil" path="res://aug-9-2025/assets/water_normal1.jpeg" id="5_fnrh4"]
-[ext_resource type="Texture2D" uid="uid://4f3dbsngae4o" path="res://aug-9-2025/assets/water_normal2.jpg" id="6_by2jp"]
+[ext_resource type="Material" uid="uid://dci3vssaaaqb6" path="res://materials/water/water.material" id="4_nhiyu"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4xowi"]
 
@@ -49,38 +47,8 @@ size = Vector2(25, 25)
 subdivide_width = 1024
 subdivide_depth = 1024
 
-[sub_resource type="ShaderMaterial" id="WaterMaterial"]
-render_priority = 0
-shader = ExtResource("4_water")
-shader_parameter/shallow_color = Color(0.12, 0.45, 0.7, 1)
-shader_parameter/deep_color = Color(0.02, 0.12, 0.25, 1)
-shader_parameter/amplitude = 0.15
-shader_parameter/frequency = 6.0
-shader_parameter/speed = 1.2
-shader_parameter/metallic_factor = 0.0
-shader_parameter/smoothness = 0.85
-shader_parameter/water_level = 0.55
-shader_parameter/base_alpha = 0.7
-shader_parameter/fresnel_opacity = 0.35
-shader_parameter/normal_map_1 = ExtResource("5_fnrh4")
-shader_parameter/normal_map_2 = ExtResource("6_by2jp")
-shader_parameter/normal1_uv_scale = Vector2(2, 2)
-shader_parameter/normal2_uv_scale = Vector2(4, 4)
-shader_parameter/normal1_scroll_dir = Vector2(0.1, 0)
-shader_parameter/normal2_scroll_dir = Vector2(-0.05, 0.07)
-shader_parameter/normal1_speed = 0.6
-shader_parameter/normal2_speed = 0.9
-shader_parameter/normal1_strength = 0.6
-shader_parameter/normal2_strength = 0.7
-shader_parameter/normal_mix = 0.85
-shader_parameter/foam_color = Vector3(1, 1, 1)
-shader_parameter/foam_intensity = 0.8
-shader_parameter/foam_edge_width = 0.02
-shader_parameter/foam_softness = 0.05
-shader_parameter/foam_alpha_boost = 0.15
-
 [sub_resource type="PlaneMesh" id="WaterPlane"]
-material = SubResource("WaterMaterial")
+material = ExtResource("4_nhiyu")
 size = Vector2(25, 25)
 subdivide_width = 200
 subdivide_depth = 200
