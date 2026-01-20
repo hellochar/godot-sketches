@@ -4,7 +4,7 @@ class_name InventoryUI
 @onready var title_label: Label = %Title
 @onready var cards_container: FlowContainer = %CardsContainer
 
-const ITEM_CARD = preload("res://item_card.tscn")
+const ITEM_CARD = preload("res://dec-7-2025/item_card.tscn")
 
 var inventory: World.Inventory
 var needs_refresh: bool = false
