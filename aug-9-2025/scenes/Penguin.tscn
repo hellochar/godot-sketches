@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://x3i1f7oiw2hu"]
 
-[ext_resource type="Script" uid="uid://btuua1ym682us" path="res://scripts/Penguin.gd" id="1_m6l3h"]
+[ext_resource type="Script" uid="uid://btuua1ym682us" path="res://aug-9-2025/scripts/Penguin.gd" id="1_m6l3h"]
 
 [sub_resource type="CircleShape2D" id="2_shape"]
 radius = 12.0

@@ -1,11 +1,11 @@
 [gd_scene load_steps=16 format=3 uid="uid://d4hx2opanvdu2"]
 
-[ext_resource type="Material" uid="uid://rjtoefm7ly6a" path="res://blue_material.material" id="1_sge3k"]
-[ext_resource type="ArrayMesh" uid="uid://c4c7bhek7xhd6" path="res://new_array_mesh.tres" id="2_0f1g3"]
-[ext_resource type="Shader" uid="uid://bvn2icgnf34dy" path="res://fractal_ground.tres" id="3_vvs6j"]
-[ext_resource type="Shader" uid="uid://nxqw2p2k2lhx" path="res://water.gdshader" id="4_water"]
-[ext_resource type="Texture2D" uid="uid://cgctpwkg11l5w" path="res://assets/water_normal1.jpeg" id="5_fnrh4"]
-[ext_resource type="Texture2D" uid="uid://d2uxuf6w8lkxa" path="res://assets/water_normal2.jpg" id="6_by2jp"]
+[ext_resource type="Material" uid="uid://rjtoefm7ly6a" path="res://aug-9-2025/blue_material.material" id="1_sge3k"]
+[ext_resource type="ArrayMesh" uid="uid://c4c7bhek7xhd6" path="res://aug-9-2025/new_array_mesh.tres" id="2_0f1g3"]
+[ext_resource type="Shader" uid="uid://bvn2icgnf34dy" path="res://aug-9-2025/fractal_ground.tres" id="3_vvs6j"]
+[ext_resource type="Shader" uid="uid://nxqw2p2k2lhx" path="res://aug-9-2025/water.gdshader" id="4_water"]
+[ext_resource type="Texture2D" uid="uid://dqql8x0tqpnil" path="res://aug-9-2025/assets/water_normal1.jpeg" id="5_fnrh4"]
+[ext_resource type="Texture2D" uid="uid://4f3dbsngae4o" path="res://aug-9-2025/assets/water_normal2.jpg" id="6_by2jp"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4xowi"]
 
@@ -114,5 +114,4 @@ mesh = SubResource("PlaneMesh_sge3k")
 
 [node name="Water" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.19131, 0)
-visible = false
 mesh = SubResource("WaterPlane")

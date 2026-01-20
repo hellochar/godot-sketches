@@ -1,11 +1,11 @@
 @tool
 extends EditorScript
 
-## Generates seamless tiling water normal maps procedurally and saves them under res://textures/.
+## Generates seamless tiling water normal maps procedurally and saves them under res://aug-9-2025/textures/.
 ## Run from the Script panel (File > Run) or the triangle "Run" button when this script is open.
 
 const SIZE := 512
-const OUTPUT_DIR := "res://textures"
+const OUTPUT_DIR := "res://aug-9-2025/textures"
 
 func _run() -> void:
 	print("[WaterNormals] Generating tiling water normal maps...")
@@ -43,9 +43,9 @@ func _run() -> void:
 
 
 func _ensure_output_dir() -> void:
-	var root := DirAccess.open("res://")
+	var root := DirAccess.open("res://aug-9-2025/")
 	if root == null:
-		push_error("Failed to open res:// for writing")
+		push_error("Failed to open res://aug-9-2025/ for writing")
 		return
 	if not root.dir_exists("textures"):
 		var err := root.make_dir("textures")

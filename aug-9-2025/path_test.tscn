@@ -1,9 +1,9 @@
 [gd_scene load_steps=22 format=4 uid="uid://bu1dpggprq64k"]
 
-[ext_resource type="Script" uid="uid://undgxl648bmd" path="res://path_follow_3d.gd" id="1_28qa7"]
-[ext_resource type="Curve3D" uid="uid://c47y0kum3lrj8" path="res://path_curve3d.tres" id="1_qpnnw"]
-[ext_resource type="Script" uid="uid://ce8gbarpemo5o" path="res://camera_3d.gd" id="1_r8hkk"]
-[ext_resource type="CompressedTexture3D" uid="uid://d1jygxeylpi6x" path="res://path_test/path_test.GPUParticlesCollisionSDF3D_data.exr" id="3_dp1qd"]
+[ext_resource type="Script" uid="uid://undgxl648bmd" path="res://aug-9-2025/path_follow_3d.gd" id="1_28qa7"]
+[ext_resource type="Curve3D" uid="uid://c47y0kum3lrj8" path="res://aug-9-2025/path_curve3d.tres" id="1_qpnnw"]
+[ext_resource type="Script" uid="uid://ce8gbarpemo5o" path="res://aug-9-2025/camera_3d.gd" id="1_r8hkk"]
+[ext_resource type="CompressedTexture3D" uid="uid://d1jygxeylpi6x" path="res://aug-9-2025/path_test/path_test.GPUParticlesCollisionSDF3D_data.exr" id="3_dp1qd"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_3e2i6"]
 radius = 0.1

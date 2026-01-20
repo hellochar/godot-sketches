@@ -1,6 +1,6 @@
 [gd_resource type="VisualShader" load_steps=17 format=3 uid="uid://bvn2icgnf34dy"]
 
-[ext_resource type="Texture2D" uid="uid://poaabv1n0dnx" path="res://noise_texture_2d.tres" id="1_mlnvc"]
+[ext_resource type="Texture2D" uid="uid://poaabv1n0dnx" path="res://aug-9-2025/noise_texture_2d.tres" id="1_mlnvc"]
 
 [sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_mlnvc"]
 texture = ExtResource("1_mlnvc")
@@ -60,7 +60,7 @@ operator = 2
 
 [resource]
 code = "shader_type spatial;
-render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_lambert, specular_schlick_ggx;
+render_mode blend_mix, depth_draw_opaque, depth_test_default, cull_back, diffuse_lambert, specular_schlick_ggx;
 
 uniform sampler2D tex_vtx_2;
 uniform float HeightScale = 1.0;

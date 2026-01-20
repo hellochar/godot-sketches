@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 ItemLibrary="*res://item_library.gd"
 HTags="*res://addons/htags/autoload/htag_system.gd"
+MultiplayerManager="*res://aug-9-2025/scripts/MultiplayerManager.gd"
 
 [display]
 
