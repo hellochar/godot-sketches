@@ -1,14 +1,11 @@
-[gd_scene load_steps=11 format=3 uid="uid://nmpbm4g3jim4"]
+[gd_scene load_steps=8 format=3 uid="uid://nmpbm4g3jim4"]
 
-[ext_resource type="Script" uid="uid://bigcfyacvshrd" path="res://addons/type_writer_label/classes/type_writer_label.gd" id="1_80nbo"]
-[ext_resource type="Script" uid="uid://dcgixhll7ycus" path="res://stage.gd" id="1_e2o6t"]
-[ext_resource type="AudioStream" uid="uid://cwwp1in3oe0jt" path="res://mp3_English_en-US-EmmaNeural.mp3" id="3_feb5d"]
-[ext_resource type="AudioStream" uid="uid://vu3pp2mg7l0b" path="res://clack-85854.mp3" id="4_fc0e3"]
-[ext_resource type="Texture2D" uid="uid://dbit13o6pcei4" path="res://ChatGPT Image Nov 23, 2025, 11_37_31 AM.png" id="4_ryrav"]
-[ext_resource type="AudioStream" uid="uid://casiu1mosafn3" path="res://synthy ambient atmospheric.mp3" id="5_7jktm"]
-[ext_resource type="AudioStream" uid="uid://bc7fxyh271cw8" path="res://Nikko Hunt's Sound Design Essentials/Nature/Jungles of Sarawak - Nature - (Nikko Hunt's S.D.Essentials).wav" id="7_eow3j"]
-[ext_resource type="AudioStream" uid="uid://cyfjuu5aukea1" path="res://Nikko Hunt's Sound Design Essentials/Sweeps/Dry - Sweeps - (Nikko Hunt's S.D.Essentials).wav" id="8_j5wjh"]
-[ext_resource type="PackedScene" uid="uid://bb6pclx1od245" path="res://intro_cinematic.tscn" id="9_vef74"]
+[ext_resource type="Script" uid="uid://bigcfyacvshrd" path="res://nov-23-2025/addons/type_writer_label/classes/type_writer_label.gd" id="1_80nbo"]
+[ext_resource type="Script" uid="uid://dcgixhll7ycus" path="res://nov-23-2025/stage.gd" id="1_e2o6t"]
+[ext_resource type="AudioStream" uid="uid://bhupoqihw4hqb" path="res://assets/Nikko Hunt's Sound Design Essentials/Nature/Jungles of Sarawak - Nature - (Nikko Hunt's S.D.Essentials).wav" id="4_cibw0"]
+[ext_resource type="Texture2D" uid="uid://bljjjfveylcml" path="res://nov-23-2025/ChatGPT Image Nov 23, 2025, 11_37_31 AM.png" id="4_ryrav"]
+[ext_resource type="AudioStream" uid="uid://0tdvgexchj1e" path="res://assets/Nikko Hunt's Sound Design Essentials/Sweeps/Dry - Sweeps - (Nikko Hunt's S.D.Essentials).wav" id="5_q36b4"]
+[ext_resource type="PackedScene" uid="uid://bb6pclx1od245" path="res://nov-23-2025/intro_cinematic.tscn" id="9_vef74"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_80nbo"]
 bg_color = Color(0, 0, 0, 1)
@@ -61,7 +58,6 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_80nbo")
 
 [node name="audio" type="AudioStreamPlayer" parent="UI"]
 unique_name_in_owner = true
-stream = ExtResource("3_feb5d")
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="UI"]
 position = Vector2(576, 324)
@@ -77,25 +73,22 @@ scale_amount_max = 5.0
 color = Color(1, 1, 1, 0.3)
 
 [node name="Clack-85854" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("4_fc0e3")
 volume_db = -12.0
 pitch_scale = 4.0
 
 [node name="SynthyAmbientAtmospheric" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("5_7jktm")
 volume_db = -80.0
 autoplay = true
-parameters/looping = true
 
 [node name="Node" type="Node" parent="."]
 
 [node name="jungles-of-sarawak" type="AudioStreamPlayer" parent="Node"]
-stream = ExtResource("7_eow3j")
+stream = ExtResource("4_cibw0")
 volume_db = -80.0
 autoplay = true
 
 [node name="dry-sweep" type="AudioStreamPlayer" parent="Node"]
-stream = ExtResource("8_j5wjh")
+stream = ExtResource("5_q36b4")
 volume_db = -12.0
 
 [node name="intro-cinematic" parent="." instance=ExtResource("9_vef74")]
