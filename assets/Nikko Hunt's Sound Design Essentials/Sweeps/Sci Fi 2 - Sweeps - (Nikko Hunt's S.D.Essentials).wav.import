@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://8ei0sucapri4"
+path="res://.godot/imported/Sci Fi 2 - Sweeps - (Nikko Hunt's S.D.Essentials).wav-553163a4855157ece795c5efd31f8d2d.sample"
+
+[deps]
+
+source_file="res://assets/Nikko Hunt's Sound Design Essentials/Sweeps/Sci Fi 2 - Sweeps - (Nikko Hunt's S.D.Essentials).wav"
+dest_files=["res://.godot/imported/Sci Fi 2 - Sweeps - (Nikko Hunt's S.D.Essentials).wav-553163a4855157ece795c5efd31f8d2d.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

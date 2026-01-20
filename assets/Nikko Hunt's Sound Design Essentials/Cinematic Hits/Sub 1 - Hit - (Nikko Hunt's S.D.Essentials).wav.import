@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://cup1a5eawr4qy"
+path="res://.godot/imported/Sub 1 - Hit - (Nikko Hunt's S.D.Essentials).wav-cf96f82e94e47dcad054601265cf3f8b.sample"
+
+[deps]
+
+source_file="res://assets/Nikko Hunt's Sound Design Essentials/Cinematic Hits/Sub 1 - Hit - (Nikko Hunt's S.D.Essentials).wav"
+dest_files=["res://.godot/imported/Sub 1 - Hit - (Nikko Hunt's S.D.Essentials).wav-cf96f82e94e47dcad054601265cf3f8b.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

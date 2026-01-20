@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://b40w7egcl1txa"
+path="res://.godot/imported/White Noise Flicker - Glitch - (Nikko Hunt's S.D.Essentials).wav-3e55d220959bcc37fa82b1d809817740.sample"
+
+[deps]
+
+source_file="res://assets/Nikko Hunt's Sound Design Essentials/Glitches/White Noise Flicker - Glitch - (Nikko Hunt's S.D.Essentials).wav"
+dest_files=["res://.godot/imported/White Noise Flicker - Glitch - (Nikko Hunt's S.D.Essentials).wav-3e55d220959bcc37fa82b1d809817740.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

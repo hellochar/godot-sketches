@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://bc0s4dl7xfx83"
+path="res://.godot/imported/Busy City With Construction  - Foley_Humans - (Nikko Hunt's S.D.Essentials).wav-e0b21352ae299f1f9a45d021f82ecf02.sample"
+
+[deps]
+
+source_file="res://assets/Nikko Hunt's Sound Design Essentials/Foley_Humans/Busy City With Construction  - Foley_Humans - (Nikko Hunt's S.D.Essentials).wav"
+dest_files=["res://.godot/imported/Busy City With Construction  - Foley_Humans - (Nikko Hunt's S.D.Essentials).wav-e0b21352ae299f1f9a45d021f82ecf02.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

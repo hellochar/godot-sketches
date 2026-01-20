@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://djo444n10fo0s"
+path="res://.godot/imported/Fireball 1 - Whoosh - (Nikko Hunt's S.D.Essentials).wav-c0718ad681b4f78cb2f59ac514aad351.sample"
+
+[deps]
+
+source_file="res://assets/Nikko Hunt's Sound Design Essentials/Whooshs/Fireball 1 - Whoosh - (Nikko Hunt's S.D.Essentials).wav"
+dest_files=["res://.godot/imported/Fireball 1 - Whoosh - (Nikko Hunt's S.D.Essentials).wav-c0718ad681b4f78cb2f59ac514aad351.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

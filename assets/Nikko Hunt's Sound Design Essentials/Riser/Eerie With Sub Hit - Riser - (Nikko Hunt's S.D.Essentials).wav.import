@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://ckm2k1awubi6j"
+path="res://.godot/imported/Eerie With Sub Hit - Riser - (Nikko Hunt's S.D.Essentials).wav-49735ef63253142415f937ca9a8b53f0.sample"
+
+[deps]
+
+source_file="res://assets/Nikko Hunt's Sound Design Essentials/Riser/Eerie With Sub Hit - Riser - (Nikko Hunt's S.D.Essentials).wav"
+dest_files=["res://.godot/imported/Eerie With Sub Hit - Riser - (Nikko Hunt's S.D.Essentials).wav-49735ef63253142415f937ca9a8b53f0.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

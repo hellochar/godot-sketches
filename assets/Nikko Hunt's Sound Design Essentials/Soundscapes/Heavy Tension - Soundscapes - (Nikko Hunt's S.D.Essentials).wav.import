@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://dgqaht04yhcou"
+path="res://.godot/imported/Heavy Tension - Soundscapes - (Nikko Hunt's S.D.Essentials).wav-9727154ca8e6cf89998c879eb657c882.sample"
+
+[deps]
+
+source_file="res://assets/Nikko Hunt's Sound Design Essentials/Soundscapes/Heavy Tension - Soundscapes - (Nikko Hunt's S.D.Essentials).wav"
+dest_files=["res://.godot/imported/Heavy Tension - Soundscapes - (Nikko Hunt's S.D.Essentials).wav-9727154ca8e6cf89998c879eb657c882.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2
