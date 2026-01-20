@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://nmpbm4g3jim4"]
 
-[ext_resource type="Script" uid="uid://bigcfyacvshrd" path="res://nov-23-2025/addons/type_writer_label/classes/type_writer_label.gd" id="1_80nbo"]
+[ext_resource type="Script" uid="uid://bigcfyacvshrd" path="res://addons/type_writer_label/classes/type_writer_label.gd" id="1_80nbo"]
 [ext_resource type="Script" uid="uid://dcgixhll7ycus" path="res://nov-23-2025/stage.gd" id="1_e2o6t"]
 [ext_resource type="AudioStream" uid="uid://bhupoqihw4hqb" path="res://assets/Nikko Hunt's Sound Design Essentials/Nature/Jungles of Sarawak - Nature - (Nikko Hunt's S.D.Essentials).wav" id="4_cibw0"]
 [ext_resource type="Texture2D" uid="uid://bljjjfveylcml" path="res://nov-23-2025/ChatGPT Image Nov 23, 2025, 11_37_31 AM.png" id="4_ryrav"]
