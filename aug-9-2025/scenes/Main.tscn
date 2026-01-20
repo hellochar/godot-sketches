@@ -1,9 +1,9 @@
 [gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://scripts/Main.gd" id="1_6r0qj"]
-[ext_resource type="PackedScene" path="res://scenes/Penguin.tscn" id="2_km1n2"]
-[ext_resource type="PackedScene" path="res://scenes/Fire.tscn" id="3_x7h2k"]
-[ext_resource type="PackedScene" path="res://scenes/ChatUI.tscn" id="4_bb4gk"]
+[ext_resource type="Script" path="res://aug-9-2025/scripts/Main.gd" id="1_6r0qj"]
+[ext_resource type="PackedScene" path="res://aug-9-2025/scenes/Penguin.tscn" id="2_km1n2"]
+[ext_resource type="PackedScene" path="res://aug-9-2025/scenes/Fire.tscn" id="3_x7h2k"]
+[ext_resource type="PackedScene" path="res://aug-9-2025/scenes/ChatUI.tscn" id="4_bb4gk"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_6r0qj")

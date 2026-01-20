@@ -95,4 +95,3 @@ func _on_peer_disconnected(id):
 
 func _on_server_disconnected():
 	print("Disconnected from server")
-

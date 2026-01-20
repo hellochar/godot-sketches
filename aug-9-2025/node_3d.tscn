@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://cg6rwlew8bhs7"]
 
-[ext_resource type="Material" uid="uid://rjtoefm7ly6a" path="res://blue_material.material" id="1_a202f"]
-[ext_resource type="Material" uid="uid://dy118ki5ryfst" path="res://visual_shader_material.material" id="2_noarx"]
+[ext_resource type="Material" uid="uid://rjtoefm7ly6a" path="res://aug-9-2025/blue_material.material" id="1_a202f"]
+[ext_resource type="Material" uid="uid://dy118ki5ryfst" path="res://aug-9-2025/visual_shader_material.material" id="2_noarx"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4xowi"]
 
@@ -21,6 +21,7 @@ sky = SubResource("Sky_a202f")
 [node name="Node3D" type="Node3D"]
 
 [node name="PopupPanel" type="PopupPanel" parent="."]
+oversampling_override = 1.0
 title = "asdf"
 visible = true
 

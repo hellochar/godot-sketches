@@ -3,17 +3,17 @@ extends Camera3D
 
 func _process(delta):
 	var direction := Vector3.ZERO
-	if Input.is_action_pressed("move_forward"):
+	if Input.is_action_pressed("camera_up"):
 		direction -= Vector3.FORWARD
-	if Input.is_action_pressed("move_back"):
+	if Input.is_action_pressed("camera_down"):
 		direction += Vector3.FORWARD
-	if Input.is_action_pressed("move_left"):
+	if Input.is_action_pressed("camera_left"):
 		direction -= Vector3.RIGHT
-	if Input.is_action_pressed("move_right"):
+	if Input.is_action_pressed("camera_right"):
 		direction += Vector3.RIGHT
-	if Input.is_action_pressed("move_up"):
+	if Input.is_action_pressed("interact"):
 		direction += Vector3.UP
-	if Input.is_action_pressed("move_down"):
+	if Input.is_action_pressed("ui_cancel"):
 		direction -= Vector3.UP
 
 	if direction != Vector3.ZERO:

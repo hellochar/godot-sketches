@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/ChatUI.gd" id="1_7t0ii"]
+[ext_resource type="Script" path="res://aug-9-2025/scripts/ChatUI.gd" id="1_7t0ii"]
 
 [node name="ChatUI" type="Control"]
 anchor_right = 1.0
