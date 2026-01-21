@@ -1,4 +1,4 @@
-# General 
+# General
 - ALWAYS use two spaces for indentation, never tabs
 - Do NOT add defensive null and valid checks unless the variable is used in a way that requires it.
 - Start every response with the word 'banana'.
@@ -9,6 +9,9 @@
 - Shorten summaries to just the most important code bits.
 - Do not ever delete the .godot folder unless I explicitly ask.
 
+# Godot MCP Tools
+- AVOID using `add_node` MCP tool. Instead, write/edit .tscn files directly.
+- ALWAYS use `update_project_uids` after renaming or moving assets to fix UID references.
 
 ### Checklist for file moves in Godot:
 
