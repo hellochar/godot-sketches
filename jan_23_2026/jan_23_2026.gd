@@ -30,12 +30,12 @@ const BEATS := {
 }
 
 const ANIM_DURATION := 0.3
+const CARD_CORNER_RADIUS := 8
 
 var player_hand: Array[Element] = []
 var computer_hand: Array[Element] = []
 var player_score := 0
 var computer_score := 0
-var selected_card_index := -1
 var battle_in_progress := false
 
 @onready var player_hand_container: HBoxContainer = $VBoxContainer/GameArea/PlayerSection/PlayerHand
@@ -57,7 +57,6 @@ func start_new_game() -> void:
   computer_hand.clear()
   player_score = 0
   computer_score = 0
-  selected_card_index = -1
   battle_in_progress = false
 
   deal_hands()
@@ -77,10 +76,8 @@ func random_element() -> Element:
 
 
 func update_ui() -> void:
-  update_hand_display(player_hand_container, player_hand, true)
-  update_hand_display(computer_hand_container, computer_hand, false)
-  score_label.text = "Player: %d | Computer: %d" % [player_score, computer_score]
-
+  update_both_hands()
+  update_score_display()
   player_battle_card.visible = false
   computer_battle_card.visible = false
   result_label.text = ""
@@ -100,22 +97,39 @@ func get_text_color(bg_color: Color) -> Color:
   return Color.BLACK if luminance > 0.5 else Color.WHITE
 
 
+func create_card_style(color: Color) -> StyleBoxFlat:
+  var style := StyleBoxFlat.new()
+  style.bg_color = color
+  style.set_corner_radius_all(CARD_CORNER_RADIUS)
+  return style
+
+
+func update_both_hands() -> void:
+  update_hand_display(player_hand_container, player_hand, true)
+  update_hand_display(computer_hand_container, computer_hand, false)
+
+
+func update_score_display() -> void:
+  score_label.text = "Player: %d | Computer: %d" % [player_score, computer_score]
+
+
+func tween_position(node: Control, target: Vector2) -> Tween:
+  var tween := create_tween()
+  tween.tween_property(node, "global_position", target, ANIM_DURATION).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+  return tween
+
+
 func create_card_button(element: Element, is_player: bool, index: int) -> Button:
   var button := Button.new()
   button.custom_minimum_size = Vector2(80, 120)
   button.text = ELEMENT_NAMES[element]
 
-  var style := StyleBoxFlat.new()
+  var bg_color := ELEMENT_COLORS[element] if is_player else Color(0.3, 0.3, 0.3)
+  var style := create_card_style(bg_color)
   if is_player:
-    style.bg_color = ELEMENT_COLORS[element]
-    button.add_theme_color_override("font_color", get_text_color(style.bg_color))
-    button.add_theme_color_override("font_hover_color", get_text_color(style.bg_color))
-  else:
-    style.bg_color = Color(0.3, 0.3, 0.3)
-  style.corner_radius_top_left = 8
-  style.corner_radius_top_right = 8
-  style.corner_radius_bottom_left = 8
-  style.corner_radius_bottom_right = 8
+    var text_color := get_text_color(bg_color)
+    button.add_theme_color_override("font_color", text_color)
+    button.add_theme_color_override("font_hover_color", text_color)
   button.add_theme_stylebox_override("normal", style)
 
   var hover_style := style.duplicate()
@@ -134,18 +148,13 @@ func create_animated_card(element: Element) -> Panel:
   var panel := Panel.new()
   panel.custom_minimum_size = Vector2(100, 150)
 
-  var style := StyleBoxFlat.new()
-  style.bg_color = ELEMENT_COLORS[element]
-  style.corner_radius_top_left = 8
-  style.corner_radius_top_right = 8
-  style.corner_radius_bottom_left = 8
-  style.corner_radius_bottom_right = 8
-  panel.add_theme_stylebox_override("panel", style)
+  var bg_color := ELEMENT_COLORS[element]
+  panel.add_theme_stylebox_override("panel", create_card_style(bg_color))
 
   var label := Label.new()
   label.text = ELEMENT_NAMES[element]
   label.add_theme_font_size_override("font_size", 16)
-  label.add_theme_color_override("font_color", get_text_color(style.bg_color))
+  label.add_theme_color_override("font_color", get_text_color(bg_color))
   label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
   label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
   label.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -158,7 +167,6 @@ func _on_player_card_selected(index: int) -> void:
   if battle_in_progress or index >= player_hand.size() or computer_hand.is_empty():
     return
 
-  selected_card_index = index
   battle_in_progress = true
   instruction_label.text = "Battle!"
 
@@ -173,8 +181,7 @@ func _on_player_card_selected(index: int) -> void:
 
   player_hand.remove_at(index)
   computer_hand.remove_at(computer_index)
-  update_hand_display(player_hand_container, player_hand, true)
-  update_hand_display(computer_hand_container, computer_hand, false)
+  update_both_hands()
 
   await animate_battle(player_element, computer_element, player_start_pos, computer_start_pos)
 
@@ -229,7 +236,7 @@ func animate_battle(player_element: Element, computer_element: Element, player_s
       player_hand.append(player_element)
       computer_hand.append(computer_element)
 
-  score_label.text = "Player: %d | Computer: %d" % [player_score, computer_score]
+  update_score_display()
 
   await get_tree().create_timer(1.0).timeout
 
@@ -237,8 +244,7 @@ func animate_battle(player_element: Element, computer_element: Element, player_s
   computer_battle_card.visible = false
   result_label.text = ""
 
-  update_hand_display(player_hand_container, player_hand, true)
-  update_hand_display(computer_hand_container, computer_hand, false)
+  update_both_hands()
   await get_tree().process_frame
 
   var has_return_anim := false
@@ -247,16 +253,14 @@ func animate_battle(player_element: Element, computer_element: Element, player_s
     var target_button: Button = player_hand_container.get_child(player_hand.size() - 1)
     player_card.visible = true
     player_card.global_position = player_target
-    var return_tween := create_tween()
-    return_tween.tween_property(player_card, "global_position", target_button.global_position, ANIM_DURATION).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+    tween_position(player_card, target_button.global_position)
     has_return_anim = true
 
   if result <= 0 and computer_hand.size() > 0:
     var target_button: Button = computer_hand_container.get_child(computer_hand.size() - 1)
     computer_card.visible = true
     computer_card.global_position = computer_target
-    var return_tween := create_tween()
-    return_tween.tween_property(computer_card, "global_position", target_button.global_position, ANIM_DURATION).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+    tween_position(computer_card, target_button.global_position)
     has_return_anim = true
 
   if has_return_anim:
@@ -266,24 +270,18 @@ func animate_battle(player_element: Element, computer_element: Element, player_s
   computer_card.queue_free()
 
   battle_in_progress = false
-  update_hand_display(player_hand_container, player_hand, true)
-  update_hand_display(computer_hand_container, computer_hand, false)
+  update_both_hands()
   check_game_end()
 
 
 func setup_battle_card(panel: Panel, element: Element) -> void:
-  var style := StyleBoxFlat.new()
-  style.bg_color = ELEMENT_COLORS[element]
-  style.corner_radius_top_left = 8
-  style.corner_radius_top_right = 8
-  style.corner_radius_bottom_left = 8
-  style.corner_radius_bottom_right = 8
-  panel.add_theme_stylebox_override("panel", style)
+  var bg_color := ELEMENT_COLORS[element]
+  panel.add_theme_stylebox_override("panel", create_card_style(bg_color))
 
   var label: Label = panel.get_node_or_null("Label")
   if label:
     label.text = ELEMENT_NAMES[element]
-    label.add_theme_color_override("font_color", get_text_color(style.bg_color))
+    label.add_theme_color_override("font_color", get_text_color(bg_color))
 
 
 func resolve_battle(player: Element, computer: Element) -> int:
