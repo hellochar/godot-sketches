@@ -1,18 +1,19 @@
 {
   "permissions": {
     "allow": [
-      "Bash(*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(ls:*)",
-      "Bash(xargs:*)",
-      "Bash(grep:*)",
+      "Bash",
       "mcp__godot__get_project_info",
       "mcp__godot__create_scene",
       "mcp__godot__launch_editor",
       "mcp__godot__run_project",
       "mcp__godot__stop_project",
-      "mcp__godot__update_project_uids"
+      "mcp__godot__update_project_uids",
+      "Skill(superpowers:brainstorming)",
+      "Skill(superpowers:brainstorming:*)"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "godot"
+  ]
 }
