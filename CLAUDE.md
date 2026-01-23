@@ -1,14 +1,16 @@
 # General
-- ALWAYS use two spaces for indentation, never tabs
 - Do NOT add defensive null and valid checks unless the variable is used in a way that requires it.
 - Do not add comments, but don't delete existing comments.
 - Be short and concise in your language.
 - Only expand and explain things if asked.
 - Avoid the word "Data". Use more descriptive terminology.
 - Shorten summaries to just the most important code bits.
-- Do not ever delete the .godot folder unless I explicitly ask.
+- when you are uncertain, clearly explain things you're not sure of. Double check your knowledge by accessing documentation or doing a web search.
 
-# Godot MCP Tools
+# Godot
+- ALWAYS use two spaces for indentation, never tabs
+- Do not ever delete the .godot folder unless I explicitly ask.
+- Prefer using `unique_name_in_owner = true` to access nodes through %Name in gdscript
 - AVOID using `add_node` MCP tool. Instead, write/edit .tscn files directly.
 - ALWAYS use `update_project_uids` after renaming or moving assets to fix UID references.
 
