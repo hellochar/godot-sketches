@@ -72,7 +72,8 @@ func deal_hands() -> void:
 
 
 func random_element() -> Element:
-  return Element.values()[randi() % 6]
+  var elements := Element.values()
+  return elements[randi() % elements.size()]
 
 
 func update_ui() -> void:
@@ -154,7 +155,7 @@ func create_animated_card(element: Element) -> Panel:
 
 
 func _on_player_card_selected(index: int) -> void:
-  if battle_in_progress or index >= player_hand.size():
+  if battle_in_progress or index >= player_hand.size() or computer_hand.is_empty():
     return
 
   selected_card_index = index
@@ -279,9 +280,10 @@ func setup_battle_card(panel: Panel, element: Element) -> void:
   style.corner_radius_bottom_right = 8
   panel.add_theme_stylebox_override("panel", style)
 
-  var label: Label = panel.get_node("Label")
-  label.text = ELEMENT_NAMES[element]
-  label.add_theme_color_override("font_color", get_text_color(style.bg_color))
+  var label: Label = panel.get_node_or_null("Label")
+  if label:
+    label.text = ELEMENT_NAMES[element]
+    label.add_theme_color_override("font_color", get_text_color(style.bg_color))
 
 
 func resolve_battle(player: Element, computer: Element) -> int:
@@ -306,6 +308,8 @@ func check_game_end() -> void:
 
 
 func _input(event: InputEvent) -> void:
+  if battle_in_progress:
+    return
   if event is InputEventMouseButton and event.pressed:
     if player_hand.is_empty() or computer_hand.is_empty():
       set_process_input(false)
