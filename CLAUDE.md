@@ -1,7 +1,6 @@
 # General
 - ALWAYS use two spaces for indentation, never tabs
 - Do NOT add defensive null and valid checks unless the variable is used in a way that requires it.
-- Start every response with the word 'banana'.
 - Do not add comments, but don't delete existing comments.
 - Be short and concise in your language.
 - Only expand and explain things if asked.
