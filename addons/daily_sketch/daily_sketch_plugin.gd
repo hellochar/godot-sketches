@@ -3,9 +3,13 @@ extends EditorPlugin
 
 func _enter_tree() -> void:
   add_tool_menu_item("Create Daily Sketch", _create_daily_sketch)
+  var command_palette := EditorInterface.get_command_palette()
+  command_palette.add_command("Create Daily Sketch", "daily_sketch/create", _create_daily_sketch)
 
 func _exit_tree() -> void:
   remove_tool_menu_item("Create Daily Sketch")
+  var command_palette := EditorInterface.get_command_palette()
+  command_palette.remove_command("daily_sketch/create")
 
 func _create_daily_sketch() -> void:
   var date := Time.get_date_dict_from_system()
@@ -62,5 +66,9 @@ script = ExtResource("1_script")
   scene_file.close()
 
   EditorInterface.get_resource_filesystem().scan()
+
+  var scene_path := "%s/%s" % [folder_path, scene_name]
+  EditorInterface.open_scene_from_path(scene_path)
+  EditorInterface.edit_script(load("%s/%s" % [folder_path, script_name]))
 
   print("Created daily sketch: %s" % folder_path)
