@@ -9,7 +9,9 @@
       "mcp__godot__stop_project",
       "mcp__godot__update_project_uids",
       "Skill(superpowers:brainstorming)",
-      "Skill(superpowers:brainstorming:*)"
+      "Skill(superpowers:brainstorming:*)",
+      "mcp__godot__get_debug_output",
+      "mcp__codex__codex"
     ]
   },
   "enableAllProjectMcpServers": true,
