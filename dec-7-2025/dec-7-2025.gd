@@ -19,7 +19,7 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
   # # add three basic random resources
-  var basic_resources = ItemLibrary.get_by_tier(Item.ETier.Basic).filter(
+  var _basic_resources = ItemLibrary.get_by_tier(Item.ETier.Basic).filter(
     func(i: Item): return not (i is Structure or Item.ETag.Waste in i.tags)
   )
   # for i in range(3):
@@ -56,7 +56,7 @@ func tick(ticks: int) -> void:
   if turn_count % 5 == 0:
     create_reward()
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
   %TurnCounter.text = "Turn: %d" % turn_count
   %MainInventory.text = inventory._to_string()
   %Blueprints.text = blueprints._to_string()

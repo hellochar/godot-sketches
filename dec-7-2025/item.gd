@@ -15,19 +15,19 @@ enum ETag {
 
 @export var name: String:
   get:
-    var str: String = ""
+    var s: String = ""
     if resource_path == "":
-      str = name_override
+      s = name_override
       if name_override == "":
-        str = "???"
+        s = "???"
     else:
-      str = resource_path.get_file().get_basename().capitalize()
+      s = resource_path.get_file().get_basename().capitalize()
     if ETag.Structure not in tags:
       if tier == ETier.Advanced:
-        str = "[color=orange]" + str + "[/color]"
+        s = "[color=orange]" + s + "[/color]"
       elif tier == ETier.Futuristic:
-        str = "[color=purple]" + str + "[/color]"
-    return str
+        s = "[color=purple]" + s + "[/color]"
+    return s
 
 @export var name_override: String
 @export var description: String
@@ -43,5 +43,5 @@ enum ETag {
 
 @export var pickupable: bool = true
 
-func tick(inventory: World.Inventory, amount: int, ticks: int) -> Dictionary[Item, int]:
+func tick(_inventory: World.Inventory, _amount: int, _ticks: int) -> Dictionary[Item, int]:
   return {}
