@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://nuvg84pkx332"]
+[gd_scene load_steps=3 format=3 uid="uid://nuvg84pkx332"]
 
 [ext_resource type="Script" uid="uid://cgs62t3tqpdbw" path="res://jan_23_2026/jan_23_2026.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://cotmu8th4wqir" path="res://jan_23_2026/element_diagram.gd" id="2_diagram"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -30,6 +31,7 @@ text = "Player: 0 | Computer: 0"
 horizontal_alignment = 1
 
 [node name="InstructionLabel" type="Label" parent="VBoxContainer/TopBar"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 20
@@ -118,3 +120,14 @@ horizontal_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 4
 alignment = 1
+
+[node name="ElementDiagram" type="Control" parent="."]
+layout_mode = 1
+offset_left = 55.0
+offset_top = 67.0
+offset_right = 185.0
+offset_bottom = 197.0
+script = ExtResource("2_diagram")
+diagram_radius = 100.0
+node_radius = 24.0
+font_size = 14

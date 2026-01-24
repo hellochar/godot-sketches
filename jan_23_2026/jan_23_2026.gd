@@ -1,39 +1,10 @@
 extends Control
 
-enum Element { FIRE, WATER, EARTH, AIR, LIGHTNING, ICE }
-
-const ELEMENT_NAMES := {
-  Element.FIRE: "Fire",
-  Element.WATER: "Water",
-  Element.EARTH: "Earth",
-  Element.AIR: "Air",
-  Element.LIGHTNING: "Lightning",
-  Element.ICE: "Ice"
-}
-
-const ELEMENT_COLORS := {
-  Element.FIRE: Color(1.0, 0.3, 0.1),
-  Element.WATER: Color(0.2, 0.5, 1.0),
-  Element.EARTH: Color(0.6, 0.4, 0.2),
-  Element.AIR: Color(0.8, 0.9, 1.0),
-  Element.LIGHTNING: Color(1.0, 1.0, 0.3),
-  Element.ICE: Color(0.7, 0.9, 1.0)
-}
-
-const BEATS := {
-  Element.FIRE: [Element.ICE, Element.AIR],
-  Element.WATER: [Element.FIRE, Element.EARTH],
-  Element.EARTH: [Element.LIGHTNING, Element.WATER],
-  Element.AIR: [Element.EARTH, Element.ICE],
-  Element.LIGHTNING: [Element.WATER, Element.AIR],
-  Element.ICE: [Element.LIGHTNING, Element.FIRE]
-}
-
 const ANIM_DURATION := 0.3
 const CARD_CORNER_RADIUS := 8
 
-var player_hand: Array[Element] = []
-var computer_hand: Array[Element] = []
+var player_hand: Array[Elements.Type] = []
+var computer_hand: Array[Elements.Type] = []
 var player_score := 0
 var computer_score := 0
 var battle_in_progress := false
@@ -70,9 +41,9 @@ func deal_hands() -> void:
     computer_hand.append(random_element())
 
 
-func random_element() -> Element:
-  var elements := Element.values()
-  return elements[randi() % elements.size()]
+func random_element() -> Elements.Type:
+  var types := Elements.Type.values()
+  return types[randi() % types.size()]
 
 
 func update_ui() -> void:
@@ -83,7 +54,7 @@ func update_ui() -> void:
   result_label.text = ""
 
 
-func update_hand_display(container: HBoxContainer, hand: Array[Element], is_player: bool) -> void:
+func update_hand_display(container: HBoxContainer, hand: Array[Elements.Type], is_player: bool) -> void:
   for child in container.get_children():
     child.queue_free()
 
@@ -93,8 +64,7 @@ func update_hand_display(container: HBoxContainer, hand: Array[Element], is_play
 
 
 func get_text_color(bg_color: Color) -> Color:
-  var luminance := 0.299 * bg_color.r + 0.587 * bg_color.g + 0.114 * bg_color.b
-  return Color.BLACK if luminance > 0.5 else Color.WHITE
+  return Elements.get_text_color(bg_color)
 
 
 func create_card_style(color: Color) -> StyleBoxFlat:
@@ -119,12 +89,12 @@ func tween_position(node: Control, target: Vector2) -> Tween:
   return tween
 
 
-func create_card_button(element: Element, is_player: bool, index: int) -> Button:
+func create_card_button(element: Elements.Type, is_player: bool, index: int) -> Button:
   var button := Button.new()
   button.custom_minimum_size = Vector2(80, 120)
-  button.text = ELEMENT_NAMES[element]
+  button.text = Elements.NAMES[element]
 
-  var bg_color := ELEMENT_COLORS[element] if is_player else Color(0.3, 0.3, 0.3)
+  var bg_color: Color = Elements.COLORS[element] if is_player else Color(0.3, 0.3, 0.3)
   var style := create_card_style(bg_color)
   if is_player:
     var text_color := get_text_color(bg_color)
@@ -144,15 +114,15 @@ func create_card_button(element: Element, is_player: bool, index: int) -> Button
   return button
 
 
-func create_animated_card(element: Element) -> Panel:
+func create_animated_card(element: Elements.Type) -> Panel:
   var panel := Panel.new()
   panel.custom_minimum_size = Vector2(100, 150)
 
-  var bg_color := ELEMENT_COLORS[element]
+  var bg_color: Color = Elements.COLORS[element]
   panel.add_theme_stylebox_override("panel", create_card_style(bg_color))
 
   var label := Label.new()
-  label.text = ELEMENT_NAMES[element]
+  label.text = Elements.NAMES[element]
   label.add_theme_font_size_override("font_size", 16)
   label.add_theme_color_override("font_color", get_text_color(bg_color))
   label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -190,7 +160,7 @@ func choose_computer_card() -> int:
   return randi() % computer_hand.size()
 
 
-func animate_battle(player_element: Element, computer_element: Element, player_start: Vector2, computer_start: Vector2) -> void:
+func animate_battle(player_element: Elements.Type, computer_element: Elements.Type, player_start: Vector2, computer_start: Vector2) -> void:
   var player_card := create_animated_card(player_element)
   var computer_card := create_animated_card(computer_element)
 
@@ -274,22 +244,18 @@ func animate_battle(player_element: Element, computer_element: Element, player_s
   check_game_end()
 
 
-func setup_battle_card(panel: Panel, element: Element) -> void:
-  var bg_color := ELEMENT_COLORS[element]
+func setup_battle_card(panel: Panel, element: Elements.Type) -> void:
+  var bg_color: Color = Elements.COLORS[element]
   panel.add_theme_stylebox_override("panel", create_card_style(bg_color))
 
   var label: Label = panel.get_node_or_null("Label")
   if label:
-    label.text = ELEMENT_NAMES[element]
+    label.text = Elements.NAMES[element]
     label.add_theme_color_override("font_color", get_text_color(bg_color))
 
 
-func resolve_battle(player: Element, computer: Element) -> int:
-  if player == computer:
-    return 0
-  if computer in BEATS[player]:
-    return 1
-  return -1
+func resolve_battle(player: Elements.Type, computer: Elements.Type) -> int:
+  return Elements.resolve_battle(player, computer)
 
 
 func check_game_end() -> void:
