@@ -2,7 +2,7 @@ extends Item
 class_name Grass
 
 const FOOD = preload("res://items/basic/food.tres")
-func tick(inventory: World.Inventory, grass: int, ticks: int) -> Dictionary[Item, int]:
+func tick(_inventory: World.Inventory, grass: int, ticks: int) -> Dictionary[Item, int]:
   # every 10 grass produces one grass
   var changes: Dictionary[Item, int] = {}
   var food_produced = 0 # int((grass * ticks) / 10.0)

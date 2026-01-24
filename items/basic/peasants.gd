@@ -9,7 +9,7 @@ const STONE = preload("res://items/basic/stone.tres")
 const WOOD = preload("res://items/basic/wood.tres")
 const LIVESTOCK = preload("res://items/basic/livestock.tres")
 
-func tick(inventory: World.Inventory, amount: int, ticks: int) -> Dictionary[Item, int]:
+func tick(inventory: World.Inventory, _amount: int, _ticks: int) -> Dictionary[Item, int]:
   var changes: Dictionary[Item, int] = {}
   # iteration 2: eat one food per five peasants. Gain 1 peasant if fully fed.
   # Lose 1 peasant if not.
@@ -25,7 +25,7 @@ func tick(inventory: World.Inventory, amount: int, ticks: int) -> Dictionary[Ite
     changes[BONES] = 1
   return changes
 
-func tickv1(inventory: World.Inventory, peasants: int, ticks: int) -> Dictionary[Item, int]:
+func tickv1(inventory: World.Inventory, peasants: int, _ticks: int) -> Dictionary[Item, int]:
   # separate peasants into housed and unhoused:
   # housed = min(peasants, huts * 2)
   # unhoused = peasants - housed
@@ -52,8 +52,8 @@ func tickv1(inventory: World.Inventory, peasants: int, ticks: int) -> Dictionary
   
   var food = inventory.num(FOOD)
   # var livestock_count = inventory.num(LIVESTOCK)
-  var stone = inventory.num(STONE)
-  var wood = inventory.num(WOOD)
+  var _stone = inventory.num(STONE)
+  var _wood = inventory.num(WOOD)
   
   var new_huts_desired = int(ceil(unhoused / float(HOUSING_PER_HUT)))
   var huts_to_build = 0 # min(new_huts_desired, stone, wood)

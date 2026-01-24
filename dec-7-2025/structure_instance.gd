@@ -30,7 +30,7 @@ func render() -> void:
     if type.production_time > 1:
       text += " %d / %d" % [production_timer, type.production_time]
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
   render()
 
 func tick(ticks: int) -> void:
