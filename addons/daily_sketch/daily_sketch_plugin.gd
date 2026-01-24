@@ -18,15 +18,19 @@ func _create_daily_sketch() -> void:
   var day := str(date.day)
   var year := str(date.year)
 
-  var folder_name := "%s_%s_%s" % [month, day, year]
+  var base_name := "%s_%s_%s" % [month, day, year]
+  var folder_name := base_name
+  var dir := DirAccess.open("res://")
+
+  if dir.dir_exists(folder_name):
+    var suffix := "b"
+    while dir.dir_exists(base_name + suffix):
+      suffix = String.chr(suffix.unicode_at(0) + 1)
+    folder_name = base_name + suffix
+
   var folder_path := "res://%s" % folder_name
   var script_name := "%s.gd" % folder_name
   var scene_name := "%s.tscn" % folder_name
-
-  var dir := DirAccess.open("res://")
-  if dir.dir_exists(folder_name):
-    push_error("Folder already exists: %s" % folder_path)
-    return
 
   dir.make_dir(folder_name)
 
