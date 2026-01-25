@@ -58,6 +58,9 @@ var feedback_message: String = ""
 var feedback_timer: float = 0.0
 var needs_redraw: bool = true
 
+var screen_shake: float = 0.0
+var shake_offset: Vector2 = Vector2.ZERO
+
 const BUILDING_COLORS := {
   BuildingType.EXTRACTOR: Color.YELLOW,
   BuildingType.GENERATOR: Color.ORANGE,
@@ -103,6 +106,17 @@ func _process(delta: float) -> void:
       feedback_message = ""
       needs_redraw = true
 
+  if screen_shake > 0:
+    screen_shake -= delta
+    var trauma := screen_shake * screen_shake
+    shake_offset = Vector2(
+      randf_range(-8, 8) * trauma,
+      randf_range(-8, 8) * trauma
+    )
+    needs_redraw = true
+  else:
+    shake_offset = Vector2.ZERO
+
   if needs_redraw or drawing_pipe:
     queue_redraw()
     needs_redraw = false
@@ -147,14 +161,18 @@ func show_feedback(msg: String) -> void:
   feedback_timer = 2.0
   needs_redraw = true
 
+func add_screen_shake(amount: float) -> void:
+  screen_shake = maxf(screen_shake, amount)
+
 func pixel_to_grid(pixel: Vector2) -> Vector2i:
   var rel := pixel - GRID_OFFSET
   var gx := int(rel.x / CELL_SIZE)
   var gy := int(rel.y / CELL_SIZE)
   return Vector2i(gx, gy)
 
-func grid_to_pixel(grid_pos: Vector2i) -> Vector2:
-  return GRID_OFFSET + Vector2(grid_pos) * CELL_SIZE + Vector2(CELL_SIZE / 2, CELL_SIZE / 2)
+func grid_to_pixel(grid_pos: Vector2i, with_shake: bool = true) -> Vector2:
+  var offset := GRID_OFFSET + (shake_offset if with_shake else Vector2.ZERO)
+  return offset + Vector2(grid_pos) * CELL_SIZE + Vector2(CELL_SIZE / 2, CELL_SIZE / 2)
 
 func is_valid_cell(pos: Vector2i) -> bool:
   return pos.x >= 0 and pos.x < GRID_SIZE and pos.y >= 0 and pos.y < GRID_SIZE
@@ -357,6 +375,7 @@ func simulate_tick() -> void:
           if b.heat_buildup >= 3:
             b.shutdown = true
             show_feedback("Generator overheated!")
+            add_screen_shake(0.3)
         else:
           b.heat_buildup = max(0, b.heat_buildup - 1)
 
@@ -453,14 +472,16 @@ func route_heat(generator_pos: Vector2i, heat_amount: int) -> bool:
 func _draw() -> void:
   draw_rect(Rect2(Vector2.ZERO, size), Color(0.1, 0.1, 0.15))
 
+  var offset := GRID_OFFSET + shake_offset
+
   for x in range(GRID_SIZE + 1):
-    var start := GRID_OFFSET + Vector2(x * CELL_SIZE, 0)
-    var end := GRID_OFFSET + Vector2(x * CELL_SIZE, GRID_SIZE * CELL_SIZE)
+    var start := offset + Vector2(x * CELL_SIZE, 0)
+    var end := offset + Vector2(x * CELL_SIZE, GRID_SIZE * CELL_SIZE)
     draw_line(start, end, Color(0.3, 0.3, 0.35), 1.0)
 
   for y in range(GRID_SIZE + 1):
-    var start := GRID_OFFSET + Vector2(0, y * CELL_SIZE)
-    var end := GRID_OFFSET + Vector2(GRID_SIZE * CELL_SIZE, y * CELL_SIZE)
+    var start := offset + Vector2(0, y * CELL_SIZE)
+    var end := offset + Vector2(GRID_SIZE * CELL_SIZE, y * CELL_SIZE)
     draw_line(start, end, Color(0.3, 0.3, 0.35), 1.0)
 
   for outport in outports:
@@ -522,7 +543,7 @@ func _draw() -> void:
           draw_string(ThemeDB.fallback_font, center + Vector2(-5, 5), str(b.heat_capacity), HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.WHITE)
 
   if hovered_cell != Vector2i(-1, -1) and not is_outport(hovered_cell):
-    var rect_pos := GRID_OFFSET + Vector2(hovered_cell) * CELL_SIZE
+    var rect_pos := offset + Vector2(hovered_cell) * CELL_SIZE
     var can_place := can_place_building(hovered_cell, selected_building) if selected_building != BuildingType.NONE else false
     var hover_color := Color.GREEN if can_place else Color(0.5, 0.5, 0.5, 0.3)
     draw_rect(Rect2(rect_pos, Vector2(CELL_SIZE, CELL_SIZE)), hover_color, false, 2.0)
