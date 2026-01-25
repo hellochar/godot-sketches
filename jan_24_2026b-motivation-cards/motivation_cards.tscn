@@ -1,0 +1,232 @@
+[gd_scene load_steps=2 format=3 uid="uid://d0motivation_cards"]
+
+[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/motivation_cards.gd" id="1_main"]
+
+[node name="MotivationCards" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.12, 0.12, 0.15, 1)
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+theme_override_constants/separation = 15
+
+[node name="TopBar" type="HBoxContainer" parent="MainContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="DayLabel" type="Label" parent="MainContainer/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Day 1"
+
+[node name="ScoreLabel" type="Label" parent="MainContainer/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Score: 0"
+
+[node name="Spacer" type="Control" parent="MainContainer/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="WillpowerLabel" type="Label" parent="MainContainer/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Willpower: 100/100"
+
+[node name="ActionSelectionScreen" type="VBoxContainer" parent="MainContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+
+[node name="Title" type="Label" parent="MainContainer/ActionSelectionScreen"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Choose an Action"
+horizontal_alignment = 1
+
+[node name="ActionGrid" type="GridContainer" parent="MainContainer/ActionSelectionScreen"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/h_separation = 15
+theme_override_constants/v_separation = 15
+columns = 3
+
+[node name="MotivationPhaseScreen" type="VBoxContainer" parent="MainContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+
+[node name="SelectedActionPanel" type="PanelContainer" parent="MainContainer/MotivationPhaseScreen"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ActionInfo" type="VBoxContainer" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ActionTitle" type="Label" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Action Title"
+horizontal_alignment = 1
+
+[node name="ActionDetails" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 30
+
+[node name="CostLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo/ActionDetails"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Cost: 75"
+
+[node name="SuccessLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo/ActionDetails"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Success: 80%"
+
+[node name="TagsContainer" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 10
+
+[node name="MotivationSection" type="VBoxContainer" parent="MainContainer/MotivationPhaseScreen"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="MotivationTitle" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Your Motivations"
+horizontal_alignment = 1
+
+[node name="DrawnCardsContainer" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen/MotivationSection"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 1
+theme_override_constants/separation = 10
+
+[node name="WorldModifierLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSection"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = ""
+horizontal_alignment = 1
+
+[node name="MotivationSummary" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 30
+
+[node name="TotalMotivation" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSummary"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Total Motivation: 0 / 75"
+
+[node name="GapLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSummary"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Gap: 75"
+
+[node name="WillpowerSpend" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 15
+
+[node name="SpendLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/WillpowerSpend"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Spend Willpower:"
+
+[node name="WillpowerSlider" type="HSlider" parent="MainContainer/MotivationPhaseScreen/WillpowerSpend"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="WillpowerSpendValue" type="Label" parent="MainContainer/MotivationPhaseScreen/WillpowerSpend"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "0"
+
+[node name="ActionButtons" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 20
+
+[node name="BackButton" type="Button" parent="MainContainer/MotivationPhaseScreen/ActionButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+text = "Back"
+
+[node name="AttemptButton" type="Button" parent="MainContainer/MotivationPhaseScreen/ActionButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 40)
+layout_mode = 2
+text = "Attempt Action"
+
+[node name="ResultPanel" type="PanelContainer" parent="MainContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="ResultContent" type="VBoxContainer" parent="MainContainer/ResultPanel"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="ResultTitle" type="Label" parent="MainContainer/ResultPanel/ResultContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Success!"
+horizontal_alignment = 1
+
+[node name="ResultDetails" type="Label" parent="MainContainer/ResultPanel/ResultContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "You gained 25 points!"
+horizontal_alignment = 1
+
+[node name="ContinueButton" type="Button" parent="MainContainer/ResultPanel/ResultContent"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Continue"
