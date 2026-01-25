@@ -138,6 +138,19 @@ const RESOURCE_COLORS := {
   ResourceType.HEAT: Color.ORANGE_RED,
 }
 
+const BUILDING_DESCRIPTIONS := {
+  BuildingType.EXTRACTOR: ["Extractor", "Produces 1 Fuel per tick.", "Must be on edge cells."],
+  BuildingType.GENERATOR: ["Generator", "Consumes 1 Fuel -> 2 Power + 1 Heat.", "Must be in interior. Shuts down if heat not routed."],
+  BuildingType.RADIATOR: ["Radiator", "Absorbs 2 Heat total.", "Must be on edge cells."],
+  BuildingType.HEAT_SINK: ["Heat Sink", "Absorbs 4 Heat total.", "Must be in interior."],
+}
+
+const RESOURCE_DESCRIPTIONS := {
+  ResourceType.FUEL: "Fuel pipes carry fuel from Extractors to Generators.",
+  ResourceType.POWER: "Power pipes carry power from Generators to Outports (green diamonds).",
+  ResourceType.HEAT: "Heat pipes carry heat from Generators to Radiators/Heat Sinks.",
+}
+
 func _ready() -> void:
   for x in range(grid_size):
     var column := []
@@ -288,6 +301,66 @@ func show_feedback(msg: String) -> void:
   feedback_message = msg
   feedback_timer = 2.0
   needs_redraw = true
+
+func get_contextual_prompt() -> String:
+  if selected_building != BuildingType.NONE:
+    var building_name: String = BUILDING_DESCRIPTIONS[selected_building][0]
+    return "Click a highlighted cell to place " + building_name + ". Press Esc to cancel."
+  if drawing_pipe:
+    return "Drag to an adjacent building to connect."
+  if not simulating:
+    var has_extractor := false
+    var has_generator := false
+    for x in range(grid_size):
+      for y in range(grid_size):
+        var b: Building = grid[x][y]
+        if b != null:
+          if b.type == BuildingType.EXTRACTOR:
+            has_extractor = true
+          if b.type == BuildingType.GENERATOR:
+            has_generator = true
+    if not has_extractor:
+      return "Press 1 to select Extractor, then click an edge cell."
+    if not has_generator:
+      return "Press 2 to select Generator, then click an interior cell."
+    if pipes.size() == 0:
+      return "Click and drag from a building to connect with pipes."
+    return "Press Space to start simulation."
+  return ""
+
+func get_placement_reason(pos: Vector2i, type: BuildingType) -> String:
+  if not is_valid_cell(pos):
+    return ""
+  if is_outport(pos):
+    return "Cannot build on Outport"
+  if grid[pos.x][pos.y] != null:
+    return "Cell occupied"
+  match type:
+    BuildingType.EXTRACTOR, BuildingType.RADIATOR:
+      if not is_edge_cell(pos):
+        return "Must be on edge"
+    BuildingType.GENERATOR, BuildingType.HEAT_SINK:
+      if is_edge_cell(pos):
+        return "Must be in interior"
+  return ""
+
+func get_hover_tooltip() -> String:
+  if hovered_cell == Vector2i(-1, -1):
+    return ""
+  if is_outport(hovered_cell):
+    return "Outport: Deliver Power here to score points."
+  var b: Building = grid[hovered_cell.x][hovered_cell.y]
+  if b != null:
+    var desc: Array = BUILDING_DESCRIPTIONS[b.type]
+    var status := ""
+    if b.shutdown:
+      status = " [SHUTDOWN]"
+    elif b.type == BuildingType.GENERATOR and b.heat_buildup > 0:
+      status = " [Heat: %d/%d]" % [b.heat_buildup, heat_shutdown_threshold]
+    elif b.type in [BuildingType.RADIATOR, BuildingType.HEAT_SINK]:
+      status = " [Capacity: %d]" % b.heat_capacity
+    return desc[0] + status + " - " + desc[1]
+  return ""
 
 func add_screen_shake(amount: float) -> void:
   screen_shake = maxf(screen_shake, amount)
@@ -684,6 +757,15 @@ func _draw() -> void:
     var end := offset + Vector2(grid_size * cell_size, y * cell_size)
     draw_line(start, end, Color(0.3, 0.3, 0.35), 1.0)
 
+  if selected_building != BuildingType.NONE:
+    for x in range(grid_size):
+      for y in range(grid_size):
+        var pos := Vector2i(x, y)
+        if can_place_building(pos, selected_building):
+          var cell_pos := offset + Vector2(x, y) * cell_size
+          var highlight_color := Color(0.2, 0.8, 0.2, 0.15)
+          draw_rect(Rect2(cell_pos, Vector2(cell_size, cell_size)), highlight_color)
+
   for outport in outports:
     var center := grid_to_pixel(outport)
     var outport_scale := 1.0
@@ -790,30 +872,38 @@ func _draw() -> void:
   if hovered_cell != Vector2i(-1, -1) and not is_outport(hovered_cell):
     var can_place := can_place_building(hovered_cell, selected_building) if selected_building != BuildingType.NONE else false
     var hover_color := Color.GREEN if can_place else Color(0.5, 0.5, 0.5, 0.3)
+    if selected_building != BuildingType.NONE and not can_place:
+      hover_color = Color(1.0, 0.3, 0.3, 0.5)
     var pulse := sin(Time.get_ticks_msec() / 150.0) * 0.03 + 1.0
     var hover_size := cell_size * pulse
     var hover_offset := (cell_size - hover_size) / 2.0
     var rect_pos := offset + Vector2(hovered_cell) * cell_size + Vector2(hover_offset, hover_offset)
     draw_rect(Rect2(rect_pos, Vector2(hover_size, hover_size)), hover_color, false, 2.0)
 
-    if selected_building != BuildingType.NONE and can_place:
-      var ghost_center := grid_to_pixel(hovered_cell)
-      var ghost_color: Color = BUILDING_COLORS[selected_building]
-      ghost_color.a = 0.4
-      match selected_building:
-        BuildingType.EXTRACTOR:
-          draw_circle(ghost_center, 20, ghost_color)
-        BuildingType.GENERATOR:
-          draw_rect(Rect2(ghost_center - Vector2(20, 20), Vector2(40, 40)), ghost_color)
-        BuildingType.RADIATOR:
-          var ghost_points := PackedVector2Array([
-            ghost_center + Vector2(0, -20),
-            ghost_center + Vector2(20, 20),
-            ghost_center + Vector2(-20, 20),
-          ])
-          draw_colored_polygon(ghost_points, ghost_color)
-        BuildingType.HEAT_SINK:
-          draw_rect(Rect2(ghost_center - Vector2(15, 15), Vector2(30, 30)), ghost_color)
+    if selected_building != BuildingType.NONE:
+      if can_place:
+        var ghost_center := grid_to_pixel(hovered_cell)
+        var ghost_color: Color = BUILDING_COLORS[selected_building]
+        ghost_color.a = 0.4
+        match selected_building:
+          BuildingType.EXTRACTOR:
+            draw_circle(ghost_center, 20, ghost_color)
+          BuildingType.GENERATOR:
+            draw_rect(Rect2(ghost_center - Vector2(20, 20), Vector2(40, 40)), ghost_color)
+          BuildingType.RADIATOR:
+            var ghost_points := PackedVector2Array([
+              ghost_center + Vector2(0, -20),
+              ghost_center + Vector2(20, 20),
+              ghost_center + Vector2(-20, 20),
+            ])
+            draw_colored_polygon(ghost_points, ghost_color)
+          BuildingType.HEAT_SINK:
+            draw_rect(Rect2(ghost_center - Vector2(15, 15), Vector2(30, 30)), ghost_color)
+      else:
+        var reason := get_placement_reason(hovered_cell, selected_building)
+        if reason != "":
+          var reason_pos := grid_to_pixel(hovered_cell) + Vector2(0, 35)
+          draw_string(ThemeDB.fallback_font, reason_pos, reason, HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color(1, 0.5, 0.5))
 
   if drawing_pipe and pipe_start != Vector2i(-1, -1):
     var start_pos := grid_to_pixel(pipe_start)
@@ -838,10 +928,10 @@ func draw_ui() -> void:
   ui_y += line_height
 
   var building_names := {
-    BuildingType.EXTRACTOR: "1: Extractor (edge)",
-    BuildingType.GENERATOR: "2: Generator (interior)",
-    BuildingType.RADIATOR: "3: Radiator (edge, cap:2)",
-    BuildingType.HEAT_SINK: "4: Heat Sink (int, cap:4)",
+    BuildingType.EXTRACTOR: "1: Extractor",
+    BuildingType.GENERATOR: "2: Generator",
+    BuildingType.RADIATOR: "3: Radiator",
+    BuildingType.HEAT_SINK: "4: Heat Sink",
   }
 
   for type in building_names:
@@ -851,8 +941,17 @@ func draw_ui() -> void:
     draw_string(ThemeDB.fallback_font, Vector2(ui_x, ui_y), building_names[type], HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color)
     ui_y += line_height
 
-  ui_y += 10
-  draw_string(ThemeDB.fallback_font, Vector2(ui_x, ui_y), "PIPE RESOURCE", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.WHITE)
+  if selected_building != BuildingType.NONE:
+    ui_y += 5
+    var desc: Array = BUILDING_DESCRIPTIONS[selected_building]
+    draw_string(ThemeDB.fallback_font, Vector2(ui_x, ui_y), desc[1], HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.7, 0.9, 0.7))
+    ui_y += 15
+    draw_string(ThemeDB.fallback_font, Vector2(ui_x, ui_y), desc[2], HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.6, 0.6, 0.6))
+    ui_y += 20
+  else:
+    ui_y += 10
+
+  draw_string(ThemeDB.fallback_font, Vector2(ui_x, ui_y), "PIPES", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.WHITE)
   ui_y += line_height
 
   var resource_names := {
@@ -888,3 +987,15 @@ func draw_ui() -> void:
   if feedback_message != "":
     var alpha: float = minf(1.0, feedback_timer)
     draw_string(ThemeDB.fallback_font, Vector2(score_x, 150), feedback_message, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color(1, 0.3, 0.3, alpha))
+
+  var prompt := get_contextual_prompt()
+  if prompt != "":
+    draw_string(ThemeDB.fallback_font, Vector2(score_x, 180), prompt, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(0.9, 0.9, 0.5))
+
+  var tooltip := get_hover_tooltip()
+  if tooltip != "":
+    draw_string(ThemeDB.fallback_font, Vector2(score_x, 220), tooltip, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(0.8, 0.8, 0.8))
+
+  if selected_building == BuildingType.NONE and not drawing_pipe:
+    var res_desc: String = RESOURCE_DESCRIPTIONS[pipe_resource]
+    draw_string(ThemeDB.fallback_font, Vector2(score_x, 260), res_desc, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.6, 0.6, 0.6))
