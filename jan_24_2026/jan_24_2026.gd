@@ -48,6 +48,20 @@ class ScorePopup:
     pos = p
     text = t
 
+class SmokeParticle:
+  var pos: Vector2
+  var velocity: Vector2
+  var life: float
+  var max_life: float
+  var size: float
+
+  func _init(p: Vector2):
+    pos = p
+    velocity = Vector2(randf_range(-15, 15), randf_range(-30, -15))
+    life = randf_range(0.5, 1.0)
+    max_life = life
+    size = randf_range(4, 8)
+
 var grid: Array = []
 var pipes: Array[Pipe] = []
 var outports: Array[Vector2i] = [
@@ -77,8 +91,10 @@ var needs_redraw: bool = true
 var screen_shake: float = 0.0
 var shake_offset: Vector2 = Vector2.ZERO
 var score_popups: Array[ScorePopup] = []
+var smoke_particles: Array[SmokeParticle] = []
 var sim_start_pulse: float = 0.0
 var flow_anim_time: float = 0.0
+var smoke_spawn_timer: float = 0.0
 
 const BUILDING_COLORS := {
   BuildingType.EXTRACTOR: Color.YELLOW,
@@ -147,6 +163,23 @@ func _process(delta: float) -> void:
   if sim_start_pulse > 0:
     sim_start_pulse -= delta
     needs_redraw = true
+
+  for particle in smoke_particles:
+    particle.pos += particle.velocity * delta
+    particle.life -= delta
+  smoke_particles = smoke_particles.filter(func(p): return p.life > 0)
+  if smoke_particles.size() > 0:
+    needs_redraw = true
+
+  smoke_spawn_timer -= delta
+  if smoke_spawn_timer <= 0 and simulating:
+    smoke_spawn_timer = 0.1
+    for x in range(GRID_SIZE):
+      for y in range(GRID_SIZE):
+        var b: Building = grid[x][y]
+        if b != null and b.type == BuildingType.GENERATOR and b.heat_buildup > 0 and not b.shutdown:
+          var center := grid_to_pixel(Vector2i(x, y), false)
+          smoke_particles.append(SmokeParticle.new(center + Vector2(randf_range(-10, 10), -15)))
 
   for x in range(GRID_SIZE):
     for y in range(GRID_SIZE):
@@ -623,6 +656,11 @@ func _draw() -> void:
           draw_rect(Rect2(center - Vector2(outer, outer), Vector2(outer * 2, outer * 2)), color)
           draw_rect(Rect2(center - Vector2(inner, inner), Vector2(inner * 2, inner * 2)), color.darkened(0.3))
           draw_string(ThemeDB.fallback_font, center + Vector2(-5, 5), str(b.heat_capacity), HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.WHITE)
+
+  for particle in smoke_particles:
+    var alpha := particle.life / particle.max_life
+    var smoke_color := Color(0.5, 0.5, 0.5, alpha * 0.6)
+    draw_circle(particle.pos + shake_offset, particle.size * (1.0 + (1.0 - alpha) * 0.5), smoke_color)
 
   if hovered_cell != Vector2i(-1, -1) and not is_outport(hovered_cell):
     var rect_pos := offset + Vector2(hovered_cell) * CELL_SIZE
