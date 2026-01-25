@@ -62,6 +62,17 @@ class SmokeParticle:
     max_life = life
     size = randf_range(4, 8)
 
+class AbsorbParticle:
+  var pos: Vector2
+  var target: Vector2
+  var life: float = 0.3
+  var color: Color
+
+  func _init(start: Vector2, end: Vector2, c: Color):
+    pos = start
+    target = end
+    color = c
+
 var grid: Array = []
 var pipes: Array[Pipe] = []
 var outports: Array[Vector2i] = [
@@ -92,6 +103,7 @@ var screen_shake: float = 0.0
 var shake_offset: Vector2 = Vector2.ZERO
 var score_popups: Array[ScorePopup] = []
 var smoke_particles: Array[SmokeParticle] = []
+var absorb_particles: Array[AbsorbParticle] = []
 var sim_start_pulse: float = 0.0
 var flow_anim_time: float = 0.0
 var smoke_spawn_timer: float = 0.0
@@ -170,6 +182,14 @@ func _process(delta: float) -> void:
     particle.life -= delta
   smoke_particles = smoke_particles.filter(func(p): return p.life > 0)
   if smoke_particles.size() > 0:
+    needs_redraw = true
+
+  for particle in absorb_particles:
+    var t := 1.0 - (particle.life / 0.3)
+    particle.pos = particle.pos.lerp(particle.target, t * 0.15)
+    particle.life -= delta
+  absorb_particles = absorb_particles.filter(func(p): return p.life > 0)
+  if absorb_particles.size() > 0:
     needs_redraw = true
 
   smoke_spawn_timer -= delta
@@ -255,6 +275,16 @@ func add_screen_shake(amount: float) -> void:
 func spawn_score_popup(grid_pos: Vector2i, amount: int) -> void:
   var pixel_pos := grid_to_pixel(grid_pos, false)
   score_popups.append(ScorePopup.new(pixel_pos, "+" + str(amount)))
+
+func spawn_absorb_particles(grid_pos: Vector2i, count: int) -> void:
+  var center := grid_to_pixel(grid_pos, false)
+  var b: Building = grid[grid_pos.x][grid_pos.y]
+  var particle_color := Color.DEEP_SKY_BLUE if b.type == BuildingType.RADIATOR else Color.SLATE_BLUE
+  for i in range(count * 3):
+    var angle := randf() * TAU
+    var dist := randf_range(25, 40)
+    var start := center + Vector2(cos(angle), sin(angle)) * dist
+    absorb_particles.append(AbsorbParticle.new(start, center, particle_color))
 
 func pixel_to_grid(pixel: Vector2) -> Vector2i:
   var rel := pixel - GRID_OFFSET
@@ -585,6 +615,7 @@ func route_heat(generator_pos: Vector2i, heat_amount: int) -> bool:
           var absorbed := mini(heat_amount, b.heat_capacity)
           b.heat_capacity -= absorbed
           heat_amount -= absorbed
+          spawn_absorb_particles(current, absorbed)
           if heat_amount <= 0:
             return true
 
@@ -703,6 +734,11 @@ func _draw() -> void:
     var alpha := particle.life / particle.max_life
     var smoke_color := Color(0.5, 0.5, 0.5, alpha * 0.6)
     draw_circle(particle.pos + shake_offset, particle.size * (1.0 + (1.0 - alpha) * 0.5), smoke_color)
+
+  for particle in absorb_particles:
+    var alpha := particle.life / 0.3
+    var absorb_color := Color(particle.color.r, particle.color.g, particle.color.b, alpha)
+    draw_circle(particle.pos + shake_offset, 4, absorb_color)
 
   if hovered_cell != Vector2i(-1, -1) and not is_outport(hovered_cell):
     var can_place := can_place_building(hovered_cell, selected_building) if selected_building != BuildingType.NONE else false
