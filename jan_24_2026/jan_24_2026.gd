@@ -705,10 +705,13 @@ func _draw() -> void:
     draw_circle(particle.pos + shake_offset, particle.size * (1.0 + (1.0 - alpha) * 0.5), smoke_color)
 
   if hovered_cell != Vector2i(-1, -1) and not is_outport(hovered_cell):
-    var rect_pos := offset + Vector2(hovered_cell) * CELL_SIZE
     var can_place := can_place_building(hovered_cell, selected_building) if selected_building != BuildingType.NONE else false
     var hover_color := Color.GREEN if can_place else Color(0.5, 0.5, 0.5, 0.3)
-    draw_rect(Rect2(rect_pos, Vector2(CELL_SIZE, CELL_SIZE)), hover_color, false, 2.0)
+    var pulse := sin(Time.get_ticks_msec() / 150.0) * 0.03 + 1.0
+    var hover_size := CELL_SIZE * pulse
+    var hover_offset := (CELL_SIZE - hover_size) / 2.0
+    var rect_pos := offset + Vector2(hovered_cell) * CELL_SIZE + Vector2(hover_offset, hover_offset)
+    draw_rect(Rect2(rect_pos, Vector2(hover_size, hover_size)), hover_color, false, 2.0)
 
   if drawing_pipe and pipe_start != Vector2i(-1, -1):
     var start_pos := grid_to_pixel(pipe_start)
