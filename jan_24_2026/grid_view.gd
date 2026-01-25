@@ -72,6 +72,13 @@ class AbsorbParticle:
 @export_group("Grid")
 @export var grid_size: int = 7
 
+@export_group("Pipes")
+@export var pipe_width: float = 6.0
+@export var pipe_reach: float = 0.8
+@export var pipe_dot_size: float = 4.0
+@export var pipe_dot_spacing: float = 0.33
+@export var pipe_dot_count: int = 3
+
 @export_group("Game Feel")
 @export var flow_dot_speed: float = 2.0
 @export var milestone_flash_duration: float = 0.5
@@ -101,7 +108,7 @@ var hovered_cell: Vector2i = Vector2i(-1, -1)
 var pipe_resource: ResourceType = ResourceType.FUEL
 
 var simulating: bool = false
-var active_flows: Dictionary = {}
+var active_flows: Dictionary = {}  # key: "x,y", value: Vector2i (upstream cell position)
 var shake_offset: Vector2 = Vector2.ZERO
 var flow_anim_time: float = 0.0
 var sim_start_pulse: float = 0.0
@@ -186,12 +193,13 @@ func draw_grid_elements() -> void:
   for x in range(grid_size):
     for y in range(grid_size):
       var element = grid[x][y]
-      if element == null:
-        continue
+      if element is Pipe:
+        draw_pipe_element(element, Vector2i(x, y))
+  for x in range(grid_size):
+    for y in range(grid_size):
+      var element = grid[x][y]
       if element is Building:
         draw_building(element, Vector2i(x, y))
-      elif element is Pipe:
-        draw_pipe_element(element, Vector2i(x, y))
 
 func draw_building(b: Building, pos: Vector2i) -> void:
   var center := grid_to_pixel(pos)
@@ -222,7 +230,6 @@ func draw_pipe_element(p: Pipe, pos: Vector2i) -> void:
   var center := grid_to_pixel(pos)
   var color: Color = RESOURCE_COLORS[p.resource]
   var cs := cell_size
-  var pipe_width := 6.0
   var flow_key := "%d,%d" % [pos.x, pos.y]
   var is_active := active_flows.has(flow_key)
 
@@ -234,16 +241,20 @@ func draw_pipe_element(p: Pipe, pos: Vector2i) -> void:
   else:
     for conn in p.connections:
       var dir := Vector2(conn - pos).normalized()
-      var edge := center + dir * (cs / 2)
+      var endpoint := center + dir * (cs * pipe_reach)
       if is_active:
-        draw_line(center, edge, color.lightened(0.3), pipe_width + 4)
-      draw_line(center, edge, color, pipe_width)
+        draw_line(center, endpoint, color.lightened(0.3), pipe_width + 4)
+      draw_line(center, endpoint, color, pipe_width)
 
     if simulating and is_active:
+      var upstream: Vector2i = active_flows[flow_key]
       for conn in p.connections:
-        var dir := Vector2(conn - pos).normalized()
-        var edge := center + dir * (cs / 2)
-        draw_flow_dots(center, edge, color)
+        if conn == upstream:
+          var upstream_edge := center + Vector2(upstream - pos).normalized() * (cs * pipe_reach)
+          draw_flow_dots(upstream_edge, center, color)
+        else:
+          var downstream_edge := center + Vector2(conn - pos).normalized() * (cs * pipe_reach)
+          draw_flow_dots(center, downstream_edge, color)
 
   draw_circle(center, pipe_width / 2, color.lightened(0.2))
 
@@ -277,11 +288,10 @@ func draw_heat_sink(center: Vector2, s: float, color: Color, heat_capacity: int)
   draw_string(ThemeDB.fallback_font, center + Vector2(-5, 5), str(heat_capacity), HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.WHITE)
 
 func draw_flow_dots(from_pos: Vector2, to_pos: Vector2, color: Color) -> void:
-  var dot_spacing := 0.33
-  for i in range(3):
-    var dot_t := fmod(flow_anim_time * flow_dot_speed + i * dot_spacing, 1.0)
+  for i in range(pipe_dot_count):
+    var dot_t := fmod(flow_anim_time * flow_dot_speed + i * pipe_dot_spacing, 1.0)
     var dot_pos := from_pos.lerp(to_pos, dot_t)
-    draw_circle(dot_pos, 4, color.lightened(0.3))
+    draw_circle(dot_pos, pipe_dot_size, color.lightened(0.3))
 
 func draw_smoke_particles() -> void:
   for particle in smoke_particles:
@@ -321,12 +331,12 @@ func draw_element_ghost(pos: Vector2i) -> void:
   if selected_building == BuildingType.PIPE:
     var ghost_color: Color = RESOURCE_COLORS[pipe_resource]
     ghost_color.a = 0.4
-    draw_circle(ghost_center, 6, ghost_color)
+    draw_circle(ghost_center, pipe_width, ghost_color)
     for neighbor in get_adjacent_cells(pos):
-      if should_connect_pipe(pos, neighbor):
+      if should_connect_pipe(pos, neighbor, pipe_resource):
         var dir := Vector2(neighbor - pos).normalized()
-        var edge := ghost_center + dir * (cell_size / 2)
-        draw_line(ghost_center, edge, ghost_color, 6.0)
+        var endpoint := ghost_center + dir * (cell_size * pipe_reach)
+        draw_line(ghost_center, endpoint, ghost_color, pipe_width)
   else:
     var ghost_color: Color = BUILDING_COLORS[selected_building]
     ghost_color.a = 0.4
@@ -406,15 +416,23 @@ func can_place_at(pos: Vector2i, type: BuildingType) -> bool:
       return true
   return false
 
-func should_connect_pipe(_pipe_pos: Vector2i, neighbor_pos: Vector2i) -> bool:
+func should_connect_pipe(_pipe_pos: Vector2i, neighbor_pos: Vector2i, res: ResourceType) -> bool:
   if is_outport(neighbor_pos):
-    return true
+    return res == ResourceType.POWER
   var neighbor = grid[neighbor_pos.x][neighbor_pos.y]
   if neighbor == null:
     return false
   if neighbor is Pipe:
-    return neighbor.resource == pipe_resource
-  return true
+    return neighbor.resource == res
+  if neighbor is Building:
+    match neighbor.type:
+      BuildingType.EXTRACTOR:
+        return res == ResourceType.FUEL
+      BuildingType.GENERATOR:
+        return true
+      BuildingType.RADIATOR, BuildingType.HEAT_SINK:
+        return res == ResourceType.HEAT
+  return false
 
 func place_pipe(pos: Vector2i) -> Pipe:
   var p := Pipe.new(pos, pipe_resource)
@@ -433,7 +451,7 @@ func update_pipe_connections(pos: Vector2i) -> void:
   var p: Pipe = element
   p.connections.clear()
   for neighbor in get_adjacent_cells(pos):
-    if should_connect_pipe(pos, neighbor):
+    if should_connect_pipe(pos, neighbor, p.resource):
       p.connections.append(neighbor)
 
 func get_element_at(pos: Vector2i):

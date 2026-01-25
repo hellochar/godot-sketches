@@ -1,7 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://3uwxrbrfv8h6"]
+[gd_scene load_steps=7 format=3 uid="uid://3uwxrbrfv8h6"]
 
 [ext_resource type="Script" uid="uid://c1mr8ety4yubf" path="res://jan_24_2026/jan_24_2026.gd" id="1_script"]
-[ext_resource type="Script" path="res://jan_24_2026/grid_view.gd" id="2_grid_view"]
+[ext_resource type="Script" uid="uid://bfaweodl0h47y" path="res://jan_24_2026/grid_view.gd" id="2_grid_view"]
+[ext_resource type="LabelSettings" uid="uid://dg5l8qp2vxk4r" path="res://jan_24_2026/label_settings.tres" id="3_label_settings"]
+[ext_resource type="LabelSettings" uid="uid://bh3kmam2nop5q" path="res://jan_24_2026/label_settings_header.tres" id="4_label_settings_header"]
+[ext_resource type="LabelSettings" uid="uid://ch4lm0n3opq6r" path="res://jan_24_2026/label_settings_small.tres" id="5_label_settings_small"]
+[ext_resource type="LabelSettings" uid="uid://di5mn1o4pqr7s" path="res://jan_24_2026/label_settings_large.tres" id="6_label_settings_large"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -11,6 +15,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
+heat_shutdown_threshold = 9999
+radiator_capacity = 9999
+heat_sink_capacity = 9999
 
 [node name="GridView" type="Control" parent="."]
 unique_name_in_owner = true
@@ -25,6 +32,9 @@ offset_bottom = -20.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_grid_view")
+pipe_reach = 1.0
+pipe_dot_size = 8.0
+pipe_dot_spacing = 0.5
 
 [node name="LeftPanel" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -38,8 +48,8 @@ grow_vertical = 2
 
 [node name="BuildingsHeader" type="Label" parent="LeftPanel"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
 text = "BUILDINGS"
+label_settings = ExtResource("4_label_settings_header")
 
 [node name="BuildingsList" type="VBoxContainer" parent="LeftPanel"]
 layout_mode = 2
@@ -47,32 +57,32 @@ layout_mode = 2
 [node name="Extractor" type="Label" parent="LeftPanel/BuildingsList"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
 text = "1: Extractor"
+label_settings = ExtResource("3_label_settings")
 
 [node name="Generator" type="Label" parent="LeftPanel/BuildingsList"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
 text = "2: Generator"
+label_settings = ExtResource("3_label_settings")
 
 [node name="Radiator" type="Label" parent="LeftPanel/BuildingsList"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
 text = "3: Radiator"
+label_settings = ExtResource("3_label_settings")
 
 [node name="HeatSink" type="Label" parent="LeftPanel/BuildingsList"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
 text = "4: Heat Sink"
+label_settings = ExtResource("3_label_settings")
 
 [node name="Pipe" type="Label" parent="LeftPanel/BuildingsList"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
 text = "5: Pipe"
+label_settings = ExtResource("3_label_settings")
 
 [node name="BuildingDesc" type="VBoxContainer" parent="LeftPanel"]
 unique_name_in_owner = true
@@ -81,12 +91,12 @@ layout_mode = 2
 [node name="Line1" type="Label" parent="LeftPanel/BuildingDesc"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.9, 0.7, 1)
-theme_override_font_sizes/font_size = 11
+label_settings = ExtResource("5_label_settings_small")
 
 [node name="Line2" type="Label" parent="LeftPanel/BuildingDesc"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 11
+label_settings = ExtResource("5_label_settings_small")
 
 [node name="Spacer1" type="Control" parent="LeftPanel"]
 custom_minimum_size = Vector2(0, 10)
@@ -94,8 +104,8 @@ layout_mode = 2
 
 [node name="PipesHeader" type="Label" parent="LeftPanel"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
 text = "PIPES"
+label_settings = ExtResource("4_label_settings_header")
 
 [node name="PipesList" type="VBoxContainer" parent="LeftPanel"]
 layout_mode = 2
@@ -103,20 +113,20 @@ layout_mode = 2
 [node name="Fuel" type="Label" parent="LeftPanel/PipesList"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
 text = "F: Fuel"
+label_settings = ExtResource("3_label_settings")
 
 [node name="Power" type="Label" parent="LeftPanel/PipesList"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
 text = "P: Power"
+label_settings = ExtResource("3_label_settings")
 
 [node name="Heat" type="Label" parent="LeftPanel/PipesList"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
 text = "H: Heat"
+label_settings = ExtResource("3_label_settings")
 
 [node name="Spacer2" type="Control" parent="LeftPanel"]
 custom_minimum_size = Vector2(0, 10)
@@ -124,8 +134,8 @@ layout_mode = 2
 
 [node name="ControlsHeader" type="Label" parent="LeftPanel"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
 text = "CONTROLS"
+label_settings = ExtResource("4_label_settings_header")
 
 [node name="ControlsList" type="VBoxContainer" parent="LeftPanel"]
 layout_mode = 2
@@ -134,26 +144,26 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
-theme_override_font_sizes/font_size = 14
 text = "Space: Start"
+label_settings = ExtResource("3_label_settings")
 
 [node name="Reset" type="Label" parent="LeftPanel/ControlsList"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
-theme_override_font_sizes/font_size = 14
 text = "R: Reset"
+label_settings = ExtResource("3_label_settings")
 
 [node name="Deselect" type="Label" parent="LeftPanel/ControlsList"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
-theme_override_font_sizes/font_size = 14
 text = "Esc: Deselect"
+label_settings = ExtResource("3_label_settings")
 
 [node name="Remove" type="Label" parent="LeftPanel/ControlsList"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
-theme_override_font_sizes/font_size = 14
 text = "RClick: Remove"
+label_settings = ExtResource("3_label_settings")
 
 [node name="RightPanel" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -172,14 +182,14 @@ grow_vertical = 2
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.2, 1, 0.2, 1)
-theme_override_font_sizes/font_size = 24
 text = "SCORE: 0"
+label_settings = ExtResource("6_label_settings_large")
 
 [node name="StatusLabel" type="Label" parent="RightPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 0, 1)
-theme_override_font_sizes/font_size = 16
+label_settings = ExtResource("4_label_settings_header")
 
 [node name="Spacer1" type="Control" parent="RightPanel"]
 custom_minimum_size = Vector2(0, 10)
@@ -189,7 +199,7 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
-theme_override_font_sizes/font_size = 14
+label_settings = ExtResource("3_label_settings")
 
 [node name="Spacer2" type="Control" parent="RightPanel"]
 custom_minimum_size = Vector2(0, 10)
@@ -199,27 +209,18 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.9, 0.5, 1)
-theme_override_font_sizes/font_size = 13
+label_settings = ExtResource("3_label_settings")
 autowrap_mode = 2
-
-[node name="Spacer3" type="Control" parent="RightPanel"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-
-[node name="TooltipLabel" type="Label" parent="RightPanel"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
-theme_override_font_sizes/font_size = 12
-autowrap_mode = 2
-
-[node name="Spacer4" type="Control" parent="RightPanel"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
 
 [node name="ResourceDescLabel" type="Label" parent="RightPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 11
+label_settings = ExtResource("5_label_settings_small")
 autowrap_mode = 2
+
+[node name="TooltipLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+label_settings = ExtResource("3_label_settings")
