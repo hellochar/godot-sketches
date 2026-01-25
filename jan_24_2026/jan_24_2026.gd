@@ -1,11 +1,31 @@
 extends Control
 
-const GRID_SIZE := 7
-const CELL_SIZE := 60.0
-const GRID_OFFSET := Vector2(200, 50)
-
 enum BuildingType { NONE, EXTRACTOR, GENERATOR, RADIATOR, HEAT_SINK }
 enum ResourceType { FUEL, POWER, HEAT }
+
+@export_group("Grid")
+@export var grid_size: int = 7
+@export var cell_size: float = 60.0
+@export var grid_offset: Vector2 = Vector2(200, 50)
+
+@export_group("Simulation")
+@export var tick_interval: float = 0.5
+@export var heat_shutdown_threshold: int = 3
+@export var radiator_capacity: int = 2
+@export var heat_sink_capacity: int = 4
+
+@export_group("Game Feel")
+@export var shake_amplitude: float = 8.0
+@export var shake_duration: float = 0.3
+@export var building_pop_scale: float = 1.4
+@export var building_spring: float = 150.0
+@export var building_damping: float = 12.0
+@export var pipe_anim_speed: float = 5.0
+@export var flow_dot_speed: float = 2.0
+@export var smoke_spawn_interval: float = 0.1
+@export var score_popup_speed: float = 40.0
+@export var milestone_flash_duration: float = 0.5
+@export var milestone_shake_amount: float = 0.2
 
 class Building:
   var type: BuildingType
@@ -19,12 +39,7 @@ class Building:
   func _init(t: BuildingType, p: Vector2i):
     type = t
     pos = p
-    scale = 1.4
     scale_velocity = 0.0
-    if t == BuildingType.RADIATOR:
-      heat_capacity = 2
-    elif t == BuildingType.HEAT_SINK:
-      heat_capacity = 4
 
 class Pipe:
   var from: Vector2i
@@ -42,7 +57,7 @@ class ScorePopup:
   var pos: Vector2
   var text: String
   var life: float = 1.0
-  var velocity: Vector2 = Vector2(0, -40)
+  var velocity: Vector2 = Vector2.ZERO
 
   func _init(p: Vector2, t: String):
     pos = p
@@ -89,7 +104,6 @@ var pipe_resource: ResourceType = ResourceType.FUEL
 
 var simulating: bool = false
 var tick_timer: float = 0.0
-const TICK_INTERVAL := 0.5
 var total_score: int = 0
 
 var pipes_from: Dictionary = {}
@@ -125,9 +139,9 @@ const RESOURCE_COLORS := {
 }
 
 func _ready() -> void:
-  for x in range(GRID_SIZE):
+  for x in range(grid_size):
     var column := []
-    for y in range(GRID_SIZE):
+    for y in range(grid_size):
       column.append(null)
     grid.append(column)
 
@@ -146,7 +160,7 @@ func _process(delta: float) -> void:
   if simulating:
     tick_timer += delta
     flow_anim_time += delta
-    if tick_timer >= TICK_INTERVAL:
+    if tick_timer >= tick_interval:
       tick_timer = 0.0
       simulate_tick()
     needs_redraw = true
@@ -161,8 +175,8 @@ func _process(delta: float) -> void:
     screen_shake -= delta
     var trauma := screen_shake * screen_shake
     shake_offset = Vector2(
-      randf_range(-8, 8) * trauma,
-      randf_range(-8, 8) * trauma
+      randf_range(-shake_amplitude, shake_amplitude) * trauma,
+      randf_range(-shake_amplitude, shake_amplitude) * trauma
     )
     needs_redraw = true
   else:
@@ -200,20 +214,20 @@ func _process(delta: float) -> void:
 
   smoke_spawn_timer -= delta
   if smoke_spawn_timer <= 0 and simulating:
-    smoke_spawn_timer = 0.1
-    for x in range(GRID_SIZE):
-      for y in range(GRID_SIZE):
+    smoke_spawn_timer = smoke_spawn_interval
+    for x in range(grid_size):
+      for y in range(grid_size):
         var b: Building = grid[x][y]
         if b != null and b.type == BuildingType.GENERATOR and b.heat_buildup > 0 and not b.shutdown:
           var center := grid_to_pixel(Vector2i(x, y), false)
           smoke_particles.append(SmokeParticle.new(center + Vector2(randf_range(-10, 10), -15)))
 
-  for x in range(GRID_SIZE):
-    for y in range(GRID_SIZE):
+  for x in range(grid_size):
+    for y in range(grid_size):
       var b: Building = grid[x][y]
       if b != null and b.scale != 1.0:
-        var spring := 150.0
-        var damping := 12.0
+        var spring := building_spring
+        var damping := building_damping
         var diff := 1.0 - b.scale
         b.scale_velocity += diff * spring * delta
         b.scale_velocity *= exp(-damping * delta)
@@ -225,7 +239,7 @@ func _process(delta: float) -> void:
 
   for pipe in pipes:
     if pipe.anim_progress < 1.0:
-      pipe.anim_progress = minf(1.0, pipe.anim_progress + delta * 5.0)
+      pipe.anim_progress = minf(1.0, pipe.anim_progress + delta * pipe_anim_speed)
       needs_redraw = true
 
   if needs_redraw or drawing_pipe:
@@ -280,7 +294,9 @@ func add_screen_shake(amount: float) -> void:
 
 func spawn_score_popup(grid_pos: Vector2i, amount: int) -> void:
   var pixel_pos := grid_to_pixel(grid_pos, false)
-  score_popups.append(ScorePopup.new(pixel_pos, "+" + str(amount)))
+  var popup := ScorePopup.new(pixel_pos, "+" + str(amount))
+  popup.velocity = Vector2(0, -score_popup_speed)
+  score_popups.append(popup)
 
 func spawn_absorb_particles(grid_pos: Vector2i, count: int) -> void:
   var center := grid_to_pixel(grid_pos, false)
@@ -293,20 +309,20 @@ func spawn_absorb_particles(grid_pos: Vector2i, count: int) -> void:
     absorb_particles.append(AbsorbParticle.new(start, center, particle_color))
 
 func pixel_to_grid(pixel: Vector2) -> Vector2i:
-  var rel := pixel - GRID_OFFSET
-  var gx := int(rel.x / CELL_SIZE)
-  var gy := int(rel.y / CELL_SIZE)
+  var rel := pixel - grid_offset
+  var gx := int(rel.x / cell_size)
+  var gy := int(rel.y / cell_size)
   return Vector2i(gx, gy)
 
 func grid_to_pixel(grid_pos: Vector2i, with_shake: bool = true) -> Vector2:
-  var offset := GRID_OFFSET + (shake_offset if with_shake else Vector2.ZERO)
-  return offset + Vector2(grid_pos) * CELL_SIZE + Vector2(CELL_SIZE / 2, CELL_SIZE / 2)
+  var offset := grid_offset + (shake_offset if with_shake else Vector2.ZERO)
+  return offset + Vector2(grid_pos) * cell_size + Vector2(cell_size / 2, cell_size / 2)
 
 func is_valid_cell(pos: Vector2i) -> bool:
-  return pos.x >= 0 and pos.x < GRID_SIZE and pos.y >= 0 and pos.y < GRID_SIZE
+  return pos.x >= 0 and pos.x < grid_size and pos.y >= 0 and pos.y < grid_size
 
 func is_edge_cell(pos: Vector2i) -> bool:
-  return pos.x == 0 or pos.x == GRID_SIZE - 1 or pos.y == 0 or pos.y == GRID_SIZE - 1
+  return pos.x == 0 or pos.x == grid_size - 1 or pos.y == 0 or pos.y == grid_size - 1
 
 func is_outport(pos: Vector2i) -> bool:
   return pos in outports
@@ -337,7 +353,13 @@ func can_place_building(pos: Vector2i, type: BuildingType) -> bool:
 
 func try_place_building(pos: Vector2i, type: BuildingType) -> void:
   if can_place_building(pos, type):
-    grid[pos.x][pos.y] = Building.new(type, pos)
+    var b := Building.new(type, pos)
+    b.scale = building_pop_scale
+    if type == BuildingType.RADIATOR:
+      b.heat_capacity = radiator_capacity
+    elif type == BuildingType.HEAT_SINK:
+      b.heat_capacity = heat_sink_capacity
+    grid[pos.x][pos.y] = b
     needs_redraw = true
   else:
     if is_outport(pos):
@@ -419,16 +441,16 @@ func reset_simulation() -> void:
   tick_timer = 0.0
   total_score = 0
   last_milestone = 0
-  for x in range(GRID_SIZE):
-    for y in range(GRID_SIZE):
+  for x in range(grid_size):
+    for y in range(grid_size):
       var b: Building = grid[x][y]
       if b != null:
         b.heat_buildup = 0
         b.shutdown = false
         if b.type == BuildingType.RADIATOR:
-          b.heat_capacity = 2
+          b.heat_capacity = radiator_capacity
         elif b.type == BuildingType.HEAT_SINK:
-          b.heat_capacity = 4
+          b.heat_capacity = heat_sink_capacity
   needs_redraw = true
 
 func find_path(start: Vector2i, resource: ResourceType, target_types: Array) -> Array:
@@ -467,16 +489,16 @@ func simulate_tick() -> void:
   var heat_produced := {}
   active_power_pipes.clear()
 
-  for x in range(GRID_SIZE):
-    for y in range(GRID_SIZE):
+  for x in range(grid_size):
+    for y in range(grid_size):
       var b: Building = grid[x][y]
       if b == null or b.shutdown:
         continue
       if b.type == BuildingType.EXTRACTOR:
         fuel_available[b.pos] = 1
 
-  for x in range(GRID_SIZE):
-    for y in range(GRID_SIZE):
+  for x in range(grid_size):
+    for y in range(grid_size):
       var b: Building = grid[x][y]
       if b == null or b.shutdown:
         continue
@@ -490,8 +512,8 @@ func simulate_tick() -> void:
             power_produced[b.pos] = 2
             heat_produced[b.pos] = 1
 
-  for x in range(GRID_SIZE):
-    for y in range(GRID_SIZE):
+  for x in range(grid_size):
+    for y in range(grid_size):
       var b: Building = grid[x][y]
       if b == null or b.shutdown:
         continue
@@ -502,10 +524,10 @@ func simulate_tick() -> void:
 
         if not heat_routed:
           b.heat_buildup += heat_amount
-          if b.heat_buildup >= 3:
+          if b.heat_buildup >= heat_shutdown_threshold:
             b.shutdown = true
             show_feedback("Generator overheated!")
-            add_screen_shake(0.3)
+            add_screen_shake(shake_duration)
         else:
           b.heat_buildup = max(0, b.heat_buildup - 1)
 
@@ -528,8 +550,8 @@ func check_milestones() -> void:
   for m in milestones:
     if total_score >= m and last_milestone < m:
       last_milestone = m
-      milestone_flash = 0.5
-      add_screen_shake(0.2)
+      milestone_flash = milestone_flash_duration
+      add_screen_shake(milestone_shake_amount)
       show_feedback("Milestone: " + str(m) + " power!")
       break
 
@@ -650,23 +672,23 @@ func route_heat(generator_pos: Vector2i, heat_amount: int) -> bool:
 func _draw() -> void:
   draw_rect(Rect2(Vector2.ZERO, size), Color(0.1, 0.1, 0.15))
 
-  var offset := GRID_OFFSET + shake_offset
+  var offset := grid_offset + shake_offset
 
-  for x in range(GRID_SIZE + 1):
-    var start := offset + Vector2(x * CELL_SIZE, 0)
-    var end := offset + Vector2(x * CELL_SIZE, GRID_SIZE * CELL_SIZE)
+  for x in range(grid_size + 1):
+    var start := offset + Vector2(x * cell_size, 0)
+    var end := offset + Vector2(x * cell_size, grid_size * cell_size)
     draw_line(start, end, Color(0.3, 0.3, 0.35), 1.0)
 
-  for y in range(GRID_SIZE + 1):
-    var start := offset + Vector2(0, y * CELL_SIZE)
-    var end := offset + Vector2(GRID_SIZE * CELL_SIZE, y * CELL_SIZE)
+  for y in range(grid_size + 1):
+    var start := offset + Vector2(0, y * cell_size)
+    var end := offset + Vector2(grid_size * cell_size, y * cell_size)
     draw_line(start, end, Color(0.3, 0.3, 0.35), 1.0)
 
   for outport in outports:
     var center := grid_to_pixel(outport)
     var outport_scale := 1.0
     if milestone_flash > 0:
-      outport_scale = 1.0 + (milestone_flash / 0.5) * 0.3
+      outport_scale = 1.0 + (milestone_flash / milestone_flash_duration) * 0.3
     var points := PackedVector2Array([
       center + Vector2(0, -20 * outport_scale),
       center + Vector2(20 * outport_scale, 0),
@@ -675,7 +697,7 @@ func _draw() -> void:
     ])
     var outport_color := Color.LIME_GREEN
     if milestone_flash > 0:
-      outport_color = outport_color.lerp(Color.WHITE, milestone_flash / 0.5)
+      outport_color = outport_color.lerp(Color.WHITE, milestone_flash / milestone_flash_duration)
     draw_colored_polygon(points, outport_color)
     draw_polyline(points + PackedVector2Array([points[0]]), Color.WHITE, 2.0)
 
@@ -701,15 +723,15 @@ func _draw() -> void:
       draw_line(to_pos, arrow_pos - perp, color, 3.0)
 
       if simulating:
-        var flow_speed := 2.0
+        var flow_speed := flow_dot_speed
         var dot_spacing := 0.33
         for i in range(3):
           var dot_t := fmod(flow_anim_time * flow_speed + i * dot_spacing, 1.0)
           var dot_pos := from_pos.lerp(to_pos, dot_t)
           draw_circle(dot_pos, 4, color.lightened(0.3))
 
-  for x in range(GRID_SIZE):
-    for y in range(GRID_SIZE):
+  for x in range(grid_size):
+    for y in range(grid_size):
       var b: Building = grid[x][y]
       if b == null:
         continue
@@ -769,9 +791,9 @@ func _draw() -> void:
     var can_place := can_place_building(hovered_cell, selected_building) if selected_building != BuildingType.NONE else false
     var hover_color := Color.GREEN if can_place else Color(0.5, 0.5, 0.5, 0.3)
     var pulse := sin(Time.get_ticks_msec() / 150.0) * 0.03 + 1.0
-    var hover_size := CELL_SIZE * pulse
-    var hover_offset := (CELL_SIZE - hover_size) / 2.0
-    var rect_pos := offset + Vector2(hovered_cell) * CELL_SIZE + Vector2(hover_offset, hover_offset)
+    var hover_size := cell_size * pulse
+    var hover_offset := (cell_size - hover_size) / 2.0
+    var rect_pos := offset + Vector2(hovered_cell) * cell_size + Vector2(hover_offset, hover_offset)
     draw_rect(Rect2(rect_pos, Vector2(hover_size, hover_size)), hover_color, false, 2.0)
 
     if selected_building != BuildingType.NONE and can_place:
@@ -857,7 +879,7 @@ func draw_ui() -> void:
   ui_y += line_height
   draw_string(ThemeDB.fallback_font, Vector2(ui_x, ui_y), "RClick: Remove", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color.GRAY)
 
-  var score_x := GRID_OFFSET.x + GRID_SIZE * CELL_SIZE + 30
+  var score_x := grid_offset.x + grid_size * cell_size + 30
   draw_string(ThemeDB.fallback_font, Vector2(score_x, 80), "SCORE: " + str(total_score), HORIZONTAL_ALIGNMENT_LEFT, -1, 24, Color.LIME_GREEN)
 
   if simulating:
