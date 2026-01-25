@@ -78,6 +78,7 @@ var screen_shake: float = 0.0
 var shake_offset: Vector2 = Vector2.ZERO
 var score_popups: Array[ScorePopup] = []
 var sim_start_pulse: float = 0.0
+var flow_anim_time: float = 0.0
 
 const BUILDING_COLORS := {
   BuildingType.EXTRACTOR: Color.YELLOW,
@@ -113,10 +114,11 @@ func _process(delta: float) -> void:
 
   if simulating:
     tick_timer += delta
+    flow_anim_time += delta
     if tick_timer >= TICK_INTERVAL:
       tick_timer = 0.0
       simulate_tick()
-      needs_redraw = true
+    needs_redraw = true
 
   if feedback_timer > 0:
     feedback_timer -= delta
@@ -570,6 +572,14 @@ func _draw() -> void:
       var perp := Vector2(-dir.y, dir.x) * 8
       draw_line(to_pos, arrow_pos + perp, color, 3.0)
       draw_line(to_pos, arrow_pos - perp, color, 3.0)
+
+      if simulating:
+        var flow_speed := 2.0
+        var dot_spacing := 0.33
+        for i in range(3):
+          var dot_t := fmod(flow_anim_time * flow_speed + i * dot_spacing, 1.0)
+          var dot_pos := from_pos.lerp(to_pos, dot_t)
+          draw_circle(dot_pos, 4, color.lightened(0.3))
 
   for x in range(GRID_SIZE):
     for y in range(GRID_SIZE):
