@@ -95,6 +95,7 @@ var smoke_particles: Array[SmokeParticle] = []
 var sim_start_pulse: float = 0.0
 var flow_anim_time: float = 0.0
 var smoke_spawn_timer: float = 0.0
+var active_power_pipes: Dictionary = {}
 
 const BUILDING_COLORS := {
   BuildingType.EXTRACTOR: Color.YELLOW,
@@ -427,6 +428,7 @@ func simulate_tick() -> void:
   var fuel_available := {}
   var power_produced := {}
   var heat_produced := {}
+  active_power_pipes.clear()
 
   for x in range(GRID_SIZE):
     for y in range(GRID_SIZE):
@@ -478,6 +480,7 @@ func simulate_tick() -> void:
         outport_power += power_produced[source]
         total_score += power_produced[source]
         power_produced[source] = 0
+        mark_power_path(source, outport)
     if outport_power > 0:
       spawn_score_popup(outport, outport_power)
 
@@ -506,6 +509,36 @@ func find_path_to_fuel(generator_pos: Vector2i) -> Array:
           queue.append(prev)
 
   return []
+
+func mark_power_path(from_pos: Vector2i, to_pos: Vector2i) -> void:
+  var visited := {}
+  var queue := [to_pos]
+  var parent := {}
+
+  while queue.size() > 0:
+    var current: Vector2i = queue.pop_front()
+    var key := "%d,%d" % [current.x, current.y]
+
+    if visited.has(key):
+      continue
+    visited[key] = true
+
+    if current == from_pos:
+      var path_node := current
+      while parent.has(path_node):
+        var next_node: Vector2i = parent[path_node]
+        var pipe_key := "%d,%d-%d,%d" % [path_node.x, path_node.y, next_node.x, next_node.y]
+        active_power_pipes[pipe_key] = true
+        path_node = next_node
+      return
+
+    for pipe in get_pipes_to(current):
+      if pipe.resource == ResourceType.POWER:
+        var prev: Vector2i = pipe.from
+        var prev_key := "%d,%d" % [prev.x, prev.y]
+        if not visited.has(prev_key):
+          queue.append(prev)
+          parent[prev] = current
 
 func find_power_sources(outport: Vector2i) -> Array:
   var sources := []
@@ -594,6 +627,11 @@ func _draw() -> void:
     var from_pos := grid_to_pixel(pipe.from)
     var to_pos := grid_to_pixel(pipe.to)
     var color: Color = RESOURCE_COLORS[pipe.resource]
+    var pipe_key := "%d,%d-%d,%d" % [pipe.from.x, pipe.from.y, pipe.to.x, pipe.to.y]
+    var is_active := active_power_pipes.has(pipe_key)
+    if is_active:
+      draw_line(from_pos, to_pos, color.lightened(0.5), 8.0)
+      color = color.lightened(0.3)
     var t := pipe.anim_progress
     var eased := 1.0 - (1.0 - t) * (1.0 - t)
     var current_end := from_pos.lerp(to_pos, eased)
