@@ -108,6 +108,8 @@ var sim_start_pulse: float = 0.0
 var flow_anim_time: float = 0.0
 var smoke_spawn_timer: float = 0.0
 var active_power_pipes: Dictionary = {}
+var milestone_flash: float = 0.0
+var last_milestone: int = 0
 
 const BUILDING_COLORS := {
   BuildingType.EXTRACTOR: Color.YELLOW,
@@ -175,6 +177,10 @@ func _process(delta: float) -> void:
 
   if sim_start_pulse > 0:
     sim_start_pulse -= delta
+    needs_redraw = true
+
+  if milestone_flash > 0:
+    milestone_flash -= delta
     needs_redraw = true
 
   for particle in smoke_particles:
@@ -412,6 +418,7 @@ func reset_simulation() -> void:
   simulating = false
   tick_timer = 0.0
   total_score = 0
+  last_milestone = 0
   for x in range(GRID_SIZE):
     for y in range(GRID_SIZE):
       var b: Building = grid[x][y]
@@ -513,6 +520,18 @@ func simulate_tick() -> void:
         mark_power_path(source, outport)
     if outport_power > 0:
       spawn_score_popup(outport, outport_power)
+
+  check_milestones()
+
+func check_milestones() -> void:
+  var milestones := [10, 25, 50, 100, 200, 500]
+  for m in milestones:
+    if total_score >= m and last_milestone < m:
+      last_milestone = m
+      milestone_flash = 0.5
+      add_screen_shake(0.2)
+      show_feedback("Milestone: " + str(m) + " power!")
+      break
 
 func find_path_to_fuel(generator_pos: Vector2i) -> Array:
   var visited := {}
@@ -645,13 +664,19 @@ func _draw() -> void:
 
   for outport in outports:
     var center := grid_to_pixel(outport)
+    var outport_scale := 1.0
+    if milestone_flash > 0:
+      outport_scale = 1.0 + (milestone_flash / 0.5) * 0.3
     var points := PackedVector2Array([
-      center + Vector2(0, -20),
-      center + Vector2(20, 0),
-      center + Vector2(0, 20),
-      center + Vector2(-20, 0),
+      center + Vector2(0, -20 * outport_scale),
+      center + Vector2(20 * outport_scale, 0),
+      center + Vector2(0, 20 * outport_scale),
+      center + Vector2(-20 * outport_scale, 0),
     ])
-    draw_colored_polygon(points, Color.LIME_GREEN)
+    var outport_color := Color.LIME_GREEN
+    if milestone_flash > 0:
+      outport_color = outport_color.lerp(Color.WHITE, milestone_flash / 0.5)
+    draw_colored_polygon(points, outport_color)
     draw_polyline(points + PackedVector2Array([points[0]]), Color.WHITE, 2.0)
 
   for pipe in pipes:
