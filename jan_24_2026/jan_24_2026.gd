@@ -637,6 +637,10 @@ func _draw() -> void:
       match b.type:
         BuildingType.EXTRACTOR:
           draw_circle(center, 20 * s, color)
+          if simulating and not b.shutdown:
+            var pump := sin(flow_anim_time * 6.0) * 0.3 + 0.7
+            var inner_radius := 10 * s * pump
+            draw_circle(center, inner_radius, color.darkened(0.3))
         BuildingType.GENERATOR:
           var half := 20 * s
           draw_rect(Rect2(center - Vector2(half, half), Vector2(half * 2, half * 2)), color)
