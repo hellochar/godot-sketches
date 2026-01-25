@@ -3,37 +3,36 @@ class_name GridView
 
 signal cell_clicked(pos: Vector2i)
 signal cell_right_clicked(pos: Vector2i)
-signal pipe_drag_started(pos: Vector2i)
-signal pipe_drag_ended(from: Vector2i, to: Vector2i)
 
-enum BuildingType { NONE, EXTRACTOR, GENERATOR, RADIATOR, HEAT_SINK }
+enum BuildingType { NONE, EXTRACTOR, GENERATOR, RADIATOR, HEAT_SINK, PIPE }
 enum ResourceType { FUEL, POWER, HEAT }
 
-class Building:
-  var type: BuildingType
+class GridElement:
   var pos: Vector2i
-  var heat_buildup: int = 0
-  var heat_capacity: int = 0
-  var shutdown: bool = false
   var scale: float = 1.0
   var scale_velocity: float = 0.0
 
-  func _init(t: BuildingType, p: Vector2i):
-    type = t
+  func _init(p: Vector2i):
     pos = p
-    scale_velocity = 0.0
 
-class Pipe:
-  var from: Vector2i
-  var to: Vector2i
+class Building extends GridElement:
+  var type: BuildingType
+  var heat_buildup: int = 0
+  var heat_capacity: int = 0
+  var shutdown: bool = false
+
+  func _init(t: BuildingType, p: Vector2i):
+    super(p)
+    type = t
+
+class Pipe extends GridElement:
   var resource: ResourceType
-  var anim_progress: float = 0.0
+  var connections: Array[Vector2i] = []
+  var carrying: int = 0
 
-  func _init(f: Vector2i, t: Vector2i, r: ResourceType):
-    from = f
-    to = t
+  func _init(p: Vector2i, r: ResourceType):
+    super(p)
     resource = r
-    anim_progress = 0.0
 
 class ScorePopup:
   var pos: Vector2
@@ -91,7 +90,6 @@ const RESOURCE_COLORS := {
 }
 
 var grid: Array = []
-var pipes: Array[Pipe] = []
 var outports: Array[Vector2i] = [
   Vector2i(3, 0),
   Vector2i(0, 3),
@@ -100,12 +98,10 @@ var outports: Array[Vector2i] = [
 
 var selected_building: BuildingType = BuildingType.NONE
 var hovered_cell: Vector2i = Vector2i(-1, -1)
-var drawing_pipe: bool = false
-var pipe_start: Vector2i = Vector2i(-1, -1)
 var pipe_resource: ResourceType = ResourceType.FUEL
 
 var simulating: bool = false
-var active_power_pipes: Dictionary = {}
+var active_flows: Dictionary = {}
 var shake_offset: Vector2 = Vector2.ZERO
 var flow_anim_time: float = 0.0
 var sim_start_pulse: float = 0.0
@@ -131,12 +127,10 @@ func _draw() -> void:
   draw_grid_lines()
   draw_valid_placement_highlights()
   draw_outports()
-  draw_pipes()
-  draw_buildings()
+  draw_grid_elements()
   draw_smoke_particles()
   draw_absorb_particles()
   draw_hover_indicator()
-  draw_pipe_preview()
   draw_score_popups()
 
 func draw_background() -> void:
@@ -162,7 +156,7 @@ func draw_valid_placement_highlights() -> void:
   for x in range(grid_size):
     for y in range(grid_size):
       var pos := Vector2i(x, y)
-      if can_place_building(pos, selected_building):
+      if can_place_at(pos, selected_building):
         var cell_pos := offset + Vector2(x, y) * cs
         draw_rect(Rect2(cell_pos, Vector2(cs, cs)), Color(0.2, 0.8, 0.2, 0.15))
 
@@ -188,49 +182,16 @@ func draw_outport(pos: Vector2i) -> void:
   draw_colored_polygon(points, outport_color)
   draw_polyline(points + PackedVector2Array([points[0]]), Color.WHITE, 2.0)
 
-func draw_pipes() -> void:
-  for pipe in pipes:
-    draw_pipe(pipe)
-
-func draw_pipe(pipe: Pipe) -> void:
-  var from_pos := grid_to_pixel(pipe.from)
-  var to_pos := grid_to_pixel(pipe.to)
-  var color: Color = RESOURCE_COLORS[pipe.resource]
-  var pipe_key := "%d,%d-%d,%d" % [pipe.from.x, pipe.from.y, pipe.to.x, pipe.to.y]
-  var is_active := active_power_pipes.has(pipe_key)
-  if is_active:
-    draw_line(from_pos, to_pos, color.lightened(0.5), 8.0)
-    color = color.lightened(0.3)
-  var t := pipe.anim_progress
-  var eased := 1.0 - (1.0 - t) * (1.0 - t)
-  var current_end := from_pos.lerp(to_pos, eased)
-  draw_line(from_pos, current_end, color, 3.0)
-
-  if t >= 1.0:
-    draw_pipe_arrow(from_pos, to_pos, color)
-    if simulating:
-      draw_flow_dots(from_pos, to_pos, color)
-
-func draw_pipe_arrow(from_pos: Vector2, to_pos: Vector2, color: Color) -> void:
-  var dir := (to_pos - from_pos).normalized()
-  var arrow_pos := to_pos - dir * 15
-  var perp := Vector2(-dir.y, dir.x) * 8
-  draw_line(to_pos, arrow_pos + perp, color, 3.0)
-  draw_line(to_pos, arrow_pos - perp, color, 3.0)
-
-func draw_flow_dots(from_pos: Vector2, to_pos: Vector2, color: Color) -> void:
-  var dot_spacing := 0.33
-  for i in range(3):
-    var dot_t := fmod(flow_anim_time * flow_dot_speed + i * dot_spacing, 1.0)
-    var dot_pos := from_pos.lerp(to_pos, dot_t)
-    draw_circle(dot_pos, 4, color.lightened(0.3))
-
-func draw_buildings() -> void:
+func draw_grid_elements() -> void:
   for x in range(grid_size):
     for y in range(grid_size):
-      var b: Building = grid[x][y]
-      if b != null:
-        draw_building(b, Vector2i(x, y))
+      var element = grid[x][y]
+      if element == null:
+        continue
+      if element is Building:
+        draw_building(element, Vector2i(x, y))
+      elif element is Pipe:
+        draw_pipe_element(element, Vector2i(x, y))
 
 func draw_building(b: Building, pos: Vector2i) -> void:
   var center := grid_to_pixel(pos)
@@ -256,6 +217,35 @@ func draw_building(b: Building, pos: Vector2i) -> void:
       draw_radiator(center, s, color, b.heat_capacity)
     BuildingType.HEAT_SINK:
       draw_heat_sink(center, s, color, b.heat_capacity)
+
+func draw_pipe_element(p: Pipe, pos: Vector2i) -> void:
+  var center := grid_to_pixel(pos)
+  var color: Color = RESOURCE_COLORS[p.resource]
+  var cs := cell_size
+  var pipe_width := 6.0
+  var flow_key := "%d,%d" % [pos.x, pos.y]
+  var is_active := active_flows.has(flow_key)
+
+  if is_active:
+    color = color.lightened(0.3)
+
+  if p.connections.size() == 0:
+    draw_circle(center, pipe_width, color)
+  else:
+    for conn in p.connections:
+      var dir := Vector2(conn - pos).normalized()
+      var edge := center + dir * (cs / 2)
+      if is_active:
+        draw_line(center, edge, color.lightened(0.3), pipe_width + 4)
+      draw_line(center, edge, color, pipe_width)
+
+    if simulating and is_active:
+      for conn in p.connections:
+        var dir := Vector2(conn - pos).normalized()
+        var edge := center + dir * (cs / 2)
+        draw_flow_dots(center, edge, color)
+
+  draw_circle(center, pipe_width / 2, color.lightened(0.2))
 
 func draw_extractor(center: Vector2, s: float, color: Color, shutdown: bool) -> void:
   draw_circle(center, 20 * s, color)
@@ -286,6 +276,13 @@ func draw_heat_sink(center: Vector2, s: float, color: Color, heat_capacity: int)
   draw_rect(Rect2(center - Vector2(inner, inner), Vector2(inner * 2, inner * 2)), color.darkened(0.3))
   draw_string(ThemeDB.fallback_font, center + Vector2(-5, 5), str(heat_capacity), HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.WHITE)
 
+func draw_flow_dots(from_pos: Vector2, to_pos: Vector2, color: Color) -> void:
+  var dot_spacing := 0.33
+  for i in range(3):
+    var dot_t := fmod(flow_anim_time * flow_dot_speed + i * dot_spacing, 1.0)
+    var dot_pos := from_pos.lerp(to_pos, dot_t)
+    draw_circle(dot_pos, 4, color.lightened(0.3))
+
 func draw_smoke_particles() -> void:
   for particle in smoke_particles:
     var alpha := particle.life / particle.max_life
@@ -303,7 +300,7 @@ func draw_hover_indicator() -> void:
     return
   var offset := shake_offset
   var cs := cell_size
-  var can_place := can_place_building(hovered_cell, selected_building) if selected_building != BuildingType.NONE else false
+  var can_place := can_place_at(hovered_cell, selected_building) if selected_building != BuildingType.NONE else false
   var hover_color := Color.GREEN if can_place else Color(0.5, 0.5, 0.5, 0.3)
   if selected_building != BuildingType.NONE and not can_place:
     hover_color = Color(1.0, 0.3, 0.3, 0.5)
@@ -315,43 +312,44 @@ func draw_hover_indicator() -> void:
 
   if selected_building != BuildingType.NONE:
     if can_place:
-      draw_building_ghost(hovered_cell)
+      draw_element_ghost(hovered_cell)
     else:
       draw_placement_reason(hovered_cell)
 
-func draw_building_ghost(pos: Vector2i) -> void:
+func draw_element_ghost(pos: Vector2i) -> void:
   var ghost_center := grid_to_pixel(pos)
-  var ghost_color: Color = BUILDING_COLORS[selected_building]
-  ghost_color.a = 0.4
-  match selected_building:
-    BuildingType.EXTRACTOR:
-      draw_circle(ghost_center, 20, ghost_color)
-    BuildingType.GENERATOR:
-      draw_rect(Rect2(ghost_center - Vector2(20, 20), Vector2(40, 40)), ghost_color)
-    BuildingType.RADIATOR:
-      var ghost_points := PackedVector2Array([
-        ghost_center + Vector2(0, -20),
-        ghost_center + Vector2(20, 20),
-        ghost_center + Vector2(-20, 20),
-      ])
-      draw_colored_polygon(ghost_points, ghost_color)
-    BuildingType.HEAT_SINK:
-      draw_rect(Rect2(ghost_center - Vector2(15, 15), Vector2(30, 30)), ghost_color)
+  if selected_building == BuildingType.PIPE:
+    var ghost_color: Color = RESOURCE_COLORS[pipe_resource]
+    ghost_color.a = 0.4
+    draw_circle(ghost_center, 6, ghost_color)
+    for neighbor in get_adjacent_cells(pos):
+      if should_connect_pipe(pos, neighbor):
+        var dir := Vector2(neighbor - pos).normalized()
+        var edge := ghost_center + dir * (cell_size / 2)
+        draw_line(ghost_center, edge, ghost_color, 6.0)
+  else:
+    var ghost_color: Color = BUILDING_COLORS[selected_building]
+    ghost_color.a = 0.4
+    match selected_building:
+      BuildingType.EXTRACTOR:
+        draw_circle(ghost_center, 20, ghost_color)
+      BuildingType.GENERATOR:
+        draw_rect(Rect2(ghost_center - Vector2(20, 20), Vector2(40, 40)), ghost_color)
+      BuildingType.RADIATOR:
+        var ghost_points := PackedVector2Array([
+          ghost_center + Vector2(0, -20),
+          ghost_center + Vector2(20, 20),
+          ghost_center + Vector2(-20, 20),
+        ])
+        draw_colored_polygon(ghost_points, ghost_color)
+      BuildingType.HEAT_SINK:
+        draw_rect(Rect2(ghost_center - Vector2(15, 15), Vector2(30, 30)), ghost_color)
 
 func draw_placement_reason(pos: Vector2i) -> void:
   var reason := get_placement_reason(pos, selected_building)
   if reason != "":
     var reason_pos := grid_to_pixel(pos) + Vector2(0, 35)
     draw_string(ThemeDB.fallback_font, reason_pos, reason, HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color(1, 0.5, 0.5))
-
-func draw_pipe_preview() -> void:
-  if not drawing_pipe or pipe_start == Vector2i(-1, -1):
-    return
-  var start_pos := grid_to_pixel(pipe_start)
-  var end_pos := get_local_mouse_position()
-  var valid := hovered_cell != Vector2i(-1, -1) and can_place_pipe(pipe_start, hovered_cell)
-  var pipe_color: Color = RESOURCE_COLORS[pipe_resource] if valid else Color.RED
-  draw_line(start_pos, end_pos, pipe_color.lerp(Color.WHITE, 0.3), 2.0)
 
 func draw_score_popups() -> void:
   for popup in score_popups:
@@ -379,16 +377,20 @@ func is_edge_cell(pos: Vector2i) -> bool:
 func is_outport(pos: Vector2i) -> bool:
   return pos in outports
 
-func has_building_or_outport(pos: Vector2i) -> bool:
-  if is_outport(pos):
-    return true
-  return grid[pos.x][pos.y] != null
-
 func is_adjacent(a: Vector2i, b: Vector2i) -> bool:
   var diff := (a - b).abs()
   return (diff.x == 1 and diff.y == 0) or (diff.x == 0 and diff.y == 1)
 
-func can_place_building(pos: Vector2i, type: BuildingType) -> bool:
+func get_adjacent_cells(pos: Vector2i) -> Array[Vector2i]:
+  var neighbors: Array[Vector2i] = []
+  var offsets: Array[Vector2i] = [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
+  for off in offsets:
+    var neighbor := pos + off
+    if is_valid_cell(neighbor):
+      neighbors.append(neighbor)
+  return neighbors
+
+func can_place_at(pos: Vector2i, type: BuildingType) -> bool:
   if not is_valid_cell(pos):
     return false
   if grid[pos.x][pos.y] != null:
@@ -400,23 +402,56 @@ func can_place_building(pos: Vector2i, type: BuildingType) -> bool:
       return is_edge_cell(pos)
     BuildingType.GENERATOR, BuildingType.HEAT_SINK:
       return not is_edge_cell(pos)
+    BuildingType.PIPE:
+      return true
   return false
 
-func can_place_pipe(from: Vector2i, to: Vector2i) -> bool:
-  if not is_valid_cell(from) or not is_valid_cell(to):
+func should_connect_pipe(_pipe_pos: Vector2i, neighbor_pos: Vector2i) -> bool:
+  if is_outport(neighbor_pos):
+    return true
+  var neighbor = grid[neighbor_pos.x][neighbor_pos.y]
+  if neighbor == null:
     return false
-  if from == to:
-    return false
-  if not is_adjacent(from, to):
-    return false
-  if not has_building_or_outport(from):
-    return false
-  if not has_building_or_outport(to):
-    return false
-  for existing in pipes:
-    if existing.from == from and existing.to == to and existing.resource == pipe_resource:
-      return false
+  if neighbor is Pipe:
+    return neighbor.resource == pipe_resource
   return true
+
+func place_pipe(pos: Vector2i) -> Pipe:
+  var p := Pipe.new(pos, pipe_resource)
+  grid[pos.x][pos.y] = p
+  update_pipe_connections(pos)
+  for neighbor in get_adjacent_cells(pos):
+    var n = grid[neighbor.x][neighbor.y]
+    if n is Pipe:
+      update_pipe_connections(neighbor)
+  return p
+
+func update_pipe_connections(pos: Vector2i) -> void:
+  var element = grid[pos.x][pos.y]
+  if not element is Pipe:
+    return
+  var p: Pipe = element
+  p.connections.clear()
+  for neighbor in get_adjacent_cells(pos):
+    if should_connect_pipe(pos, neighbor):
+      p.connections.append(neighbor)
+
+func get_element_at(pos: Vector2i):
+  if not is_valid_cell(pos):
+    return null
+  return grid[pos.x][pos.y]
+
+func get_building_at(pos: Vector2i) -> Building:
+  var element = get_element_at(pos)
+  if element is Building:
+    return element
+  return null
+
+func get_pipe_at(pos: Vector2i) -> Pipe:
+  var element = get_element_at(pos)
+  if element is Pipe:
+    return element
+  return null
 
 func get_placement_reason(pos: Vector2i, type: BuildingType) -> String:
   if not is_valid_cell(pos):
