@@ -15,6 +15,13 @@
 - ALWAYS use `update_project_uids` after renaming or moving assets to fix UID references.
 - Prefer `@export var` over `const` for tunable values (grid size, speeds, durations, thresholds). Use `@export_group()` to organize related exports.
 
+### UX for new players
+- Show descriptions when items are selected, not just names
+- Provide contextual prompts telling the player what to do next
+- Highlight valid placement locations when placing items
+- Show why placement is invalid when hovering invalid cells
+- Add hover tooltips explaining what things are and their current state
+
 ### Checklist for file moves in Godot:
 
 1. Move files to new location
