@@ -10,3 +10,195 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
+
+[node name="LeftPanel" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 50.0
+offset_right = 180.0
+offset_bottom = -20.0
+grow_vertical = 2
+
+[node name="BuildingsHeader" type="Label" parent="LeftPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "BUILDINGS"
+
+[node name="BuildingsList" type="VBoxContainer" parent="LeftPanel"]
+layout_mode = 2
+
+[node name="Extractor" type="Label" parent="LeftPanel/BuildingsList"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "1: Extractor"
+
+[node name="Generator" type="Label" parent="LeftPanel/BuildingsList"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "2: Generator"
+
+[node name="Radiator" type="Label" parent="LeftPanel/BuildingsList"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "3: Radiator"
+
+[node name="HeatSink" type="Label" parent="LeftPanel/BuildingsList"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "4: Heat Sink"
+
+[node name="BuildingDesc" type="VBoxContainer" parent="LeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Line1" type="Label" parent="LeftPanel/BuildingDesc"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.9, 0.7, 1)
+theme_override_font_sizes/font_size = 11
+
+[node name="Line2" type="Label" parent="LeftPanel/BuildingDesc"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 11
+
+[node name="Spacer1" type="Control" parent="LeftPanel"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="PipesHeader" type="Label" parent="LeftPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "PIPES"
+
+[node name="PipesList" type="VBoxContainer" parent="LeftPanel"]
+layout_mode = 2
+
+[node name="Fuel" type="Label" parent="LeftPanel/PipesList"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "F: Fuel"
+
+[node name="Power" type="Label" parent="LeftPanel/PipesList"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "P: Power"
+
+[node name="Heat" type="Label" parent="LeftPanel/PipesList"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "H: Heat"
+
+[node name="Spacer2" type="Control" parent="LeftPanel"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="ControlsHeader" type="Label" parent="LeftPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "CONTROLS"
+
+[node name="ControlsList" type="VBoxContainer" parent="LeftPanel"]
+layout_mode = 2
+
+[node name="StartStop" type="Label" parent="LeftPanel/ControlsList"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 14
+text = "Space: Start"
+
+[node name="Reset" type="Label" parent="LeftPanel/ControlsList"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 14
+text = "R: Reset"
+
+[node name="Deselect" type="Label" parent="LeftPanel/ControlsList"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 14
+text = "Esc: Deselect"
+
+[node name="Remove" type="Label" parent="LeftPanel/ControlsList"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 14
+text = "RClick: Remove"
+
+[node name="RightPanel" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = 50.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="ScoreLabel" type="Label" parent="RightPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 1, 0.2, 1)
+theme_override_font_sizes/font_size = 24
+text = "SCORE: 0"
+
+[node name="StatusLabel" type="Label" parent="RightPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 0, 1)
+theme_override_font_sizes/font_size = 16
+
+[node name="Spacer1" type="Control" parent="RightPanel"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="FeedbackLabel" type="Label" parent="RightPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+theme_override_font_sizes/font_size = 14
+
+[node name="Spacer2" type="Control" parent="RightPanel"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="PromptLabel" type="Label" parent="RightPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.5, 1)
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 2
+
+[node name="Spacer3" type="Control" parent="RightPanel"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="TooltipLabel" type="Label" parent="RightPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 2
+
+[node name="Spacer4" type="Control" parent="RightPanel"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="ResourceDescLabel" type="Label" parent="RightPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 11
+autowrap_mode = 2

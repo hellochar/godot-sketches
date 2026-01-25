@@ -125,6 +125,22 @@ var active_power_pipes: Dictionary = {}
 var milestone_flash: float = 0.0
 var last_milestone: int = 0
 
+@onready var extractor_label: Label = %Extractor
+@onready var generator_label: Label = %Generator
+@onready var radiator_label: Label = %Radiator
+@onready var heat_sink_label: Label = %HeatSink
+@onready var building_desc: VBoxContainer = %BuildingDesc
+@onready var fuel_label: Label = %Fuel
+@onready var power_label: Label = %Power
+@onready var heat_label: Label = %Heat
+@onready var start_stop_label: Label = %StartStop
+@onready var score_label: Label = %ScoreLabel
+@onready var status_label: Label = %StatusLabel
+@onready var feedback_label: Label = %FeedbackLabel
+@onready var prompt_label: Label = %PromptLabel
+@onready var tooltip_label: Label = %TooltipLabel
+@onready var resource_desc_label: Label = %ResourceDescLabel
+
 const BUILDING_COLORS := {
   BuildingType.EXTRACTOR: Color.YELLOW,
   BuildingType.GENERATOR: Color.ORANGE,
@@ -917,85 +933,45 @@ func _draw() -> void:
     var popup_color := Color(0.3, 1.0, 0.3, alpha)
     draw_string(ThemeDB.fallback_font, popup.pos + shake_offset, popup.text, HORIZONTAL_ALIGNMENT_CENTER, -1, 20, popup_color)
 
-  draw_ui()
+  update_ui()
 
-func draw_ui() -> void:
-  var ui_x := 20.0
-  var ui_y := 50.0
-  var line_height := 25.0
+func update_ui() -> void:
+  extractor_label.add_theme_color_override("font_color", Color.WHITE if selected_building == BuildingType.EXTRACTOR else BUILDING_COLORS[BuildingType.EXTRACTOR])
+  generator_label.add_theme_color_override("font_color", Color.WHITE if selected_building == BuildingType.GENERATOR else BUILDING_COLORS[BuildingType.GENERATOR])
+  radiator_label.add_theme_color_override("font_color", Color.WHITE if selected_building == BuildingType.RADIATOR else BUILDING_COLORS[BuildingType.RADIATOR])
+  heat_sink_label.add_theme_color_override("font_color", Color.WHITE if selected_building == BuildingType.HEAT_SINK else BUILDING_COLORS[BuildingType.HEAT_SINK])
 
-  draw_string(ThemeDB.fallback_font, Vector2(ui_x, ui_y), "BUILDINGS", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.WHITE)
-  ui_y += line_height
-
-  var building_names := {
-    BuildingType.EXTRACTOR: "1: Extractor",
-    BuildingType.GENERATOR: "2: Generator",
-    BuildingType.RADIATOR: "3: Radiator",
-    BuildingType.HEAT_SINK: "4: Heat Sink",
-  }
-
-  for type in building_names:
-    var color: Color = BUILDING_COLORS[type]
-    if selected_building == type:
-      color = Color.WHITE
-    draw_string(ThemeDB.fallback_font, Vector2(ui_x, ui_y), building_names[type], HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color)
-    ui_y += line_height
-
+  var desc_line1: Label = building_desc.get_node("Line1")
+  var desc_line2: Label = building_desc.get_node("Line2")
   if selected_building != BuildingType.NONE:
-    ui_y += 5
     var desc: Array = BUILDING_DESCRIPTIONS[selected_building]
-    draw_string(ThemeDB.fallback_font, Vector2(ui_x, ui_y), desc[1], HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.7, 0.9, 0.7))
-    ui_y += 15
-    draw_string(ThemeDB.fallback_font, Vector2(ui_x, ui_y), desc[2], HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.6, 0.6, 0.6))
-    ui_y += 20
+    desc_line1.text = desc[1]
+    desc_line2.text = desc[2]
+    building_desc.visible = true
   else:
-    ui_y += 10
+    building_desc.visible = false
 
-  draw_string(ThemeDB.fallback_font, Vector2(ui_x, ui_y), "PIPES", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.WHITE)
-  ui_y += line_height
+  fuel_label.add_theme_color_override("font_color", Color.WHITE if pipe_resource == ResourceType.FUEL else RESOURCE_COLORS[ResourceType.FUEL])
+  power_label.add_theme_color_override("font_color", Color.WHITE if pipe_resource == ResourceType.POWER else RESOURCE_COLORS[ResourceType.POWER])
+  heat_label.add_theme_color_override("font_color", Color.WHITE if pipe_resource == ResourceType.HEAT else RESOURCE_COLORS[ResourceType.HEAT])
 
-  var resource_names := {
-    ResourceType.FUEL: "F: Fuel",
-    ResourceType.POWER: "P: Power",
-    ResourceType.HEAT: "H: Heat",
-  }
+  start_stop_label.text = "Space: " + ("Stop" if simulating else "Start")
 
-  for res in resource_names:
-    var color: Color = RESOURCE_COLORS[res]
-    if pipe_resource == res:
-      color = Color.WHITE
-    draw_string(ThemeDB.fallback_font, Vector2(ui_x, ui_y), resource_names[res], HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color)
-    ui_y += line_height
+  score_label.text = "SCORE: " + str(total_score)
 
-  ui_y += 10
-  draw_string(ThemeDB.fallback_font, Vector2(ui_x, ui_y), "CONTROLS", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.WHITE)
-  ui_y += line_height
-  draw_string(ThemeDB.fallback_font, Vector2(ui_x, ui_y), "Space: " + ("Stop" if simulating else "Start"), HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color.GRAY)
-  ui_y += line_height
-  draw_string(ThemeDB.fallback_font, Vector2(ui_x, ui_y), "R: Reset", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color.GRAY)
-  ui_y += line_height
-  draw_string(ThemeDB.fallback_font, Vector2(ui_x, ui_y), "Esc: Deselect", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color.GRAY)
-  ui_y += line_height
-  draw_string(ThemeDB.fallback_font, Vector2(ui_x, ui_y), "RClick: Remove", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color.GRAY)
-
-  var score_x := grid_offset.x + grid_size * cell_size + 30
-  draw_string(ThemeDB.fallback_font, Vector2(score_x, 80), "SCORE: " + str(total_score), HORIZONTAL_ALIGNMENT_LEFT, -1, 24, Color.LIME_GREEN)
-
-  if simulating:
-    draw_string(ThemeDB.fallback_font, Vector2(score_x, 110), "RUNNING", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.YELLOW)
+  status_label.text = "RUNNING" if simulating else ""
 
   if feedback_message != "":
     var alpha: float = minf(1.0, feedback_timer)
-    draw_string(ThemeDB.fallback_font, Vector2(score_x, 150), feedback_message, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color(1, 0.3, 0.3, alpha))
+    feedback_label.text = feedback_message
+    feedback_label.add_theme_color_override("font_color", Color(1, 0.3, 0.3, alpha))
+  else:
+    feedback_label.text = ""
 
-  var prompt := get_contextual_prompt()
-  if prompt != "":
-    draw_string(ThemeDB.fallback_font, Vector2(score_x, 180), prompt, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(0.9, 0.9, 0.5))
-
-  var tooltip := get_hover_tooltip()
-  if tooltip != "":
-    draw_string(ThemeDB.fallback_font, Vector2(score_x, 220), tooltip, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(0.8, 0.8, 0.8))
+  prompt_label.text = get_contextual_prompt()
+  tooltip_label.text = get_hover_tooltip()
 
   if selected_building == BuildingType.NONE and not drawing_pipe:
-    var res_desc: String = RESOURCE_DESCRIPTIONS[pipe_resource]
-    draw_string(ThemeDB.fallback_font, Vector2(score_x, 260), res_desc, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.6, 0.6, 0.6))
+    resource_desc_label.text = RESOURCE_DESCRIPTIONS[pipe_resource]
+  else:
+    resource_desc_label.text = ""
