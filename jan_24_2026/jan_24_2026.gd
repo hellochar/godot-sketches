@@ -13,10 +13,14 @@ class Building:
   var heat_buildup: int = 0
   var heat_capacity: int = 0
   var shutdown: bool = false
+  var scale: float = 1.0
+  var scale_velocity: float = 0.0
 
   func _init(t: BuildingType, p: Vector2i):
     type = t
     pos = p
+    scale = 1.4
+    scale_velocity = 0.0
     if t == BuildingType.RADIATOR:
       heat_capacity = 2
     elif t == BuildingType.HEAT_SINK:
@@ -134,6 +138,21 @@ func _process(delta: float) -> void:
   score_popups = score_popups.filter(func(p): return p.life > 0)
   if score_popups.size() > 0:
     needs_redraw = true
+
+  for x in range(GRID_SIZE):
+    for y in range(GRID_SIZE):
+      var b: Building = grid[x][y]
+      if b != null and b.scale != 1.0:
+        var spring := 150.0
+        var damping := 12.0
+        var diff := 1.0 - b.scale
+        b.scale_velocity += diff * spring * delta
+        b.scale_velocity *= exp(-damping * delta)
+        b.scale += b.scale_velocity * delta
+        if absf(b.scale - 1.0) < 0.01 and absf(b.scale_velocity) < 0.1:
+          b.scale = 1.0
+          b.scale_velocity = 0.0
+        needs_redraw = true
 
   if needs_redraw or drawing_pipe:
     queue_redraw()
@@ -548,24 +567,28 @@ func _draw() -> void:
         var pulse := sin(Time.get_ticks_msec() / 200.0) * 0.3 + 0.7
         color = color.lerp(Color.RED, (b.heat_buildup / 3.0) * pulse)
 
+      var s := b.scale
       match b.type:
         BuildingType.EXTRACTOR:
-          draw_circle(center, 20, color)
+          draw_circle(center, 20 * s, color)
         BuildingType.GENERATOR:
-          draw_rect(Rect2(center - Vector2(20, 20), Vector2(40, 40)), color)
+          var half := 20 * s
+          draw_rect(Rect2(center - Vector2(half, half), Vector2(half * 2, half * 2)), color)
           if b.heat_buildup > 0 and not b.shutdown:
             draw_string(ThemeDB.fallback_font, center + Vector2(-5, 5), str(b.heat_buildup), HORIZONTAL_ALIGNMENT_CENTER, -1, 14, Color.WHITE)
         BuildingType.RADIATOR:
           var points := PackedVector2Array([
-            center + Vector2(0, -20),
-            center + Vector2(20, 20),
-            center + Vector2(-20, 20),
+            center + Vector2(0, -20 * s),
+            center + Vector2(20 * s, 20 * s),
+            center + Vector2(-20 * s, 20 * s),
           ])
           draw_colored_polygon(points, color)
           draw_string(ThemeDB.fallback_font, center + Vector2(-5, 15), str(b.heat_capacity), HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.WHITE)
         BuildingType.HEAT_SINK:
-          draw_rect(Rect2(center - Vector2(15, 15), Vector2(30, 30)), color)
-          draw_rect(Rect2(center - Vector2(10, 10), Vector2(20, 20)), color.darkened(0.3))
+          var outer := 15 * s
+          var inner := 10 * s
+          draw_rect(Rect2(center - Vector2(outer, outer), Vector2(outer * 2, outer * 2)), color)
+          draw_rect(Rect2(center - Vector2(inner, inner), Vector2(inner * 2, inner * 2)), color.darkened(0.3))
           draw_string(ThemeDB.fallback_font, center + Vector2(-5, 5), str(b.heat_capacity), HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.WHITE)
 
   if hovered_cell != Vector2i(-1, -1) and not is_outport(hovered_cell):
