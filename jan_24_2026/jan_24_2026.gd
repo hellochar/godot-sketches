@@ -77,6 +77,7 @@ var needs_redraw: bool = true
 var screen_shake: float = 0.0
 var shake_offset: Vector2 = Vector2.ZERO
 var score_popups: Array[ScorePopup] = []
+var sim_start_pulse: float = 0.0
 
 const BUILDING_COLORS := {
   BuildingType.EXTRACTOR: Color.YELLOW,
@@ -141,6 +142,10 @@ func _process(delta: float) -> void:
   if score_popups.size() > 0:
     needs_redraw = true
 
+  if sim_start_pulse > 0:
+    sim_start_pulse -= delta
+    needs_redraw = true
+
   for x in range(GRID_SIZE):
     for y in range(GRID_SIZE):
       var b: Building = grid[x][y]
@@ -193,7 +198,10 @@ func _input(event: InputEvent) -> void:
       KEY_3: selected_building = BuildingType.RADIATOR
       KEY_4: selected_building = BuildingType.HEAT_SINK
       KEY_ESCAPE: selected_building = BuildingType.NONE
-      KEY_SPACE: simulating = not simulating
+      KEY_SPACE:
+        simulating = not simulating
+        if simulating:
+          sim_start_pulse = 0.4
       KEY_F: pipe_resource = ResourceType.FUEL
       KEY_P: pipe_resource = ResourceType.POWER
       KEY_H: pipe_resource = ResourceType.HEAT
@@ -577,6 +585,10 @@ func _draw() -> void:
       elif b.heat_buildup > 0:
         var pulse := sin(Time.get_ticks_msec() / 200.0) * 0.3 + 0.7
         color = color.lerp(Color.RED, (b.heat_buildup / 3.0) * pulse)
+
+      if sim_start_pulse > 0:
+        var pulse_t := sim_start_pulse / 0.4
+        color = color.lerp(Color.WHITE, pulse_t * 0.5)
 
       var s := b.scale
       match b.type:
