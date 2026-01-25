@@ -30,11 +30,13 @@ class Pipe:
   var from: Vector2i
   var to: Vector2i
   var resource: ResourceType
+  var anim_progress: float = 0.0
 
   func _init(f: Vector2i, t: Vector2i, r: ResourceType):
     from = f
     to = t
     resource = r
+    anim_progress = 0.0
 
 class ScorePopup:
   var pos: Vector2
@@ -153,6 +155,11 @@ func _process(delta: float) -> void:
           b.scale = 1.0
           b.scale_velocity = 0.0
         needs_redraw = true
+
+  for pipe in pipes:
+    if pipe.anim_progress < 1.0:
+      pipe.anim_progress = minf(1.0, pipe.anim_progress + delta * 5.0)
+      needs_redraw = true
 
   if needs_redraw or drawing_pipe:
     queue_redraw()
@@ -544,13 +551,17 @@ func _draw() -> void:
     var from_pos := grid_to_pixel(pipe.from)
     var to_pos := grid_to_pixel(pipe.to)
     var color: Color = RESOURCE_COLORS[pipe.resource]
-    draw_line(from_pos, to_pos, color, 3.0)
+    var t := pipe.anim_progress
+    var eased := 1.0 - (1.0 - t) * (1.0 - t)
+    var current_end := from_pos.lerp(to_pos, eased)
+    draw_line(from_pos, current_end, color, 3.0)
 
-    var dir := (to_pos - from_pos).normalized()
-    var arrow_pos := to_pos - dir * 15
-    var perp := Vector2(-dir.y, dir.x) * 8
-    draw_line(to_pos, arrow_pos + perp, color, 3.0)
-    draw_line(to_pos, arrow_pos - perp, color, 3.0)
+    if t >= 1.0:
+      var dir := (to_pos - from_pos).normalized()
+      var arrow_pos := to_pos - dir * 15
+      var perp := Vector2(-dir.y, dir.x) * 8
+      draw_line(to_pos, arrow_pos + perp, color, 3.0)
+      draw_line(to_pos, arrow_pos - perp, color, 3.0)
 
   for x in range(GRID_SIZE):
     for y in range(GRID_SIZE):
