@@ -62,7 +62,7 @@ const RESOURCE_DESCRIPTIONS := {
   GridView.ResourceType.HEAT: "Heat pipes carry heat from Generators to Radiators/Heat Sinks.",
 }
 
-var simulating: bool = false
+var simulating: bool = true
 var tick_timer: float = 0.0
 var total_score: int = 0
 
@@ -416,18 +416,20 @@ func propagate_resource(res: GridView.ResourceType, source_type: GridView.Buildi
 
 func mark_flow_path(start: Vector2i, res: GridView.ResourceType) -> void:
   var visited := {}
-  var queue := [start]
+  var queue: Array = [[start, Vector2i(-1, -1)]]  # [position, came_from]
   while queue.size() > 0:
-    var current: Vector2i = queue.pop_front()
+    var item: Array = queue.pop_front()
+    var current: Vector2i = item[0]
+    var came_from: Vector2i = item[1]
     var key := "%d,%d" % [current.x, current.y]
     if visited.has(key):
       continue
     visited[key] = true
-    grid_view.active_flows[key] = true
+    grid_view.active_flows[key] = came_from
     for neighbor in grid_view.get_adjacent_cells(current):
       var p := grid_view.get_pipe_at(neighbor)
       if p != null and p.resource == res:
-        queue.append(neighbor)
+        queue.append([neighbor, current])
 
 func get_power_at_outport(outport: Vector2i, power_produced: Dictionary) -> int:
   var total := 0
@@ -534,7 +536,14 @@ func update_ui() -> void:
     feedback_label.text = ""
 
   prompt_label.text = get_contextual_prompt()
-  tooltip_label.text = get_hover_tooltip()
+  var hover_tip := get_hover_tooltip()
+  tooltip_label.text = hover_tip
+  if hover_tip != "":
+    tooltip_label.visible = true
+    var mouse_pos := get_global_mouse_position()
+    tooltip_label.position = mouse_pos + Vector2(15, 15)
+  else:
+    tooltip_label.visible = false
 
   if grid_view.selected_building == GridView.BuildingType.NONE:
     resource_desc_label.text = RESOURCE_DESCRIPTIONS[grid_view.pipe_resource]
