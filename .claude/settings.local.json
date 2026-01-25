@@ -11,7 +11,9 @@
       "Skill(superpowers:brainstorming)",
       "Skill(superpowers:brainstorming:*)",
       "mcp__godot__get_debug_output",
-      "mcp__codex__codex"
+      "mcp__codex__codex",
+      "Skill(game-feel)",
+      "Skill(game-feel:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
