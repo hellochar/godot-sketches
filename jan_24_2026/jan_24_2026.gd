@@ -713,6 +713,25 @@ func _draw() -> void:
     var rect_pos := offset + Vector2(hovered_cell) * CELL_SIZE + Vector2(hover_offset, hover_offset)
     draw_rect(Rect2(rect_pos, Vector2(hover_size, hover_size)), hover_color, false, 2.0)
 
+    if selected_building != BuildingType.NONE and can_place:
+      var ghost_center := grid_to_pixel(hovered_cell)
+      var ghost_color: Color = BUILDING_COLORS[selected_building]
+      ghost_color.a = 0.4
+      match selected_building:
+        BuildingType.EXTRACTOR:
+          draw_circle(ghost_center, 20, ghost_color)
+        BuildingType.GENERATOR:
+          draw_rect(Rect2(ghost_center - Vector2(20, 20), Vector2(40, 40)), ghost_color)
+        BuildingType.RADIATOR:
+          var ghost_points := PackedVector2Array([
+            ghost_center + Vector2(0, -20),
+            ghost_center + Vector2(20, 20),
+            ghost_center + Vector2(-20, 20),
+          ])
+          draw_colored_polygon(ghost_points, ghost_color)
+        BuildingType.HEAT_SINK:
+          draw_rect(Rect2(ghost_center - Vector2(15, 15), Vector2(30, 30)), ghost_color)
+
   if drawing_pipe and pipe_start != Vector2i(-1, -1):
     var start_pos := grid_to_pixel(pipe_start)
     var end_pos := get_local_mouse_position()
