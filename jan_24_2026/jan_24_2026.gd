@@ -32,6 +32,16 @@ class Pipe:
     to = t
     resource = r
 
+class ScorePopup:
+  var pos: Vector2
+  var text: String
+  var life: float = 1.0
+  var velocity: Vector2 = Vector2(0, -40)
+
+  func _init(p: Vector2, t: String):
+    pos = p
+    text = t
+
 var grid: Array = []
 var pipes: Array[Pipe] = []
 var outports: Array[Vector2i] = [
@@ -60,6 +70,7 @@ var needs_redraw: bool = true
 
 var screen_shake: float = 0.0
 var shake_offset: Vector2 = Vector2.ZERO
+var score_popups: Array[ScorePopup] = []
 
 const BUILDING_COLORS := {
   BuildingType.EXTRACTOR: Color.YELLOW,
@@ -117,6 +128,13 @@ func _process(delta: float) -> void:
   else:
     shake_offset = Vector2.ZERO
 
+  for popup in score_popups:
+    popup.pos += popup.velocity * delta
+    popup.life -= delta
+  score_popups = score_popups.filter(func(p): return p.life > 0)
+  if score_popups.size() > 0:
+    needs_redraw = true
+
   if needs_redraw or drawing_pipe:
     queue_redraw()
     needs_redraw = false
@@ -163,6 +181,10 @@ func show_feedback(msg: String) -> void:
 
 func add_screen_shake(amount: float) -> void:
   screen_shake = maxf(screen_shake, amount)
+
+func spawn_score_popup(grid_pos: Vector2i, amount: int) -> void:
+  var pixel_pos := grid_to_pixel(grid_pos, false)
+  score_popups.append(ScorePopup.new(pixel_pos, "+" + str(amount)))
 
 func pixel_to_grid(pixel: Vector2) -> Vector2i:
   var rel := pixel - GRID_OFFSET
@@ -381,10 +403,14 @@ func simulate_tick() -> void:
 
   for outport in outports:
     var incoming := find_power_sources(outport)
+    var outport_power := 0
     for source in incoming:
       if power_produced.has(source):
+        outport_power += power_produced[source]
         total_score += power_produced[source]
         power_produced[source] = 0
+    if outport_power > 0:
+      spawn_score_popup(outport, outport_power)
 
 func find_path_to_fuel(generator_pos: Vector2i) -> Array:
   var visited := {}
@@ -554,6 +580,11 @@ func _draw() -> void:
     var valid := hovered_cell != Vector2i(-1, -1) and can_place_pipe(pipe_start, hovered_cell)
     var pipe_color: Color = RESOURCE_COLORS[pipe_resource] if valid else Color.RED
     draw_line(start_pos, end_pos, pipe_color.lerp(Color.WHITE, 0.3), 2.0)
+
+  for popup in score_popups:
+    var alpha := popup.life
+    var popup_color := Color(0.3, 1.0, 0.3, alpha)
+    draw_string(ThemeDB.fallback_font, popup.pos + shake_offset, popup.text, HORIZONTAL_ALIGNMENT_CENTER, -1, 20, popup_color)
 
   draw_ui()
 
