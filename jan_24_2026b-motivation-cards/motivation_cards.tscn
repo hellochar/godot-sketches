@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://d0motivation_cards"]
+[gd_scene load_steps=3 format=3 uid="uid://djdbsow0rg5ol"]
 
-[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/motivation_cards.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://cvxkgmerrohu7" path="res://jan_24_2026b-motivation-cards/motivation_cards.gd" id="1_main"]
+[ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/starter_deck.tres" id="2_deck"]
 
 [node name="MotivationCards" type="Control"]
 layout_mode = 3
@@ -10,12 +11,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
+starter_deck = ExtResource("2_deck")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 color = Color(0.12, 0.12, 0.15, 1)
 
 [node name="MainContainer" type="VBoxContainer" parent="."]
@@ -27,6 +31,8 @@ offset_left = 20.0
 offset_top = 20.0
 offset_right = -20.0
 offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/separation = 15
 
 [node name="TopBar" type="HBoxContainer" parent="MainContainer"]
@@ -65,7 +71,7 @@ theme_override_constants/separation = 15
 [node name="Title" type="Label" parent="MainContainer/ActionSelectionScreen"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "Choose an Action"
+text = "How would you like to start your day?"
 horizontal_alignment = 1
 
 [node name="ActionGrid" type="GridContainer" parent="MainContainer/ActionSelectionScreen"]
@@ -100,8 +106,8 @@ horizontal_alignment = 1
 
 [node name="ActionDetails" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo"]
 layout_mode = 2
-alignment = 1
 theme_override_constants/separation = 30
+alignment = 1
 
 [node name="CostLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo/ActionDetails"]
 unique_name_in_owner = true
@@ -118,8 +124,8 @@ text = "Success: 80%"
 [node name="TagsContainer" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo"]
 unique_name_in_owner = true
 layout_mode = 2
-alignment = 1
 theme_override_constants/separation = 10
+alignment = 1
 
 [node name="MotivationSection" type="VBoxContainer" parent="MainContainer/MotivationPhaseScreen"]
 layout_mode = 2
@@ -136,20 +142,19 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-alignment = 1
 theme_override_constants/separation = 10
+alignment = 1
 
 [node name="WorldModifierLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSection"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = ""
 horizontal_alignment = 1
 
 [node name="MotivationSummary" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen"]
 layout_mode = 2
-alignment = 1
 theme_override_constants/separation = 30
+alignment = 1
 
 [node name="TotalMotivation" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSummary"]
 unique_name_in_owner = true
@@ -165,8 +170,8 @@ text = "Gap: 75"
 
 [node name="WillpowerSpend" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen"]
 layout_mode = 2
-alignment = 1
 theme_override_constants/separation = 15
+alignment = 1
 
 [node name="SpendLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/WillpowerSpend"]
 layout_mode = 2
@@ -186,8 +191,8 @@ text = "0"
 
 [node name="ActionButtons" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen"]
 layout_mode = 2
-alignment = 1
 theme_override_constants/separation = 20
+alignment = 1
 
 [node name="BackButton" type="Button" parent="MainContainer/MotivationPhaseScreen/ActionButtons"]
 unique_name_in_owner = true

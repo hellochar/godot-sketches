@@ -2,6 +2,33 @@ extends Control
 
 const CardData = preload("res://jan_24_2026b-motivation-cards/card_data.gd")
 const GameState = preload("res://jan_24_2026b-motivation-cards/game_state.gd")
+const StarterDeckResourceScript = preload("res://jan_24_2026b-motivation-cards/starter_deck_resource.gd")
+
+@export_group("Game Settings")
+@export var cards_per_draw: int = 5
+@export_range(0.0, 1.0) var world_modifier_chance: float = 0.5
+@export var starting_willpower: int = 100
+
+@export_group("Card Visuals")
+@export var action_button_size: Vector2 = Vector2(200, 120)
+@export var motivation_card_size: Vector2 = Vector2(140, 100)
+@export var card_corner_radius: int = 8
+@export var tag_corner_radius: int = 4
+@export var card_margin: int = 10
+@export var tag_margin_h: int = 8
+@export var tag_margin_v: int = 4
+
+@export_group("Colors")
+@export var neutral_card_color: Color = Color(0.3, 0.3, 0.35)
+@export var positive_card_color: Color = Color(0.2, 0.4, 0.25)
+@export var negative_card_color: Color = Color(0.4, 0.2, 0.2)
+@export var success_color: Color = Color(0.5, 1.0, 0.5)
+@export var failure_color: Color = Color(1.0, 0.5, 0.5)
+@export var button_normal_color: Color = Color(0.2, 0.25, 0.3)
+@export var button_hover_color: Color = Color(0.25, 0.3, 0.35)
+
+@export_group("Data")
+@export var starter_deck: Resource
 
 @onready var day_label: Label = %DayLabel
 @onready var score_label: Label = %ScoreLabel
@@ -38,6 +65,10 @@ var total_motivation: int = 0
 
 func _ready() -> void:
   game_state = GameState.new()
+  if starter_deck:
+    game_state.load_from_deck(starter_deck)
+  game_state.willpower = starting_willpower
+  game_state.willpower_max = starting_willpower
   _connect_signals()
   _show_action_selection()
   _update_top_bar()
@@ -74,22 +105,22 @@ func _populate_action_grid() -> void:
 
 func _create_action_button(action) -> Button:
   var btn := Button.new()
-  btn.custom_minimum_size = Vector2(200, 120)
+  btn.custom_minimum_size = action_button_size
 
   var style := StyleBoxFlat.new()
-  style.bg_color = Color(0.2, 0.25, 0.3)
-  style.corner_radius_top_left = 8
-  style.corner_radius_top_right = 8
-  style.corner_radius_bottom_left = 8
-  style.corner_radius_bottom_right = 8
-  style.content_margin_left = 10
-  style.content_margin_right = 10
-  style.content_margin_top = 10
-  style.content_margin_bottom = 10
+  style.bg_color = button_normal_color
+  style.corner_radius_top_left = card_corner_radius
+  style.corner_radius_top_right = card_corner_radius
+  style.corner_radius_bottom_left = card_corner_radius
+  style.corner_radius_bottom_right = card_corner_radius
+  style.content_margin_left = card_margin
+  style.content_margin_right = card_margin
+  style.content_margin_top = card_margin
+  style.content_margin_bottom = card_margin
   btn.add_theme_stylebox_override("normal", style)
 
   var hover_style := style.duplicate()
-  hover_style.bg_color = Color(0.25, 0.3, 0.35)
+  hover_style.bg_color = button_hover_color
   btn.add_theme_stylebox_override("hover", hover_style)
 
   var tags_str := _format_tags(action.tags)
@@ -136,14 +167,14 @@ func _populate_tags() -> void:
 
     var style := StyleBoxFlat.new()
     style.bg_color = CardData.TAG_COLORS[tag]
-    style.corner_radius_top_left = 4
-    style.corner_radius_top_right = 4
-    style.corner_radius_bottom_left = 4
-    style.corner_radius_bottom_right = 4
-    style.content_margin_left = 8
-    style.content_margin_right = 8
-    style.content_margin_top = 4
-    style.content_margin_bottom = 4
+    style.corner_radius_top_left = tag_corner_radius
+    style.corner_radius_top_right = tag_corner_radius
+    style.corner_radius_bottom_left = tag_corner_radius
+    style.corner_radius_bottom_right = tag_corner_radius
+    style.content_margin_left = tag_margin_h
+    style.content_margin_right = tag_margin_h
+    style.content_margin_top = tag_margin_v
+    style.content_margin_bottom = tag_margin_v
 
     var panel := PanelContainer.new()
     panel.add_theme_stylebox_override("panel", style)
@@ -152,7 +183,7 @@ func _populate_tags() -> void:
 
 
 func _draw_motivation_cards() -> void:
-  drawn_cards = game_state.draw_motivation_cards(5)
+  drawn_cards = game_state.draw_motivation_cards(cards_per_draw)
 
   for child in drawn_cards_container.get_children():
     child.queue_free()
@@ -164,25 +195,25 @@ func _draw_motivation_cards() -> void:
 
 func _create_motivation_card_display(card) -> PanelContainer:
   var panel := PanelContainer.new()
-  panel.custom_minimum_size = Vector2(140, 100)
+  panel.custom_minimum_size = motivation_card_size
 
   var motivation_value: int = card.get_motivation_for_tags(current_action.tags)
-  var bg_color := Color(0.3, 0.3, 0.35)
+  var bg_color := neutral_card_color
   if motivation_value > 0:
-    bg_color = Color(0.2, 0.4, 0.25)
+    bg_color = positive_card_color
   elif motivation_value < 0:
-    bg_color = Color(0.4, 0.2, 0.2)
+    bg_color = negative_card_color
 
   var style := StyleBoxFlat.new()
   style.bg_color = bg_color
-  style.corner_radius_top_left = 6
-  style.corner_radius_top_right = 6
-  style.corner_radius_bottom_left = 6
-  style.corner_radius_bottom_right = 6
-  style.content_margin_left = 8
-  style.content_margin_right = 8
-  style.content_margin_top = 8
-  style.content_margin_bottom = 8
+  style.corner_radius_top_left = card_corner_radius
+  style.corner_radius_top_right = card_corner_radius
+  style.corner_radius_bottom_left = card_corner_radius
+  style.corner_radius_bottom_right = card_corner_radius
+  style.content_margin_left = card_margin
+  style.content_margin_right = card_margin
+  style.content_margin_top = card_margin
+  style.content_margin_bottom = card_margin
   panel.add_theme_stylebox_override("panel", style)
 
   var vbox := VBoxContainer.new()
@@ -205,9 +236,9 @@ func _create_motivation_card_display(card) -> PanelContainer:
     contrib_label.text = "→ %s%d" % [sign_str, motivation_value]
     contrib_label.add_theme_font_size_override("font_size", 16)
     if motivation_value > 0:
-      contrib_label.add_theme_color_override("font_color", Color(0.5, 1.0, 0.5))
+      contrib_label.add_theme_color_override("font_color", success_color)
     else:
-      contrib_label.add_theme_color_override("font_color", Color(1.0, 0.5, 0.5))
+      contrib_label.add_theme_color_override("font_color", failure_color)
     vbox.add_child(contrib_label)
 
   panel.add_child(vbox)
@@ -215,7 +246,7 @@ func _create_motivation_card_display(card) -> PanelContainer:
 
 
 func _apply_world_modifier() -> void:
-  if randf() < 0.5:
+  if randf() < world_modifier_chance:
     current_world_modifier = game_state.get_random_world_modifier()
     if current_world_modifier:
       var mod_value: int = current_world_modifier.get_motivation_for_tags(current_action.tags)
@@ -287,14 +318,14 @@ func _show_result(success: bool) -> void:
     game_state.add_score(score_gained)
 
     result_title.text = "Success!"
-    result_title.add_theme_color_override("font_color", Color(0.5, 1.0, 0.5))
+    result_title.add_theme_color_override("font_color", success_color)
     if score_gained > 0:
       result_details.text = "You gained %d points!\nThis aligns with your values." % score_gained
     else:
       result_details.text = "Action completed, but it didn't align with your values."
   else:
     result_title.text = "Failed..."
-    result_title.add_theme_color_override("font_color", Color(1.0, 0.5, 0.5))
+    result_title.add_theme_color_override("font_color", failure_color)
     result_details.text = "The action didn't succeed this time.\nBetter luck next time."
 
   _update_top_bar()
