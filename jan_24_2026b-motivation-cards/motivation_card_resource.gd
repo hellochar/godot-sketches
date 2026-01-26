@@ -12,6 +12,8 @@ enum ConditionType {
   ACTION_HAS_TAG,
   LOW_ACTION_COST,
   SUCCEEDED_YESTERDAY,
+  HIGH_ACTION_COST,
+  LOW_SUCCESS_CHANCE,
 }
 
 enum SpecialEffect {
@@ -21,6 +23,8 @@ enum SpecialEffect {
   BONUS_FOR_NEW_ACTIONS,
   STREAK_SCALING,
   EXTRA_DRAW_FOR_TAG,
+  RESTORE_WILLPOWER_ON_SUCCESS,
+  EXTRA_DRAW_ON_SUCCESS,
 }
 
 @export var title: String
@@ -93,6 +97,12 @@ func check_condition(context: Dictionary) -> bool:
       return cost < condition_threshold
     ConditionType.SUCCEEDED_YESTERDAY:
       return context.get("succeeded_yesterday", false)
+    ConditionType.HIGH_ACTION_COST:
+      var cost: int = context.get("action_cost", 0)
+      return cost > condition_threshold
+    ConditionType.LOW_SUCCESS_CHANCE:
+      var chance: float = context.get("success_chance", 1.0)
+      return chance < (condition_threshold / 100.0)
   return false
 
 
@@ -114,6 +124,10 @@ func get_condition_text() -> String:
       return "If cost < %d" % condition_threshold
     ConditionType.SUCCEEDED_YESTERDAY:
       return "If succeeded yesterday"
+    ConditionType.HIGH_ACTION_COST:
+      return "If cost > %d" % condition_threshold
+    ConditionType.LOW_SUCCESS_CHANCE:
+      return "If success < %d%%" % condition_threshold
   return ""
 
 
@@ -131,6 +145,10 @@ func get_special_effect_text() -> String:
       return "+%d per success streak" % special_value
     SpecialEffect.EXTRA_DRAW_FOR_TAG:
       return "+1 draw if %s action" % CardData.TAG_NAMES[special_target_tag]
+    SpecialEffect.RESTORE_WILLPOWER_ON_SUCCESS:
+      return "+%d willpower on success" % special_value
+    SpecialEffect.EXTRA_DRAW_ON_SUCCESS:
+      return "+1 draw on success"
   return ""
 
 

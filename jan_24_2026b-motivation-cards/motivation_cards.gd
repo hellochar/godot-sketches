@@ -122,6 +122,7 @@ func _build_context_for_action(action) -> Dictionary:
     "action_tags": action.tags,
     "action_tag_count": action.tags.size(),
     "action_cost": action.motivation_cost,
+    "success_chance": action.success_chance,
     "succeeded_yesterday": game_state.succeeded_yesterday,
     "success_streak": game_state.success_streak,
     "attempted_actions": game_state.attempted_actions,
@@ -280,7 +281,7 @@ func _create_action_button(action) -> PanelContainer:
   generic_card.title = action.title
 
   if willpower_needed > 0:
-    generic_card.set_corner_text(generic_card.Corner.BOTTOM_LEFT, "WP: %d" % willpower_needed)
+    generic_card.set_corner_text(generic_card.Corner.BOTTOM_LEFT, "%d willpower" % willpower_needed)
   if action.success_chance < 1.0:
     generic_card.set_corner_text(generic_card.Corner.TOP_RIGHT, "%d%%" % int(action.success_chance * 100))
   var score_str := "+%d pts" % potential_score if potential_score > 0 else "0 pts"
@@ -397,37 +398,14 @@ func _display_mood_cards() -> void:
 
 
 func _create_mood_card_display(card) -> PanelContainer:
-  var panel := PanelContainer.new()
-  panel.custom_minimum_size = motivation_card_size
-
-  var style := StyleBoxFlat.new()
-  style.bg_color = neutral_card_color
-  style.corner_radius_top_left = card_corner_radius
-  style.corner_radius_top_right = card_corner_radius
-  style.corner_radius_bottom_left = card_corner_radius
-  style.corner_radius_bottom_right = card_corner_radius
-  style.content_margin_left = card_margin
-  style.content_margin_right = card_margin
-  style.content_margin_top = card_margin
-  style.content_margin_bottom = card_margin
-  panel.add_theme_stylebox_override("panel", style)
-
-  var vbox := VBoxContainer.new()
-  vbox.add_theme_constant_override("separation", 4)
-
-  var title_label := Label.new()
-  title_label.text = card.title
-  title_label.add_theme_font_size_override("font_size", 14)
-  title_label.autowrap_mode = TextServer.AUTOWRAP_WORD
-  vbox.add_child(title_label)
-
-  var mod_label := Label.new()
-  mod_label.text = card.format_modifiers()
-  mod_label.add_theme_font_size_override("font_size", 12)
-  vbox.add_child(mod_label)
-
-  panel.add_child(vbox)
-  return panel
+  var generic_card = GenericCardScene.instantiate()
+  generic_card.card_size = motivation_card_size
+  generic_card.background_color = neutral_card_color
+  generic_card.corner_radius = card_corner_radius
+  generic_card.content_margin = card_margin
+  generic_card.title = card.title
+  generic_card.description = card.format_modifiers()
+  return generic_card
 
 
 func _display_mood_world_modifier() -> void:
@@ -774,7 +752,7 @@ func _show_result(success: bool) -> void:
       game_state.add_motivation_card(card)
       cards_to_add.append(card)
 
-    _handle_success_special_effects()
+    willpower_restored = _handle_success_special_effects()
 
     result_title.text = "Success!"
     result_title.add_theme_color_override("font_color", success_color)
@@ -782,6 +760,8 @@ func _show_result(success: bool) -> void:
     var details_parts: Array = []
     if score_gained > 0:
       details_parts.append("You gained %d points!" % score_gained)
+    if willpower_restored > 0:
+      details_parts.append("Restored %d willpower!" % willpower_restored)
     if details_parts.is_empty() and cards_to_add.is_empty():
       result_details.text = "Action completed, but it didn't align with your values."
     else:
@@ -809,7 +789,8 @@ func _show_result(success: bool) -> void:
   _update_top_bar()
 
 
-func _handle_success_special_effects() -> void:
+func _handle_success_special_effects() -> int:
+  var willpower_restored := 0
   for card in drawn_cards:
     if not (card is MotivationCardRes):
       continue
@@ -817,6 +798,12 @@ func _handle_success_special_effects() -> void:
       MotivationCardRes.SpecialEffect.EXTRA_DRAW_FOR_TAG:
         if card.special_target_tag in current_action.tags:
           game_state.extra_draws_next_turn += 1
+      MotivationCardRes.SpecialEffect.RESTORE_WILLPOWER_ON_SUCCESS:
+        willpower_restored += card.special_value
+        game_state.willpower = mini(game_state.willpower_max, game_state.willpower + card.special_value)
+      MotivationCardRes.SpecialEffect.EXTRA_DRAW_ON_SUCCESS:
+        game_state.extra_draws_next_turn += 1
+  return willpower_restored
 
 
 func _handle_failure_special_effects() -> int:
@@ -852,38 +839,14 @@ func _animate_cards_added(cards: Array) -> void:
 
 
 func _create_deck_add_card_display(card) -> PanelContainer:
-  var panel := PanelContainer.new()
-  panel.custom_minimum_size = motivation_card_size * 0.8
-
-  var style := StyleBoxFlat.new()
-  style.bg_color = positive_card_color
-  style.corner_radius_top_left = card_corner_radius
-  style.corner_radius_top_right = card_corner_radius
-  style.corner_radius_bottom_left = card_corner_radius
-  style.corner_radius_bottom_right = card_corner_radius
-  style.content_margin_left = card_margin
-  style.content_margin_right = card_margin
-  style.content_margin_top = card_margin
-  style.content_margin_bottom = card_margin
-  panel.add_theme_stylebox_override("panel", style)
-
-  var vbox := VBoxContainer.new()
-  vbox.add_theme_constant_override("separation", 4)
-
-  var added_label := Label.new()
-  added_label.text = "+ Added"
-  added_label.add_theme_font_size_override("font_size", 12)
-  added_label.add_theme_color_override("font_color", success_color)
-  vbox.add_child(added_label)
-
-  var title_label := Label.new()
-  title_label.text = card.title
-  title_label.add_theme_font_size_override("font_size", 14)
-  title_label.autowrap_mode = TextServer.AUTOWRAP_WORD
-  vbox.add_child(title_label)
-
-  panel.add_child(vbox)
-  return panel
+  var generic_card = GenericCardScene.instantiate()
+  generic_card.card_size = motivation_card_size * 0.8
+  generic_card.background_color = positive_card_color
+  generic_card.corner_radius = card_corner_radius
+  generic_card.content_margin = card_margin
+  generic_card.title = card.title
+  generic_card.set_corner_text(generic_card.Corner.TOP_LEFT, "+ Added", success_color)
+  return generic_card
 
 
 func _on_continue_pressed() -> void:
