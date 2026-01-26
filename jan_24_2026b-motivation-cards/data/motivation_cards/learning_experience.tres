@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Learning Experience"
+health_modifier = 10
+social_modifier = 10
+routine_modifier = 10
+effort_modifier = 10
+risk_modifier = 10
+creativity_modifier = 10
+condition_type = 13
+condition_threshold = 0
+bonus_multiplier = 2.0

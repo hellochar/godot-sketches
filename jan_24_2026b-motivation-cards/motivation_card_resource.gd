@@ -17,6 +17,7 @@ enum ConditionType {
   DISCARDED_THIS_TURN,
   REPEATED_ACTION,
   LOW_WILLPOWER,
+  FAILED_YESTERDAY,
 }
 
 enum SpecialEffect {
@@ -126,6 +127,8 @@ func check_condition(context: Dictionary) -> bool:
     ConditionType.LOW_WILLPOWER:
       var willpower: int = context.get("willpower", 100)
       return willpower <= condition_threshold
+    ConditionType.FAILED_YESTERDAY:
+      return context.get("failed_yesterday", false)
   return false
 
 
@@ -159,6 +162,8 @@ func get_condition_text() -> String:
       return "If same action as last success"
     ConditionType.LOW_WILLPOWER:
       return "If willpower <= %d" % condition_threshold
+    ConditionType.FAILED_YESTERDAY:
+      return "If failed yesterday"
   return ""
 
 

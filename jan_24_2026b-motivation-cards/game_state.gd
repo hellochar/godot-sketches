@@ -19,6 +19,7 @@ var attempted_actions: Array[String] = []
 var failed_actions: Array[String] = []
 var extra_draws_next_turn: int = 0
 var succeeded_yesterday: bool = false
+var failed_yesterday: bool = false
 var total_successes_this_week: int = 0
 var last_successful_action_title: String = ""
 var momentum: int = 0

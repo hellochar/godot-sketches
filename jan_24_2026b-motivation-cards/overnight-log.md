@@ -1325,9 +1325,51 @@ When actions fail, players lose willpower and get nothing. This creates frustrat
 ### Step 2: Implementation Plan
 
 Create 4 failure-recovery motivation cards:
-1. Learning Experience - +10 to all, +20 if failed yesterday
-2. Stubborn Will - +15 Effort, restore 10 willpower if action failed before
-3. Second Chance - +10 Risk, +20 if same action failed
-4. Bounce Back - +15 to all, only triggers after failure
+1. Learning Experience - +10 to all, 2x if failed yesterday
+2. Stubborn Will - +15 Effort, +10 Risk, restore 10 willpower on success, 2x if failed yesterday
+3. Bounce Back - +15 Health/Effort/Routine, 2x if failed yesterday
+4. Try Again - +20 Risk, +10 Effort, +15 for new actions, 2x if failed yesterday
+
+### Step 3: Execution
+
+**Files Modified:**
+- `motivation_card_resource.gd` - Added FAILED_YESTERDAY condition type (index 13)
+- `game_state.gd` - Added `failed_yesterday: bool` tracking
+- `motivation_cards.gd` - Updated context to include failed_yesterday, set on success/failure
+
+**Cards Created:**
+- `learning_experience.tres` - +10 to all tags, 2x if failed yesterday
+- `stubborn_will.tres` - +15 Effort, +10 Risk, +10 willpower on success, 2x if failed yesterday
+- `bounce_back.tres` - +15 Health/Effort/Routine, 2x if failed yesterday
+- `try_again.tres` - +20 Risk, +10 Effort, +15 for new actions, 2x if failed yesterday
+
+**Updated starter_deck.tres** - Added all 4 cards.
+
+### Step 4: Commit
+
+Committed: (pending)
+
+---
+
+## Loop 31: Action Tag Diversity
+
+### Step 1: Analysis
+
+**Gap: Some Tags Underrepresented in Actions**
+
+Analyzing action coverage: Social and Creativity tags appear less frequently than Health and Effort.
+
+**Design Goals:**
+1. Add 4 new actions with underrepresented tags
+2. Create more Social-focused actions
+3. Add Creativity-Risk combinations
+
+### Step 2: Implementation Plan
+
+Create 4 new action resources:
+1. Share Meme - Social+Creativity, low cost
+2. Brainstorm Ideas - Creativity+Effort, medium cost
+3. Karaoke Night - Social+Risk+Creativity, medium cost
+4. Teach Someone - Social+Effort, higher cost
 
 ### Step 3: Execution
