@@ -3658,3 +3658,37 @@ Need world modifiers representing everyday domestic scenarios.
 **Updated starter_deck.tres** - Added all 4 world modifiers (IDs 446-449).
 
 ### Step 4: Commit
+
+Committed: `6ca7db8` - "Loop 96: Add daily life world modifiers"
+
+---
+
+## Loop 97: Balance Value Cards
+
+### Step 1: Analysis
+
+**Gap: Balance/Lifestyle Personality Types**
+
+Need value cards representing different lifestyle philosophies.
+
+**Design Goals:**
+1. Balanced vs specialized approaches
+2. Minimalist vs maximalist contrast
+3. Wellness-focused abilities
+
+### Step 2: Implementation Plan
+
+1. Create 4 balance/lifestyle themed value cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Balance Value Cards Created:**
+1. `balanced_life.tres` - Balanced Life: +2 Health, +2 Social, +2 Routine, +1 Effort, +1 Risk, +2 Creativity. Restore 15 willpower ability.
+2. `wellness_advocate.tres` - Wellness Advocate: +4 Health, +1 Social, +2 Routine, +1 Effort, +1 Creativity. Restore 20 willpower ability.
+3. `minimalist.tres` - Minimalist: +2 Health, +4 Routine, +1 Effort, +2 Creativity. Reroll hand ability.
+4. `maximalist.tres` - Maximalist: +3 Social, +3 Effort, +2 Risk, +3 Creativity. Extra 2 draws ability.
+
+**Updated starter_deck.tres** - Added all 4 value cards (IDs 450-453).
+
+### Step 4: Commit
