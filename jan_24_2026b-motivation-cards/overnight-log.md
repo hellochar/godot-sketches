@@ -3284,3 +3284,37 @@ Need value cards representing different exploration preferences.
 **Updated starter_deck.tres** - Added all 4 value cards (IDs 402-405).
 
 ### Step 4: Commit
+
+Committed: `83895ad` - "Loop 85: Add explorer value cards"
+
+---
+
+## Loop 86: Learning Motivation Cards
+
+### Step 1: Analysis
+
+**Gap: Learning/Growth Mental States**
+
+Need motivation cards representing different learning and growth mindsets.
+
+**Design Goals:**
+1. Growth vs fixed mindset contrast
+2. Curiosity and knowledge seeking
+3. Bonuses for trying new things
+
+### Step 2: Implementation Plan
+
+1. Create 4 learning themed motivation cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Learning Motivation Cards Created:**
+1. `growth_mindset.tres` - Growth Mindset: +20 Effort, +10 Creativity, +10 Risk. 1.5x if new action.
+2. `curious_mind.tres` - Curious Mind: +20 Creativity, +5 Effort, +5 Risk.
+3. `knowledge_hunger.tres` - Knowledge Hunger: +25 Effort, +5 Routine, +5 Creativity, -10 Social.
+4. `beginner_mind.tres` - Beginner Mind: +15 Creativity, +10 Risk, +5 Effort, -10 Routine. 2x if new action.
+
+**Updated starter_deck.tres** - Added all 4 motivation cards (IDs 406-409).
+
+### Step 4: Commit
