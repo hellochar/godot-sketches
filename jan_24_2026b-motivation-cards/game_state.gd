@@ -20,6 +20,9 @@ var extra_draws_next_turn: int = 0
 var succeeded_yesterday: bool = false
 var total_successes_this_week: int = 0
 var last_successful_action_title: String = ""
+var momentum: int = 0
+const MOMENTUM_MAX: int = 10
+const MOMENTUM_BONUS_PER: int = 3
 
 
 func _init() -> void:

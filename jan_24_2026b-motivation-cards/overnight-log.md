@@ -473,3 +473,53 @@ Current problem: Deck grows with every successful action but there's no way to t
 
 ### Step 4: Commit
 
+Committed: `919237e` - "Add card removal mechanic after successful actions"
+
+---
+
+## Loop 9: Momentum System
+
+### Step 1: Analysis
+
+**Gap: Single Resource (Willpower Only)**
+
+Per emergent-game-design skill:
+> "Only willpower creates decisions. Motivation isn't a resource you manage."
+> "Add at least one of: Momentum - Carries over between days"
+
+Current problem: No carry-over effects between days beyond deck changes. Each day is isolated.
+
+**Design Goals:**
+1. Add Momentum as a secondary resource
+2. Gained on success, lost on failure
+3. Provides scaling motivation bonus
+4. Resets weekly, not daily
+
+### Step 2: Implementation Plan
+
+1. Add `momentum` variable to game_state.gd
+2. Increase on success, decrease on failure (min 0, max 10)
+3. Add momentum bonus to motivation calculation (+3 per momentum)
+4. Display momentum in UI near willpower
+5. Reset momentum at week start
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `game_state.gd` - Added momentum system:
+  - `momentum: int = 0` variable
+  - `MOMENTUM_MAX: int = 10` constant
+  - `MOMENTUM_BONUS_PER: int = 3` constant (+3 motivation per momentum)
+
+- `motivation_cards.tscn` - Added MomentumLabel to TopBar with gold color
+
+- `motivation_cards.gd` - Implemented momentum mechanics:
+  - Added @onready for momentum_label
+  - `_get_motivation_for_action()` includes momentum bonus
+  - `_show_result()` increases momentum on success, decreases on failure
+  - `_update_top_bar()` displays momentum and its bonus
+  - Momentum resets at week start (day 1, 8, 15, etc.)
+
+### Step 4: Commit
+
