@@ -307,9 +307,25 @@ func _create_action_button(action) -> PanelContainer:
 
 func _get_motivation_for_action(action) -> int:
   var context := _build_context_for_action(action)
+  var has_negate := false
+  var has_invert := false
+  for card in drawn_cards:
+    if card is MotivationCardRes:
+      if card.special_effect == MotivationCardRes.SpecialEffect.NEGATE_NEGATIVES:
+        has_negate = true
+      elif card.special_effect == MotivationCardRes.SpecialEffect.INVERT_NEGATIVES:
+        has_invert = true
+
   var motivation := 0
   for card in drawn_cards:
-    motivation += card.get_motivation_for_tags(action.tags, context)
+    var card_contrib: int = card.get_motivation_for_tags(action.tags, context)
+    if card_contrib < 0:
+      if has_invert:
+        card_contrib = -card_contrib
+      elif has_negate:
+        card_contrib = 0
+    motivation += card_contrib
+
   if current_world_modifier:
     motivation += current_world_modifier.get_motivation_for_tags(action.tags)
   motivation += _get_special_effect_bonus(action, context)
@@ -347,9 +363,20 @@ func _get_special_effect_bonus(action, context: Dictionary) -> int:
         bonus += card.special_value * context.get("discards_this_turn", 0)
       MotivationCardRes.SpecialEffect.EXHAUST_BONUS:
         bonus += card.special_value
+      MotivationCardRes.SpecialEffect.BONUS_PER_NEGATIVE_CARD:
+        var negative_count := 0
+        for other_card in drawn_cards:
+          var contrib: int = other_card.get_motivation_for_tags(action.tags, context)
+          if contrib < 0:
+            negative_count += 1
+        bonus += card.special_value * negative_count
       MotivationCardRes.SpecialEffect.DOUBLE_TAG_ZERO_OTHER:
         pass
       MotivationCardRes.SpecialEffect.AMPLIFY_ALL:
+        pass
+      MotivationCardRes.SpecialEffect.NEGATE_NEGATIVES:
+        pass
+      MotivationCardRes.SpecialEffect.INVERT_NEGATIVES:
         pass
 
   if has_amplify:
