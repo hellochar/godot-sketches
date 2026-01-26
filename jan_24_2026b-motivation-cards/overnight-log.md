@@ -3454,3 +3454,37 @@ Need motivation cards representing different emotional states.
 **Updated starter_deck.tres** - Added all 4 motivation cards (IDs 422-425).
 
 ### Step 4: Commit
+
+Committed: `8e805ed` - "Loop 90: Add emotional motivation cards"
+
+---
+
+## Loop 91: Fitness Actions
+
+### Step 1: Analysis
+
+**Gap: Exercise/Fitness Activity Types**
+
+Need more varied fitness actions beyond basic gym and running.
+
+**Design Goals:**
+1. Range of fitness intensity levels
+2. Mix of solo and social fitness
+3. Different tag combinations
+
+### Step 2: Implementation Plan
+
+1. Create 4 fitness themed actions
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Fitness Actions Created:**
+1. `jumping_jacks.tres` - Jumping Jacks: 20 cost, Health tag, 98% success.
+2. `weight_training.tres` - Weight Training: 65 cost, Health+Effort tags, 85% success.
+3. `sports_league.tres` - Sports League: 70 cost, Health+Social+Risk tags, 75% success.
+4. `pilates.tres` - Pilates: 50 cost, Health+Routine tags, 90% success.
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 426-429).
+
+### Step 4: Commit
