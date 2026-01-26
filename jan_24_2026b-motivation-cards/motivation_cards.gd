@@ -749,15 +749,7 @@ func _display_world_modifier() -> void:
 
 
 func _calculate_motivation() -> void:
-  var context := _build_context_for_action(current_action)
-  total_motivation = 0
-  for card in drawn_cards:
-    total_motivation += card.get_motivation_for_tags(current_action.tags, context)
-
-  if current_world_modifier:
-    total_motivation += current_world_modifier.get_motivation_for_tags(current_action.tags)
-
-  total_motivation += _get_special_effect_bonus(current_action, context)
+  total_motivation = _get_motivation_for_action(current_action)
 
   var effective_cost: int = _get_effective_action_cost(current_action)
   total_motivation_label.text = "Total Motivation: %d / %d" % [total_motivation, effective_cost]
@@ -778,11 +770,25 @@ func _animate_motivation_tally() -> void:
   total_motivation_label.text = "Total Motivation: 0 / %d" % current_action.motivation_cost
   gap_label.text = "Gap: %d" % current_action.motivation_cost
 
+  var has_negate := false
+  var has_invert := false
+  for card in drawn_cards:
+    if card is MotivationCardRes:
+      if card.special_effect == MotivationCardRes.SpecialEffect.NEGATE_NEGATIVES:
+        has_negate = true
+      elif card.special_effect == MotivationCardRes.SpecialEffect.INVERT_NEGATIVES:
+        has_invert = true
+
   var card_panels := drawn_cards_container.get_children()
   for i in range(drawn_cards.size()):
     var card = drawn_cards[i]
     var card_panel: PanelContainer = card_panels[i]
     var motivation_value: int = card.get_motivation_for_tags(current_action.tags, context)
+    if motivation_value < 0:
+      if has_invert:
+        motivation_value = -motivation_value
+      elif has_negate:
+        motivation_value = 0
 
     var tween := create_tween()
     tween.set_parallel(true)
@@ -814,6 +820,15 @@ func _animate_motivation_tally() -> void:
       total_motivation_label.text = "Total Motivation: %d / %d" % [running_total, current_action.motivation_cost]
       var gap := maxi(0, current_action.motivation_cost - running_total)
       gap_label.text = "Gap: %d" % gap
+
+  var special_bonus := _get_special_effect_bonus(current_action, context)
+  var momentum_bonus: int = game_state.momentum * game_state.MOMENTUM_BONUS_PER
+  var extra_bonuses := special_bonus + momentum_bonus + value_card_bonus_motivation
+  if extra_bonuses != 0:
+    running_total += extra_bonuses
+    total_motivation_label.text = "Total Motivation: %d / %d" % [running_total, current_action.motivation_cost]
+    var gap := maxi(0, current_action.motivation_cost - running_total)
+    gap_label.text = "Gap: %d" % gap
 
   var emphasis_tween := create_tween()
   total_motivation_label.pivot_offset = total_motivation_label.size / 2

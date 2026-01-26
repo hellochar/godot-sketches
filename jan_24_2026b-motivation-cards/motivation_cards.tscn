@@ -72,29 +72,29 @@ text = "Score: 0"
 [node name="MomentumLabel" type="Label" parent="MainContainer/TopBar"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
 theme_override_colors/font_color = Color(0.9, 0.8, 0.5, 1)
+theme_override_font_sizes/font_size = 20
 text = "Momentum: 0"
 
 [node name="StreakLabel" type="Label" parent="MainContainer/TopBar"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
 theme_override_colors/font_color = Color(0.6, 0.9, 0.6, 1)
+theme_override_font_sizes/font_size = 20
 text = "Streak: 0"
 
 [node name="BonusTagLabel" type="Label" parent="MainContainer/TopBar"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.75, 0.4, 1)
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(1.0, 0.75, 0.4, 1)
 text = "Bonus: Health"
 
 [node name="DeckInfoLabel" type="Label" parent="MainContainer/TopBar"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.7, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 16
 text = "Deck: 65"
 
 [node name="Spacer" type="Control" parent="MainContainer/TopBar"]
@@ -173,10 +173,11 @@ horizontal_alignment = 1
 
 [node name="SynergyLabel" type="Label" parent="MainContainer/ActionSelectionScreen/YouSection"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.6, 0.9, 0.7, 1)
-horizontal_alignment = 1
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 2
 
 [node name="Title" type="Label" parent="MainContainer/ActionSelectionScreen"]
 layout_mode = 2
@@ -269,8 +270,8 @@ horizontal_alignment = 1
 [node name="DiscardLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSection"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 1, 1)
 theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.7, 0.8, 1.0, 1)
 text = "Click a card to discard and redraw (2 remaining)"
 horizontal_alignment = 1
 
@@ -417,8 +418,8 @@ horizontal_alignment = 1
 
 [node name="RemovalHint" type="Label" parent="MainContainer/CardRemovalPanel/CardRemovalContent"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
 text = "Removing a card makes your deck more focused"
 horizontal_alignment = 1
 
@@ -459,8 +460,8 @@ horizontal_alignment = 1
 
 [node name="ValueSelectionHint" type="Label" parent="MainContainer/ValueSelectionPanel/ValueSelectionContent"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
 text = "This value determines how you earn points"
 horizontal_alignment = 1
 
