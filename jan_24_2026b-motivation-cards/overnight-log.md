@@ -560,3 +560,50 @@ The success_streak variable exists and cards like Streak Keeper use it, but play
 
 ### Step 4: Commit
 
+Committed: `99e8542` - "Add streak display and score bonus"
+
+---
+
+## Loop 11: Action Mastery System
+
+### Step 1: Analysis
+
+**Gap: No Action Progression**
+
+Actions are static - their cost never changes. Repeated successes don't make future attempts easier.
+
+**Design Goals:**
+1. Track how many times each action has succeeded
+2. Reduce motivation cost by 5 per mastery level (max 3 levels = -15)
+3. Show mastery level on action buttons
+
+### Step 2: Implementation Plan
+
+1. Add `action_mastery: Dictionary` to game_state (action_title -> level)
+2. Increase mastery on success (max level 3)
+3. Apply mastery discount to motivation cost display
+4. Show mastery indicator on action buttons
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `game_state.gd` - Added action mastery system:
+  - `action_mastery: Dictionary` tracks mastery per action title
+  - `MASTERY_MAX = 3`, `MASTERY_DISCOUNT_PER = 5`
+  - `get_action_mastery()` and `increase_action_mastery()` helpers
+
+- `motivation_cards.gd` - Integrated mastery:
+  - `_get_effective_action_cost()` applies mastery discount
+  - `_create_action_button()` shows stars (*, **, ***) for mastery
+  - All cost/gap calculations use effective cost
+  - `increase_action_mastery()` called on success
+
+**Mastery Mechanics:**
+- Each success on an action increases mastery (max 3)
+- Each mastery level reduces cost by 5 motivation
+- Stars shown on action buttons indicate mastery level
+- Cost display shows discount when applicable
+
+### Step 4: Commit
+
