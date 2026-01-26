@@ -1146,3 +1146,58 @@ Create 6 new world modifier resources:
 **Updated starter_deck.tres** - Added all 6 world modifiers.
 
 ### Step 4: Commit
+
+Committed: `64c8b32` - "Add 6 new world modifiers for environmental variety"
+
+---
+
+## Summary of Loops 12-25
+
+Completed improvements:
+12. **Daily Bonus Tag** - Random featured tag each day for bonus scoring
+13. **Willpower Recovery Cards** - 4 cards that restore willpower on success
+14. **Action Categories** - Sorted by bonus tag, then category, visual highlighting
+15. **Deck Info Display** - Show deck size in top bar
+16. **Tag Synergy Hints** - Display tag counts when 2+ cards share a tag
+17. **Weekly Summary** - Detailed end screen with best day, cards added/removed
+18. **Score Bonus Cards** - 3 cards with SCORE_BONUS special effect
+19. **Failed Action Tracking** - Show "Failed before" indicator on action buttons
+20. **Extended Week** - Changed from 7 to 14 days, mid-week willpower boost
+21. **Value Card Selection** - Choose from 3 value cards at game start
+22. **Easy Actions** - 5 low-cost (20-35) actions for beginners
+23. **Momentum Display** - Show momentum bonus on action buttons when high
+24. **Value Card Rewards** - Earn new value cards from expensive action successes
+25. **World Modifiers** - Added 6 more world modifiers
+
+---
+
+## Loop 26: Deck Manipulation Cards
+
+### Step 1: Analysis
+
+**Gap: No Draw Manipulation**
+
+Players can't control what cards they draw. The "discard to redraw" mechanic exists but no cards enhance it.
+
+**Design Goals:**
+1. Add cards that grant extra draws
+2. Add cards that scale with discards
+3. Create draw-manipulation archetype
+
+### Step 2: Implementation Plan
+
+Create 3 draw-manipulation motivation cards:
+1. Card Shark - +10 to all tags, +1 draw next turn
+2. Hand Manager - +5 per discard this turn, extra discard allowed
+3. Deep Dig - +15 Creativity, draw 2 extra cards next turn if Creativity action
+
+### Step 3: Execution
+
+**Cards Created:**
+- `card_shark.tres` - +10 to all tags, +1 draw on success
+- `hand_manager.tres` - +10 Routine, +10 per discard this turn
+- `deep_dig.tres` - +15 Creativity, +1 draw if Creativity action
+
+**Updated starter_deck.tres** - Added all 3 cards.
+
+### Step 4: Commit
