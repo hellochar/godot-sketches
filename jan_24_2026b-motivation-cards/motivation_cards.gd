@@ -63,6 +63,7 @@ const GenericCardScene = preload("res://common/generic_card.tscn")
 @onready var day_label: Label = %DayLabel
 @onready var score_label: Label = %ScoreLabel
 @onready var momentum_label: Label = %MomentumLabel
+@onready var streak_label: Label = %StreakLabel
 @onready var willpower_bar: ProgressBar = %WillpowerBar
 @onready var willpower_label: Label = %WillpowerLabel
 
@@ -248,6 +249,7 @@ func _update_top_bar() -> void:
     momentum_label.text = "Momentum: %d (+%d)" % [game_state.momentum, momentum_bonus]
   else:
     momentum_label.text = "Momentum: %d" % game_state.momentum
+  streak_label.text = "Streak: %d" % game_state.success_streak
   willpower_bar.max_value = game_state.willpower_max
   willpower_bar.value = game_state.willpower
   willpower_label.text = "%d/%d" % [game_state.willpower, game_state.willpower_max]
@@ -974,6 +976,8 @@ func _show_result(success: bool) -> void:
 
     for value_card in game_state.value_cards:
       score_gained += value_card.get_score_for_tags(current_action.tags)
+    var streak_bonus: int = game_state.success_streak
+    score_gained += streak_bonus
     if double_next_score:
       score_gained *= 2
       double_next_score = false
@@ -992,7 +996,10 @@ func _show_result(success: bool) -> void:
     forget_card_button.visible = game_state.motivation_deck.size() > 5
     var details_parts: Array = []
     if score_gained > 0:
-      details_parts.append("You gained %d points!" % score_gained)
+      if streak_bonus > 1:
+        details_parts.append("You gained %d points! (+%d streak bonus)" % [score_gained, streak_bonus])
+      else:
+        details_parts.append("You gained %d points!" % score_gained)
     if willpower_restored > 0:
       details_parts.append("Restored %d willpower!" % willpower_restored)
     if details_parts.is_empty() and cards_to_add.is_empty():
