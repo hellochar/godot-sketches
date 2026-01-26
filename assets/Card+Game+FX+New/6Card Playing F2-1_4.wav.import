@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://0vd4qt2kimbm"
+path="res://.godot/imported/6Card Playing F2-1_4.wav-438462abf472d17a6fdf5827450fc6b9.sample"
+
+[deps]
+
+source_file="res://assets/Card+Game+FX+New/6Card Playing F2-1_4.wav"
+dest_files=["res://.godot/imported/6Card Playing F2-1_4.wav-438462abf472d17a6fdf5827450fc6b9.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://ba4xtgk5yk6n2"
+path="res://.godot/imported/8Card Playing F2-12_1.wav-5c0f710f69aaced96831de01b0963f12.sample"
+
+[deps]
+
+source_file="res://assets/Card+Game+FX+New/8Card Playing F2-12_1.wav"
+dest_files=["res://.godot/imported/8Card Playing F2-12_1.wav-5c0f710f69aaced96831de01b0963f12.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

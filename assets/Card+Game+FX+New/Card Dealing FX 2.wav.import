@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://b635fvetykb6f"
+path="res://.godot/imported/Card Dealing FX 2.wav-10e5795027429b157f2525a755951cba.sample"
+
+[deps]
+
+source_file="res://assets/Card+Game+FX+New/Card Dealing FX 2.wav"
+dest_files=["res://.godot/imported/Card Dealing FX 2.wav-10e5795027429b157f2525a755951cba.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2
