@@ -18,6 +18,7 @@ enum ConditionType {
   REPEATED_ACTION,
   LOW_WILLPOWER,
   FAILED_YESTERDAY,
+  ACTION_HAS_BOTH_TAGS,
 }
 
 enum SpecialEffect {
@@ -55,6 +56,7 @@ enum SpecialEffect {
 @export_group("Conditional Effect")
 @export var condition_type: ConditionType = ConditionType.NONE
 @export var condition_tag: CardData.Tag = CardData.Tag.HEALTH
+@export var condition_secondary_tag: CardData.Tag = CardData.Tag.HEALTH
 @export var condition_threshold: int = 0
 @export var bonus_multiplier: float = 2.0
 
@@ -129,6 +131,9 @@ func check_condition(context: Dictionary) -> bool:
       return willpower <= condition_threshold
     ConditionType.FAILED_YESTERDAY:
       return context.get("failed_yesterday", false)
+    ConditionType.ACTION_HAS_BOTH_TAGS:
+      var action_tags: Array = context.get("action_tags", [])
+      return condition_tag in action_tags and condition_secondary_tag in action_tags
   return false
 
 
@@ -164,6 +169,8 @@ func get_condition_text() -> String:
       return "If willpower <= %d" % condition_threshold
     ConditionType.FAILED_YESTERDAY:
       return "If failed yesterday"
+    ConditionType.ACTION_HAS_BOTH_TAGS:
+      return "If %s + %s action" % [CardData.TAG_NAMES[condition_tag], CardData.TAG_NAMES[condition_secondary_tag]]
   return ""
 
 

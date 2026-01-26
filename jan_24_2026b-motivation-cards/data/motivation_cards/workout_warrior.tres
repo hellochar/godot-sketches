@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://4tef4320mo68" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Workout Warrior"
+health_modifier = 10
+effort_modifier = 10
+condition_type = 14
+condition_tag = 0
+condition_secondary_tag = 3
+bonus_multiplier = 2.0

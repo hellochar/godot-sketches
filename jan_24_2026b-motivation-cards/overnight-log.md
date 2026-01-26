@@ -1623,7 +1623,53 @@ Total content added:
 
 ### Step 2-3: Run Test
 
-Testing the game...
+Testing the game... Found and fixed:
+- Color values in .tscn missing alpha component
+- Missing get_score_description/get_ability_text in ValueCardResource
+- Wrong signal name (clicked→pressed) in value card selection
+
+### Step 4: Commit
+
+Committed: `7c32052` - "Loop 38: Fix runtime errors - signal names, Color values, missing functions"
+
+---
+
+## Loop 39: Action Tag Combo System
+
+### Step 1: Analysis
+
+**Gap: No Tag Combo Rewards**
+
+Actions have multiple tags, but no bonus for specific tag combinations. This limits deck synergy optimization.
+
+**Design Goals:**
+1. Reward specific tag pair combinations
+2. Create "tag combo" motivation cards
+3. Enable synergy-focused deck building
+
+### Step 2: Implementation Plan
+
+1. Add ACTION_HAS_BOTH_TAGS condition type (check for two specific tags)
+2. Add condition_secondary_tag field for dual-tag conditions
+3. Create 4 tag combo motivation cards
+4. Register in starter_deck.tres
+
+### Step 3: Execution
+
+**Files Modified:**
+- `motivation_card_resource.gd`:
+  - Added ACTION_HAS_BOTH_TAGS to ConditionType enum
+  - Added condition_secondary_tag export variable
+  - Implemented check_condition for dual-tag conditions
+  - Added condition text formatting
+
+**Tag Combo Cards Created:**
+1. `workout_warrior.tres` - +10 Health/Effort, 2x if Health+Effort action
+2. `creative_social.tres` - +10 Social/Creativity, 2x if Social+Creativity action
+3. `bold_creator.tres` - +10 Risk/Creativity, 2x if Risk+Creativity action
+4. `disciplined_worker.tres` - +10 Routine/Effort, 2x if Routine+Effort action
+
+**Updated starter_deck.tres** - Added all 4 cards (IDs 218-221).
 
 ### Step 4: Commit
 
