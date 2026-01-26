@@ -895,7 +895,7 @@ func _discard_card(card_index: int) -> void:
   drawn_cards.remove_at(card_index)
 
   var draw_count := 1 + _get_discard_draw_bonus()
-  var new_cards: Array = game_state.draw_motivation_cards(draw_count)
+  var new_cards: Array = game_state.draw_motivation_cards(draw_count, drawn_cards)
   for i in new_cards.size():
     if i == 0:
       drawn_cards.insert(card_index, new_cards[i])
