@@ -151,6 +151,7 @@ func _build_context_for_action(action) -> Dictionary:
     "action_title": action.title,
     "success_chance": action.success_chance,
     "succeeded_yesterday": game_state.succeeded_yesterday,
+    "failed_yesterday": game_state.failed_yesterday,
     "success_streak": game_state.success_streak,
     "attempted_actions": game_state.attempted_actions,
     "discards_this_turn": discards_this_turn,
@@ -1045,6 +1046,7 @@ func _show_result(success: bool) -> void:
   if success:
     game_state.success_streak += 1
     game_state.succeeded_yesterday = true
+    game_state.failed_yesterday = false
     game_state.total_successes_this_week += 1
     game_state.last_successful_action_title = current_action.title
     game_state.momentum = mini(game_state.MOMENTUM_MAX, game_state.momentum + 1)
@@ -1096,6 +1098,7 @@ func _show_result(success: bool) -> void:
   else:
     game_state.success_streak = 0
     game_state.succeeded_yesterday = false
+    game_state.failed_yesterday = true
     game_state.momentum = maxi(0, game_state.momentum - 1)
     last_action_succeeded = false
     if current_action.title not in game_state.failed_actions:
