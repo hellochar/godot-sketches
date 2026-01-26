@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ActionResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Make Quick List"
+motivation_cost = 20
+tags = [2, 3]
+success_chance = 1.0
