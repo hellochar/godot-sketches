@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://4tef4320mo68" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Victory lap"
+is_temporary = true
+health_modifier = 25
+social_modifier = 25
+effort_modifier = 25
+creativity_modifier = 25

@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="ActionResource" load_steps=4 format=3 uid="uid://c5oi7jhgvcp6g"]
+[gd_resource type="Resource" script_class="ActionResource" load_steps=5 format=3 uid="uid://c5oi7jhgvcp6g"]
 
 [ext_resource type="Script" uid="uid://d0jysd6hdr7j3" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
 [ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/motivation_cards/body_feels_good.tres" id="2"]
 [ext_resource type="Resource" uid="uid://dcwvg70qt5u3e" path="res://jan_24_2026b-motivation-cards/data/motivation_cards/thrill_seeker.tres" id="3"]
+[ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/motivation_cards/victory_lap.tres" id="4"]
 
 [resource]
 script = ExtResource("1")
@@ -10,4 +11,4 @@ title = "Run a 5K Race"
 motivation_cost = 120
 tags = Array[int]([0, 3, 4])
 success_chance = 0.75
-cards_on_success = Array[Resource]([ExtResource("2"), ExtResource("3")])
+cards_on_success = Array[Resource]([ExtResource("2"), ExtResource("3"), ExtResource("4")])
