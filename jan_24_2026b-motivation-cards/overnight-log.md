@@ -1756,4 +1756,46 @@ Current high-risk actions all have similar profiles. Need more variety in risk/r
 
 ### Step 4: Commit
 
+Committed: `2eca05a` - "Loop 41: Add high-risk high-reward actions"
+
+---
+
+## Loop 42: Value Card Abilities Expansion
+
+### Step 1: Analysis
+
+**Gap: Limited Value Card Abilities**
+
+Value cards have ability types but few use them. Most are passive score bonuses.
+
+**Current AbilityTypes:**
+1. EXTRA_DRAW - Draw extra cards
+2. RESTORE_WILLPOWER - Restore willpower
+3. DOUBLE_NEXT_SCORE - 2x score
+4. REROLL_HAND - Discard and redraw
+5. BONUS_MOTIVATION - Flat motivation bonus
+
+**Design Goals:**
+1. Create value cards using underused abilities
+2. Add variety to value card strategy
+3. Balance abilities with score trade-offs
+
+### Step 2: Implementation Plan
+
+1. Create 4 ability-focused value cards
+2. Each emphasizes a different ability type
+3. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Value Cards Created:**
+1. `card_collector.tres` - +5 Creativity, draw 2 extra cards (EXTRA_DRAW)
+2. `energy_reserve.tres` - +5 Health/Effort, restore 15 willpower (RESTORE_WILLPOWER)
+3. `fresh_start_value.tres` - +8 Risk, reroll hand draw 5 (REROLL_HAND)
+4. `inner_drive.tres` - +10 Effort, +10 flat motivation bonus (BONUS_MOTIVATION)
+
+**Updated starter_deck.tres** - Added all 4 value cards (IDs 230-233).
+
+### Step 4: Commit
+
 Committed: (pending)
