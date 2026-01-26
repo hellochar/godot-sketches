@@ -15,7 +15,14 @@ var world_modifiers: Array = []
 
 
 func _init() -> void:
-  _create_starter_content()
+  pass
+
+
+func load_from_deck(deck: Resource) -> void:
+  available_actions = deck.actions.duplicate()
+  motivation_deck = deck.motivation_cards.duplicate()
+  value_cards = deck.value_cards.duplicate()
+  world_modifiers = deck.world_modifiers.duplicate()
 
 
 func _create_starter_content() -> void:
