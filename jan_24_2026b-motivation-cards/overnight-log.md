@@ -150,3 +150,66 @@ Per emergent-game-design skill:
 
 ### Step 4: Commit
 
+Committed: `69aa74b` - "Add build-around cards and engine-strengthening mechanics"
+
+---
+
+## Loop 3: Converter Cards & Resource Tension
+
+### Step 1: Analysis
+
+**Gap: No Converters / Resource Tension**
+
+Per emergent-game-design skill:
+> "Converters: Transform one resource into another."
+> "No free lunches: Powerful effects should cost multiple resource types."
+
+**Current Problem:**
+- Cards either help or hurt, no trade-offs
+- No "pay X for Y" decisions
+- Willpower is the only manipulable resource
+- No way to convert desperation into power
+
+**Design Goals:**
+1. Create cards that trade one resource for another
+2. Add "when desperate" bonuses (low willpower = high reward)
+3. Create meaningful "pay now vs pay later" decisions
+
+### Step 2: Implementation Plan
+
+1. Add new condition: `LOW_WILLPOWER` (triggers when willpower below threshold)
+2. Add new special effects:
+   - `DRAIN_WILLPOWER_ON_SUCCESS` (costs willpower when you win)
+   - `REDUCE_MAX_WILLPOWER` (permanent cost for power)
+3. Create 5 converter cards:
+   - Desperation Surge (huge bonus when willpower low)
+   - Borrowed Energy (strong bonus, drains willpower on success)
+   - Burnout Burst (massive power, reduces max willpower)
+   - Last Resort (+80, but only when very low willpower)
+   - Trade Tomorrow (+40 with permanent max willpower cost)
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `motivation_card_resource.gd` - Added new mechanics:
+  - ConditionType.LOW_WILLPOWER (triggers when willpower <= threshold)
+  - SpecialEffect.DRAIN_WILLPOWER_ON_SUCCESS (costs willpower when you win)
+  - SpecialEffect.REDUCE_MAX_WILLPOWER (permanent max willpower reduction)
+
+- `motivation_cards.gd` - Implemented converter effects:
+  - Context now includes `willpower` for LOW_WILLPOWER condition
+  - `_handle_success_special_effects()` handles draining and max reduction
+  - Max willpower can't go below 30 (prevents soft-lock)
+
+**Converter Cards Created:**
+1. `desperation_surge.tres` - +20 all tags, 2x when willpower <= 30. Rewards playing desperate.
+2. `borrowed_energy.tres` - +25 Effort/Health, but -15 willpower on success. Trade tomorrow for today.
+3. `burnout_burst.tres` - +40 Effort/Creativity, but -10 max willpower permanently. High power, high cost.
+4. `last_resort.tres` - +40 all tags when willpower <= 15. Emergency power spike.
+5. `trade_tomorrow.tres` - +30 Routine/Effort, -5 max willpower. Lighter cost version.
+
+**Added to starter_deck.tres** - All 5 cards registered with ExtResource IDs 145-149.
+
+### Step 4: Commit
+

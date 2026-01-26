@@ -16,6 +16,7 @@ enum ConditionType {
   LOW_SUCCESS_CHANCE,
   DISCARDED_THIS_TURN,
   REPEATED_ACTION,
+  LOW_WILLPOWER,
 }
 
 enum SpecialEffect {
@@ -31,6 +32,8 @@ enum SpecialEffect {
   DISCARD_SCALING,
   AMPLIFY_ALL,
   EXHAUST_BONUS,
+  DRAIN_WILLPOWER_ON_SUCCESS,
+  REDUCE_MAX_WILLPOWER,
 }
 
 @export var title: String
@@ -116,6 +119,9 @@ func check_condition(context: Dictionary) -> bool:
       var action_title: String = context.get("action_title", "")
       var last_success: String = context.get("last_successful_action_title", "")
       return action_title == last_success and not action_title.is_empty()
+    ConditionType.LOW_WILLPOWER:
+      var willpower: int = context.get("willpower", 100)
+      return willpower <= condition_threshold
   return false
 
 
@@ -147,6 +153,8 @@ func get_condition_text() -> String:
       return "If discarded %d+ this turn" % condition_threshold
     ConditionType.REPEATED_ACTION:
       return "If same action as last success"
+    ConditionType.LOW_WILLPOWER:
+      return "If willpower <= %d" % condition_threshold
   return ""
 
 
@@ -176,6 +184,10 @@ func get_special_effect_text() -> String:
       return "Double all other modifiers"
     SpecialEffect.EXHAUST_BONUS:
       return "Exhaust: +%d, removes card" % special_value
+    SpecialEffect.DRAIN_WILLPOWER_ON_SUCCESS:
+      return "-%d willpower on success" % special_value
+    SpecialEffect.REDUCE_MAX_WILLPOWER:
+      return "-%d max willpower on success" % special_value
   return ""
 
 
