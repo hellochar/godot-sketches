@@ -1508,8 +1508,47 @@ The "Adrenaline High" card is referenced in actions but may not exist.
 
 ### Step 2: Implementation Plan
 
-1. Check if adrenaline_high.tres exists
-2. Create it if missing
-3. Review other action reward references
+1. Check if adrenaline_high.tres exists - Exists!
+2. Create 4 new reward-style cards
+3. Add them to starter deck
+
+### Step 3: Execution
+
+**Verified:** All referenced cards exist (adrenaline_high.tres confirmed).
+
+**New Reward Cards Created:**
+- `confidence_boost.tres` - +10 Health, +15 Social, +15 Risk, +5 willpower on success
+- `small_victory.tres` - +5 Health/Social, +10 Routine/Effort, +5 score bonus
+- `accomplished.tres` - +15 Routine, +20 Effort, 2x if succeeded yesterday
+- `sense_of_purpose.tres` - +10 Health, +15 Effort, +10 Creativity, +1 extra draw on success
+
+**Updated starter_deck.tres** - Added all 4 cards.
+
+### Step 4: Commit
+
+Committed: (pending)
+
+---
+
+## Loop 36: Low-Cost Quick Win Actions
+
+### Step 1: Analysis
+
+**Gap: Very Low Cost Actions Limited**
+
+Some players want quick, easy wins to build momentum.
+
+**Design Goals:**
+1. Add 4 very low-cost actions (10-20 motivation)
+2. Quick wins that feel rewarding
+3. Good for building streaks
+
+### Step 2: Implementation Plan
+
+Create 4 new low-cost actions:
+1. Smile at Mirror - 10 cost, Health+Social, 100%
+2. Write One Sentence - 15 cost, Creativity, 100%
+3. Check In With Self - 15 cost, Health+Routine, 100%
+4. Make Quick List - 20 cost, Routine+Effort, 100%
 
 ### Step 3: Execution
