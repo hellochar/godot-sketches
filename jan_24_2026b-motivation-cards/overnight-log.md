@@ -3590,3 +3590,37 @@ Need motivation cards representing persistence and bouncing back from failure.
 **Updated starter_deck.tres** - Added all 4 motivation cards (IDs 438-441).
 
 ### Step 4: Commit
+
+Committed: `a54594b` - "Loop 94: Add resilience motivation cards"
+
+---
+
+## Loop 95: Self-Improvement Actions
+
+### Step 1: Analysis
+
+**Gap: Self-Improvement/Personal Growth Actions**
+
+Need actions focused on self-improvement and personal development.
+
+**Design Goals:**
+1. Mental health focused actions
+2. Range from easy daily to challenging growth actions
+3. Mix of Health, Routine, and Risk tags
+
+### Step 2: Implementation Plan
+
+1. Create 4 self-improvement themed actions
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Self-Improvement Actions Created:**
+1. `gratitude_journal.tres` - Gratitude Journal: 25 cost, Health+Routine tags, 95% success.
+2. `therapy_session.tres` - Therapy Session: 70 cost, Health+Social+Effort tags, 90% success.
+3. `break_comfort_zone.tres` - Break Comfort Zone: 80 cost, Risk+Effort+Creativity tags, 65% success.
+4. `affirmations.tres` - Affirmations: 15 cost, Health+Routine tags, 98% success.
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 442-445).
+
+### Step 4: Commit
