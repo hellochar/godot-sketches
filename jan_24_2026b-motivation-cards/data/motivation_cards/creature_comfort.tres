@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://byn44r1nv7hoc" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Creature Comfort"
+health_modifier = 15
+social_modifier = 5
+routine_modifier = 25
+effort_modifier = -5
+risk_modifier = -15
+creativity_modifier = 0
+condition_type = 2
+condition_threshold = 90
+condition_tag = 0
+bonus_multiplier = 1.5
+description = "Loves the safe path"
+special_effect = 2
+special_value = 5
+
