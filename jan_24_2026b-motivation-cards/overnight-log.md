@@ -1287,8 +1287,47 @@ From existing plan: bridge card ratio is at 16%, target is 40%. The plan file id
 
 ### Step 2: Implementation Plan
 
-Per existing plan, create bridge cards starting with Health+Risk pair:
-1. Calculated Risk - +15 Health, +15 Risk
-2. Adrenaline Workout - +10 Health, +10 Risk, restore willpower
+Create 4 new conditional motivation cards:
+1. Power Combo - +10 Health/Effort, 2x if Effort action
+2. Creative Rush - +20 Creativity/+10 Risk, 2x if success < 60%
+3. Routine Breaker - -10 Routine, +25 Risk, +15 Creativity, +25 for new actions
+4. Social Energy Boost - +15 Social/Effort, 2x if Social action
+
+### Step 3: Execution
+
+**Cards Created:**
+- `power_combo.tres` - +10 Health, +10 Effort, 2x if action has Effort tag
+- `creative_rush.tres` - +20 Creativity, +10 Risk, 2x if success < 60%
+- `routine_breaker.tres` - -10 Routine, +25 Risk, +15 Creativity, +25 for new actions
+- `social_energy_boost.tres` - +15 Social, +15 Effort, 2x if action has Social tag
+
+**Updated starter_deck.tres** - Added all 4 cards.
+
+### Step 4: Commit
+
+Committed: (pending)
+
+---
+
+## Loop 30: Failure Recovery Mechanics
+
+### Step 1: Analysis
+
+**Gap: Failures Feel Bad Without Upside**
+
+When actions fail, players lose willpower and get nothing. This creates frustration without strategic depth.
+
+**Design Goals:**
+1. Add cards that benefit from failures
+2. Create "comeback" mechanics
+3. Turn failures into learning opportunities
+
+### Step 2: Implementation Plan
+
+Create 4 failure-recovery motivation cards:
+1. Learning Experience - +10 to all, +20 if failed yesterday
+2. Stubborn Will - +15 Effort, restore 10 willpower if action failed before
+3. Second Chance - +10 Risk, +20 if same action failed
+4. Bounce Back - +15 to all, only triggers after failure
 
 ### Step 3: Execution
