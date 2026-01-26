@@ -3556,3 +3556,37 @@ Need more varied creative personality value cards.
 **Updated starter_deck.tres** - Added all 4 value cards (IDs 434-437).
 
 ### Step 4: Commit
+
+Committed: `20196ad` - "Loop 93: Add creative value cards"
+
+---
+
+## Loop 94: Resilience Motivation Cards
+
+### Step 1: Analysis
+
+**Gap: Resilience/Perseverance Mental States**
+
+Need motivation cards representing persistence and bouncing back from failure.
+
+**Design Goals:**
+1. Rewards for recovering from failures
+2. Persistence-themed bonuses
+3. Build-around potential for failure-recovery strategies
+
+### Step 2: Implementation Plan
+
+1. Create 4 resilience themed motivation cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Resilience Motivation Cards Created:**
+1. `never_give_up.tres` - Never Give Up: +25 Effort, +10 Risk, +10 Routine. 2x if failed yesterday.
+2. `thick_skin.tres` - Thick Skin: +15 Health, +10 Effort, +5 Risk, -5 Social.
+3. `grit.tres` - Grit: +20 Effort, +15 Routine, -5 Creativity.
+4. `phoenix_rising.tres` - Phoenix Rising: +15 Health, +15 Effort, +10 Creativity. 2.5x if failed yesterday, willpower restore effect.
+
+**Updated starter_deck.tres** - Added all 4 motivation cards (IDs 438-441).
+
+### Step 4: Commit
