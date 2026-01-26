@@ -1201,3 +1201,39 @@ Create 3 draw-manipulation motivation cards:
 **Updated starter_deck.tres** - Added all 3 cards.
 
 ### Step 4: Commit
+
+Committed: `bbd1088` - "Add draw manipulation cards for deck control archetype"
+
+---
+
+## Loop 27: Action Reward Variety
+
+### Step 1: Analysis
+
+**Gap: Few Actions Give Cards**
+
+Only a handful of actions grant motivation cards on success. Most actions just give points.
+
+**Design Goals:**
+1. Add card rewards to more actions
+2. Make rewards thematically appropriate
+3. Create more deck-building variety through action choices
+
+### Step 2: Implementation Plan
+
+Update 5 actions to grant motivation cards:
+1. Meditate - grants "Calm Mind"
+2. Journal - grants "Renewed Focus"
+3. Cook Meal - grants "Rest Day"
+4. Learn Skill - grants existing skill-themed card
+5. Full Workout - grants "Physical Energy"
+
+### Step 3: Execution
+
+**Actions Updated:**
+- `journal.tres` - Now grants "Renewed Focus" on success
+- `cook_meal.tres` - Now grants "Rest Day" on success
+- `learn_skill.tres` - Now grants "Deep Focus" on success
+- `full_workout.tres` - Now grants "Physical Energy" on success
+
+### Step 4: Commit
