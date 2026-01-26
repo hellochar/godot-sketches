@@ -15,6 +15,7 @@ enum ConditionType {
   HIGH_ACTION_COST,
   LOW_SUCCESS_CHANCE,
   DISCARDED_THIS_TURN,
+  REPEATED_ACTION,
 }
 
 enum SpecialEffect {
@@ -26,6 +27,10 @@ enum SpecialEffect {
   EXTRA_DRAW_FOR_TAG,
   RESTORE_WILLPOWER_ON_SUCCESS,
   EXTRA_DRAW_ON_SUCCESS,
+  MOMENTUM_SCALING,
+  DISCARD_SCALING,
+  AMPLIFY_ALL,
+  EXHAUST_BONUS,
 }
 
 @export var title: String
@@ -107,6 +112,10 @@ func check_condition(context: Dictionary) -> bool:
     ConditionType.DISCARDED_THIS_TURN:
       var discards: int = context.get("discards_this_turn", 0)
       return discards >= condition_threshold
+    ConditionType.REPEATED_ACTION:
+      var action_title: String = context.get("action_title", "")
+      var last_success: String = context.get("last_successful_action_title", "")
+      return action_title == last_success and not action_title.is_empty()
   return false
 
 
@@ -136,6 +145,8 @@ func get_condition_text() -> String:
       if condition_threshold <= 1:
         return "If discarded this turn"
       return "If discarded %d+ this turn" % condition_threshold
+    ConditionType.REPEATED_ACTION:
+      return "If same action as last success"
   return ""
 
 
@@ -157,6 +168,14 @@ func get_special_effect_text() -> String:
       return "+%d willpower on success" % special_value
     SpecialEffect.EXTRA_DRAW_ON_SUCCESS:
       return "+1 draw on success"
+    SpecialEffect.MOMENTUM_SCALING:
+      return "+%d per success this week" % special_value
+    SpecialEffect.DISCARD_SCALING:
+      return "+%d per discard this turn" % special_value
+    SpecialEffect.AMPLIFY_ALL:
+      return "Double all other modifiers"
+    SpecialEffect.EXHAUST_BONUS:
+      return "Exhaust: +%d, removes card" % special_value
   return ""
 
 
