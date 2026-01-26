@@ -20,6 +20,8 @@
 - AVOID using `add_node` MCP tool. Instead, write/edit .tscn files directly.
 - ALWAYS use `update_project_uids` after renaming or moving assets to fix UID references.
 - Prefer `@export var` over `const` for tunable values (grid size, speeds, durations, thresholds). Use `@export_group()` to organize related exports.
+- Use components and other elements in `common/`.
+- Use methods from `common/utils.gd` (autoload `Utils`).
 
 ### UX for new players
 - Show descriptions when items are selected, not just names
