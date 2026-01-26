@@ -11,7 +11,7 @@ const GenericCardScene = preload("res://common/generic_card.tscn")
 @export var cards_per_draw: int = 5
 @export_range(0.0, 1.0) var world_modifier_chance: float = 0.5
 @export var starting_willpower: int = 100
-@export var max_days: int = 7
+@export var max_days: int = 14
 @export var card_reveal_delay: float = 0.15
 @export var willpower_burnout_threshold: int = 50
 @export var max_discards_per_turn: int = 2
@@ -1191,6 +1191,8 @@ func _on_continue_pressed() -> void:
   if willpower_spent_today >= willpower_burnout_threshold:
     var burnout_penalty := willpower_spent_today / 10
     game_state.willpower_max = maxi(50, game_state.willpower_max - burnout_penalty)
+  if game_state.current_day == 8:
+    game_state.willpower_max = mini(150, game_state.willpower_max + 20)
   game_state.willpower = game_state.willpower_max
   willpower_spent_today = 0
 
