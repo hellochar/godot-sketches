@@ -81,8 +81,12 @@ func get_modifier(tag: CardData.Tag) -> int:
 
 func get_motivation_for_tags(action_tags: Array, context: Dictionary = {}) -> int:
   var total := 0
-  for tag in action_tags:
-    total += get_modifier(tag)
+  if special_effect == SpecialEffect.DOUBLE_TAG_ZERO_OTHER:
+    if special_target_tag in action_tags:
+      total = get_modifier(special_target_tag) * 2
+  else:
+    for tag in action_tags:
+      total += get_modifier(tag)
 
   if condition_type != ConditionType.NONE:
     if check_condition(context):
