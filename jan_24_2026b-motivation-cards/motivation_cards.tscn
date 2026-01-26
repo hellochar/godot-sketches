@@ -56,11 +56,28 @@ text = "Score: 0"
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="WillpowerLabel" type="Label" parent="MainContainer/TopBar"]
+[node name="WillpowerContainer" type="HBoxContainer" parent="MainContainer/TopBar"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="WillpowerTitle" type="Label" parent="MainContainer/TopBar/WillpowerContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Willpower:"
+
+[node name="WillpowerBar" type="ProgressBar" parent="MainContainer/TopBar/WillpowerContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="WillpowerLabel" type="Label" parent="MainContainer/TopBar/WillpowerContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-text = "Willpower: 100/100"
+text = "100/100"
 
 [node name="ActionSelectionScreen" type="VBoxContainer" parent="MainContainer"]
 unique_name_in_owner = true
@@ -258,3 +275,41 @@ custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Continue"
+
+[node name="EndGamePanel" type="PanelContainer" parent="MainContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="EndGameContent" type="VBoxContainer" parent="MainContainer/EndGamePanel"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="EndTitle" type="Label" parent="MainContainer/EndGamePanel/EndGameContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Week Complete!"
+horizontal_alignment = 1
+
+[node name="FinalScore" type="Label" parent="MainContainer/EndGamePanel/EndGameContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Final Score: 0"
+horizontal_alignment = 1
+
+[node name="ActionsSummary" type="Label" parent="MainContainer/EndGamePanel/EndGameContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Actions taken:"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="PlayAgainButton" type="Button" parent="MainContainer/EndGamePanel/EndGameContent"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Play Again"
