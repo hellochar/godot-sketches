@@ -1970,4 +1970,38 @@ Social archetype needs more action variety.
 
 ### Step 4: Commit
 
+Committed: `ff3988e` - "Loop 47: Add social archetype actions"
+
+---
+
+## Loop 48: Creativity Archetype Actions
+
+### Step 1: Analysis
+
+**Gap: Limited Creativity Actions**
+
+Creativity archetype needs more variety.
+
+**Design Goals:**
+1. Add diverse creativity-tagged actions
+2. Mix different difficulty levels
+3. Various secondary tags
+
+### Step 2: Implementation Plan
+
+1. Create 4 creativity-focused actions
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Creativity Actions Created:**
+1. `paint_canvas.tres` - Paint on Canvas: 75 cost, Creativity+Effort, 75% success
+2. `write_poem.tres` - Write Poetry: 55 cost, Creativity, 85% success
+3. `improv_class.tres` - Improv Class: 80 cost, Creativity+Social+Risk, 55% success
+4. `learn_instrument.tres` - Learn Instrument: 90 cost, Creativity+Effort+Routine, 50% success
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 254-257).
+
+### Step 4: Commit
+
 Committed: (pending)
