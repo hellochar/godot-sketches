@@ -2978,3 +2978,37 @@ Need value cards representing community involvement and social responsibility.
 **Updated starter_deck.tres** - Added all 4 cards (IDs 366-369).
 
 ### Step 4: Commit
+
+Committed: `c445629` - "Loop 76: Add community value cards"
+
+---
+
+## Loop 77: Outdoor Adventure Actions
+
+### Step 1: Analysis
+
+**Gap: Outdoor Adventure Activities**
+
+Need actions representing outdoor adventure and exploration.
+
+**Design Goals:**
+1. Health-focused with Risk elements
+2. Mix of social and solo adventures
+3. Various difficulty levels
+
+### Step 2: Implementation Plan
+
+1. Create 4 outdoor adventure themed actions
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Outdoor Adventure Actions Created:**
+1. `go_camping.tres` - Go Camping: 75 cost, Health+Social+Risk, 75% success.
+2. `rock_climbing.tres` - Go Rock Climbing: 70 cost, Health+Risk, 70% success.
+3. `beach_day.tres` - Beach Day: 55 cost, Health+Social+Creativity, 85% success.
+4. `mountain_biking.tres` - Mountain Biking: 65 cost, Health+Effort+Risk, 75% success.
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 370-373).
+
+### Step 4: Commit
