@@ -1,14 +1,15 @@
-[gd_scene load_steps=10 format=3 uid="uid://djdbsow0rg5ol"]
+[gd_scene load_steps=11 format=3 uid="uid://djdbsow0rg5ol"]
 
 [ext_resource type="Script" uid="uid://cvxkgmerrohu7" path="res://jan_24_2026b-motivation-cards/motivation_cards.gd" id="1_main"]
 [ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/starter_deck.tres" id="2_deck"]
-[ext_resource type="AudioStream" uid="uid://wt3kecoqg2ek" path="res://jan_24_2026b-motivation-cards/audio/card_reveal.wav" id="3_card_reveal"]
+[ext_resource type="AudioStream" uid="uid://b2cac6accysfl" path="res://assets/Card+Game+FX+New/Card Deal 2.wav" id="3_65vhf"]
 [ext_resource type="AudioStream" uid="uid://csuk2adojlboi" path="res://jan_24_2026b-motivation-cards/audio/attempt.wav" id="4_attempt"]
 [ext_resource type="AudioStream" uid="uid://cgplsurhcdhde" path="res://jan_24_2026b-motivation-cards/audio/success.wav" id="5_success"]
 [ext_resource type="AudioStream" uid="uid://dut5t5tjp58tf" path="res://jan_24_2026b-motivation-cards/audio/failure.wav" id="6_failure"]
-[ext_resource type="AudioStream" uid="uid://m88ewlmxem5r" path="res://assets/inteface_sfx_pack_1_wav/Wav/Cursor_tones/cursor_style_1.wav" id="7_click"]
+[ext_resource type="AudioStream" uid="uid://0df45qg8yxkk" path="res://assets/kenney_ui-audio/Audio/switch7.ogg" id="7_pv113"]
 [ext_resource type="AudioStream" uid="uid://dp7vryecobp2e" path="res://assets/inteface_sfx_pack_1_wav/Wav/Confirm_tones/style1/confirm_style_1_001.wav" id="8_deck_add"]
 [ext_resource type="AudioStream" uid="uid://h72lh8rx27op" path="res://assets/inteface_sfx_pack_1_wav/Wav/Error_tones/style2/error_style_2_001.wav" id="9_willpower_low"]
+[ext_resource type="AudioStream" uid="uid://d04om3j1mlxa3" path="res://assets/ChillLofiR.mp3" id="10_pv113"]
 
 [node name="MotivationCards" type="Control"]
 layout_mode = 3
@@ -21,11 +22,11 @@ script = ExtResource("1_main")
 action_button_size = Vector2(200, 300)
 motivation_card_size = Vector2(200, 300)
 starter_deck = ExtResource("2_deck")
-card_reveal_sound = ExtResource("3_card_reveal")
+card_reveal_sound = ExtResource("3_65vhf")
 attempt_sound = ExtResource("4_attempt")
 success_sound = ExtResource("5_success")
 failure_sound = ExtResource("6_failure")
-click_sound = ExtResource("7_click")
+click_sound = ExtResource("7_pv113")
 deck_add_sound = ExtResource("8_deck_add")
 willpower_low_sound = ExtResource("9_willpower_low")
 
@@ -351,3 +352,9 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0.5)
+
+[node name="BGMusic" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("10_pv113")
+volume_db = -12.0
+autoplay = true
+parameters/looping = true
