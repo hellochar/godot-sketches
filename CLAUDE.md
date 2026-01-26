@@ -10,6 +10,11 @@
 # Godot
 - ALWAYS use two spaces for indentation, never tabs
 - Do not ever delete the .godot folder unless I explicitly ask.
+- Avoid hardcoding magic numbers and values, and expose them as human editable in the editor.
+- Avoid hardcoding UIs in code, preferring to create nodes for them in the .tscn.
+- Don't add empty whitespace spacer elements, preferring to use idiomatic and clean UI architecture practices in godot. take full advantage of the features of godot UI - all the layout properties, the theme, visibility, etc.
+* When possible use data assets and resources that are hooked up through .tscn references, so it's human editable and inspectable.
+* Prioritize allowing the game developer to easily iterate and control numbers and content by being data driven
 - Prefer using `unique_name_in_owner = true` to access nodes through %Name in gdscript
 - AVOID using `add_node` MCP tool. Instead, write/edit .tscn files directly.
 - ALWAYS use `update_project_uids` after renaming or moving assets to fix UID references.

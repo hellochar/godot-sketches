@@ -72,6 +72,26 @@ class AbsorbParticle:
 @export_group("Grid")
 @export var grid_size: int = 7
 
+@export_group("Buildings")
+@export var extractor_radius: float = 20.0
+@export var generator_half_size: float = 20.0
+@export var radiator_size: float = 20.0
+@export var heat_sink_outer: float = 15.0
+@export var heat_sink_inner: float = 10.0
+@export var outport_radius: float = 20.0
+
+@export_group("Building Colors")
+@export var extractor_color: Color = Color.YELLOW
+@export var generator_color: Color = Color.ORANGE
+@export var radiator_color: Color = Color.DEEP_SKY_BLUE
+@export var heat_sink_color: Color = Color.SLATE_BLUE
+@export var outport_color: Color = Color.LIME_GREEN
+
+@export_group("Resource Colors")
+@export var fuel_color: Color = Color.YELLOW
+@export var power_color: Color = Color.LIME_GREEN
+@export var heat_color: Color = Color.ORANGE_RED
+
 @export_group("Pipes")
 @export var pipe_width: float = 6.0
 @export var pipe_reach: float = 0.8
@@ -82,19 +102,6 @@ class AbsorbParticle:
 @export_group("Game Feel")
 @export var flow_dot_speed: float = 2.0
 @export var milestone_flash_duration: float = 0.5
-
-const BUILDING_COLORS := {
-  BuildingType.EXTRACTOR: Color.YELLOW,
-  BuildingType.GENERATOR: Color.ORANGE,
-  BuildingType.RADIATOR: Color.DEEP_SKY_BLUE,
-  BuildingType.HEAT_SINK: Color.SLATE_BLUE,
-}
-
-const RESOURCE_COLORS := {
-  ResourceType.FUEL: Color.YELLOW,
-  ResourceType.POWER: Color.LIME_GREEN,
-  ResourceType.HEAT: Color.ORANGE_RED,
-}
 
 var grid: Array = []
 var outports: Array[Vector2i] = [
@@ -121,6 +128,21 @@ var absorb_particles: Array[AbsorbParticle] = []
 var cell_size: float:
   get:
     return minf(size.x, size.y) / grid_size
+
+func get_building_color(type: BuildingType) -> Color:
+  match type:
+    BuildingType.EXTRACTOR: return extractor_color
+    BuildingType.GENERATOR: return generator_color
+    BuildingType.RADIATOR: return radiator_color
+    BuildingType.HEAT_SINK: return heat_sink_color
+  return Color.WHITE
+
+func get_resource_color(res: ResourceType) -> Color:
+  match res:
+    ResourceType.FUEL: return fuel_color
+    ResourceType.POWER: return power_color
+    ResourceType.HEAT: return heat_color
+  return Color.WHITE
 
 func _ready() -> void:
   for x in range(grid_size):
@@ -176,17 +198,17 @@ func draw_outport(pos: Vector2i) -> void:
   var outport_scale := 1.0
   if milestone_flash > 0:
     outport_scale = 1.0 + (milestone_flash / milestone_flash_duration) * 0.3
-  var r := 20.0 * outport_scale
+  var r := outport_radius * outport_scale
   var points := PackedVector2Array([
     center + Vector2(0, -r),
     center + Vector2(r, 0),
     center + Vector2(0, r),
     center + Vector2(-r, 0),
   ])
-  var outport_color := Color.LIME_GREEN
+  var draw_color := outport_color
   if milestone_flash > 0:
-    outport_color = outport_color.lerp(Color.WHITE, milestone_flash / milestone_flash_duration)
-  draw_colored_polygon(points, outport_color)
+    draw_color = draw_color.lerp(Color.WHITE, milestone_flash / milestone_flash_duration)
+  draw_colored_polygon(points, draw_color)
   draw_polyline(points + PackedVector2Array([points[0]]), Color.WHITE, 2.0)
 
 func draw_grid_elements() -> void:
@@ -203,7 +225,7 @@ func draw_grid_elements() -> void:
 
 func draw_building(b: Building, pos: Vector2i) -> void:
   var center := grid_to_pixel(pos)
-  var color: Color = BUILDING_COLORS[b.type]
+  var color: Color = get_building_color(b.type)
 
   if b.shutdown:
     color = Color.DARK_GRAY
@@ -228,7 +250,7 @@ func draw_building(b: Building, pos: Vector2i) -> void:
 
 func draw_pipe_element(p: Pipe, pos: Vector2i) -> void:
   var center := grid_to_pixel(pos)
-  var color: Color = RESOURCE_COLORS[p.resource]
+  var color: Color = get_resource_color(p.resource)
   var cs := cell_size
   var flow_key := "%d,%d" % [pos.x, pos.y]
   var is_active := active_flows.has(flow_key)
@@ -259,30 +281,31 @@ func draw_pipe_element(p: Pipe, pos: Vector2i) -> void:
   draw_circle(center, pipe_width / 2, color.lightened(0.2))
 
 func draw_extractor(center: Vector2, s: float, color: Color, shutdown: bool) -> void:
-  draw_circle(center, 20 * s, color)
+  draw_circle(center, extractor_radius * s, color)
   if simulating and not shutdown:
     var pump := sin(flow_anim_time * 6.0) * 0.3 + 0.7
-    var inner_radius := 10 * s * pump
+    var inner_radius := (extractor_radius * 0.5) * s * pump
     draw_circle(center, inner_radius, color.darkened(0.3))
 
 func draw_generator(center: Vector2, s: float, color: Color, heat_buildup: int, shutdown: bool) -> void:
-  var half := 20 * s
+  var half := generator_half_size * s
   draw_rect(Rect2(center - Vector2(half, half), Vector2(half * 2, half * 2)), color)
   if heat_buildup > 0 and not shutdown:
     draw_string(ThemeDB.fallback_font, center + Vector2(-5, 5), str(heat_buildup), HORIZONTAL_ALIGNMENT_CENTER, -1, 14, Color.WHITE)
 
 func draw_radiator(center: Vector2, s: float, color: Color, heat_capacity: int) -> void:
+  var rs := radiator_size * s
   var points := PackedVector2Array([
-    center + Vector2(0, -20 * s),
-    center + Vector2(20 * s, 20 * s),
-    center + Vector2(-20 * s, 20 * s),
+    center + Vector2(0, -rs),
+    center + Vector2(rs, rs),
+    center + Vector2(-rs, rs),
   ])
   draw_colored_polygon(points, color)
   draw_string(ThemeDB.fallback_font, center + Vector2(-5, 15), str(heat_capacity), HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.WHITE)
 
 func draw_heat_sink(center: Vector2, s: float, color: Color, heat_capacity: int) -> void:
-  var outer := 15 * s
-  var inner := 10 * s
+  var outer := heat_sink_outer * s
+  var inner := heat_sink_inner * s
   draw_rect(Rect2(center - Vector2(outer, outer), Vector2(outer * 2, outer * 2)), color)
   draw_rect(Rect2(center - Vector2(inner, inner), Vector2(inner * 2, inner * 2)), color.darkened(0.3))
   draw_string(ThemeDB.fallback_font, center + Vector2(-5, 5), str(heat_capacity), HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.WHITE)
@@ -329,7 +352,7 @@ func draw_hover_indicator() -> void:
 func draw_element_ghost(pos: Vector2i) -> void:
   var ghost_center := grid_to_pixel(pos)
   if selected_building == BuildingType.PIPE:
-    var ghost_color: Color = RESOURCE_COLORS[pipe_resource]
+    var ghost_color: Color = get_resource_color(pipe_resource)
     ghost_color.a = 0.4
     draw_circle(ghost_center, pipe_width, ghost_color)
     for neighbor in get_adjacent_cells(pos):
@@ -338,22 +361,23 @@ func draw_element_ghost(pos: Vector2i) -> void:
         var endpoint := ghost_center + dir * (cell_size * pipe_reach)
         draw_line(ghost_center, endpoint, ghost_color, pipe_width)
   else:
-    var ghost_color: Color = BUILDING_COLORS[selected_building]
+    var ghost_color: Color = get_building_color(selected_building)
     ghost_color.a = 0.4
     match selected_building:
       BuildingType.EXTRACTOR:
-        draw_circle(ghost_center, 20, ghost_color)
+        draw_circle(ghost_center, extractor_radius, ghost_color)
       BuildingType.GENERATOR:
-        draw_rect(Rect2(ghost_center - Vector2(20, 20), Vector2(40, 40)), ghost_color)
+        var half := generator_half_size
+        draw_rect(Rect2(ghost_center - Vector2(half, half), Vector2(half * 2, half * 2)), ghost_color)
       BuildingType.RADIATOR:
         var ghost_points := PackedVector2Array([
-          ghost_center + Vector2(0, -20),
-          ghost_center + Vector2(20, 20),
-          ghost_center + Vector2(-20, 20),
+          ghost_center + Vector2(0, -radiator_size),
+          ghost_center + Vector2(radiator_size, radiator_size),
+          ghost_center + Vector2(-radiator_size, radiator_size),
         ])
         draw_colored_polygon(ghost_points, ghost_color)
       BuildingType.HEAT_SINK:
-        draw_rect(Rect2(ghost_center - Vector2(15, 15), Vector2(30, 30)), ghost_color)
+        draw_rect(Rect2(ghost_center - Vector2(heat_sink_outer, heat_sink_outer), Vector2(heat_sink_outer * 2, heat_sink_outer * 2)), ghost_color)
 
 func draw_placement_reason(pos: Vector2i) -> void:
   var reason := get_placement_reason(pos, selected_building)
