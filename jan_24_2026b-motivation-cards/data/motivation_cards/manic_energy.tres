@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://byn44r1nv7hoc" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Manic Energy"
+health_modifier = -10
+social_modifier = 15
+routine_modifier = -15
+effort_modifier = 20
+risk_modifier = 20
+creativity_modifier = 25
+condition_type = 0
+condition_threshold = 0
+condition_tag = 0
+bonus_multiplier = 1.0
+description = "Chaotic energy"
+special_effect = 1
+special_value = 1
+
