@@ -3726,3 +3726,37 @@ Need motivation cards representing different energy states and momentum.
 **Updated starter_deck.tres** - Added all 4 motivation cards (IDs 454-457).
 
 ### Step 4: Commit
+
+Committed: `3eb91bb` - "Loop 98: Add energy motivation cards"
+
+---
+
+## Loop 99: Social Event Actions
+
+### Step 1: Analysis
+
+**Gap: Social Event/Gathering Actions**
+
+Need actions focused on social events and gatherings.
+
+**Design Goals:**
+1. Range of social event sizes
+2. Different commitment levels
+3. Mix of Social with other tags
+
+### Step 2: Implementation Plan
+
+1. Create 4 social event themed actions
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Social Event Actions Created:**
+1. `family_dinner.tres` - Family Dinner: 50 cost, Social+Routine tags, 90% success.
+2. `wedding_attendance.tres` - Wedding Attendance: 85 cost, Social+Creativity+Risk tags, 85% success.
+3. `casual_hangout.tres` - Casual Hangout: 35 cost, Social tag, 95% success.
+4. `group_trip.tres` - Group Trip: 90 cost, Social+Risk+Health tags, 75% success.
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 458-461).
+
+### Step 4: Commit
