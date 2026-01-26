@@ -3012,3 +3012,37 @@ Need actions representing outdoor adventure and exploration.
 **Updated starter_deck.tres** - Added all 4 actions (IDs 370-373).
 
 ### Step 4: Commit
+
+Committed: `4b247be` - "Loop 77: Add outdoor adventure actions"
+
+---
+
+## Loop 78: Anxiety Motivation Cards
+
+### Step 1: Analysis
+
+**Gap: Anxiety/Stress Mental States**
+
+Need motivation cards representing anxiety and stress-related mindsets.
+
+**Design Goals:**
+1. Mixed effects - some positive from nervous energy
+2. Use conditions like LOW_WILLPOWER, MAX_CARDS_OF_TAG
+3. Represent common anxiety patterns
+
+### Step 2: Implementation Plan
+
+1. Create 4 anxiety-themed motivation cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Anxiety Motivation Cards Created:**
+1. `performance_anxiety.tres` - Performance Anxiety: -15 Social, +10 Effort. 2x if no Social cards drawn.
+2. `deadline_panic.tres` - Deadline Panic: -10 Routine, +20 Effort, +15 Risk.
+3. `overthinking.tres` - Overthinking: +15 Routine, -15 Risk, -10 Creativity.
+4. `nervous_energy.tres` - Nervous Energy: +10 Effort, +10 Risk. 2x if willpower < 30.
+
+**Updated starter_deck.tres** - Added all 4 cards (IDs 374-377).
+
+### Step 4: Commit
