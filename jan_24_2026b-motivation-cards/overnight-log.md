@@ -1832,4 +1832,39 @@ World modifiers shape each day's strategy but variety is limited.
 
 ### Step 4: Commit
 
+Committed: `028b99f` - "Loop 43: Add diverse world modifiers"
+
+---
+
+## Loop 44: Streak-Based Motivation Cards
+
+### Step 1: Analysis
+
+**Gap: Limited Streak Synergy**
+
+Few cards benefit from success streaks beyond the basic STREAK_SCALING.
+
+**Design Goals:**
+1. Create cards with diverse streak interactions
+2. Reward consistent performance
+3. Create risk/reward around maintaining streaks
+
+### Step 2: Implementation Plan
+
+1. Create 4 streak-themed motivation cards
+2. Use existing STREAK_SCALING and conditions
+3. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Streak Cards Created:**
+1. `hot_streak.tres` - +5 Effort, +10 Risk, +8 per streak
+2. `unstoppable.tres` - +10 Health/Effort, 2x if succeeded yesterday
+3. `on_a_roll.tres` - +10 Creativity, +5 Social, +5 per streak
+4. `consistency_pays.tres` - +15 Routine, +5 Effort, +6 per streak
+
+**Updated starter_deck.tres** - Added all 4 motivation cards (IDs 238-241).
+
+### Step 4: Commit
+
 Committed: (pending)
