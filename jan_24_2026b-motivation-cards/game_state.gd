@@ -5,6 +5,7 @@ const CardData = preload("res://jan_24_2026b-motivation-cards/card_data.gd")
 
 var motivation_deck: Array = []
 var value_cards: Array = []
+var all_value_cards: Array = []
 var willpower: int = 100
 var willpower_max: int = 100
 var score: int = 0
@@ -26,7 +27,11 @@ func _init() -> void:
 func load_from_deck(deck: Resource) -> void:
   available_actions = deck.actions.duplicate()
   motivation_deck = deck.motivation_cards.duplicate()
-  value_cards = deck.value_cards.duplicate()
+  all_value_cards = deck.value_cards.duplicate()
+  value_cards = []
+  if not all_value_cards.is_empty():
+    var random_index := randi() % all_value_cards.size()
+    value_cards.append(all_value_cards[random_index])
   world_modifiers = deck.world_modifiers.duplicate()
 
 
@@ -93,11 +98,15 @@ func _create_starter_motivation_cards() -> void:
 
 
 func _create_starter_value_cards() -> void:
-  value_cards = [
+  all_value_cards = [
     CardData.ValueCard.new("I care about health", {CardData.Tag.HEALTH: 10}),
     CardData.ValueCard.new("Community matters", {CardData.Tag.SOCIAL: 10}),
     CardData.ValueCard.new("Self-expression", {CardData.Tag.CREATIVITY: 15}),
   ]
+  value_cards = []
+  if not all_value_cards.is_empty():
+    var random_index := randi() % all_value_cards.size()
+    value_cards.append(all_value_cards[random_index])
 
 
 func _create_world_modifiers() -> void:
