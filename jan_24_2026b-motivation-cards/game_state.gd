@@ -26,6 +26,8 @@ const MOMENTUM_BONUS_PER: int = 3
 var action_mastery: Dictionary = {}
 const MASTERY_MAX: int = 3
 const MASTERY_DISCOUNT_PER: int = 5
+var daily_bonus_tag: int = -1
+const DAILY_BONUS_SCORE: int = 5
 
 
 func _init() -> void:
@@ -39,6 +41,10 @@ func get_action_mastery(action_title: String) -> int:
 func increase_action_mastery(action_title: String) -> void:
   var current: int = action_mastery.get(action_title, 0)
   action_mastery[action_title] = mini(MASTERY_MAX, current + 1)
+
+
+func randomize_daily_bonus_tag() -> void:
+  daily_bonus_tag = randi() % CardData.Tag.size()
 
 
 func load_from_deck(deck: Resource) -> void:

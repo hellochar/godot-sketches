@@ -627,3 +627,45 @@ Completed improvements:
 11. **Action Mastery** - Progression through repeated success
 
 The game now has significantly deeper emergent mechanics.
+
+---
+
+## Loop 12: Daily Bonus Tag
+
+### Step 1: Analysis
+
+**Gap: Days Feel Same**
+
+Each day plays identically - no environmental variety beyond world modifiers.
+
+**Design Goals:**
+1. Add a random "featured tag" each day
+2. Actions with that tag get bonus score
+3. Creates daily puzzle of which actions to prioritize
+
+### Step 2: Implementation Plan
+
+1. Add `daily_bonus_tag` variable to game_state.gd
+2. Randomize bonus tag at start of each day
+3. Display bonus tag in TopBar
+4. Apply bonus score (+5) when action has bonus tag
+5. Highlight bonus tag on action cards
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `game_state.gd` - Added daily bonus tag system:
+  - `daily_bonus_tag: int = -1` variable
+  - `DAILY_BONUS_SCORE: int = 5` constant
+  - `randomize_daily_bonus_tag()` function
+
+- `motivation_cards.tscn` - Added BonusTagLabel to TopBar with orange color
+
+- `motivation_cards.gd` - Integrated bonus tag display and scoring:
+  - Added @onready for bonus_tag_label
+  - `_start_new_turn()` calls randomize_daily_bonus_tag()
+  - `_update_top_bar()` displays bonus tag name and bonus
+  - `_get_potential_score()` and `_show_result()` apply bonus score
+
+### Step 4: Commit

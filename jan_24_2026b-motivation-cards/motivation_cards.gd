@@ -64,6 +64,7 @@ const GenericCardScene = preload("res://common/generic_card.tscn")
 @onready var score_label: Label = %ScoreLabel
 @onready var momentum_label: Label = %MomentumLabel
 @onready var streak_label: Label = %StreakLabel
+@onready var bonus_tag_label: Label = %BonusTagLabel
 @onready var willpower_bar: ProgressBar = %WillpowerBar
 @onready var willpower_label: Label = %WillpowerLabel
 
@@ -250,6 +251,11 @@ func _update_top_bar() -> void:
   else:
     momentum_label.text = "Momentum: %d" % game_state.momentum
   streak_label.text = "Streak: %d" % game_state.success_streak
+  if game_state.daily_bonus_tag >= 0:
+    var tag_name: String = CardData.TAG_NAMES[game_state.daily_bonus_tag]
+    bonus_tag_label.text = "Bonus: %s (+%d)" % [tag_name, game_state.DAILY_BONUS_SCORE]
+  else:
+    bonus_tag_label.text = ""
   willpower_bar.max_value = game_state.willpower_max
   willpower_bar.value = game_state.willpower
   willpower_label.text = "%d/%d" % [game_state.willpower, game_state.willpower_max]
@@ -365,6 +371,8 @@ func _get_potential_score(action) -> int:
   var score := 0
   for value_card in game_state.value_cards:
     score += value_card.get_score_for_tags(action.tags)
+  if game_state.daily_bonus_tag in action.tags:
+    score += game_state.DAILY_BONUS_SCORE
   return score
 
 
@@ -472,6 +480,7 @@ func _start_new_turn() -> void:
   discards_this_turn = 0
   discarded_cards_this_turn.clear()
   value_card_bonus_motivation = 0
+  game_state.randomize_daily_bonus_tag()
   if (game_state.current_day - 1) % 7 == 0:
     value_card_abilities_used.clear()
     game_state.momentum = 0
@@ -998,6 +1007,8 @@ func _show_result(success: bool) -> void:
 
     for value_card in game_state.value_cards:
       score_gained += value_card.get_score_for_tags(current_action.tags)
+    if game_state.daily_bonus_tag in current_action.tags:
+      score_gained += game_state.DAILY_BONUS_SCORE
     var streak_bonus: int = game_state.success_streak
     score_gained += streak_bonus
     if double_next_score:
