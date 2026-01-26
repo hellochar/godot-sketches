@@ -810,3 +810,40 @@ Players don't know which tags synergize well. Many conditional cards check for t
   - Called in `_show_action_selection()`
 
 ### Step 4: Commit
+
+Committed: `4a74835` - "Add tag synergy hints to action selection"
+
+---
+
+## Loop 17: Weekly Summary
+
+### Step 1: Analysis
+
+**Gap: End Screen Lacks Detail**
+
+The end screen just shows total score and actions taken. Players don't see their progression, best days, or deck growth.
+
+**Design Goals:**
+1. Track best day score
+2. Show cards added/removed during week
+3. Display deck growth statistics
+
+### Step 2: Implementation Plan
+
+1. Add tracking variables: best_day_score, cards_added_count, cards_removed_count
+2. Update _show_end_screen to display these stats
+3. Format as meaningful summary
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `motivation_cards.gd`:
+  - Added tracking vars: best_day_score, cards_added_count, cards_removed_count, starting_deck_size
+  - Track best day score in `_show_result()`
+  - Track cards added when actions succeed
+  - Track cards removed in `_remove_card_from_deck()`
+  - Updated `_show_end_screen()` to show detailed summary
+  - Reset tracking vars in `_on_play_again_pressed()`
+
+### Step 4: Commit

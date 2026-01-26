@@ -124,6 +124,10 @@ var is_animating: bool = false
 var value_card_abilities_used: Dictionary = {}
 var value_card_bonus_motivation: int = 0
 var double_next_score: bool = false
+var best_day_score: int = 0
+var cards_added_count: int = 0
+var cards_removed_count: int = 0
+var starting_deck_size: int = 0
 
 
 func _build_context_for_action(action) -> Dictionary:
@@ -159,6 +163,7 @@ func _ready() -> void:
     game_state.load_from_deck(starter_deck)
   game_state.willpower = starting_willpower
   game_state.willpower_max = starting_willpower
+  starting_deck_size = game_state.motivation_deck.size()
   _connect_signals()
   _start_new_turn()
   _update_top_bar()
@@ -1048,10 +1053,13 @@ func _show_result(success: bool) -> void:
       score_gained *= 2
       double_next_score = false
     game_state.add_score(score_gained)
+    if score_gained > best_day_score:
+      best_day_score = score_gained
 
     for card in current_action.cards_on_success:
       game_state.add_motivation_card(card)
       cards_to_add.append(card)
+      cards_added_count += 1
 
     willpower_restored = _handle_success_special_effects()
     _handle_exhaust_cards()
@@ -1197,10 +1205,22 @@ func _show_end_screen() -> void:
   end_title.text = "Week Complete!"
   final_score_label.text = "Final Score: %d" % game_state.score
 
+  var summary_parts: Array = []
+  if best_day_score > 0:
+    summary_parts.append("Best Day: %d points" % best_day_score)
+  var deck_change: int = game_state.motivation_deck.size() - starting_deck_size
+  var deck_change_str := "+%d" % deck_change if deck_change >= 0 else "%d" % deck_change
+  summary_parts.append("Deck: %d → %d (%s)" % [starting_deck_size, game_state.motivation_deck.size(), deck_change_str])
+  if cards_added_count > 0:
+    summary_parts.append("Cards Added: %d" % cards_added_count)
+  if cards_removed_count > 0:
+    summary_parts.append("Cards Removed: %d" % cards_removed_count)
+  summary_parts.append("")
   if actions_taken.is_empty():
-    actions_summary.text = "You didn't take any actions this week."
+    summary_parts.append("No actions taken this week.")
   else:
-    actions_summary.text = "Actions taken:\n" + "\n".join(actions_taken)
+    summary_parts.append("Actions: " + ", ".join(actions_taken))
+  actions_summary.text = "\n".join(summary_parts)
 
   await _fade_in(end_game_panel)
 
@@ -1216,6 +1236,10 @@ func _on_play_again_pressed() -> void:
   actions_taken.clear()
   willpower_spent_today = 0
   value_card_abilities_used.clear()
+  best_day_score = 0
+  cards_added_count = 0
+  cards_removed_count = 0
+  starting_deck_size = game_state.motivation_deck.size()
   _start_new_turn()
   _update_top_bar()
 
@@ -1253,6 +1277,7 @@ func _create_removal_card_display(card) -> PanelContainer:
 
 func _remove_card_from_deck(card) -> void:
   game_state.remove_motivation_card(card)
+  cards_removed_count += 1
   _play_sound(click_sound)
   await _fade_out(card_removal_panel)
   _on_continue_pressed()
