@@ -13,6 +13,7 @@ const GenericCardScene = preload("res://common/generic_card.tscn")
 @export var max_days: int = 7
 @export var card_reveal_delay: float = 0.15
 @export var willpower_burnout_threshold: int = 50
+@export var max_discards_per_turn: int = 2
 
 @export_group("Card Visuals")
 @export var action_button_size: Vector2 = Vector2(200, 120)
@@ -79,6 +80,7 @@ const GenericCardScene = preload("res://common/generic_card.tscn")
 @onready var total_motivation_label: Label = %TotalMotivation
 @onready var gap_label: Label = %GapLabel
 @onready var willpower_cost_label: Label = %WillpowerCostLabel
+@onready var discard_label: Label = %DiscardLabel
 @onready var back_button: Button = %BackButton
 @onready var attempt_button: Button = %AttemptButton
 
@@ -105,6 +107,9 @@ var total_motivation: int = 0
 var actions_taken: Array = []
 var willpower_spent_today: int = 0
 var last_action_succeeded: bool = false
+var discards_this_turn: int = 0
+var discarded_cards_this_turn: Array = []
+var is_animating: bool = false
 
 
 func _build_context_for_action(action) -> Dictionary:
@@ -126,6 +131,7 @@ func _build_context_for_action(action) -> Dictionary:
     "succeeded_yesterday": game_state.succeeded_yesterday,
     "success_streak": game_state.success_streak,
     "attempted_actions": game_state.attempted_actions,
+    "discards_this_turn": discards_this_turn,
   }
 
 
@@ -357,12 +363,15 @@ func _show_motivation_phase() -> void:
   _populate_tags()
   _display_drawn_cards()
   _display_world_modifier()
+  _update_discard_label()
 
   await _fade_in(motivation_phase_screen)
   await _animate_motivation_tally()
 
+  _display_drawn_cards_instant()
   _calculate_motivation()
   _update_willpower_display()
+  _update_discard_label()
   back_button.disabled = false
 
 
@@ -370,6 +379,8 @@ func _start_new_turn() -> void:
   var draw_count: int = cards_per_draw + game_state.extra_draws_next_turn
   game_state.extra_draws_next_turn = 0
   drawn_cards = game_state.draw_motivation_cards(draw_count)
+  discards_this_turn = 0
+  discarded_cards_this_turn.clear()
   if randf() < world_modifier_chance:
     current_world_modifier = game_state.get_random_world_modifier()
   else:
@@ -619,6 +630,92 @@ func _update_willpower_display() -> void:
 
   attempt_button.disabled = not can_attempt
   attempt_button.text = "Attempt Action" if can_attempt else "Not enough willpower"
+
+
+func _update_discard_label() -> void:
+  var remaining := max_discards_per_turn - discards_this_turn
+  if remaining > 0:
+    discard_label.text = "Click a card to discard and redraw (%d remaining)" % remaining
+    discard_label.modulate = Color.WHITE
+  else:
+    discard_label.text = "No discards remaining"
+    discard_label.modulate = Color(0.6, 0.6, 0.6)
+
+
+func _discard_card(card_index: int) -> void:
+  if is_animating or discards_this_turn >= max_discards_per_turn:
+    return
+  if card_index < 0 or card_index >= drawn_cards.size():
+    return
+
+  is_animating = true
+  discards_this_turn += 1
+  var discarded_card = drawn_cards[card_index]
+  discarded_cards_this_turn.append(discarded_card)
+  drawn_cards.remove_at(card_index)
+
+  var new_card = game_state.draw_motivation_cards(1)
+  if new_card.size() > 0:
+    drawn_cards.insert(card_index, new_card[0])
+
+  _play_sound(card_reveal_sound)
+
+  _display_drawn_cards_instant()
+  _calculate_motivation()
+  _update_willpower_display()
+  _update_discard_label()
+  is_animating = false
+
+
+func _display_drawn_cards_instant() -> void:
+  for child in drawn_cards_container.get_children():
+    child.queue_free()
+
+  for i in range(drawn_cards.size()):
+    var card = drawn_cards[i]
+    var card_panel := _create_motivation_card_display_clickable(card, i)
+    drawn_cards_container.add_child(card_panel)
+
+
+func _create_motivation_card_display_clickable(card, card_index: int) -> PanelContainer:
+  var context := _build_context_for_action(current_action)
+  var motivation_value: int = card.get_motivation_for_tags(current_action.tags, context)
+
+  var bg_color := neutral_card_color
+  if motivation_value > 0:
+    bg_color = positive_card_color
+  elif motivation_value < 0:
+    bg_color = negative_card_color
+
+  var generic_card = GenericCardScene.instantiate()
+  generic_card.card_size = motivation_card_size
+  generic_card.background_color = bg_color
+  generic_card.corner_radius = card_corner_radius
+  generic_card.content_margin = card_margin
+  generic_card.enable_hover = true
+  generic_card.title = card.title
+  generic_card.description = card.format_modifiers()
+
+  if card is MotivationCardRes:
+    var condition_text: String = card.get_condition_text()
+    if not condition_text.is_empty():
+      var condition_met: bool = card.check_condition(context)
+      var cond_color := success_color if condition_met else Color(0.6, 0.6, 0.6)
+      generic_card.add_content_label(condition_text, 10, cond_color)
+
+    var special_text: String = card.get_special_effect_text()
+    if not special_text.is_empty():
+      generic_card.add_content_label(special_text, 10, Color(0.8, 0.7, 1.0))
+
+  if motivation_value != 0:
+    var sign_str := "+" if motivation_value > 0 else ""
+    var contrib_color := success_color if motivation_value > 0 else failure_color
+    generic_card.add_content_label("→ %s%d" % [sign_str, motivation_value], 16, contrib_color)
+
+  if discards_this_turn < max_discards_per_turn:
+    generic_card.pressed.connect(func() -> void: _discard_card(card_index))
+
+  return generic_card
 
 
 func _on_back_pressed() -> void:
