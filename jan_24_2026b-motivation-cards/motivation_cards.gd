@@ -130,6 +130,7 @@ var best_day_score: int = 0
 var cards_added_count: int = 0
 var cards_removed_count: int = 0
 var starting_deck_size: int = 0
+var pending_value_card_reward: bool = false
 
 
 func _build_context_for_action(action) -> Dictionary:
@@ -1090,6 +1091,8 @@ func _show_result(success: bool) -> void:
       result_details.text = "Action completed, but it didn't align with your values."
     else:
       result_details.text = "\n".join(details_parts)
+    if current_action.motivation_cost >= 70 and game_state.value_cards.size() < 3:
+      pending_value_card_reward = true
   else:
     game_state.success_streak = 0
     game_state.succeeded_yesterday = false
@@ -1192,6 +1195,11 @@ func _create_deck_add_card_display(card) -> PanelContainer:
 
 
 func _on_continue_pressed() -> void:
+  if pending_value_card_reward:
+    pending_value_card_reward = false
+    await _fade_out(result_panel)
+    _show_value_card_reward()
+    return
   game_state.current_day += 1
   if willpower_spent_today >= willpower_burnout_threshold:
     var burnout_penalty := willpower_spent_today / 10
@@ -1319,6 +1327,44 @@ func _select_starting_value(value_card) -> void:
   await _fade_out(value_selection_panel)
   _start_new_turn()
   _update_top_bar()
+
+
+func _show_value_card_reward() -> void:
+  for child in value_selection_container.get_children():
+    child.queue_free()
+
+  var current_card_titles: Array = []
+  for vc in game_state.value_cards:
+    current_card_titles.append(vc.title)
+
+  var available: Array = []
+  for vc in game_state.all_value_cards:
+    if vc.title not in current_card_titles:
+      available.append(vc)
+  available.shuffle()
+  var selection := available.slice(0, mini(3, available.size()))
+
+  for value_card in selection:
+    var generic_card := GenericCardScene.instantiate()
+    value_selection_container.add_child(generic_card)
+    generic_card.card_size = motivation_card_size
+    generic_card.background_color = button_normal_color.lightened(0.1)
+    generic_card.corner_radius = card_corner_radius
+    generic_card.content_margin = card_margin
+    generic_card.title = value_card.title
+    generic_card.add_content_label(value_card.get_score_description(), 12, Color.WHITE)
+    if value_card.ability_type != ValueCardRes.AbilityType.NONE:
+      generic_card.add_content_label(value_card.get_ability_text(), 10, Color(0.8, 0.9, 1.0))
+    generic_card.clicked.connect(func(): _select_reward_value(value_card))
+
+  value_selection_panel.visible = true
+
+
+func _select_reward_value(value_card) -> void:
+  game_state.value_cards.append(value_card)
+  _play_sound(deck_add_sound)
+  await _fade_out(value_selection_panel)
+  _on_continue_pressed()
 
 
 func _remove_card_from_deck(card) -> void:
