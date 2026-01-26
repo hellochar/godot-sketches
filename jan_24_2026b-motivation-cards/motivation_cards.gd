@@ -36,6 +36,8 @@ const StarterDeckResourceScript = preload("res://jan_24_2026b-motivation-cards/s
 
 @onready var action_selection_screen: VBoxContainer = %ActionSelectionScreen
 @onready var action_grid: GridContainer = %ActionGrid
+@onready var mood_cards_container: HBoxContainer = %MoodCardsContainer
+@onready var mood_world_label: Label = %MoodWorldLabel
 
 @onready var motivation_phase_screen: VBoxContainer = %MotivationPhaseScreen
 @onready var action_title: Label = %ActionTitle
@@ -70,7 +72,7 @@ func _ready() -> void:
   game_state.willpower = starting_willpower
   game_state.willpower_max = starting_willpower
   _connect_signals()
-  _show_action_selection()
+  _start_new_turn()
   _update_top_bar()
 
 
@@ -92,6 +94,8 @@ func _show_action_selection() -> void:
   motivation_phase_screen.visible = false
   result_panel.visible = false
   _populate_action_grid()
+  _display_mood_cards()
+  _display_mood_world_modifier()
 
 
 func _populate_action_grid() -> void:
@@ -124,7 +128,10 @@ func _create_action_button(action) -> Button:
   btn.add_theme_stylebox_override("hover", hover_style)
 
   var tags_str := _format_tags(action.tags)
-  btn.text = "%s\nCost: %d | %d%%\n%s" % [action.title, action.motivation_cost, int(action.success_chance * 100), tags_str]
+  if action.success_chance >= 1.0:
+    btn.text = "%s\nCost: %d\n%s" % [action.title, action.motivation_cost, tags_str]
+  else:
+    btn.text = "%s\nCost: %d | %d%%\n%s" % [action.title, action.motivation_cost, int(action.success_chance * 100), tags_str]
   btn.pressed.connect(func() -> void: _select_action(action))
   return btn
 
@@ -148,13 +155,75 @@ func _show_motivation_phase() -> void:
 
   action_title.text = current_action.title
   cost_label.text = "Cost: %d" % current_action.motivation_cost
-  success_label.text = "Success: %d%%" % int(current_action.success_chance * 100)
+  if current_action.success_chance >= 1.0:
+    success_label.text = ""
+  else:
+    success_label.text = "Success: %d%%" % int(current_action.success_chance * 100)
 
   _populate_tags()
-  _draw_motivation_cards()
-  _apply_world_modifier()
+  _display_drawn_cards()
+  _display_world_modifier()
   _calculate_motivation()
   _update_willpower_slider()
+
+
+func _start_new_turn() -> void:
+  drawn_cards = game_state.draw_motivation_cards(cards_per_draw)
+  if randf() < world_modifier_chance:
+    current_world_modifier = game_state.get_random_world_modifier()
+  else:
+    current_world_modifier = null
+  _show_action_selection()
+
+
+func _display_mood_cards() -> void:
+  for child in mood_cards_container.get_children():
+    child.queue_free()
+
+  for card in drawn_cards:
+    var card_panel := _create_mood_card_display(card)
+    mood_cards_container.add_child(card_panel)
+
+
+func _create_mood_card_display(card) -> PanelContainer:
+  var panel := PanelContainer.new()
+  panel.custom_minimum_size = motivation_card_size
+
+  var style := StyleBoxFlat.new()
+  style.bg_color = neutral_card_color
+  style.corner_radius_top_left = card_corner_radius
+  style.corner_radius_top_right = card_corner_radius
+  style.corner_radius_bottom_left = card_corner_radius
+  style.corner_radius_bottom_right = card_corner_radius
+  style.content_margin_left = card_margin
+  style.content_margin_right = card_margin
+  style.content_margin_top = card_margin
+  style.content_margin_bottom = card_margin
+  panel.add_theme_stylebox_override("panel", style)
+
+  var vbox := VBoxContainer.new()
+  vbox.add_theme_constant_override("separation", 4)
+
+  var title_label := Label.new()
+  title_label.text = card.title
+  title_label.add_theme_font_size_override("font_size", 14)
+  title_label.autowrap_mode = TextServer.AUTOWRAP_WORD
+  vbox.add_child(title_label)
+
+  var mod_label := Label.new()
+  mod_label.text = card.format_modifiers()
+  mod_label.add_theme_font_size_override("font_size", 12)
+  vbox.add_child(mod_label)
+
+  panel.add_child(vbox)
+  return panel
+
+
+func _display_mood_world_modifier() -> void:
+  if current_world_modifier:
+    mood_world_label.text = "World: %s" % current_world_modifier.title
+  else:
+    mood_world_label.text = ""
 
 
 func _populate_tags() -> void:
@@ -182,9 +251,7 @@ func _populate_tags() -> void:
     tags_container.add_child(panel)
 
 
-func _draw_motivation_cards() -> void:
-  drawn_cards = game_state.draw_motivation_cards(cards_per_draw)
-
+func _display_drawn_cards() -> void:
   for child in drawn_cards_container.get_children():
     child.queue_free()
 
@@ -245,20 +312,15 @@ func _create_motivation_card_display(card) -> PanelContainer:
   return panel
 
 
-func _apply_world_modifier() -> void:
-  if randf() < world_modifier_chance:
-    current_world_modifier = game_state.get_random_world_modifier()
-    if current_world_modifier:
-      var mod_value: int = current_world_modifier.get_motivation_for_tags(current_action.tags)
-      if mod_value != 0:
-        var sign_str := "+" if mod_value > 0 else ""
-        world_modifier_label.text = "World: %s (%s%d)" % [current_world_modifier.title, sign_str, mod_value]
-      else:
-        world_modifier_label.text = "World: %s (no effect)" % current_world_modifier.title
+func _display_world_modifier() -> void:
+  if current_world_modifier:
+    var mod_value: int = current_world_modifier.get_motivation_for_tags(current_action.tags)
+    if mod_value != 0:
+      var sign_str := "+" if mod_value > 0 else ""
+      world_modifier_label.text = "World: %s (%s%d)" % [current_world_modifier.title, sign_str, mod_value]
     else:
-      world_modifier_label.text = ""
+      world_modifier_label.text = "World: %s (no effect)" % current_world_modifier.title
   else:
-    current_world_modifier = null
     world_modifier_label.text = ""
 
 
@@ -332,4 +394,4 @@ func _show_result(success: bool) -> void:
 
 
 func _on_continue_pressed() -> void:
-  _show_action_selection()
+  _start_new_turn()

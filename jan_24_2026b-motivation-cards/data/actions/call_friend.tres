@@ -1,10 +1,10 @@
-[gd_resource type="Resource" script_class="ActionResource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ActionResource" load_steps=2 format=3 uid="uid://dc2dhp18armvq"]
 
-[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://d0jysd6hdr7j3" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
 title = "Call a Friend"
 motivation_cost = 40
-tags = [1]
-success_chance = 0.95
+tags = Array[int]([1])
+success_chance = 1.0
