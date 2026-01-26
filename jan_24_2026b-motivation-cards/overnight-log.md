@@ -997,3 +997,42 @@ Players get one random value card at game start. This removes agency from build 
   - Modified `_ready()` to show value selection instead of starting game directly
 
 ### Step 4: Commit
+
+Committed: `2a42c8d` - "Add value card selection at game start"
+
+---
+
+## Loop 22: New Actions - Easy Tier
+
+### Step 1: Analysis
+
+**Gap: Limited Easy Actions**
+
+Most actions cost 50+ motivation. New players have few options when their mood is bad.
+
+**Design Goals:**
+1. Add 5 easy actions (cost 20-35)
+2. Low risk, low reward pattern
+3. Build confidence before harder actions
+
+### Step 2: Implementation Plan
+
+Create 5 new action resources:
+1. Deep Breath (20 cost, Health, 100% success)
+2. Quick Stretch (25 cost, Health/Routine)
+3. Send Emoji (25 cost, Social)
+4. Tidy Desk (30 cost, Routine)
+5. Hum a Tune (30 cost, Creativity)
+
+### Step 3: Execution
+
+**Actions Created:**
+- `deep_breath.tres` - 20 cost, Health, 100% success
+- `quick_stretch.tres` - 25 cost, Health/Routine, 100% success
+- `send_emoji.tres` - 25 cost, Social, 100% success
+- `tidy_desk.tres` - 30 cost, Routine/Effort, 100% success
+- `hum_tune.tres` - 30 cost, Creativity, 100% success
+
+**Updated starter_deck.tres** - Added all 5 actions.
+
+### Step 4: Commit
