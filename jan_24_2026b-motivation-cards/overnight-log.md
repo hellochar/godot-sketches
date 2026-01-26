@@ -2604,3 +2604,37 @@ Need actions representing modern technology-related activities.
 **Updated starter_deck.tres** - Added all 4 actions (IDs 322-325).
 
 ### Step 4: Commit
+
+Committed: `22f79f8` - "Loop 65: Add technology-themed actions"
+
+---
+
+## Loop 66: Relationship World Modifiers
+
+### Step 1: Analysis
+
+**Gap: Relationship/Interpersonal States**
+
+Need world modifiers representing relationship dynamics and interpersonal situations.
+
+**Design Goals:**
+1. Represent romantic, social conflict, celebration, isolation states
+2. Strong effects on Social and emotional tags
+3. Meaningful willpower and draw changes
+
+### Step 2: Implementation Plan
+
+1. Create 4 relationship-themed world modifiers
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Relationship World Modifiers Created:**
+1. `romantic_mood.tres` - Romantic Mood: +5 Health, +20 Social, -5 Routine, +10 Risk, +15 Creativity, +10 willpower.
+2. `argument_hangover.tres` - Argument Hangover: -5 Health, -15 Social, -10 Effort, -5 Risk, +5 Creativity, -15 willpower.
+3. `birthday_celebration.tres` - Birthday Celebration: +5 Health, +25 Social, -10 Routine, -5 Effort, +10 Risk/Creativity, +15 willpower, +1 draw.
+4. `feeling_lonely.tres` - Feeling Lonely: -5 Health, +5 Social, +10 Routine, -5 Risk, +15 Creativity, -10 willpower.
+
+**Updated starter_deck.tres** - Added all 4 modifiers (IDs 326-329).
+
+### Step 4: Commit
