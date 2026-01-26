@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://byn44r1nv7hoc" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Zen State"
+health_modifier = 15
+social_modifier = 5
+routine_modifier = 15
+effort_modifier = 0
+risk_modifier = -10
+creativity_modifier = 10
+condition_type = 0
+condition_threshold = 0
+condition_tag = 0
+bonus_multiplier = 1.0
+description = "Inner peace"
+special_effect = 2
+special_value = 10
+

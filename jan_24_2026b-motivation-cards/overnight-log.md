@@ -2536,3 +2536,37 @@ Need more high-stakes, low-success actions for risk-taking builds and "bold_ambi
 **Updated starter_deck.tres** - Added all 4 actions (IDs 314-317).
 
 ### Step 4: Commit
+
+Committed: `e42fb93` - "Loop 63: Add extreme high-risk actions"
+
+---
+
+## Loop 64: Mental State Motivation Cards
+
+### Step 1: Analysis
+
+**Gap: Mental State Representation**
+
+Need cards representing different mental/emotional states with distinct trade-offs.
+
+**Design Goals:**
+1. Strong positive effects paired with downsides
+2. Represent focus, calm, mania, stability
+3. Some with special effects (draw, willpower)
+
+### Step 2: Implementation Plan
+
+1. Create 4 mental state motivation cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Mental State Cards Created:**
+1. `hyper_focus.tres` - Hyper Focus: -5 Health, -15 Social, +30 Effort, +20 Creativity.
+2. `zen_state.tres` - Zen State: +15 Health, +5 Social, +15 Routine, -10 Risk, +10 Creativity. Restores 10 willpower.
+3. `manic_energy.tres` - Manic Energy: -10 Health, +15 Social, -15 Routine, +20 Effort/Risk, +25 Creativity. +1 draw.
+4. `grounded_presence.tres` - Grounded Presence: +10 Health/Social, +20 Routine, +10 Effort, -5 Risk. 1.5x with streak >= 2.
+
+**Updated starter_deck.tres** - Added all 4 cards (IDs 318-321).
+
+### Step 4: Commit
