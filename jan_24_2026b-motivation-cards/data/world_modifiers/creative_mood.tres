@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1")
-title = "Deadline Pressure"
-effort_modifier = 20
-routine_modifier = 10
-social_modifier = -15
+title = "Creative Mood"
+creativity_modifier = 20
+health_modifier = -5
+routine_modifier = -5
