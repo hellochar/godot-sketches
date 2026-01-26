@@ -442,6 +442,34 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "Keep All"
 
+[node name="ValueSelectionPanel" type="PanelContainer" parent="MainContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="ValueSelectionContent" type="VBoxContainer" parent="MainContainer/ValueSelectionPanel"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="ValueSelectionTitle" type="Label" parent="MainContainer/ValueSelectionPanel/ValueSelectionContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Choose Your Starting Value"
+horizontal_alignment = 1
+
+[node name="ValueSelectionHint" type="Label" parent="MainContainer/ValueSelectionPanel/ValueSelectionContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7)
+text = "This value determines how you earn points"
+horizontal_alignment = 1
+
+[node name="ValueSelectionContainer" type="HBoxContainer" parent="MainContainer/ValueSelectionPanel/ValueSelectionContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
 [node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
 unique_name_in_owner = true
 
