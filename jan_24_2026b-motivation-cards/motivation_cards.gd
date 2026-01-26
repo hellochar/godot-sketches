@@ -143,11 +143,13 @@ func _build_context_for_action(action) -> Dictionary:
       if card.get_modifier(tag) != 0:
         tag_counts[tag] += 1
 
+  var effective_cost := _get_effective_action_cost(action)
+
   return {
     "tag_counts": tag_counts,
     "action_tags": action.tags,
     "action_tag_count": action.tags.size(),
-    "action_cost": action.motivation_cost,
+    "action_cost": effective_cost,
     "action_title": action.title,
     "success_chance": action.success_chance,
     "succeeded_yesterday": game_state.succeeded_yesterday,
@@ -446,11 +448,26 @@ func _get_special_effect_bonus(action, context: Dictionary) -> int:
         pass
 
   if has_amplify:
+    var has_negate := false
+    var has_invert := false
+    for card in drawn_cards:
+      if card is MotivationCardRes:
+        if card.special_effect == MotivationCardRes.SpecialEffect.NEGATE_NEGATIVES:
+          has_negate = true
+        elif card.special_effect == MotivationCardRes.SpecialEffect.INVERT_NEGATIVES:
+          has_invert = true
+
     var base_motivation := 0
     for card in drawn_cards:
       if card is MotivationCardRes and card.special_effect == MotivationCardRes.SpecialEffect.AMPLIFY_ALL:
         continue
-      base_motivation += card.get_motivation_for_tags(action.tags, context)
+      var contrib: int = card.get_motivation_for_tags(action.tags, context)
+      if contrib < 0:
+        if has_invert:
+          contrib = -contrib
+        elif has_negate:
+          contrib = 0
+      base_motivation += contrib
     bonus += base_motivation
 
   return bonus
@@ -600,7 +617,7 @@ func _create_value_card_display(card) -> PanelContainer:
   generic_card.corner_radius = card_corner_radius
   generic_card.content_margin = card_margin
   generic_card.title = card.title
-  generic_card.description = _format_value_card_scores(card)
+  generic_card.description = card.get_score_description("\n")
   generic_card.description_color = success_color
 
   if has_ability:
@@ -617,23 +634,6 @@ func _create_value_card_display(card) -> PanelContainer:
   return generic_card
 
 
-func _format_value_card_scores(card) -> String:
-  var parts: Array = []
-  if card.health_score > 0:
-    parts.append("+%d Health" % card.health_score)
-  if card.social_score > 0:
-    parts.append("+%d Social" % card.social_score)
-  if card.routine_score > 0:
-    parts.append("+%d Routine" % card.routine_score)
-  if card.effort_score > 0:
-    parts.append("+%d Effort" % card.effort_score)
-  if card.risk_score > 0:
-    parts.append("+%d Risk" % card.risk_score)
-  if card.creativity_score > 0:
-    parts.append("+%d Creativity" % card.creativity_score)
-  return "\n".join(parts)
-
-
 func _activate_value_card_ability(card) -> void:
   if value_card_abilities_used.get(card.title, false):
     return
@@ -643,10 +643,9 @@ func _activate_value_card_ability(card) -> void:
 
   match card.ability_type:
     ValueCardRes.AbilityType.EXTRA_DRAW:
-      var new_cards: Array = game_state.draw_motivation_cards(card.ability_value)
+      var new_cards: Array = game_state.draw_motivation_cards(card.ability_value, drawn_cards)
       for new_card in new_cards:
-        if new_card not in drawn_cards:
-          drawn_cards.append(new_card)
+        drawn_cards.append(new_card)
     ValueCardRes.AbilityType.RESTORE_WILLPOWER:
       game_state.willpower = mini(game_state.willpower_max, game_state.willpower + card.ability_value)
       _update_top_bar()
@@ -767,9 +766,10 @@ func _get_effective_action_cost(action) -> int:
 
 func _animate_motivation_tally() -> void:
   var context := _build_context_for_action(current_action)
+  var effective_cost := _get_effective_action_cost(current_action)
   var running_total := 0
-  total_motivation_label.text = "Total Motivation: 0 / %d" % current_action.motivation_cost
-  gap_label.text = "Gap: %d" % current_action.motivation_cost
+  total_motivation_label.text = "Total Motivation: 0 / %d" % effective_cost
+  gap_label.text = "Gap: %d" % effective_cost
 
   var has_negate := false
   var has_invert := false
@@ -807,8 +807,8 @@ func _animate_motivation_tally() -> void:
       pulse_tween.tween_property(card_panel, "modulate", original_modulate, 0.2)
 
     running_total += motivation_value
-    total_motivation_label.text = "Total Motivation: %d / %d" % [running_total, current_action.motivation_cost]
-    var gap := maxi(0, current_action.motivation_cost - running_total)
+    total_motivation_label.text = "Total Motivation: %d / %d" % [running_total, effective_cost]
+    var gap := maxi(0, effective_cost - running_total)
     gap_label.text = "Gap: %d" % gap
 
     if i < drawn_cards.size() - 1:
@@ -818,8 +818,8 @@ func _animate_motivation_tally() -> void:
     var mod_value: int = current_world_modifier.get_motivation_for_tags(current_action.tags)
     if mod_value != 0:
       running_total += mod_value
-      total_motivation_label.text = "Total Motivation: %d / %d" % [running_total, current_action.motivation_cost]
-      var gap := maxi(0, current_action.motivation_cost - running_total)
+      total_motivation_label.text = "Total Motivation: %d / %d" % [running_total, effective_cost]
+      var gap := maxi(0, effective_cost - running_total)
       gap_label.text = "Gap: %d" % gap
 
   var special_bonus := _get_special_effect_bonus(current_action, context)
@@ -827,8 +827,8 @@ func _animate_motivation_tally() -> void:
   var extra_bonuses := special_bonus + momentum_bonus + value_card_bonus_motivation
   if extra_bonuses != 0:
     running_total += extra_bonuses
-    total_motivation_label.text = "Total Motivation: %d / %d" % [running_total, current_action.motivation_cost]
-    var gap := maxi(0, current_action.motivation_cost - running_total)
+    total_motivation_label.text = "Total Motivation: %d / %d" % [running_total, effective_cost]
+    var gap := maxi(0, effective_cost - running_total)
     gap_label.text = "Gap: %d" % gap
 
   var emphasis_tween := create_tween()
@@ -895,7 +895,8 @@ func _discard_card(card_index: int) -> void:
   drawn_cards.remove_at(card_index)
 
   var draw_count := 1 + _get_discard_draw_bonus()
-  var new_cards: Array = game_state.draw_motivation_cards(draw_count, drawn_cards)
+  var excluded := drawn_cards + discarded_cards_this_turn
+  var new_cards: Array = game_state.draw_motivation_cards(draw_count, excluded)
   for i in new_cards.size():
     if i == 0:
       drawn_cards.insert(card_index, new_cards[i])
@@ -1346,6 +1347,11 @@ func _show_value_selection() -> void:
   choices.shuffle()
   var selection := choices.slice(0, mini(3, choices.size()))
 
+  if selection.is_empty():
+    _start_new_turn()
+    _update_top_bar()
+    return
+
   for value_card in selection:
     var generic_card := GenericCardScene.instantiate()
     value_selection_container.add_child(generic_card)
@@ -1385,6 +1391,10 @@ func _show_value_card_reward() -> void:
       available.append(vc)
   available.shuffle()
   var selection := available.slice(0, mini(3, available.size()))
+
+  if selection.is_empty():
+    _on_continue_pressed()
+    return
 
   for value_card in selection:
     var generic_card := GenericCardScene.instantiate()
