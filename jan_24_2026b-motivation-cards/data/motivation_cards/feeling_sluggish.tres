@@ -5,4 +5,6 @@
 [resource]
 script = ExtResource("1")
 title = "Feeling sluggish"
-health_modifier = -4
+health_modifier = -10
+social_modifier = 10
+routine_modifier = 5

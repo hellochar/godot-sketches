@@ -1407,3 +1407,38 @@ Modify 4 existing negative cards to have upsides:
 - Cards with only negatives should have conditional bonuses or special effects
 
 ### Step 3: Execution
+
+**Cards Modified:**
+- `lazy_afternoon.tres` - Now: -20 Effort, +15 Routine, +10 willpower on success
+- `brain_fog.tres` - Now: -15 Effort, +10 Creativity, +5 Routine (creative when foggy)
+- `writers_block.tres` - Now: -15 Creativity, +15 Routine, +5 Effort (fall back on habits)
+- `feeling_sluggish.tres` - Now: -10 Health, +10 Social, +5 Routine (rest and connect)
+
+### Step 4: Commit
+
+Committed: (pending)
+
+---
+
+## Loop 33: Value Card Variety
+
+### Step 1: Analysis
+
+**Gap: Value Cards Lack Diversity**
+
+Many value cards have similar structures. Need more variety in scoring patterns.
+
+**Design Goals:**
+1. Add 4 more value cards with unique scoring patterns
+2. Create multi-conditional value cards
+3. Add negative scoring value cards (risk-reward)
+
+### Step 2: Implementation Plan
+
+Create 4 new value card resources:
+1. Jack of All Trades - Low bonus to all tags
+2. Specialist - High bonus to one tag, penalty to others
+3. Contrarian Values - Bonus for tags other cards penalize
+4. Balanced Life - Bonus for actions with 2+ tags
+
+### Step 3: Execution

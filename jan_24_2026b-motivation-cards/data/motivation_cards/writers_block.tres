@@ -5,4 +5,6 @@
 [resource]
 script = ExtResource("1")
 title = "Writer's block"
-creativity_modifier = -4
+creativity_modifier = -15
+routine_modifier = 15
+effort_modifier = 5
