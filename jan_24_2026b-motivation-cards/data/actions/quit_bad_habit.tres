@@ -1,10 +1,13 @@
-[gd_resource type="Resource" script_class="ActionResource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ActionResource" load_steps=4 format=3 uid="uid://be124wqfxd6y5"]
 
-[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://d0jysd6hdr7j3" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
+[ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/motivation_cards/clean_living.tres" id="2"]
+[ext_resource type="Resource" uid="uid://dkuorfmdldkq4" path="res://jan_24_2026b-motivation-cards/data/motivation_cards/in_the_zone.tres" id="3"]
 
 [resource]
 script = ExtResource("1")
 title = "Quit a Bad Habit"
 motivation_cost = 200
-tags = [0, 3, 4]
+tags = Array[int]([0, 3, 4])
 success_chance = 0.2
+cards_on_success = Array[Resource]([ExtResource("2"), ExtResource("3")])

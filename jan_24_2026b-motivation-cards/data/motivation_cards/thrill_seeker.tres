@@ -1,9 +1,12 @@
-[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3 uid="uid://dcwvg70qt5u3e"]
 
-[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://4tef4320mo68" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
 title = "Thrill seeker"
-risk_modifier = 25
 routine_modifier = -4
+risk_modifier = 25
+condition_type = 1
+condition_tag = 4
+condition_threshold = 2

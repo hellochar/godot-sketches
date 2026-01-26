@@ -1,10 +1,13 @@
-[gd_resource type="Resource" script_class="ActionResource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ActionResource" load_steps=4 format=3 uid="uid://bxgi0ooyuwkx8"]
 
-[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://d0jysd6hdr7j3" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
+[ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/motivation_cards/ambitious_drive.tres" id="2"]
+[ext_resource type="Resource" uid="uid://dl545uqr13kyj" path="res://jan_24_2026b-motivation-cards/data/motivation_cards/tunnel_vision.tres" id="3"]
 
 [resource]
 script = ExtResource("1")
 title = "Start a Side Business"
 motivation_cost = 250
-tags = [4, 3, 5]
+tags = Array[int]([4, 3, 5])
 success_chance = 0.25
+cards_on_success = Array[Resource]([ExtResource("2"), ExtResource("3")])

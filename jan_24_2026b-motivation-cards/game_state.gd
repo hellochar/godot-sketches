@@ -13,6 +13,11 @@ var current_day: int = 1
 var available_actions: Array = []
 var world_modifiers: Array = []
 
+var success_streak: int = 0
+var attempted_actions: Array[String] = []
+var extra_draws_next_turn: int = 0
+var succeeded_yesterday: bool = false
+
 
 func _init() -> void:
   pass
