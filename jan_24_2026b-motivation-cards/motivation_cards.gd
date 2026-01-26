@@ -65,6 +65,7 @@ const GenericCardScene = preload("res://common/generic_card.tscn")
 @onready var momentum_label: Label = %MomentumLabel
 @onready var streak_label: Label = %StreakLabel
 @onready var bonus_tag_label: Label = %BonusTagLabel
+@onready var deck_info_label: Label = %DeckInfoLabel
 @onready var willpower_bar: ProgressBar = %WillpowerBar
 @onready var willpower_label: Label = %WillpowerLabel
 
@@ -256,6 +257,7 @@ func _update_top_bar() -> void:
     bonus_tag_label.text = "Bonus: %s (+%d)" % [tag_name, game_state.DAILY_BONUS_SCORE]
   else:
     bonus_tag_label.text = ""
+  deck_info_label.text = "Deck: %d" % game_state.motivation_deck.size()
   willpower_bar.max_value = game_state.willpower_max
   willpower_bar.value = game_state.willpower
   willpower_label.text = "%d/%d" % [game_state.willpower, game_state.willpower_max]

@@ -742,3 +742,35 @@ With 35+ actions, the action grid is overwhelming. Players struggle to find rele
   - Actions with daily bonus tag are visually highlighted and grouped first
 
 ### Step 4: Commit
+
+Committed: `de0f826` - "Sort actions by bonus tag and category with visual highlighting"
+
+---
+
+## Loop 15: Deck Info Display
+
+### Step 1: Analysis
+
+**Gap: Deck Is Invisible**
+
+Players can't see their deck composition. They don't know how many cards they have or what archetypes are represented.
+
+**Design Goals:**
+1. Show deck size in UI
+2. Display tag distribution as mini bar chart
+3. Let players understand their deck's identity
+
+### Step 2: Implementation Plan
+
+1. Add DeckInfoLabel to TopBar showing deck size
+2. Calculate tag distribution from motivation_deck
+3. Show as "Deck: 65 (H:12 S:8 R:15 E:10 Ri:8 C:12)"
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `motivation_cards.tscn` - Added DeckInfoLabel to TopBar with gray color
+- `motivation_cards.gd` - Added @onready for deck_info_label, updated _update_top_bar to show deck size
+
+### Step 4: Commit
