@@ -3522,3 +3522,37 @@ Need world modifiers representing digital and technology states.
 **Updated starter_deck.tres** - Added all 4 world modifiers (IDs 430-433).
 
 ### Step 4: Commit
+
+Committed: `c5a4911` - "Loop 92: Add technology world modifiers"
+
+---
+
+## Loop 93: Creative Value Cards
+
+### Step 1: Analysis
+
+**Gap: Creative/Artistic Personality Types**
+
+Need more varied creative personality value cards.
+
+**Design Goals:**
+1. Different creative approaches
+2. Range from tortured artist to casual hobbyist
+3. Varied ability types
+
+### Step 2: Implementation Plan
+
+1. Create 4 creative themed value cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Creative Value Cards Created:**
+1. `tortured_artist.tres` - Tortured Artist: +2 Effort, +3 Risk, +5 Creativity. Extra 2 draws ability.
+2. `craftsperson.tres` - Craftsperson: +1 Health, +3 Routine, +3 Effort, +2 Creativity. +10 bonus motivation ability.
+3. `performing_artist.tres` - Performing Artist: +1 Health, +3 Social, +1 Routine, +1 Effort, +2 Risk, +3 Creativity. Double next score ability.
+4. `hobbyist.tres` - Hobbyist: +2 Health, +1 Social, +2 Routine, +1 Effort, +2 Creativity. Restore 10 willpower ability.
+
+**Updated starter_deck.tres** - Added all 4 value cards (IDs 434-437).
+
+### Step 4: Commit
