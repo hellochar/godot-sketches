@@ -347,6 +347,9 @@ func _create_action_button(action) -> PanelContainer:
     generic_card.set_corner_text(generic_card.Corner.TOP_LEFT, stars, Color(1.0, 0.85, 0.3))
   if action.title in game_state.failed_actions:
     generic_card.add_content_label("Failed before", 10, failure_color)
+  var momentum_bonus: int = game_state.momentum * game_state.MOMENTUM_BONUS_PER
+  if momentum_bonus >= 10:
+    generic_card.add_content_label("Momentum +%d" % momentum_bonus, 10, Color(0.9, 0.8, 0.5))
   if willpower_needed > 0:
     generic_card.set_corner_text(generic_card.Corner.BOTTOM_LEFT, "%d willpower" % willpower_needed)
   if action.success_chance < 1.0:

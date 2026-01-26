@@ -1036,3 +1036,36 @@ Create 5 new action resources:
 **Updated starter_deck.tres** - Added all 5 actions.
 
 ### Step 4: Commit
+
+Committed: `a12dedf` - "Add 5 easy low-cost actions for new players"
+
+---
+
+## Loop 23: Momentum Display Enhancement
+
+### Step 1: Analysis
+
+**Gap: Momentum Benefits Unclear**
+
+Momentum exists but players don't see how it affects their actions. The bonus is hidden.
+
+**Design Goals:**
+1. Show momentum bonus on action cards
+2. Make momentum feel more impactful
+3. Clarify resource relationships
+
+### Step 2: Implementation Plan
+
+1. Display momentum bonus on each action button
+2. Add visual indicator when momentum is high
+3. Show momentum effect in motivation phase
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `motivation_cards.gd`:
+  - Added momentum bonus display on action buttons when bonus >= 10
+  - Shows "Momentum +X" in gold color when momentum is significant
+
+### Step 4: Commit
