@@ -143,8 +143,12 @@ func _create_world_modifiers() -> void:
   ]
 
 
-func draw_motivation_cards(count: int) -> Array:
+func draw_motivation_cards(count: int, excluded: Array = []) -> Array:
   var deck_copy := motivation_deck.duplicate()
+  for card in excluded:
+    var idx := deck_copy.find(card)
+    if idx >= 0:
+      deck_copy.remove_at(idx)
   deck_copy.shuffle()
   var drawn: Array = []
   for i in mini(count, deck_copy.size()):
