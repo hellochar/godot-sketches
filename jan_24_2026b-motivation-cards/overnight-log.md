@@ -1901,4 +1901,39 @@ Need more actions with balanced risk/reward profiles (60-80% success).
 
 ### Step 4: Commit
 
+Committed: `4235d62` - "Loop 45: Add balanced mid-range actions"
+
+---
+
+## Loop 46: Willpower Management Cards
+
+### Step 1: Analysis
+
+**Gap: Limited Willpower Strategy**
+
+Few cards interact with willpower as a strategic resource.
+
+**Design Goals:**
+1. Create cards that restore willpower
+2. Create cards with willpower-based conditions
+3. Enable willpower-focused strategies
+
+### Step 2: Implementation Plan
+
+1. Create 4 willpower-themed motivation cards
+2. Use RESTORE_WILLPOWER_ON_SUCCESS and LOW_WILLPOWER condition
+3. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Willpower Cards Created:**
+1. `energy_efficient.tres` - +10 Health/Routine, restore 10 willpower on success
+2. `desperate_strength.tres` - +15 Effort, +10 Risk, 2x if willpower <= 30
+3. `willpower_surge.tres` - +5 Effort/Creativity, restore 15 willpower on success
+4. `last_push.tres` - +10 Health, +20 Effort, 2.5x if willpower <= 20
+
+**Updated starter_deck.tres** - Added all 4 motivation cards (IDs 246-249).
+
+### Step 4: Commit
+
 Committed: (pending)
