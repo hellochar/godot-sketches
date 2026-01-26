@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Routine Breaker"
+routine_modifier = -10
+risk_modifier = 25
+creativity_modifier = 15
+special_effect = 3
+special_value = 25
