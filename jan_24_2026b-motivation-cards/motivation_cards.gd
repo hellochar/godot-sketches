@@ -62,6 +62,7 @@ const GenericCardScene = preload("res://common/generic_card.tscn")
 
 @onready var day_label: Label = %DayLabel
 @onready var score_label: Label = %ScoreLabel
+@onready var momentum_label: Label = %MomentumLabel
 @onready var willpower_bar: ProgressBar = %WillpowerBar
 @onready var willpower_label: Label = %WillpowerLabel
 
@@ -242,6 +243,11 @@ func _setup_card_feedback(card: Control) -> void:
 func _update_top_bar() -> void:
   day_label.text = "Day %d of %d" % [game_state.current_day, max_days]
   score_label.text = "Score: %d" % game_state.score
+  var momentum_bonus: int = game_state.momentum * game_state.MOMENTUM_BONUS_PER
+  if momentum_bonus > 0:
+    momentum_label.text = "Momentum: %d (+%d)" % [game_state.momentum, momentum_bonus]
+  else:
+    momentum_label.text = "Momentum: %d" % game_state.momentum
   willpower_bar.max_value = game_state.willpower_max
   willpower_bar.value = game_state.willpower
   willpower_label.text = "%d/%d" % [game_state.willpower, game_state.willpower_max]
@@ -343,6 +349,7 @@ func _get_motivation_for_action(action) -> int:
     motivation += current_world_modifier.get_motivation_for_tags(action.tags)
   motivation += _get_special_effect_bonus(action, context)
   motivation += value_card_bonus_motivation
+  motivation += game_state.momentum * game_state.MOMENTUM_BONUS_PER
   return motivation
 
 
@@ -453,6 +460,7 @@ func _start_new_turn() -> void:
   value_card_bonus_motivation = 0
   if (game_state.current_day - 1) % 7 == 0:
     value_card_abilities_used.clear()
+    game_state.momentum = 0
   if randf() < world_modifier_chance:
     current_world_modifier = game_state.get_random_world_modifier()
   else:
@@ -961,6 +969,7 @@ func _show_result(success: bool) -> void:
     game_state.succeeded_yesterday = true
     game_state.total_successes_this_week += 1
     game_state.last_successful_action_title = current_action.title
+    game_state.momentum = mini(game_state.MOMENTUM_MAX, game_state.momentum + 1)
     last_action_succeeded = true
 
     for value_card in game_state.value_cards:
@@ -993,6 +1002,7 @@ func _show_result(success: bool) -> void:
   else:
     game_state.success_streak = 0
     game_state.succeeded_yesterday = false
+    game_state.momentum = maxi(0, game_state.momentum - 1)
     last_action_succeeded = false
 
     willpower_restored = _handle_failure_special_effects()
