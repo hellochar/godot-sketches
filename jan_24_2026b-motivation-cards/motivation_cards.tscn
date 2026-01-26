@@ -1,11 +1,14 @@
-[gd_scene load_steps=7 format=3 uid="uid://djdbsow0rg5ol"]
+[gd_scene load_steps=10 format=3 uid="uid://djdbsow0rg5ol"]
 
 [ext_resource type="Script" uid="uid://cvxkgmerrohu7" path="res://jan_24_2026b-motivation-cards/motivation_cards.gd" id="1_main"]
 [ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/starter_deck.tres" id="2_deck"]
-[ext_resource type="AudioStream" path="res://jan_24_2026b-motivation-cards/audio/card_reveal.wav" id="3_card_reveal"]
-[ext_resource type="AudioStream" path="res://jan_24_2026b-motivation-cards/audio/attempt.wav" id="4_attempt"]
-[ext_resource type="AudioStream" path="res://jan_24_2026b-motivation-cards/audio/success.wav" id="5_success"]
-[ext_resource type="AudioStream" path="res://jan_24_2026b-motivation-cards/audio/failure.wav" id="6_failure"]
+[ext_resource type="AudioStream" uid="uid://wt3kecoqg2ek" path="res://jan_24_2026b-motivation-cards/audio/card_reveal.wav" id="3_card_reveal"]
+[ext_resource type="AudioStream" uid="uid://csuk2adojlboi" path="res://jan_24_2026b-motivation-cards/audio/attempt.wav" id="4_attempt"]
+[ext_resource type="AudioStream" uid="uid://cgplsurhcdhde" path="res://jan_24_2026b-motivation-cards/audio/success.wav" id="5_success"]
+[ext_resource type="AudioStream" uid="uid://dut5t5tjp58tf" path="res://jan_24_2026b-motivation-cards/audio/failure.wav" id="6_failure"]
+[ext_resource type="AudioStream" uid="uid://m88ewlmxem5r" path="res://assets/inteface_sfx_pack_1_wav/Wav/Cursor_tones/cursor_style_1.wav" id="7_click"]
+[ext_resource type="AudioStream" uid="uid://dp7vryecobp2e" path="res://assets/inteface_sfx_pack_1_wav/Wav/Confirm_tones/style1/confirm_style_1_001.wav" id="8_deck_add"]
+[ext_resource type="AudioStream" uid="uid://h72lh8rx27op" path="res://assets/inteface_sfx_pack_1_wav/Wav/Error_tones/style2/error_style_2_001.wav" id="9_willpower_low"]
 
 [node name="MotivationCards" type="Control"]
 layout_mode = 3
@@ -22,6 +25,9 @@ card_reveal_sound = ExtResource("3_card_reveal")
 attempt_sound = ExtResource("4_attempt")
 success_sound = ExtResource("5_success")
 failure_sound = ExtResource("6_failure")
+click_sound = ExtResource("7_click")
+deck_add_sound = ExtResource("8_deck_add")
+willpower_low_sound = ExtResource("9_willpower_low")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
@@ -93,6 +99,22 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 15
+
+[node name="ValuesSection" type="VBoxContainer" parent="MainContainer/ActionSelectionScreen"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ValuesTitle" type="Label" parent="MainContainer/ActionSelectionScreen/ValuesSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Your Values"
+horizontal_alignment = 1
+
+[node name="ValuesCardsContainer" type="HBoxContainer" parent="MainContainer/ActionSelectionScreen/ValuesSection"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
 
 [node name="MoodSection" type="VBoxContainer" parent="MainContainer/ActionSelectionScreen"]
 layout_mode = 2
@@ -264,6 +286,12 @@ theme_override_font_sizes/font_size = 18
 text = "You gained 25 points!"
 horizontal_alignment = 1
 
+[node name="CardsAddedContainer" type="HBoxContainer" parent="MainContainer/ResultPanel/ResultContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
 [node name="ContinueButton" type="Button" parent="MainContainer/ResultPanel/ResultContent"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 40)
@@ -311,3 +339,15 @@ text = "Play Again"
 
 [node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
 unique_name_in_owner = true
+
+[node name="ScreenOverlay" type="ColorRect" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.5)

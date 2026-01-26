@@ -38,6 +38,23 @@ const StarterDeckResourceScript = preload("res://jan_24_2026b-motivation-cards/s
 @export var attempt_sound: AudioStream
 @export var success_sound: AudioStream
 @export var failure_sound: AudioStream
+@export var click_sound: AudioStream
+@export var deck_add_sound: AudioStream
+@export var willpower_low_sound: AudioStream
+
+@export_group("Feedback")
+@export var button_press_scale: float = 0.95
+@export var button_hover_scale: float = 1.03
+@export var pitch_variance: float = 0.1
+@export var volume_variance_db: float = 2.0
+@export var shake_amplitude: float = 8.0
+@export var shake_duration: float = 0.2
+@export var willpower_drain_duration: float = 0.4
+@export var result_pause_duration: float = 0.2
+@export var tally_card_delay: float = 0.15
+@export var tally_card_reveal_time: float = 0.2
+@export var transition_duration: float = 0.15
+@export var low_willpower_threshold: float = 0.2
 
 @onready var day_label: Label = %DayLabel
 @onready var score_label: Label = %ScoreLabel
@@ -48,6 +65,7 @@ const StarterDeckResourceScript = preload("res://jan_24_2026b-motivation-cards/s
 @onready var action_grid: GridContainer = %ActionGrid
 @onready var mood_cards_container: HBoxContainer = %MoodCardsContainer
 @onready var mood_world_label: Label = %MoodWorldLabel
+@onready var values_cards_container: HBoxContainer = %ValuesCardsContainer
 
 @onready var motivation_phase_screen: VBoxContainer = %MotivationPhaseScreen
 @onready var action_title: Label = %ActionTitle
@@ -65,6 +83,7 @@ const StarterDeckResourceScript = preload("res://jan_24_2026b-motivation-cards/s
 @onready var result_panel: PanelContainer = %ResultPanel
 @onready var result_title: Label = %ResultTitle
 @onready var result_details: Label = %ResultDetails
+@onready var cards_added_container: HBoxContainer = %CardsAddedContainer
 @onready var continue_button: Button = %ContinueButton
 
 @onready var end_game_panel: PanelContainer = %EndGamePanel
@@ -73,6 +92,8 @@ const StarterDeckResourceScript = preload("res://jan_24_2026b-motivation-cards/s
 @onready var actions_summary: Label = %ActionsSummary
 @onready var play_again_button: Button = %PlayAgainButton
 @onready var audio_player: AudioStreamPlayer = %AudioPlayer
+@onready var screen_overlay: ColorRect = %ScreenOverlay
+@onready var main_container: VBoxContainer = $MainContainer
 
 var game_state
 var current_action
@@ -100,11 +121,48 @@ func _connect_signals() -> void:
   continue_button.pressed.connect(_on_continue_pressed)
   play_again_button.pressed.connect(_on_play_again_pressed)
 
+  _setup_button_feedback(back_button)
+  _setup_button_feedback(attempt_button)
+  _setup_button_feedback(continue_button)
+  _setup_button_feedback(play_again_button)
 
-func _play_sound(sound: AudioStream) -> void:
+
+func _play_sound(sound: AudioStream, vary: bool = true) -> void:
   if sound and audio_player:
     audio_player.stream = sound
+    if vary:
+      audio_player.pitch_scale = randf_range(1.0 - pitch_variance, 1.0 + pitch_variance)
+      audio_player.volume_db = randf_range(-volume_variance_db, 0.0)
+    else:
+      audio_player.pitch_scale = 1.0
+      audio_player.volume_db = 0.0
     audio_player.play()
+
+
+func _setup_button_feedback(btn: Button) -> void:
+  btn.pivot_offset = btn.size / 2
+  btn.button_down.connect(func() -> void:
+    _play_sound(click_sound)
+    var tween := create_tween()
+    tween.tween_property(btn, "scale", Vector2.ONE * button_press_scale, 0.05)
+  )
+  btn.button_up.connect(func() -> void:
+    var tween := create_tween()
+    tween.tween_property(btn, "scale", Vector2.ONE, 0.1).set_ease(Tween.EASE_OUT)
+  )
+  btn.mouse_entered.connect(func() -> void:
+    if not btn.disabled:
+      btn.pivot_offset = btn.size / 2
+      var tween := create_tween()
+      tween.tween_property(btn, "scale", Vector2.ONE * button_hover_scale, 0.1).set_ease(Tween.EASE_OUT)
+  )
+  btn.mouse_exited.connect(func() -> void:
+    var tween := create_tween()
+    tween.tween_property(btn, "scale", Vector2.ONE, 0.1).set_ease(Tween.EASE_OUT)
+  )
+  btn.resized.connect(func() -> void:
+    btn.pivot_offset = btn.size / 2
+  )
 
 
 func _update_top_bar() -> void:
@@ -114,14 +172,26 @@ func _update_top_bar() -> void:
   willpower_bar.value = game_state.willpower
   willpower_label.text = "%d/%d" % [game_state.willpower, game_state.willpower_max]
 
+  var low_threshold: float = game_state.willpower_max * low_willpower_threshold
+  if game_state.willpower <= low_threshold:
+    willpower_label.add_theme_color_override("font_color", failure_color)
+    willpower_bar.modulate = Color(1.2, 0.8, 0.8)
+  else:
+    willpower_label.remove_theme_color_override("font_color")
+    willpower_bar.modulate = Color.WHITE
+
 
 func _show_action_selection() -> void:
-  action_selection_screen.visible = true
-  motivation_phase_screen.visible = false
-  result_panel.visible = false
+  if motivation_phase_screen.visible:
+    await _fade_out(motivation_phase_screen)
+  if result_panel.visible:
+    await _fade_out(result_panel)
+
   _populate_action_grid()
+  _display_value_cards()
   _display_mood_cards()
   _display_mood_world_modifier()
+  await _fade_in(action_selection_screen)
 
 
 func _populate_action_grid() -> void:
@@ -176,6 +246,7 @@ func _create_action_button(action) -> Button:
   else:
     btn.text = "%s\n%s | %d%%\n%s" % [action.title, willpower_str, int(action.success_chance * 100), tags_str]
   btn.pressed.connect(func() -> void: _select_action(action))
+  _setup_button_feedback(btn)
   return btn
 
 
@@ -197,13 +268,14 @@ func _format_tags(tags: Array) -> String:
 
 func _select_action(action) -> void:
   current_action = action
-  _show_motivation_phase()
+  await _show_motivation_phase()
 
 
 func _show_motivation_phase() -> void:
-  action_selection_screen.visible = false
-  motivation_phase_screen.visible = true
-  result_panel.visible = false
+  await _fade_out(action_selection_screen)
+
+  attempt_button.disabled = true
+  back_button.disabled = true
 
   action_title.text = current_action.title
   cost_label.text = "Cost: %d" % current_action.motivation_cost
@@ -215,8 +287,13 @@ func _show_motivation_phase() -> void:
   _populate_tags()
   _display_drawn_cards()
   _display_world_modifier()
+
+  await _fade_in(motivation_phase_screen)
+  await _animate_motivation_tally()
+
   _calculate_motivation()
   _update_willpower_display()
+  back_button.disabled = false
 
 
 func _start_new_turn() -> void:
@@ -289,6 +366,67 @@ func _display_mood_world_modifier() -> void:
     mood_world_label.text = ""
 
 
+func _display_value_cards() -> void:
+  for child in values_cards_container.get_children():
+    child.queue_free()
+
+  for value_card in game_state.value_cards:
+    var card_panel := _create_value_card_display(value_card)
+    values_cards_container.add_child(card_panel)
+
+
+func _create_value_card_display(card) -> PanelContainer:
+  var panel := PanelContainer.new()
+  panel.custom_minimum_size = motivation_card_size
+
+  var style := StyleBoxFlat.new()
+  style.bg_color = Color(0.25, 0.35, 0.45)
+  style.corner_radius_top_left = card_corner_radius
+  style.corner_radius_top_right = card_corner_radius
+  style.corner_radius_bottom_left = card_corner_radius
+  style.corner_radius_bottom_right = card_corner_radius
+  style.content_margin_left = card_margin
+  style.content_margin_right = card_margin
+  style.content_margin_top = card_margin
+  style.content_margin_bottom = card_margin
+  panel.add_theme_stylebox_override("panel", style)
+
+  var vbox := VBoxContainer.new()
+  vbox.add_theme_constant_override("separation", 4)
+
+  var title_label := Label.new()
+  title_label.text = card.title
+  title_label.add_theme_font_size_override("font_size", 14)
+  title_label.autowrap_mode = TextServer.AUTOWRAP_WORD
+  vbox.add_child(title_label)
+
+  var scores_label := Label.new()
+  scores_label.text = _format_value_card_scores(card)
+  scores_label.add_theme_font_size_override("font_size", 12)
+  scores_label.add_theme_color_override("font_color", success_color)
+  vbox.add_child(scores_label)
+
+  panel.add_child(vbox)
+  return panel
+
+
+func _format_value_card_scores(card) -> String:
+  var parts: Array = []
+  if card.health_score > 0:
+    parts.append("+%d Health" % card.health_score)
+  if card.social_score > 0:
+    parts.append("+%d Social" % card.social_score)
+  if card.routine_score > 0:
+    parts.append("+%d Routine" % card.routine_score)
+  if card.effort_score > 0:
+    parts.append("+%d Effort" % card.effort_score)
+  if card.risk_score > 0:
+    parts.append("+%d Risk" % card.risk_score)
+  if card.creativity_score > 0:
+    parts.append("+%d Creativity" % card.creativity_score)
+  return "\n".join(parts)
+
+
 func _populate_tags() -> void:
   for child in tags_container.get_children():
     child.queue_free()
@@ -320,6 +458,9 @@ func _display_drawn_cards() -> void:
 
   for card in drawn_cards:
     var card_panel := _create_motivation_card_display(card)
+    card_panel.pivot_offset = motivation_card_size / 2
+    card_panel.scale = Vector2.ZERO
+    card_panel.modulate.a = 0.0
     drawn_cards_container.add_child(card_panel)
 
 
@@ -401,6 +542,54 @@ func _calculate_motivation() -> void:
   gap_label.text = "Gap: %d" % gap
 
 
+func _animate_motivation_tally() -> void:
+  var running_total := 0
+  total_motivation_label.text = "Total Motivation: 0 / %d" % current_action.motivation_cost
+  gap_label.text = "Gap: %d" % current_action.motivation_cost
+
+  var card_panels := drawn_cards_container.get_children()
+  for i in range(drawn_cards.size()):
+    var card = drawn_cards[i]
+    var card_panel: PanelContainer = card_panels[i]
+    var motivation_value: int = card.get_motivation_for_tags(current_action.tags)
+
+    var tween := create_tween()
+    tween.set_parallel(true)
+    tween.tween_property(card_panel, "scale", Vector2.ONE, tally_card_reveal_time).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+    tween.tween_property(card_panel, "modulate:a", 1.0, tally_card_reveal_time * 0.75)
+    _play_sound(card_reveal_sound)
+
+    await tween.finished
+
+    if motivation_value != 0:
+      var pulse_color := success_color if motivation_value > 0 else failure_color
+      var original_modulate := card_panel.modulate
+      card_panel.modulate = pulse_color
+      var pulse_tween := create_tween()
+      pulse_tween.tween_property(card_panel, "modulate", original_modulate, 0.2)
+
+    running_total += motivation_value
+    total_motivation_label.text = "Total Motivation: %d / %d" % [running_total, current_action.motivation_cost]
+    var gap := maxi(0, current_action.motivation_cost - running_total)
+    gap_label.text = "Gap: %d" % gap
+
+    if i < drawn_cards.size() - 1:
+      await get_tree().create_timer(tally_card_delay * 0.5).timeout
+
+  if current_world_modifier:
+    var mod_value: int = current_world_modifier.get_motivation_for_tags(current_action.tags)
+    if mod_value != 0:
+      running_total += mod_value
+      total_motivation_label.text = "Total Motivation: %d / %d" % [running_total, current_action.motivation_cost]
+      var gap := maxi(0, current_action.motivation_cost - running_total)
+      gap_label.text = "Gap: %d" % gap
+
+  var emphasis_tween := create_tween()
+  total_motivation_label.pivot_offset = total_motivation_label.size / 2
+  emphasis_tween.tween_property(total_motivation_label, "scale", Vector2.ONE * 1.15, 0.1)
+  emphasis_tween.tween_property(total_motivation_label, "scale", Vector2.ONE, 0.15).set_ease(Tween.EASE_OUT)
+
+
 func _update_willpower_display() -> void:
   var gap := maxi(0, current_action.motivation_cost - total_motivation)
   var willpower_needed := mini(gap, game_state.willpower)
@@ -423,22 +612,113 @@ func _on_back_pressed() -> void:
 
 func _on_attempt_pressed() -> void:
   _play_sound(attempt_sound)
+  attempt_button.disabled = true
+  back_button.disabled = true
+
   var gap := maxi(0, current_action.motivation_cost - total_motivation)
   var willpower_spent := mini(gap, game_state.willpower)
+
+  screen_overlay.color = Color(0, 0, 0, 0)
+  screen_overlay.visible = true
+  var dim_tween := create_tween()
+  dim_tween.tween_property(screen_overlay, "color:a", 0.3, 0.15)
+
+  if willpower_spent > 0:
+    var start_willpower: int = game_state.willpower
+    var end_willpower: int = start_willpower - willpower_spent
+    var low_threshold: float = game_state.willpower_max * low_willpower_threshold
+    var crossed_low_threshold := start_willpower > low_threshold and end_willpower <= low_threshold
+    var already_low := start_willpower <= low_threshold
+    var warning_color := failure_color
+
+    var drain_tween := create_tween()
+    drain_tween.tween_method(func(val: float) -> void:
+      willpower_bar.value = val
+      willpower_label.text = "%d/%d" % [int(val), game_state.willpower_max]
+      if val <= low_threshold:
+        willpower_label.add_theme_color_override("font_color", warning_color)
+      else:
+        willpower_label.remove_theme_color_override("font_color")
+    , float(start_willpower), float(end_willpower), willpower_drain_duration)
+
+    if crossed_low_threshold or already_low:
+      var pulse_tween := create_tween()
+      pulse_tween.set_loops(3)
+      pulse_tween.tween_property(willpower_bar, "modulate", Color(1.5, 0.5, 0.5), 0.1)
+      pulse_tween.tween_property(willpower_bar, "modulate", Color.WHITE, 0.1)
+
+    await drain_tween.finished
+
+    if crossed_low_threshold:
+      _play_sound(willpower_low_sound)
+
+    willpower_bar.modulate = Color.WHITE
+    willpower_label.remove_theme_color_override("font_color")
+
   game_state.spend_willpower(willpower_spent)
   willpower_spent_today += willpower_spent
   actions_taken.append(current_action.title)
 
+  await get_tree().create_timer(result_pause_duration).timeout
+
   var success: bool = randf() < current_action.success_chance
+
+  if success:
+    await _flash_screen(Color.WHITE, 0.08)
+  else:
+    await _shake_screen()
+
+  screen_overlay.visible = false
   _show_result(success)
 
 
+func _flash_screen(flash_color: Color, duration: float) -> void:
+  screen_overlay.color = flash_color
+  var tween := create_tween()
+  tween.tween_property(screen_overlay, "color:a", 0.0, duration)
+  await tween.finished
+
+
+func _shake_screen() -> void:
+  var original_pos := main_container.position
+  var elapsed := 0.0
+  while elapsed < shake_duration:
+    var offset := Vector2(
+      randf_range(-shake_amplitude, shake_amplitude),
+      randf_range(-shake_amplitude, shake_amplitude)
+    )
+    main_container.position = original_pos + offset
+    await get_tree().process_frame
+    elapsed += get_process_delta_time()
+  main_container.position = original_pos
+
+
+func _fade_out(node: Control) -> void:
+  if not node.visible:
+    return
+  var tween := create_tween()
+  tween.tween_property(node, "modulate:a", 0.0, transition_duration)
+  await tween.finished
+  node.visible = false
+  node.modulate.a = 1.0
+
+
+func _fade_in(node: Control) -> void:
+  node.modulate.a = 0.0
+  node.visible = true
+  var tween := create_tween()
+  tween.tween_property(node, "modulate:a", 1.0, transition_duration)
+  await tween.finished
+
+
 func _show_result(success: bool) -> void:
-  motivation_phase_screen.visible = false
-  result_panel.visible = true
+  await _fade_out(motivation_phase_screen)
+
+  for child in cards_added_container.get_children():
+    child.queue_free()
 
   var score_gained := 0
-  var cards_added := 0
+  var cards_to_add: Array = []
   if success:
     for value_card in game_state.value_cards:
       score_gained += value_card.get_score_for_tags(current_action.tags)
@@ -446,7 +726,7 @@ func _show_result(success: bool) -> void:
 
     for card in current_action.cards_on_success:
       game_state.add_motivation_card(card)
-      cards_added += 1
+      cards_to_add.append(card)
 
     result_title.text = "Success!"
     result_title.add_theme_color_override("font_color", success_color)
@@ -454,9 +734,7 @@ func _show_result(success: bool) -> void:
     var details_parts: Array = []
     if score_gained > 0:
       details_parts.append("You gained %d points!" % score_gained)
-    if cards_added > 0:
-      details_parts.append("Added %d card(s) to your motivation deck." % cards_added)
-    if details_parts.is_empty():
+    if details_parts.is_empty() and cards_to_add.is_empty():
       result_details.text = "Action completed, but it didn't align with your values."
     else:
       result_details.text = "\n".join(details_parts)
@@ -466,7 +744,67 @@ func _show_result(success: bool) -> void:
     _play_sound(failure_sound)
     result_details.text = "The action didn't succeed this time.\nBetter luck next time."
 
+  await _fade_in(result_panel)
+
+  if not cards_to_add.is_empty():
+    await _animate_cards_added(cards_to_add)
+
   _update_top_bar()
+
+
+func _animate_cards_added(cards: Array) -> void:
+  for i in range(cards.size()):
+    var card = cards[i]
+    var card_panel := _create_deck_add_card_display(card)
+    card_panel.pivot_offset = motivation_card_size / 2
+    card_panel.scale = Vector2.ZERO
+    card_panel.modulate.a = 0.0
+    cards_added_container.add_child(card_panel)
+
+    _play_sound(deck_add_sound)
+    var tween := create_tween()
+    tween.set_parallel(true)
+    tween.tween_property(card_panel, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+    tween.tween_property(card_panel, "modulate:a", 1.0, 0.2)
+    await tween.finished
+
+    if i < cards.size() - 1:
+      await get_tree().create_timer(0.1).timeout
+
+
+func _create_deck_add_card_display(card) -> PanelContainer:
+  var panel := PanelContainer.new()
+  panel.custom_minimum_size = motivation_card_size * 0.8
+
+  var style := StyleBoxFlat.new()
+  style.bg_color = positive_card_color
+  style.corner_radius_top_left = card_corner_radius
+  style.corner_radius_top_right = card_corner_radius
+  style.corner_radius_bottom_left = card_corner_radius
+  style.corner_radius_bottom_right = card_corner_radius
+  style.content_margin_left = card_margin
+  style.content_margin_right = card_margin
+  style.content_margin_top = card_margin
+  style.content_margin_bottom = card_margin
+  panel.add_theme_stylebox_override("panel", style)
+
+  var vbox := VBoxContainer.new()
+  vbox.add_theme_constant_override("separation", 4)
+
+  var added_label := Label.new()
+  added_label.text = "+ Added"
+  added_label.add_theme_font_size_override("font_size", 12)
+  added_label.add_theme_color_override("font_color", success_color)
+  vbox.add_child(added_label)
+
+  var title_label := Label.new()
+  title_label.text = card.title
+  title_label.add_theme_font_size_override("font_size", 14)
+  title_label.autowrap_mode = TextServer.AUTOWRAP_WORD
+  vbox.add_child(title_label)
+
+  panel.add_child(vbox)
+  return panel
 
 
 func _on_continue_pressed() -> void:
@@ -485,10 +823,12 @@ func _on_continue_pressed() -> void:
 
 
 func _show_end_screen() -> void:
-  action_selection_screen.visible = false
-  motivation_phase_screen.visible = false
-  result_panel.visible = false
-  end_game_panel.visible = true
+  if action_selection_screen.visible:
+    await _fade_out(action_selection_screen)
+  if motivation_phase_screen.visible:
+    await _fade_out(motivation_phase_screen)
+  if result_panel.visible:
+    await _fade_out(result_panel)
 
   end_title.text = "Week Complete!"
   final_score_label.text = "Final Score: %d" % game_state.score
@@ -498,8 +838,12 @@ func _show_end_screen() -> void:
   else:
     actions_summary.text = "Actions taken:\n" + "\n".join(actions_taken)
 
+  await _fade_in(end_game_panel)
+
 
 func _on_play_again_pressed() -> void:
+  await _fade_out(end_game_panel)
+
   game_state = GameState.new()
   if starter_deck:
     game_state.load_from_deck(starter_deck)
@@ -507,6 +851,5 @@ func _on_play_again_pressed() -> void:
   game_state.willpower_max = starting_willpower
   actions_taken.clear()
   willpower_spent_today = 0
-  end_game_panel.visible = false
   _start_new_turn()
   _update_top_bar()
