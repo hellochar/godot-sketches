@@ -3182,3 +3182,37 @@ Need motivation cards representing different mental focus states.
 **Updated starter_deck.tres** - Added all 4 motivation cards (IDs 390-393).
 
 ### Step 4: Commit
+
+Committed: `e03cf0c` - "Loop 82: Add focus motivation cards"
+
+---
+
+## Loop 83: Communication Actions
+
+### Step 1: Analysis
+
+**Gap: Communication/Interpersonal Actions**
+
+Need actions focused on communication and interpersonal skills.
+
+**Design Goals:**
+1. Various levels of social difficulty
+2. Mix of social with other tags
+3. Range from easy to challenging
+
+### Step 2: Implementation Plan
+
+1. Create 4 communication themed actions
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Communication Actions Created:**
+1. `deep_conversation.tres` - Deep Conversation: 65 cost, Social+Effort tags, 85% success.
+2. `give_compliment.tres` - Give Compliment: 20 cost, Social tag, 95% success.
+3. `apologize.tres` - Apologize: 50 cost, Social+Risk tags, 80% success.
+4. `listen_actively.tres` - Listen Actively: 35 cost, Social+Routine tags, 90% success.
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 394-397).
+
+### Step 4: Commit
