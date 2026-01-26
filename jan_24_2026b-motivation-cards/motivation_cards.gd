@@ -4,6 +4,7 @@ const CardData = preload("res://jan_24_2026b-motivation-cards/card_data.gd")
 const GameState = preload("res://jan_24_2026b-motivation-cards/game_state.gd")
 const StarterDeckResourceScript = preload("res://jan_24_2026b-motivation-cards/starter_deck_resource.gd")
 const MotivationCardRes = preload("res://jan_24_2026b-motivation-cards/motivation_card_resource.gd")
+const GenericCardScene = preload("res://jan_24_2026b-motivation-cards/generic_card.tscn")
 
 @export_group("Game Settings")
 @export var cards_per_draw: int = 5
@@ -188,6 +189,32 @@ func _setup_button_feedback(btn: Button) -> void:
   )
 
 
+func _setup_card_feedback(card: Control) -> void:
+  card.pivot_offset = card.size / 2
+  card.gui_input.connect(func(event: InputEvent) -> void:
+    if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+      if event.pressed:
+        _play_sound(click_sound)
+        var tween := create_tween()
+        tween.tween_property(card, "scale", Vector2.ONE * button_press_scale, 0.05)
+      else:
+        var tween := create_tween()
+        tween.tween_property(card, "scale", Vector2.ONE, 0.1).set_ease(Tween.EASE_OUT)
+  )
+  card.mouse_entered.connect(func() -> void:
+    card.pivot_offset = card.size / 2
+    var tween := create_tween()
+    tween.tween_property(card, "scale", Vector2.ONE * button_hover_scale, 0.1).set_ease(Tween.EASE_OUT)
+  )
+  card.mouse_exited.connect(func() -> void:
+    var tween := create_tween()
+    tween.tween_property(card, "scale", Vector2.ONE, 0.1).set_ease(Tween.EASE_OUT)
+  )
+  card.resized.connect(func() -> void:
+    card.pivot_offset = card.size / 2
+  )
+
+
 func _update_top_bar() -> void:
   day_label.text = "Day %d of %d" % [game_state.current_day, max_days]
   score_label.text = "Score: %d" % game_state.score
@@ -233,12 +260,10 @@ func _populate_action_grid() -> void:
     action_grid.add_child(btn)
 
 
-func _create_action_button(action) -> Button:
-  var btn := Button.new()
-  btn.custom_minimum_size = action_button_size
-
+func _create_action_button(action) -> PanelContainer:
   var motivation := _get_motivation_for_action(action)
   var willpower_needed := maxi(0, action.motivation_cost - motivation)
+  var potential_score := _get_potential_score(action)
 
   var bg_color := button_normal_color
   if willpower_needed == 0:
@@ -246,31 +271,27 @@ func _create_action_button(action) -> Button:
   elif willpower_needed > game_state.willpower:
     bg_color = negative_card_color
 
-  var style := StyleBoxFlat.new()
-  style.bg_color = bg_color
-  style.corner_radius_top_left = card_corner_radius
-  style.corner_radius_top_right = card_corner_radius
-  style.corner_radius_bottom_left = card_corner_radius
-  style.corner_radius_bottom_right = card_corner_radius
-  style.content_margin_left = card_margin
-  style.content_margin_right = card_margin
-  style.content_margin_top = card_margin
-  style.content_margin_bottom = card_margin
-  btn.add_theme_stylebox_override("normal", style)
+  var generic_card = GenericCardScene.instantiate()
+  generic_card.card_size = action_button_size
+  generic_card.background_color = bg_color
+  generic_card.corner_radius = card_corner_radius
+  generic_card.content_margin = card_margin
+  generic_card.enable_hover = true
+  generic_card.title = action.title
 
-  var hover_style := style.duplicate()
-  hover_style.bg_color = bg_color.lightened(0.1)
-  btn.add_theme_stylebox_override("hover", hover_style)
+  if willpower_needed > 0:
+    generic_card.set_corner_text(generic_card.Corner.BOTTOM_LEFT, "WP: %d" % willpower_needed)
+  if action.success_chance < 1.0:
+    generic_card.set_corner_text(generic_card.Corner.TOP_RIGHT, "%d%%" % int(action.success_chance * 100))
+  var score_str := "+%d pts" % potential_score if potential_score > 0 else "0 pts"
+  generic_card.set_corner_text(generic_card.Corner.BOTTOM_RIGHT, score_str)
 
-  var tags_str := _format_tags(action.tags)
-  var willpower_str := "Willpower: %d" % willpower_needed if willpower_needed > 0 else ""
-  if action.success_chance >= 1.0:
-    btn.text = "%s\n%s\n%s" % [action.title, willpower_str, tags_str]
-  else:
-    btn.text = "%s\n%s | %d%%\n%s" % [action.title, willpower_str, int(action.success_chance * 100), tags_str]
-  btn.pressed.connect(func() -> void: _select_action(action))
-  _setup_button_feedback(btn)
-  return btn
+  for tag in action.tags:
+    generic_card.add_tag(CardData.TAG_NAMES[tag], CardData.TAG_COLORS[tag])
+
+  generic_card.pressed.connect(func() -> void: _select_action(action))
+  _setup_card_feedback(generic_card)
+  return generic_card
 
 
 func _get_motivation_for_action(action) -> int:
@@ -282,6 +303,13 @@ func _get_motivation_for_action(action) -> int:
     motivation += current_world_modifier.get_motivation_for_tags(action.tags)
   motivation += _get_special_effect_bonus(action, context)
   return motivation
+
+
+func _get_potential_score(action) -> int:
+  var score := 0
+  for value_card in game_state.value_cards:
+    score += value_card.get_score_for_tags(action.tags)
+  return score
 
 
 func _get_special_effect_bonus(action, context: Dictionary) -> int:
@@ -419,38 +447,15 @@ func _display_value_cards() -> void:
 
 
 func _create_value_card_display(card) -> PanelContainer:
-  var panel := PanelContainer.new()
-  panel.custom_minimum_size = motivation_card_size
-
-  var style := StyleBoxFlat.new()
-  style.bg_color = Color(0.25, 0.35, 0.45)
-  style.corner_radius_top_left = card_corner_radius
-  style.corner_radius_top_right = card_corner_radius
-  style.corner_radius_bottom_left = card_corner_radius
-  style.corner_radius_bottom_right = card_corner_radius
-  style.content_margin_left = card_margin
-  style.content_margin_right = card_margin
-  style.content_margin_top = card_margin
-  style.content_margin_bottom = card_margin
-  panel.add_theme_stylebox_override("panel", style)
-
-  var vbox := VBoxContainer.new()
-  vbox.add_theme_constant_override("separation", 4)
-
-  var title_label := Label.new()
-  title_label.text = card.title
-  title_label.add_theme_font_size_override("font_size", 14)
-  title_label.autowrap_mode = TextServer.AUTOWRAP_WORD
-  vbox.add_child(title_label)
-
-  var scores_label := Label.new()
-  scores_label.text = _format_value_card_scores(card)
-  scores_label.add_theme_font_size_override("font_size", 12)
-  scores_label.add_theme_color_override("font_color", success_color)
-  vbox.add_child(scores_label)
-
-  panel.add_child(vbox)
-  return panel
+  var generic_card = GenericCardScene.instantiate()
+  generic_card.card_size = motivation_card_size
+  generic_card.background_color = Color(0.25, 0.35, 0.45)
+  generic_card.corner_radius = card_corner_radius
+  generic_card.content_margin = card_margin
+  generic_card.title = card.title
+  generic_card.description = _format_value_card_scores(card)
+  generic_card.description_color = success_color
+  return generic_card
 
 
 func _format_value_card_scores(card) -> String:
@@ -508,77 +513,40 @@ func _display_drawn_cards() -> void:
 
 
 func _create_motivation_card_display(card) -> PanelContainer:
-  var panel := PanelContainer.new()
-  panel.custom_minimum_size = motivation_card_size
-
   var context := _build_context_for_action(current_action)
   var motivation_value: int = card.get_motivation_for_tags(current_action.tags, context)
+
   var bg_color := neutral_card_color
   if motivation_value > 0:
     bg_color = positive_card_color
   elif motivation_value < 0:
     bg_color = negative_card_color
 
-  var style := StyleBoxFlat.new()
-  style.bg_color = bg_color
-  style.corner_radius_top_left = card_corner_radius
-  style.corner_radius_top_right = card_corner_radius
-  style.corner_radius_bottom_left = card_corner_radius
-  style.corner_radius_bottom_right = card_corner_radius
-  style.content_margin_left = card_margin
-  style.content_margin_right = card_margin
-  style.content_margin_top = card_margin
-  style.content_margin_bottom = card_margin
-  panel.add_theme_stylebox_override("panel", style)
-
-  var vbox := VBoxContainer.new()
-  vbox.add_theme_constant_override("separation", 2)
-
-  var title_label := Label.new()
-  title_label.text = card.title
-  title_label.add_theme_font_size_override("font_size", 14)
-  title_label.autowrap_mode = TextServer.AUTOWRAP_WORD
-  vbox.add_child(title_label)
-
-  var mod_label := Label.new()
-  mod_label.text = card.format_modifiers()
-  mod_label.add_theme_font_size_override("font_size", 12)
-  vbox.add_child(mod_label)
+  var generic_card = GenericCardScene.instantiate()
+  generic_card.card_size = motivation_card_size
+  generic_card.background_color = bg_color
+  generic_card.corner_radius = card_corner_radius
+  generic_card.content_margin = card_margin
+  generic_card.title = card.title
+  generic_card.description = card.format_modifiers()
 
   if card is MotivationCardRes:
     var condition_text: String = card.get_condition_text()
     if not condition_text.is_empty():
-      var cond_label := Label.new()
       var condition_met: bool = card.check_condition(context)
-      cond_label.text = condition_text
-      cond_label.add_theme_font_size_override("font_size", 10)
-      if condition_met:
-        cond_label.add_theme_color_override("font_color", success_color)
-      else:
-        cond_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
-      vbox.add_child(cond_label)
+      var cond_color := success_color if condition_met else Color(0.6, 0.6, 0.6)
+      generic_card.add_content_label(condition_text, 10, cond_color)
 
     var special_text: String = card.get_special_effect_text()
     if not special_text.is_empty():
-      var special_label := Label.new()
-      special_label.text = special_text
-      special_label.add_theme_font_size_override("font_size", 10)
-      special_label.add_theme_color_override("font_color", Color(0.8, 0.7, 1.0))
-      vbox.add_child(special_label)
+      generic_card.add_content_label(special_text, 10, Color(0.8, 0.7, 1.0))
 
   if motivation_value != 0:
-    var contrib_label := Label.new()
     var sign_str := "+" if motivation_value > 0 else ""
-    contrib_label.text = "→ %s%d" % [sign_str, motivation_value]
-    contrib_label.add_theme_font_size_override("font_size", 16)
-    if motivation_value > 0:
-      contrib_label.add_theme_color_override("font_color", success_color)
-    else:
-      contrib_label.add_theme_color_override("font_color", failure_color)
-    vbox.add_child(contrib_label)
+    var contrib_color := success_color if motivation_value > 0 else failure_color
+    generic_card.add_content_label("→ %s%d" % [sign_str, motivation_value], 16, contrib_color)
 
-  panel.add_child(vbox)
-  return panel
+  return generic_card
 
 
 func _display_world_modifier() -> void:

@@ -1,0 +1,88 @@
+[gd_scene load_steps=2 format=3 uid="uid://byd0xywpdrj1p"]
+
+[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/generic_card.gd" id="1_script"]
+
+[node name="GenericCard" type="PanelContainer"]
+custom_minimum_size = Vector2(140, 100)
+script = ExtResource("1_script")
+
+[node name="CardContent" type="Control" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MainContent" type="VBoxContainer" parent="CardContent"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 2
+
+[node name="IconSlot" type="TextureRect" parent="CardContent/MainContent"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+expand_mode = 2
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="CardContent/MainContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 2
+
+[node name="DescriptionLabel" type="Label" parent="CardContent/MainContent"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 2
+
+[node name="TagsContainer" type="HFlowContainer" parent="CardContent/MainContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+
+[node name="TopLeft" type="Control" parent="CardContent"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 20.0
+
+[node name="TopRight" type="Control" parent="CardContent"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_bottom = 20.0
+grow_horizontal = 0
+
+[node name="BottomLeft" type="Control" parent="CardContent"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -20.0
+offset_right = 40.0
+grow_vertical = 0
+
+[node name="BottomRight" type="Control" parent="CardContent"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -20.0
+grow_horizontal = 0
+grow_vertical = 0
