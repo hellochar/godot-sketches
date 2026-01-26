@@ -73,6 +73,7 @@ const GenericCardScene = preload("res://common/generic_card.tscn")
 @onready var action_grid: Container = %ActionGrid
 @onready var mood_cards_container: HBoxContainer = %MoodCardsContainer
 @onready var mood_world_label: Label = %MoodWorldLabel
+@onready var synergy_label: Label = %SynergyLabel
 @onready var values_cards_container: HBoxContainer = %ValuesCardsContainer
 
 @onready var motivation_phase_screen: VBoxContainer = %MotivationPhaseScreen
@@ -281,6 +282,7 @@ func _show_action_selection() -> void:
   _display_value_cards()
   _display_mood_cards()
   _display_mood_world_modifier()
+  _display_synergies()
   await _fade_in(action_selection_screen)
 
 
@@ -540,6 +542,24 @@ func _display_mood_world_modifier() -> void:
     mood_world_label.text = "World: %s" % current_world_modifier.title
   else:
     mood_world_label.text = ""
+
+
+func _display_synergies() -> void:
+  var tag_counts := {}
+  for tag in CardData.Tag.values():
+    tag_counts[tag] = 0
+  for card in drawn_cards:
+    for tag in CardData.Tag.values():
+      if card.get_modifier(tag) != 0:
+        tag_counts[tag] += 1
+  var synergies: Array = []
+  for tag in CardData.Tag.values():
+    if tag_counts[tag] >= 2:
+      synergies.append("%s x%d" % [CardData.TAG_NAMES[tag], tag_counts[tag]])
+  if synergies.is_empty():
+    synergy_label.text = ""
+  else:
+    synergy_label.text = "Synergies: " + ", ".join(synergies)
 
 
 func _display_value_cards() -> void:

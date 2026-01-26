@@ -774,3 +774,39 @@ Players can't see their deck composition. They don't know how many cards they ha
 - `motivation_cards.gd` - Added @onready for deck_info_label, updated _update_top_bar to show deck size
 
 ### Step 4: Commit
+
+Committed: `54d0fa3` - "Add deck size display to top bar"
+
+---
+
+## Loop 16: Tag Synergy Hints
+
+### Step 1: Analysis
+
+**Gap: Hidden Synergies**
+
+Players don't know which tags synergize well. Many conditional cards check for tag counts, but this isn't visible until cards are drawn.
+
+**Design Goals:**
+1. Show which tags have good synergy in current hand
+2. Highlight when synergy conditions are met
+3. Help players understand their deck's strengths
+
+### Step 2: Implementation Plan
+
+1. Count tags in drawn cards
+2. Show tag distribution on action selection screen
+3. Highlight tags with 2+ cards (synergy threshold)
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `motivation_cards.tscn` - Added SynergyLabel to action selection screen
+- `motivation_cards.gd`:
+  - Added @onready for synergy_label
+  - Added `_display_synergies()` function that counts tags in drawn cards
+  - Shows "Synergies: Health x3, Effort x2" when tags have 2+ cards
+  - Called in `_show_action_selection()`
+
+### Step 4: Commit
