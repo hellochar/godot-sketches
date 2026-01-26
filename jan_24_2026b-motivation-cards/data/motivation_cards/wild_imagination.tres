@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://byn44r1nv7hoc" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Wild Imagination"
+health_modifier = 0
+social_modifier = 0
+routine_modifier = 0
+effort_modifier = 0
+risk_modifier = 12
+creativity_modifier = 12
+condition_type = 4
+condition_threshold = 2
+condition_tag = 4
+bonus_multiplier = 2.5
+description = "Unleash creativity"
+special_effect = 1
+special_value = 1
+
