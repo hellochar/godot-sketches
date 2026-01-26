@@ -1,10 +1,10 @@
-[gd_resource type="Resource" script_class="ActionResource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ActionResource" load_steps=2 format=3 uid="uid://64xqxggdc7im"]
 
-[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://d0jysd6hdr7j3" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
 title = "Go for a Morning Run"
 motivation_cost = 75
-tags = [0, 3, 2]
-success_chance = 0.8
+tags = Array[int]([0, 3, 2])
+success_chance = 1.0

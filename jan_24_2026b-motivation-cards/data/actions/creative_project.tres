@@ -1,10 +1,10 @@
-[gd_resource type="Resource" script_class="ActionResource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ActionResource" load_steps=2 format=3 uid="uid://b82h5ju2nv5e1"]
 
-[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://d0jysd6hdr7j3" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
 title = "Start Creative Project"
 motivation_cost = 90
-tags = [5, 3, 4]
-success_chance = 0.6
+tags = Array[int]([5, 3, 4])
+success_chance = 1.0

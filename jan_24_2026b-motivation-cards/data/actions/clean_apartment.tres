@@ -1,10 +1,9 @@
-[gd_resource type="Resource" script_class="ActionResource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ActionResource" load_steps=2 format=3 uid="uid://dc2d4uj354u0v"]
 
-[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://d0jysd6hdr7j3" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
 title = "Clean the Apartment"
-motivation_cost = 50
-tags = [2, 3]
-success_chance = 0.9
+tags = Array[int]([2, 3])
+success_chance = 1.0
