@@ -6,4 +6,6 @@
 script = ExtResource("1")
 title = "Lazy afternoon"
 effort_modifier = -20
-routine_modifier = 5
+routine_modifier = 15
+special_effect = 6
+special_value = 10
