@@ -3216,3 +3216,37 @@ Need actions focused on communication and interpersonal skills.
 **Updated starter_deck.tres** - Added all 4 actions (IDs 394-397).
 
 ### Step 4: Commit
+
+Committed: `22ff537` - "Loop 83: Add communication actions"
+
+---
+
+## Loop 84: Sleep World Modifiers
+
+### Step 1: Analysis
+
+**Gap: Sleep/Rest Environmental States**
+
+Need world modifiers representing different sleep states and their effects.
+
+**Design Goals:**
+1. Various sleep quality effects
+2. Trade-offs between routine and creativity
+3. Impact on willpower and draws
+
+### Step 2: Implementation Plan
+
+1. Create 4 sleep/rest themed world modifiers
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Sleep World Modifiers Created:**
+1. `oversleep.tres` - Oversleep: +5 Health, -5 Social, -15 Routine, -10 Effort, +5 Creativity, -5 willpower.
+2. `early_alarm.tres` - Early Alarm: -5 Health, +20 Routine, +10 Effort, -5 Creativity, -5 willpower.
+3. `dream_vivid.tres` - Vivid Dreams: -5 Routine, +5 Risk, +25 Creativity, +1 draw.
+4. `insomnia.tres` - Insomnia: -15 Health, -5 Social, -10 Routine, -10 Effort, +5 Risk, +10 Creativity, -10 willpower.
+
+**Updated starter_deck.tres** - Added all 4 world modifiers (IDs 398-401).
+
+### Step 4: Commit
