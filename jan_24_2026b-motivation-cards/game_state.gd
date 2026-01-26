@@ -16,6 +16,7 @@ var world_modifiers: Array = []
 
 var success_streak: int = 0
 var attempted_actions: Array[String] = []
+var failed_actions: Array[String] = []
 var extra_draws_next_turn: int = 0
 var succeeded_yesterday: bool = false
 var total_successes_this_week: int = 0

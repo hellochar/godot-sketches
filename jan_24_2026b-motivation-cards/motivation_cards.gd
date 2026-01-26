@@ -343,6 +343,8 @@ func _create_action_button(action) -> PanelContainer:
   if mastery_level > 0:
     var stars := "*".repeat(mastery_level)
     generic_card.set_corner_text(generic_card.Corner.TOP_LEFT, stars, Color(1.0, 0.85, 0.3))
+  if action.title in game_state.failed_actions:
+    generic_card.add_content_label("Failed before", 10, failure_color)
   if willpower_needed > 0:
     generic_card.set_corner_text(generic_card.Corner.BOTTOM_LEFT, "%d willpower" % willpower_needed)
   if action.success_chance < 1.0:
@@ -1088,6 +1090,8 @@ func _show_result(success: bool) -> void:
     game_state.succeeded_yesterday = false
     game_state.momentum = maxi(0, game_state.momentum - 1)
     last_action_succeeded = false
+    if current_action.title not in game_state.failed_actions:
+      game_state.failed_actions.append(current_action.title)
 
     willpower_restored = _handle_failure_special_effects()
 

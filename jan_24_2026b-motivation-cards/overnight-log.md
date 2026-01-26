@@ -890,3 +890,39 @@ Motivation cards affect willpower costs but not scoring. There's no way to boost
 **Added to starter_deck.tres** - All 3 cards registered with ExtResource IDs 166-168.
 
 ### Step 4: Commit
+
+Committed: `898ffa3` - "Add score bonus special effect and score-boosting cards"
+
+---
+
+## Loop 19: Retry Action Tracking
+
+### Step 1: Analysis
+
+**Gap: No Failed Action Memory**
+
+When an action fails, players might want to retry it. But there's no indicator of which actions were attempted and failed.
+
+**Design Goals:**
+1. Track failed actions this week
+2. Show indicator on action buttons for recently failed actions
+3. Help players decide whether to retry
+
+### Step 2: Implementation Plan
+
+1. Add `failed_actions` array to game_state
+2. Add action to list when it fails
+3. Show "X" marker on action buttons for failed actions
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `game_state.gd`:
+  - Added `failed_actions: Array[String]` to track failed action titles
+
+- `motivation_cards.gd`:
+  - Track failed actions in `_show_result()` when action fails
+  - Show "Failed before" label in `_create_action_button()` for failed actions
+
+### Step 4: Commit
