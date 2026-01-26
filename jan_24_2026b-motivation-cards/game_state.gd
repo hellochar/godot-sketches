@@ -23,10 +23,22 @@ var last_successful_action_title: String = ""
 var momentum: int = 0
 const MOMENTUM_MAX: int = 10
 const MOMENTUM_BONUS_PER: int = 3
+var action_mastery: Dictionary = {}
+const MASTERY_MAX: int = 3
+const MASTERY_DISCOUNT_PER: int = 5
 
 
 func _init() -> void:
   pass
+
+
+func get_action_mastery(action_title: String) -> int:
+  return action_mastery.get(action_title, 0)
+
+
+func increase_action_mastery(action_title: String) -> void:
+  var current: int = action_mastery.get(action_title, 0)
+  action_mastery[action_title] = mini(MASTERY_MAX, current + 1)
 
 
 func load_from_deck(deck: Resource) -> void:

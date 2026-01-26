@@ -293,8 +293,11 @@ func _populate_action_grid() -> void:
 
 
 func _create_action_button(action) -> PanelContainer:
+  var mastery_level: int = game_state.get_action_mastery(action.title)
+  var mastery_discount: int = mastery_level * game_state.MASTERY_DISCOUNT_PER
+  var effective_cost: int = maxi(0, action.motivation_cost - mastery_discount)
   var motivation := _get_motivation_for_action(action)
-  var willpower_needed := maxi(0, action.motivation_cost - motivation)
+  var willpower_needed := maxi(0, effective_cost - motivation)
   var potential_score := _get_potential_score(action)
 
   var bg_color := button_normal_color
@@ -311,6 +314,9 @@ func _create_action_button(action) -> PanelContainer:
   generic_card.enable_hover = true
   generic_card.title = action.title
 
+  if mastery_level > 0:
+    var stars := "*".repeat(mastery_level)
+    generic_card.set_corner_text(generic_card.Corner.TOP_LEFT, stars, Color(1.0, 0.85, 0.3))
   if willpower_needed > 0:
     generic_card.set_corner_text(generic_card.Corner.BOTTOM_LEFT, "%d willpower" % willpower_needed)
   if action.success_chance < 1.0:
@@ -432,7 +438,13 @@ func _show_motivation_phase() -> void:
   back_button.disabled = true
 
   action_title.text = current_action.title
-  cost_label.text = "Cost: %d" % current_action.motivation_cost
+  var mastery_level: int = game_state.get_action_mastery(current_action.title)
+  var mastery_discount: int = mastery_level * game_state.MASTERY_DISCOUNT_PER
+  var effective_cost: int = maxi(0, current_action.motivation_cost - mastery_discount)
+  if mastery_discount > 0:
+    cost_label.text = "Cost: %d (-%d mastery)" % [effective_cost, mastery_discount]
+  else:
+    cost_label.text = "Cost: %d" % effective_cost
   if current_action.success_chance >= 1.0:
     success_label.text = ""
   else:
@@ -691,10 +703,17 @@ func _calculate_motivation() -> void:
 
   total_motivation += _get_special_effect_bonus(current_action, context)
 
-  total_motivation_label.text = "Total Motivation: %d / %d" % [total_motivation, current_action.motivation_cost]
+  var effective_cost: int = _get_effective_action_cost(current_action)
+  total_motivation_label.text = "Total Motivation: %d / %d" % [total_motivation, effective_cost]
 
-  var gap := maxi(0, current_action.motivation_cost - total_motivation)
+  var gap := maxi(0, effective_cost - total_motivation)
   gap_label.text = "Gap: %d" % gap
+
+
+func _get_effective_action_cost(action) -> int:
+  var mastery_level: int = game_state.get_action_mastery(action.title)
+  var mastery_discount: int = mastery_level * game_state.MASTERY_DISCOUNT_PER
+  return maxi(0, action.motivation_cost - mastery_discount)
 
 
 func _animate_motivation_tally() -> void:
@@ -747,9 +766,10 @@ func _animate_motivation_tally() -> void:
 
 
 func _update_willpower_display() -> void:
-  var gap := maxi(0, current_action.motivation_cost - total_motivation)
+  var effective_cost: int = _get_effective_action_cost(current_action)
+  var gap := maxi(0, effective_cost - total_motivation)
   var willpower_needed := mini(gap, game_state.willpower)
-  var can_attempt: bool = total_motivation + willpower_needed >= current_action.motivation_cost
+  var can_attempt: bool = total_motivation + willpower_needed >= effective_cost
 
   if gap == 0:
     willpower_cost_label.text = "No willpower needed"
@@ -857,7 +877,8 @@ func _on_attempt_pressed() -> void:
   attempt_button.disabled = true
   back_button.disabled = true
 
-  var gap := maxi(0, current_action.motivation_cost - total_motivation)
+  var effective_cost: int = _get_effective_action_cost(current_action)
+  var gap := maxi(0, effective_cost - total_motivation)
   var willpower_spent := mini(gap, game_state.willpower)
 
   screen_overlay.color = Color(0, 0, 0, 0)
@@ -972,6 +993,7 @@ func _show_result(success: bool) -> void:
     game_state.total_successes_this_week += 1
     game_state.last_successful_action_title = current_action.title
     game_state.momentum = mini(game_state.MOMENTUM_MAX, game_state.momentum + 1)
+    game_state.increase_action_mastery(current_action.title)
     last_action_succeeded = true
 
     for value_card in game_state.value_cards:
