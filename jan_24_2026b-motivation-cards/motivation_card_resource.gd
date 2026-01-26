@@ -34,6 +34,9 @@ enum SpecialEffect {
   EXHAUST_BONUS,
   DRAIN_WILLPOWER_ON_SUCCESS,
   REDUCE_MAX_WILLPOWER,
+  NEGATE_NEGATIVES,
+  INVERT_NEGATIVES,
+  BONUS_PER_NEGATIVE_CARD,
 }
 
 @export var title: String
@@ -188,6 +191,12 @@ func get_special_effect_text() -> String:
       return "-%d willpower on success" % special_value
     SpecialEffect.REDUCE_MAX_WILLPOWER:
       return "-%d max willpower on success" % special_value
+    SpecialEffect.NEGATE_NEGATIVES:
+      return "Negate all negative modifiers"
+    SpecialEffect.INVERT_NEGATIVES:
+      return "Invert negatives to positives"
+    SpecialEffect.BONUS_PER_NEGATIVE_CARD:
+      return "+%d per negative card in hand" % special_value
   return ""
 
 

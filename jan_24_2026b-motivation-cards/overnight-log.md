@@ -213,3 +213,62 @@ Per emergent-game-design skill:
 
 ### Step 4: Commit
 
+Committed: `754b58f` - "Add converter cards with resource tension mechanics"
+
+---
+
+## Loop 4: Counter Cards & Negative Rework
+
+### Step 1: Analysis
+
+**Gap: Negative Cards Are Just Bad**
+
+Per emergent-game-design skill:
+> "Lazy Afternoon: Pure negative (-20 Effort). Add upside."
+> "Playing It Safe: Anti-synergy without payoff."
+> "Missing Card Types: Counters - 'Negate a negative modifier'"
+
+**Current Problem:**
+- ~10 cards have purely negative effects
+- No way to turn negatives into positives
+- Drawing bad cards feels bad with no counterplay
+
+**Design Goals:**
+1. Create cards that negate or invert negative modifiers
+2. Add synergy with negative cards (lenticular: bad cards become good)
+3. Make "negative" cards interesting build-arounds
+
+### Step 2: Implementation Plan
+
+1. Add new special effect: `NEGATE_NEGATIVES` (all negative modifiers become 0)
+2. Add new special effect: `INVERT_NEGATIVES` (negative modifiers become positive)
+3. Create 4 counter/synergy cards:
+   - Optimistic Lens (negate all negatives)
+   - Silver Lining (invert negatives to positives)
+   - Contrarian (bonus for each negative card in hand)
+   - Resilience (if any negative modifier, bonus to all)
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `motivation_card_resource.gd` - Added new special effects:
+  - NEGATE_NEGATIVES (all negative modifiers become 0)
+  - INVERT_NEGATIVES (negative modifiers become positive)
+  - BONUS_PER_NEGATIVE_CARD (+X per negative card in hand)
+
+- `motivation_cards.gd` - Implemented counter mechanics:
+  - `_get_motivation_for_action()` now checks for negate/invert effects
+  - Applied to individual card contributions before totaling
+  - `_get_special_effect_bonus()` calculates bonus per negative card
+
+**Counter Cards Created:**
+1. `optimistic_lens.tres` - Negates all negative modifiers. Pure counter card.
+2. `silver_lining.tres` - Inverts negatives to positives. Turns -20 into +20.
+3. `contrarian.tres` - +15 per negative card in hand. Rewards bad draws.
+4. `resilient_spirit.tres` - +10 all tags, +10 per negative card. Bridge counter.
+
+**Added to starter_deck.tres** - All 4 cards registered with ExtResource IDs 150-153.
+
+### Step 4: Commit
+
