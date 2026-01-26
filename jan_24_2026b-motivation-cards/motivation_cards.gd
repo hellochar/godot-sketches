@@ -288,6 +288,14 @@ func _populate_action_grid() -> void:
 
   var sorted_actions: Array = game_state.available_actions.duplicate()
   sorted_actions.sort_custom(func(a, b) -> bool:
+    var a_has_bonus: bool = game_state.daily_bonus_tag in a.tags
+    var b_has_bonus: bool = game_state.daily_bonus_tag in b.tags
+    if a_has_bonus != b_has_bonus:
+      return a_has_bonus
+    var a_primary: int = a.tags[0] if a.tags.size() > 0 else -1
+    var b_primary: int = b.tags[0] if b.tags.size() > 0 else -1
+    if a_primary != b_primary:
+      return a_primary < b_primary
     var a_wp := maxi(0, a.motivation_cost - _get_motivation_for_action(a))
     var b_wp := maxi(0, b.motivation_cost - _get_motivation_for_action(b))
     return a_wp < b_wp
@@ -305,12 +313,15 @@ func _create_action_button(action) -> PanelContainer:
   var motivation := _get_motivation_for_action(action)
   var willpower_needed := maxi(0, effective_cost - motivation)
   var potential_score := _get_potential_score(action)
+  var has_bonus_tag: bool = game_state.daily_bonus_tag in action.tags
 
   var bg_color := button_normal_color
   if willpower_needed == 0:
     bg_color = positive_card_color
   elif willpower_needed > game_state.willpower:
     bg_color = negative_card_color
+  if has_bonus_tag:
+    bg_color = bg_color.lightened(0.15)
 
   var generic_card = GenericCardScene.instantiate()
   generic_card.card_size = action_button_size

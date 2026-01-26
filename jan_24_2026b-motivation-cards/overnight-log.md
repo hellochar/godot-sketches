@@ -707,3 +707,38 @@ Players have limited ways to restore willpower during the day. The Adrenaline Ju
 **Added to starter_deck.tres** - All 4 cards registered with ExtResource IDs 162-165.
 
 ### Step 4: Commit
+
+Committed: `714b25a` - "Add willpower recovery motivation cards"
+
+---
+
+## Loop 14: Action Categories Display
+
+### Step 1: Analysis
+
+**Gap: Actions Are An Unsorted List**
+
+With 35+ actions, the action grid is overwhelming. Players struggle to find relevant actions for their current mood/bonus tag.
+
+**Design Goals:**
+1. Group actions by primary tag
+2. Show bonus tag actions first
+3. Add category headers for visual organization
+
+### Step 2: Implementation Plan
+
+1. Sort actions by primary tag (first tag in their tag list)
+2. Group adjacent same-category actions
+3. Highlight actions matching daily bonus tag
+4. Add subtle category separators
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `motivation_cards.gd` - Updated action grid sorting and display:
+  - `_populate_action_grid()` now sorts: bonus tag first, then primary tag, then willpower cost
+  - `_create_action_button()` lightens background for bonus tag actions
+  - Actions with daily bonus tag are visually highlighted and grouped first
+
+### Step 4: Commit
