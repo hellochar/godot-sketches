@@ -2332,3 +2332,37 @@ Need more value cards with distinct playstyles and abilities.
 **Updated starter_deck.tres** - Added all 4 cards (IDs 290-293).
 
 ### Step 4: Commit
+
+Committed: `fdc78e1` - "Loop 57: Add personality-based value cards"
+
+---
+
+## Loop 58: Micro-Actions for Early Game
+
+### Step 1: Analysis
+
+**Gap: Limited Low-Cost Actions**
+
+Need more very low-cost "micro-actions" for easier early game and guaranteed success options.
+
+**Design Goals:**
+1. Very low motivation cost (5-15)
+2. High or guaranteed success rates
+3. Simple, everyday activities
+
+### Step 2: Implementation Plan
+
+1. Create 4 micro-actions with very low costs
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Micro-Actions Created:**
+1. `glass_water.tres` - Drink a Glass of Water: 10 cost, Health, 100% success.
+2. `open_window.tres` - Open a Window: 5 cost, Health+Routine, 100% success.
+3. `reply_message.tres` - Reply to a Message: 15 cost, Social, 95% success.
+4. `stand_stretch.tres` - Stand Up and Stretch: 8 cost, Health+Routine, 100% success.
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 294-297).
+
+### Step 4: Commit
