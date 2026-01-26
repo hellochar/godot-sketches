@@ -523,3 +523,40 @@ Current problem: No carry-over effects between days beyond deck changes. Each da
 
 ### Step 4: Commit
 
+Committed: `8e28c9b` - "Add Momentum as secondary resource system"
+
+---
+
+## Loop 10: Streak Display & Rewards
+
+### Step 1: Analysis
+
+**Gap: Hidden Streak Information**
+
+The success_streak variable exists and cards like Streak Keeper use it, but players can't see their current streak. This makes streak-based strategies feel unreliable.
+
+**Design Goals:**
+1. Display current streak prominently
+2. Add visual feedback when streak changes
+3. Make streak-based play more rewarding
+
+### Step 2: Implementation Plan
+
+1. Add StreakLabel to TopBar near momentum
+2. Show streak increase/decrease with color flash
+3. Add streak bonus to score (1 point per streak level on success)
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `motivation_cards.tscn` - Added StreakLabel to TopBar with green color
+
+- `motivation_cards.gd` - Implemented streak display and bonus:
+  - Added @onready for streak_label
+  - `_update_top_bar()` displays current streak
+  - Score calculation adds streak level as bonus points
+  - Result details show streak bonus when applicable
+
+### Step 4: Commit
+
