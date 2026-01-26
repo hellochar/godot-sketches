@@ -1867,4 +1867,38 @@ Few cards benefit from success streaks beyond the basic STREAK_SCALING.
 
 ### Step 4: Commit
 
+Committed: `e10e4f5` - "Loop 44: Add streak-based motivation cards"
+
+---
+
+## Loop 45: Balanced Mid-Range Actions
+
+### Step 1: Analysis
+
+**Gap: Mid-Range Action Variety**
+
+Need more actions with balanced risk/reward profiles (60-80% success).
+
+**Design Goals:**
+1. Add 4 actions with moderate cost and success rate
+2. Diverse tag combinations
+3. Fill gaps in action variety
+
+### Step 2: Implementation Plan
+
+1. Create 4 mid-range actions (50-80 cost, 65-85% success)
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Actions Created:**
+1. `coffee_date.tres` - 50 cost, Social+Routine, 85% success
+2. `home_workout.tres` - 60 cost, Health+Effort+Routine, 80% success
+3. `write_article.tres` - 70 cost, Creativity+Effort, 70% success
+4. `networking_event.tres` - 65 cost, Social+Risk+Effort, 65% success
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 242-245).
+
+### Step 4: Commit
+
 Committed: (pending)
