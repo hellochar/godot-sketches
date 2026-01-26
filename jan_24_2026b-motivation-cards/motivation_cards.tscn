@@ -309,11 +309,21 @@ layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="ContinueButton" type="Button" parent="MainContainer/ResultPanel/ResultContent"]
+[node name="ResultButtons" type="HBoxContainer" parent="MainContainer/ResultPanel/ResultContent"]
+layout_mode = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="ForgetCardButton" type="Button" parent="MainContainer/ResultPanel/ResultContent/ResultButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+text = "Forget a Card"
+
+[node name="ContinueButton" type="Button" parent="MainContainer/ResultPanel/ResultContent/ResultButtons"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
-size_flags_horizontal = 4
 text = "Continue"
 
 [node name="EndGamePanel" type="PanelContainer" parent="MainContainer"]
@@ -353,6 +363,49 @@ custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Play Again"
+
+[node name="CardRemovalPanel" type="PanelContainer" parent="MainContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="CardRemovalContent" type="VBoxContainer" parent="MainContainer/CardRemovalPanel"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="RemovalTitle" type="Label" parent="MainContainer/CardRemovalPanel/CardRemovalContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Choose a card to forget"
+horizontal_alignment = 1
+
+[node name="RemovalHint" type="Label" parent="MainContainer/CardRemovalPanel/CardRemovalContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7)
+text = "Removing a card makes your deck more focused"
+horizontal_alignment = 1
+
+[node name="CardRemovalScroll" type="ScrollContainer" parent="MainContainer/CardRemovalPanel/CardRemovalContent"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 2
+vertical_scroll_mode = 0
+
+[node name="CardRemovalContainer" type="HBoxContainer" parent="MainContainer/CardRemovalPanel/CardRemovalContent/CardRemovalScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_constants/separation = 10
+
+[node name="SkipRemovalButton" type="Button" parent="MainContainer/CardRemovalPanel/CardRemovalContent"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Keep All"
 
 [node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
 unique_name_in_owner = true

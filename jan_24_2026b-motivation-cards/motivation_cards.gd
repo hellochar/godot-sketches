@@ -89,7 +89,12 @@ const GenericCardScene = preload("res://common/generic_card.tscn")
 @onready var result_title: Label = %ResultTitle
 @onready var result_details: Label = %ResultDetails
 @onready var cards_added_container: HBoxContainer = %CardsAddedContainer
+@onready var forget_card_button: Button = %ForgetCardButton
 @onready var continue_button: Button = %ContinueButton
+
+@onready var card_removal_panel: PanelContainer = %CardRemovalPanel
+@onready var card_removal_container: HBoxContainer = %CardRemovalContainer
+@onready var skip_removal_button: Button = %SkipRemovalButton
 
 @onready var end_game_panel: PanelContainer = %EndGamePanel
 @onready var end_title: Label = %EndTitle
@@ -159,11 +164,15 @@ func _connect_signals() -> void:
   attempt_button.pressed.connect(_on_attempt_pressed)
   continue_button.pressed.connect(_on_continue_pressed)
   play_again_button.pressed.connect(_on_play_again_pressed)
+  forget_card_button.pressed.connect(_on_forget_card_pressed)
+  skip_removal_button.pressed.connect(_on_skip_removal_pressed)
 
   _setup_button_feedback(back_button)
   _setup_button_feedback(attempt_button)
   _setup_button_feedback(continue_button)
   _setup_button_feedback(play_again_button)
+  _setup_button_feedback(forget_card_button)
+  _setup_button_feedback(skip_removal_button)
 
 
 func _play_sound(sound: AudioStream, vary: bool = true) -> void:
@@ -971,6 +980,7 @@ func _show_result(success: bool) -> void:
     result_title.text = "Success!"
     result_title.add_theme_color_override("font_color", success_color)
     _play_sound(success_sound)
+    forget_card_button.visible = game_state.motivation_deck.size() > 5
     var details_parts: Array = []
     if score_gained > 0:
       details_parts.append("You gained %d points!" % score_gained)
@@ -990,6 +1000,7 @@ func _show_result(success: bool) -> void:
     result_title.text = "Failed..."
     result_title.add_theme_color_override("font_color", failure_color)
     _play_sound(failure_sound)
+    forget_card_button.visible = false
     var details_text := "The action didn't succeed this time."
     if willpower_restored > 0:
       details_text += "\nRestored %d willpower from Adrenaline Junkie!" % willpower_restored
@@ -1121,5 +1132,49 @@ func _on_play_again_pressed() -> void:
   game_state.willpower_max = starting_willpower
   actions_taken.clear()
   willpower_spent_today = 0
+  value_card_abilities_used.clear()
   _start_new_turn()
   _update_top_bar()
+
+
+func _on_forget_card_pressed() -> void:
+  await _fade_out(result_panel)
+  _show_card_removal()
+
+
+func _show_card_removal() -> void:
+  for child in card_removal_container.get_children():
+    child.queue_free()
+
+  for card in game_state.motivation_deck:
+    var card_panel := _create_removal_card_display(card)
+    card_removal_container.add_child(card_panel)
+
+  await _fade_in(card_removal_panel)
+
+
+func _create_removal_card_display(card) -> PanelContainer:
+  var generic_card = GenericCardScene.instantiate()
+  generic_card.card_size = motivation_card_size
+  generic_card.background_color = neutral_card_color
+  generic_card.corner_radius = card_corner_radius
+  generic_card.content_margin = card_margin
+  generic_card.enable_hover = true
+  generic_card.title = card.title
+  generic_card.description = card.format_modifiers()
+
+  generic_card.pressed.connect(func() -> void: _remove_card_from_deck(card))
+  _setup_card_feedback(generic_card)
+  return generic_card
+
+
+func _remove_card_from_deck(card) -> void:
+  game_state.remove_motivation_card(card)
+  _play_sound(click_sound)
+  await _fade_out(card_removal_panel)
+  _on_continue_pressed()
+
+
+func _on_skip_removal_pressed() -> void:
+  await _fade_out(card_removal_panel)
+  _on_continue_pressed()
