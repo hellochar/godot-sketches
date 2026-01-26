@@ -37,6 +37,7 @@ enum SpecialEffect {
   NEGATE_NEGATIVES,
   INVERT_NEGATIVES,
   BONUS_PER_NEGATIVE_CARD,
+  SCORE_BONUS,
 }
 
 @export var title: String
@@ -197,6 +198,8 @@ func get_special_effect_text() -> String:
       return "Invert negatives to positives"
     SpecialEffect.BONUS_PER_NEGATIVE_CARD:
       return "+%d per negative card in hand" % special_value
+    SpecialEffect.SCORE_BONUS:
+      return "+%d score on success" % special_value
   return ""
 
 
