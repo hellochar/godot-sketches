@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="ActionResource" load_steps=4 format=3 uid="uid://b82h5ju2nv5e1"]
+[gd_resource type="Resource" script_class="ActionResource" load_steps=5 format=3 uid="uid://b82h5ju2nv5e1"]
 
 [ext_resource type="Script" uid="uid://d0jysd6hdr7j3" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
 [ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/motivation_cards/creative_spark.tres" id="2"]
 [ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/motivation_cards/rebel_spirit.tres" id="3"]
+[ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/motivation_cards/flow_moment.tres" id="4"]
 
 [resource]
 script = ExtResource("1")
@@ -10,4 +11,4 @@ title = "Start Creative Project"
 motivation_cost = 90
 tags = Array[int]([5, 3, 4])
 success_chance = 1.0
-cards_on_success = Array[Resource]([ExtResource("2"), ExtResource("3")])
+cards_on_success = Array[Resource]([ExtResource("2"), ExtResource("3"), ExtResource("4")])

@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="ActionResource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ActionResource" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
+[ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/motivation_cards/clarity_flash.tres" id="2"]
 
 [resource]
 script = ExtResource("1")
@@ -8,3 +9,4 @@ title = "Meditate"
 motivation_cost = 45
 tags = [0, 2]
 success_chance = 0.7
+cards_on_success = [ExtResource("2")]

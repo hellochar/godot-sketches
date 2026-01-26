@@ -315,3 +315,53 @@ World modifier pool tripled: 4 → 12.
 
 ### Step 4: Commit
 
+Committed: `faf7809` - "Expand world modifiers pool from 4 to 12"
+
+---
+
+## Loop 6: Temporary Event Cards
+
+### Step 1: Analysis
+
+**Gap: Static Deck Composition**
+
+Per emergent-game-design skill:
+> "Deck evolution is dilution without direction"
+
+Current problem: Cards added from actions stay forever, diluting the deck. The `is_temporary` flag exists but isn't used.
+
+**Design Goals:**
+1. Create cards that only last one day (auto-remove at end of turn)
+2. Add powerful temporary cards as action rewards
+3. Create event-like cards that shake up strategy for one day
+
+### Step 2: Implementation Plan
+
+Create 6 temporary motivation cards (high power, one-day duration):
+- "Caffeine Rush" - Big Effort boost, temporary
+- "Social Buzz" - High Social after meetup
+- "Flow Moment" - Extreme Creativity spike
+- "Adrenaline High" - Risk bonus after challenge
+- "Clarity Flash" - All tags bonus, fleeting
+- "Victory Lap" - Huge bonus after big success
+
+### Step 3: Execution
+
+**Temporary Cards Created:**
+1. `caffeine_rush.tres` - +30 Effort, +15 Routine, -10 Health. Auto-removes at day end.
+2. `social_buzz.tres` - +35 Social, +15 Creativity. Party energy fades.
+3. `flow_moment.tres` - +40 Creativity, +15 Effort. Brief creative peak.
+4. `adrenaline_high.tres` - +30 Risk, +20 Health. Post-challenge high.
+5. `clarity_flash.tres` - +15 all tags. Moment of perfect clarity.
+6. `victory_lap.tres` - +25 all tags. Celebration energy.
+
+**Actions Updated with Temporary Rewards:**
+- `go_gym.tres` → rewards caffeine_rush
+- `attend_meetup.tres` → rewards social_buzz
+- `cold_shower.tres` → rewards adrenaline_high
+- `meditate.tres` → rewards clarity_flash
+- `creative_project.tres` → added flow_moment
+- `run_5k.tres` → added victory_lap
+
+### Step 4: Commit
+
