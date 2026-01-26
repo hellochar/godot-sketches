@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://co7vj3u6vl7gg" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Thick Skin"
+health_modifier = 15
+effort_modifier = 10
+risk_modifier = 5
+social_modifier = -5
+condition_type = 0
+special_effect = 0
+
