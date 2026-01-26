@@ -126,8 +126,17 @@ func _create_action_button(action) -> Button:
   var btn := Button.new()
   btn.custom_minimum_size = action_button_size
 
+  var motivation := _get_motivation_for_action(action)
+  var willpower_needed := maxi(0, action.motivation_cost - motivation)
+
+  var bg_color := button_normal_color
+  if willpower_needed == 0:
+    bg_color = positive_card_color
+  elif willpower_needed > game_state.willpower:
+    bg_color = negative_card_color
+
   var style := StyleBoxFlat.new()
-  style.bg_color = button_normal_color
+  style.bg_color = bg_color
   style.corner_radius_top_left = card_corner_radius
   style.corner_radius_top_right = card_corner_radius
   style.corner_radius_bottom_left = card_corner_radius
@@ -139,16 +148,26 @@ func _create_action_button(action) -> Button:
   btn.add_theme_stylebox_override("normal", style)
 
   var hover_style := style.duplicate()
-  hover_style.bg_color = button_hover_color
+  hover_style.bg_color = bg_color.lightened(0.1)
   btn.add_theme_stylebox_override("hover", hover_style)
 
   var tags_str := _format_tags(action.tags)
+  var willpower_str := "Willpower: %d" % willpower_needed if willpower_needed > 0 else "No willpower needed"
   if action.success_chance >= 1.0:
-    btn.text = "%s\nCost: %d\n%s" % [action.title, action.motivation_cost, tags_str]
+    btn.text = "%s\n%s\n%s" % [action.title, willpower_str, tags_str]
   else:
-    btn.text = "%s\nCost: %d | %d%%\n%s" % [action.title, action.motivation_cost, int(action.success_chance * 100), tags_str]
+    btn.text = "%s\n%s | %d%%\n%s" % [action.title, willpower_str, int(action.success_chance * 100), tags_str]
   btn.pressed.connect(func() -> void: _select_action(action))
   return btn
+
+
+func _get_motivation_for_action(action) -> int:
+  var motivation := 0
+  for card in drawn_cards:
+    motivation += card.get_motivation_for_tags(action.tags)
+  if current_world_modifier:
+    motivation += current_world_modifier.get_motivation_for_tags(action.tags)
+  return motivation
 
 
 func _format_tags(tags: Array) -> String:
