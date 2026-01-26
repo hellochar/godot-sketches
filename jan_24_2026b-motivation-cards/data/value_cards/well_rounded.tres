@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ValueCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/value_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Well rounded"
+health_score = 3
+social_score = 3
+routine_score = 3
+effort_score = 3
+risk_score = 3
+creativity_score = 3
