@@ -2876,3 +2876,37 @@ Need motivation cards representing competitive drive and achievement focus.
 **Updated starter_deck.tres** - Added all 4 cards (IDs 354-357).
 
 ### Step 4: Commit
+
+Committed: `37e3278` - "Loop 73: Add competitive motivation cards"
+
+---
+
+## Loop 74: Food/Eating Actions
+
+### Step 1: Analysis
+
+**Gap: Food and Eating Activities**
+
+Need actions representing food-related activities.
+
+**Design Goals:**
+1. Mix of social dining and solo cooking
+2. Health and creativity combinations
+3. Various difficulty levels
+
+### Step 2: Implementation Plan
+
+1. Create 4 food/eating themed actions
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Food/Eating Actions Created:**
+1. `eat_restaurant.tres` - Eat at Restaurant: 50 cost, Social+Risk, 90% success.
+2. `try_new_recipe.tres` - Try New Recipe: 55 cost, Routine+Creativity, 75% success.
+3. `healthy_breakfast.tres` - Make Healthy Breakfast: 30 cost, Health+Routine, 95% success.
+4. `dinner_party.tres` - Host Dinner Party: 80 cost, Social+Effort+Creativity, 70% success.
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 358-361).
+
+### Step 4: Commit
