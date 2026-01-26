@@ -52,8 +52,7 @@ const StarterDeckResourceScript = preload("res://jan_24_2026b-motivation-cards/s
 @onready var world_modifier_label: Label = %WorldModifierLabel
 @onready var total_motivation_label: Label = %TotalMotivation
 @onready var gap_label: Label = %GapLabel
-@onready var willpower_slider: HSlider = %WillpowerSlider
-@onready var willpower_spend_value: Label = %WillpowerSpendValue
+@onready var willpower_cost_label: Label = %WillpowerCostLabel
 @onready var back_button: Button = %BackButton
 @onready var attempt_button: Button = %AttemptButton
 
@@ -92,7 +91,6 @@ func _connect_signals() -> void:
   back_button.pressed.connect(_on_back_pressed)
   attempt_button.pressed.connect(_on_attempt_pressed)
   continue_button.pressed.connect(_on_continue_pressed)
-  willpower_slider.value_changed.connect(_on_willpower_slider_changed)
   play_again_button.pressed.connect(_on_play_again_pressed)
 
 
@@ -117,7 +115,14 @@ func _populate_action_grid() -> void:
   for child in action_grid.get_children():
     child.queue_free()
 
-  for action in game_state.available_actions:
+  var sorted_actions: Array = game_state.available_actions.duplicate()
+  sorted_actions.sort_custom(func(a, b) -> bool:
+    var a_wp := maxi(0, a.motivation_cost - _get_motivation_for_action(a))
+    var b_wp := maxi(0, b.motivation_cost - _get_motivation_for_action(b))
+    return a_wp < b_wp
+  )
+
+  for action in sorted_actions:
     var btn := _create_action_button(action)
     action_grid.add_child(btn)
 
@@ -198,7 +203,7 @@ func _show_motivation_phase() -> void:
   _display_drawn_cards()
   _display_world_modifier()
   _calculate_motivation()
-  _update_willpower_slider()
+  _update_willpower_display()
 
 
 func _start_new_turn() -> void:
@@ -382,23 +387,20 @@ func _calculate_motivation() -> void:
   gap_label.text = "Gap: %d" % gap
 
 
-func _update_willpower_slider() -> void:
+func _update_willpower_display() -> void:
   var gap := maxi(0, current_action.motivation_cost - total_motivation)
-  willpower_slider.min_value = 0
-  willpower_slider.max_value = mini(game_state.willpower, gap + 20)
-  willpower_slider.value = mini(gap, game_state.willpower)
-  _on_willpower_slider_changed(willpower_slider.value)
+  var willpower_needed := mini(gap, game_state.willpower)
+  var can_attempt: bool = total_motivation + willpower_needed >= current_action.motivation_cost
 
-
-func _on_willpower_slider_changed(value: float) -> void:
-  willpower_spend_value.text = str(int(value))
-  var effective_motivation := total_motivation + int(value)
-  var can_attempt: bool = effective_motivation >= current_action.motivation_cost
-  attempt_button.disabled = not can_attempt
-  if can_attempt:
-    attempt_button.text = "Attempt Action"
+  if gap == 0:
+    willpower_cost_label.text = "No willpower needed"
+  elif can_attempt:
+    willpower_cost_label.text = "Willpower cost: %d" % willpower_needed
   else:
-    attempt_button.text = "Need %d more" % (current_action.motivation_cost - effective_motivation)
+    willpower_cost_label.text = "Need %d more willpower" % (gap - game_state.willpower)
+
+  attempt_button.disabled = not can_attempt
+  attempt_button.text = "Attempt Action" if can_attempt else "Not enough willpower"
 
 
 func _on_back_pressed() -> void:
@@ -406,7 +408,8 @@ func _on_back_pressed() -> void:
 
 
 func _on_attempt_pressed() -> void:
-  var willpower_spent := int(willpower_slider.value)
+  var gap := maxi(0, current_action.motivation_cost - total_motivation)
+  var willpower_spent := mini(gap, game_state.willpower)
   game_state.spend_willpower(willpower_spent)
   willpower_spent_today += willpower_spent
   actions_taken.append(current_action.title)

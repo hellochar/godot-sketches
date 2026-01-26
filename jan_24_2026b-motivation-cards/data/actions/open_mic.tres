@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1")
-title = "Try Something Risky"
+title = "Perform at Open Mic"
 motivation_cost = 60
 tags = [4, 5]
 success_chance = 0.5
