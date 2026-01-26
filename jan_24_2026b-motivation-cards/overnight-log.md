@@ -3420,3 +3420,37 @@ Need value cards representing different leadership and social influence styles.
 **Updated starter_deck.tres** - Added all 4 value cards (IDs 418-421).
 
 ### Step 4: Commit
+
+Committed: `1672c9b` - "Loop 89: Add leadership value cards"
+
+---
+
+## Loop 90: Emotional Motivation Cards
+
+### Step 1: Analysis
+
+**Gap: Emotional/Mood Mental States**
+
+Need motivation cards representing different emotional states.
+
+**Design Goals:**
+1. Range of emotional states (joy, sadness, anger, calm)
+2. Different trade-offs for each emotion
+3. Special effects for some states
+
+### Step 2: Implementation Plan
+
+1. Create 4 emotional state themed motivation cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Emotional Motivation Cards Created:**
+1. `joyful_heart.tres` - Joyful Heart: +10 Health, +15 Social, +10 Creativity, +5 Effort.
+2. `melancholy.tres` - Melancholy: -5 Health, -10 Social, +20 Creativity, -10 Effort, +5 Routine.
+3. `angry_energy.tres` - Angry Energy: +25 Effort, +15 Risk, -15 Social, -10 Routine.
+4. `serene_calm.tres` - Serene Calm: +15 Health, +15 Routine, +5 Social, -5 Effort, -10 Risk. Willpower restore effect.
+
+**Updated starter_deck.tres** - Added all 4 motivation cards (IDs 422-425).
+
+### Step 4: Commit
