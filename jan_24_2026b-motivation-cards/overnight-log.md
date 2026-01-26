@@ -1069,3 +1069,39 @@ Momentum exists but players don't see how it affects their actions. The bonus is
   - Shows "Momentum +X" in gold color when momentum is significant
 
 ### Step 4: Commit
+
+Committed: `b4bde3d` - "Show momentum bonus on action buttons when significant"
+
+---
+
+## Loop 24: Value Card Reward Screen
+
+### Step 1: Analysis
+
+**Gap: No Value Card Acquisition**
+
+Players start with one value card but never gain more during gameplay. Deck building is one-dimensional.
+
+**Design Goals:**
+1. Offer value card selection after successful hard actions
+2. Create progression in value cards
+3. Enable multi-value builds
+
+### Step 2: Implementation Plan
+
+1. Add chance to offer value card on high-cost action success
+2. Show value card selection after result if triggered
+3. Add chosen value card to player's collection
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `motivation_cards.gd`:
+  - Added `pending_value_card_reward` flag
+  - Trigger reward when action cost >= 70 and player has < 3 value cards
+  - Added `_show_value_card_reward()` to present 3 new value cards
+  - Added `_select_reward_value()` to add chosen card
+  - Modified `_on_continue_pressed()` to check for pending reward
+
+### Step 4: Commit
