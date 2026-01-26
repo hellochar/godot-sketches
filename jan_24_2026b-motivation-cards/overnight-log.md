@@ -2400,3 +2400,37 @@ Need more actions with 3+ tags to synergize with cards like "embodied_expression
 **Updated starter_deck.tres** - Added all 4 actions (IDs 298-301).
 
 ### Step 4: Commit
+
+Committed: `5ff3365` - "Loop 59: Add multi-tag synergy actions"
+
+---
+
+## Loop 60: Negative/Tension Motivation Cards
+
+### Step 1: Analysis
+
+**Gap: Limited Negative Cards**
+
+Need more negative cards to create tension and interesting decisions (discarding, trading off).
+
+**Design Goals:**
+1. Cards with significant negative effects
+2. Represent mental/emotional challenges
+3. Encourage use of discard mechanic
+
+### Step 2: Implementation Plan
+
+1. Create 4 negative motivation cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Negative Cards Created:**
+1. `crushing_doubt.tres` - Crushing Doubt: -10 Health, -10 Social, -5 Routine, -15 Effort, -10 Creativity.
+2. `analysis_paralysis.tres` - Analysis Paralysis: -5 Social, +10 Routine, -20 Effort, -15 Risk, -10 Creativity.
+3. `social_exhaustion.tres` - Social Exhaustion: -5 Health, -25 Social, +10 Routine, -10 Risk, +5 Creativity.
+4. `burnout_feeling.tres` - Burnout: -15 Health, -5 Social, -10 Routine, -25 Effort, -15 Creativity.
+
+**Updated starter_deck.tres** - Added all 4 cards (IDs 302-305).
+
+### Step 4: Commit
