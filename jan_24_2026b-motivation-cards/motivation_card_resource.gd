@@ -14,6 +14,7 @@ enum ConditionType {
   SUCCEEDED_YESTERDAY,
   HIGH_ACTION_COST,
   LOW_SUCCESS_CHANCE,
+  DISCARDED_THIS_TURN,
 }
 
 enum SpecialEffect {
@@ -103,6 +104,9 @@ func check_condition(context: Dictionary) -> bool:
     ConditionType.LOW_SUCCESS_CHANCE:
       var chance: float = context.get("success_chance", 1.0)
       return chance < (condition_threshold / 100.0)
+    ConditionType.DISCARDED_THIS_TURN:
+      var discards: int = context.get("discards_this_turn", 0)
+      return discards >= condition_threshold
   return false
 
 
@@ -128,6 +132,10 @@ func get_condition_text() -> String:
       return "If cost > %d" % condition_threshold
     ConditionType.LOW_SUCCESS_CHANCE:
       return "If success < %d%%" % condition_threshold
+    ConditionType.DISCARDED_THIS_TURN:
+      if condition_threshold <= 1:
+        return "If discarded this turn"
+      return "If discarded %d+ this turn" % condition_threshold
   return ""
 
 
