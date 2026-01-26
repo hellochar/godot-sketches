@@ -6,6 +6,7 @@
 - Avoid the word "Data". Use more descriptive terminology.
 - Shorten summaries to just the most important code bits.
 - when you are uncertain, clearly explain things you're not sure of. Double check your knowledge by accessing documentation or doing a web search.
+- Do not invent abbreviations or acronyms for user facing text. Reuse terminology already established in the codebase and presented to the player. Optimize for understandability over brevity.
 
 # Godot
 - ALWAYS use two spaces for indentation, never tabs
