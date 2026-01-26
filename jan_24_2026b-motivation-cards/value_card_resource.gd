@@ -62,3 +62,24 @@ func get_ability_description() -> String:
 
 func has_ability() -> bool:
   return ability_type != AbilityType.NONE
+
+
+func get_score_description() -> String:
+  var parts: Array = []
+  if health_score > 0:
+    parts.append("+%d Health" % health_score)
+  if social_score > 0:
+    parts.append("+%d Social" % social_score)
+  if routine_score > 0:
+    parts.append("+%d Routine" % routine_score)
+  if effort_score > 0:
+    parts.append("+%d Effort" % effort_score)
+  if risk_score > 0:
+    parts.append("+%d Risk" % risk_score)
+  if creativity_score > 0:
+    parts.append("+%d Creativity" % creativity_score)
+  return ", ".join(parts) if not parts.is_empty() else "No bonuses"
+
+
+func get_ability_text() -> String:
+  return get_ability_description()

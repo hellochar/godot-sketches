@@ -642,7 +642,7 @@ func _activate_value_card_ability(card) -> void:
 
   match card.ability_type:
     ValueCardRes.AbilityType.EXTRA_DRAW:
-      var new_cards := game_state.draw_motivation_cards(card.ability_value)
+      var new_cards: Array = game_state.draw_motivation_cards(card.ability_value)
       for new_card in new_cards:
         if new_card not in drawn_cards:
           drawn_cards.append(new_card)
@@ -1319,7 +1319,8 @@ func _show_value_selection() -> void:
     generic_card.add_content_label(value_card.get_score_description(), 12, Color.WHITE)
     if value_card.ability_type != ValueCardRes.AbilityType.NONE:
       generic_card.add_content_label(value_card.get_ability_text(), 10, Color(0.8, 0.9, 1.0))
-    generic_card.clicked.connect(func(): _select_starting_value(value_card))
+    generic_card.enable_hover = true
+    generic_card.pressed.connect(func(): _select_starting_value(value_card))
 
   value_selection_panel.visible = true
 
@@ -1358,7 +1359,8 @@ func _show_value_card_reward() -> void:
     generic_card.add_content_label(value_card.get_score_description(), 12, Color.WHITE)
     if value_card.ability_type != ValueCardRes.AbilityType.NONE:
       generic_card.add_content_label(value_card.get_ability_text(), 10, Color(0.8, 0.9, 1.0))
-    generic_card.clicked.connect(func(): _select_reward_value(value_card))
+    generic_card.enable_hover = true
+    generic_card.pressed.connect(func(): _select_reward_value(value_card))
 
   value_selection_panel.visible = true
 
