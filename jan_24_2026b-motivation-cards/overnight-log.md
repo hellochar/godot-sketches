@@ -2128,3 +2128,37 @@ Most effort-tagged actions share tags with others. Need pure effort actions.
 **Updated starter_deck.tres** - Added all 4 actions (IDs 266-269).
 
 ### Step 4: Commit
+
+Committed: `876bb6e` - "Loop 51: Add effort archetype actions"
+
+---
+
+## Loop 52: Risk Archetype Actions
+
+### Step 1: Analysis
+
+**Gap: Limited Risk-Only Actions**
+
+Risk archetype needs more diverse actions beyond the existing high-risk ones.
+
+**Design Goals:**
+1. Add risk-focused actions with varying difficulty
+2. Include gambling, adventure, and physical risk themes
+3. Some pure risk, some bridging to other tags
+
+### Step 2: Implementation Plan
+
+1. Create 4 risk-focused actions
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Risk Actions Created:**
+1. `cliff_dive.tres` - Cliff Dive: 90 cost, Risk+Health, 55% success
+2. `spontaneous_trip.tres` - Spontaneous Trip: 75 cost, Risk+Social, 70% success
+3. `place_bet.tres` - Place a Bet: 50 cost, Risk only, 50% success
+4. `try_spicy_food.tres` - Try Extreme Spicy Food: 35 cost, Risk+Health, 80% success
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 270-273).
+
+### Step 4: Commit
