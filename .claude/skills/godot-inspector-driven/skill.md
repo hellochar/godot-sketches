@@ -88,13 +88,81 @@ func draw_thing() -> void:
   var draw_color := outline_color  # uses @export
 ```
 
+### 6. Game Content → Resource Classes + .tres Files
+For game content (cards, items, levels), create Resource classes with @export fields:
+
+```gdscript
+# card_resource.gd
+class_name CardResource extends Resource
+
+@export var title: String
+@export var cost: int = 50
+@export_range(0.0, 1.0) var success_chance: float = 0.8
+
+@export_group("Tag Modifiers")
+@export var health_modifier: int = 0
+@export var social_modifier: int = 0
+```
+
+Then create individual `.tres` files editable in the inspector. Group related content in folders:
+```
+data/
+├── cards/
+│   ├── fire_spell.tres
+│   └── heal.tres
+├── items/
+│   └── sword.tres
+└── starter_deck.tres
+```
+
+### 7. Aggregate Resources → Collection Resource
+Create a collection resource to reference multiple content pieces:
+
+```gdscript
+# deck_resource.gd
+class_name DeckResource extends Resource
+
+@export var cards: Array[Resource] = []
+@export var items: Array[Resource] = []
+```
+
+**Important:** Use `Array[Resource]` not `Array[CardResource]` to avoid load-order issues with custom class names.
+
+Wire the collection to your main scene via @export:
+```gdscript
+@export var starter_deck: Resource
+
+func _ready() -> void:
+  if starter_deck:
+    game_state.load_from_deck(starter_deck)
+```
+
+### 8. Scene Templates for Dynamic UI
+When creating UI elements dynamically, prefer PackedScene templates over pure code:
+
+```gdscript
+@export var card_scene: PackedScene
+
+func _create_card(data: Resource) -> Control:
+  var card := card_scene.instantiate()
+  card.setup(data)
+  return card
+```
+
+This allows designers to tweak card appearance in the editor without touching code.
+
 ## Checklist
 
 When refactoring Godot code:
 
-1. [ ] Find hardcoded numbers in drawing/physics code → make @export
-2. [ ] Group related exports with @export_group()
-3. [ ] Remove const dictionaries for configurable data → @export with helpers
-4. [ ] Remove Spacer Control nodes → use container separation property
-5. [ ] Check for shadowed variable warnings → rename locals
-6. [ ] Ensure ghost/preview drawing uses same exports as actual drawing
+1. [ ] Find hardcoded numbers (sizes, margins, radii, durations) → `@export var`
+2. [ ] Find hardcoded colors → `@export var color: Color`
+3. [ ] Group related exports with `@export_group()`
+4. [ ] Remove const dictionaries for configurable data → `@export` with match helpers
+5. [ ] Remove Spacer Control nodes → use container separation property
+6. [ ] Check for shadowed variable warnings → rename locals
+7. [ ] Ensure ghost/preview drawing uses same exports as actual drawing
+8. [ ] Game content (cards, items, enemies) → Resource classes + .tres files
+9. [ ] Collections of content → aggregate resource with `Array[Resource]`
+10. [ ] Dynamic UI elements → PackedScene templates via `@export var scene: PackedScene`
+11. [ ] Load resources in `_ready()`, not `_init()` (for proper @export wiring)
