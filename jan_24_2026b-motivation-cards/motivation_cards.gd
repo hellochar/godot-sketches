@@ -135,6 +135,7 @@ func _build_context_for_action(action) -> Dictionary:
     "discards_this_turn": discards_this_turn,
     "total_successes_this_week": game_state.total_successes_this_week,
     "last_successful_action_title": game_state.last_successful_action_title,
+    "willpower": game_state.willpower,
   }
 
 
@@ -917,7 +918,7 @@ func _show_result(success: bool) -> void:
 
 
 func _handle_success_special_effects() -> int:
-  var willpower_restored := 0
+  var willpower_change := 0
   for card in drawn_cards:
     if not (card is MotivationCardRes):
       continue
@@ -926,11 +927,17 @@ func _handle_success_special_effects() -> int:
         if card.special_target_tag in current_action.tags:
           game_state.extra_draws_next_turn += 1
       MotivationCardRes.SpecialEffect.RESTORE_WILLPOWER_ON_SUCCESS:
-        willpower_restored += card.special_value
+        willpower_change += card.special_value
         game_state.willpower = mini(game_state.willpower_max, game_state.willpower + card.special_value)
       MotivationCardRes.SpecialEffect.EXTRA_DRAW_ON_SUCCESS:
         game_state.extra_draws_next_turn += 1
-  return willpower_restored
+      MotivationCardRes.SpecialEffect.DRAIN_WILLPOWER_ON_SUCCESS:
+        willpower_change -= card.special_value
+        game_state.willpower = maxi(0, game_state.willpower - card.special_value)
+      MotivationCardRes.SpecialEffect.REDUCE_MAX_WILLPOWER:
+        game_state.willpower_max = maxi(30, game_state.willpower_max - card.special_value)
+        game_state.willpower = mini(game_state.willpower, game_state.willpower_max)
+  return willpower_change
 
 
 func _handle_failure_special_effects() -> int:
