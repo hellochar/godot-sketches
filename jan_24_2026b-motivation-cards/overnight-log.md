@@ -1373,3 +1373,37 @@ Create 4 new action resources:
 4. Teach Someone - Social+Effort, higher cost
 
 ### Step 3: Execution
+
+**Actions Created:**
+- `share_meme.tres` - 25 cost, Social+Creativity, 100% success
+- `brainstorm_ideas.tres` - 45 cost, Creativity+Effort, 90% success
+- `karaoke_night.tres` - 55 cost, Social+Risk+Creativity, 75% success, grants "Feeling Bold"
+- `teach_someone.tres` - 60 cost, Social+Effort, 85% success, grants "Deep Focus"
+
+**Updated starter_deck.tres** - Added all 4 actions.
+
+### Step 4: Commit
+
+Committed: (pending)
+
+---
+
+## Loop 32: Negative Cards Enhancement
+
+### Step 1: Analysis
+
+**Gap: Negative Cards Still Feel Bad**
+
+Many negative cards exist but lack strategic depth. Players just hope not to draw them.
+
+**Design Goals:**
+1. Add upsides to purely negative cards
+2. Create "risky but rewarding" negative cards
+3. Make drawing negatives feel like a choice, not just bad luck
+
+### Step 2: Implementation Plan
+
+Modify 4 existing negative cards to have upsides:
+- Cards with only negatives should have conditional bonuses or special effects
+
+### Step 3: Execution
