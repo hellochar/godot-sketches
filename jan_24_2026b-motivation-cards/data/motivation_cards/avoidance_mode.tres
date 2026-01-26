@@ -1,9 +1,12 @@
-[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3 uid="uid://bnb6eqc0ni81v"]
 
-[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://4tef4320mo68" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
 title = "Avoidance mode"
 effort_modifier = -4
 creativity_modifier = 10
+condition_type = 5
+condition_tag = 4
+bonus_multiplier = 3.0

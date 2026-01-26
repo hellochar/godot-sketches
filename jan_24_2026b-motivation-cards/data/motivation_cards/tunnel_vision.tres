@@ -1,9 +1,12 @@
-[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3 uid="uid://dl545uqr13kyj"]
 
-[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://4tef4320mo68" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
 title = "Tunnel vision"
-effort_modifier = 20
 social_modifier = -3
+effort_modifier = 20
+condition_type = 2
+condition_tag = 1
+bonus_multiplier = 1.0

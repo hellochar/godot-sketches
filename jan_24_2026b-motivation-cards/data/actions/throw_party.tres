@@ -1,10 +1,13 @@
-[gd_resource type="Resource" script_class="ActionResource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ActionResource" load_steps=4 format=3 uid="uid://cmpjtskil0gj8"]
 
-[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://d0jysd6hdr7j3" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
+[ext_resource type="Resource" uid="uid://bnae2ggvcl2iq" path="res://jan_24_2026b-motivation-cards/data/motivation_cards/party_mode.tres" id="2"]
+[ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/motivation_cards/feeling_chatty.tres" id="3"]
 
 [resource]
 script = ExtResource("1")
 title = "Throw a Party"
 motivation_cost = 110
-tags = [1, 3, 5]
+tags = Array[int]([1, 3, 5])
 success_chance = 0.9
+cards_on_success = Array[Resource]([ExtResource("2"), ExtResource("3")])

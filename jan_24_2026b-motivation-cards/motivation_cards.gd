@@ -3,6 +3,7 @@ extends Control
 const CardData = preload("res://jan_24_2026b-motivation-cards/card_data.gd")
 const GameState = preload("res://jan_24_2026b-motivation-cards/game_state.gd")
 const StarterDeckResourceScript = preload("res://jan_24_2026b-motivation-cards/starter_deck_resource.gd")
+const MotivationCardRes = preload("res://jan_24_2026b-motivation-cards/motivation_card_resource.gd")
 
 @export_group("Game Settings")
 @export var cards_per_draw: int = 5
@@ -62,7 +63,7 @@ const StarterDeckResourceScript = preload("res://jan_24_2026b-motivation-cards/s
 @onready var willpower_label: Label = %WillpowerLabel
 
 @onready var action_selection_screen: VBoxContainer = %ActionSelectionScreen
-@onready var action_grid: GridContainer = %ActionGrid
+@onready var action_grid: Container = %ActionGrid
 @onready var mood_cards_container: HBoxContainer = %MoodCardsContainer
 @onready var mood_world_label: Label = %MoodWorldLabel
 @onready var values_cards_container: HBoxContainer = %ValuesCardsContainer
@@ -102,6 +103,28 @@ var current_world_modifier
 var total_motivation: int = 0
 var actions_taken: Array = []
 var willpower_spent_today: int = 0
+var last_action_succeeded: bool = false
+
+
+func _build_context_for_action(action) -> Dictionary:
+  var tag_counts := {}
+  for tag in CardData.Tag.values():
+    tag_counts[tag] = 0
+
+  for card in drawn_cards:
+    for tag in CardData.Tag.values():
+      if card.get_modifier(tag) != 0:
+        tag_counts[tag] += 1
+
+  return {
+    "tag_counts": tag_counts,
+    "action_tags": action.tags,
+    "action_tag_count": action.tags.size(),
+    "action_cost": action.motivation_cost,
+    "succeeded_yesterday": game_state.succeeded_yesterday,
+    "success_streak": game_state.success_streak,
+    "attempted_actions": game_state.attempted_actions,
+  }
 
 
 func _ready() -> void:
@@ -132,7 +155,7 @@ func _play_sound(sound: AudioStream, vary: bool = true) -> void:
     audio_player.stream = sound
     if vary:
       audio_player.pitch_scale = randf_range(1.0 - pitch_variance, 1.0 + pitch_variance)
-      audio_player.volume_db = randf_range(-volume_variance_db, 0.0)
+      audio_player.volume_db = randf_range(-volume_variance_db, 0.0) - 12
     else:
       audio_player.pitch_scale = 1.0
       audio_player.volume_db = 0.0
@@ -251,12 +274,30 @@ func _create_action_button(action) -> Button:
 
 
 func _get_motivation_for_action(action) -> int:
+  var context := _build_context_for_action(action)
   var motivation := 0
   for card in drawn_cards:
-    motivation += card.get_motivation_for_tags(action.tags)
+    motivation += card.get_motivation_for_tags(action.tags, context)
   if current_world_modifier:
     motivation += current_world_modifier.get_motivation_for_tags(action.tags)
+  motivation += _get_special_effect_bonus(action, context)
   return motivation
+
+
+func _get_special_effect_bonus(action, context: Dictionary) -> int:
+  var bonus := 0
+  for card in drawn_cards:
+    if not (card is MotivationCardRes):
+      continue
+    match card.special_effect:
+      MotivationCardRes.SpecialEffect.BONUS_FOR_NEW_ACTIONS:
+        if action.title not in context.get("attempted_actions", []):
+          bonus += card.special_value
+      MotivationCardRes.SpecialEffect.STREAK_SCALING:
+        bonus += card.special_value * context.get("success_streak", 0)
+      MotivationCardRes.SpecialEffect.DOUBLE_TAG_ZERO_OTHER:
+        pass
+  return bonus
 
 
 func _format_tags(tags: Array) -> String:
@@ -297,7 +338,9 @@ func _show_motivation_phase() -> void:
 
 
 func _start_new_turn() -> void:
-  drawn_cards = game_state.draw_motivation_cards(cards_per_draw)
+  var draw_count: int = cards_per_draw + game_state.extra_draws_next_turn
+  game_state.extra_draws_next_turn = 0
+  drawn_cards = game_state.draw_motivation_cards(draw_count)
   if randf() < world_modifier_chance:
     current_world_modifier = game_state.get_random_world_modifier()
   else:
@@ -468,7 +511,8 @@ func _create_motivation_card_display(card) -> PanelContainer:
   var panel := PanelContainer.new()
   panel.custom_minimum_size = motivation_card_size
 
-  var motivation_value: int = card.get_motivation_for_tags(current_action.tags)
+  var context := _build_context_for_action(current_action)
+  var motivation_value: int = card.get_motivation_for_tags(current_action.tags, context)
   var bg_color := neutral_card_color
   if motivation_value > 0:
     bg_color = positive_card_color
@@ -488,7 +532,7 @@ func _create_motivation_card_display(card) -> PanelContainer:
   panel.add_theme_stylebox_override("panel", style)
 
   var vbox := VBoxContainer.new()
-  vbox.add_theme_constant_override("separation", 4)
+  vbox.add_theme_constant_override("separation", 2)
 
   var title_label := Label.new()
   title_label.text = card.title
@@ -500,6 +544,27 @@ func _create_motivation_card_display(card) -> PanelContainer:
   mod_label.text = card.format_modifiers()
   mod_label.add_theme_font_size_override("font_size", 12)
   vbox.add_child(mod_label)
+
+  if card is MotivationCardRes:
+    var condition_text: String = card.get_condition_text()
+    if not condition_text.is_empty():
+      var cond_label := Label.new()
+      var condition_met: bool = card.check_condition(context)
+      cond_label.text = condition_text
+      cond_label.add_theme_font_size_override("font_size", 10)
+      if condition_met:
+        cond_label.add_theme_color_override("font_color", success_color)
+      else:
+        cond_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+      vbox.add_child(cond_label)
+
+    var special_text: String = card.get_special_effect_text()
+    if not special_text.is_empty():
+      var special_label := Label.new()
+      special_label.text = special_text
+      special_label.add_theme_font_size_override("font_size", 10)
+      special_label.add_theme_color_override("font_color", Color(0.8, 0.7, 1.0))
+      vbox.add_child(special_label)
 
   if motivation_value != 0:
     var contrib_label := Label.new()
@@ -529,12 +594,15 @@ func _display_world_modifier() -> void:
 
 
 func _calculate_motivation() -> void:
+  var context := _build_context_for_action(current_action)
   total_motivation = 0
   for card in drawn_cards:
-    total_motivation += card.get_motivation_for_tags(current_action.tags)
+    total_motivation += card.get_motivation_for_tags(current_action.tags, context)
 
   if current_world_modifier:
     total_motivation += current_world_modifier.get_motivation_for_tags(current_action.tags)
+
+  total_motivation += _get_special_effect_bonus(current_action, context)
 
   total_motivation_label.text = "Total Motivation: %d / %d" % [total_motivation, current_action.motivation_cost]
 
@@ -543,6 +611,7 @@ func _calculate_motivation() -> void:
 
 
 func _animate_motivation_tally() -> void:
+  var context := _build_context_for_action(current_action)
   var running_total := 0
   total_motivation_label.text = "Total Motivation: 0 / %d" % current_action.motivation_cost
   gap_label.text = "Gap: %d" % current_action.motivation_cost
@@ -551,7 +620,7 @@ func _animate_motivation_tally() -> void:
   for i in range(drawn_cards.size()):
     var card = drawn_cards[i]
     var card_panel: PanelContainer = card_panels[i]
-    var motivation_value: int = card.get_motivation_for_tags(current_action.tags)
+    var motivation_value: int = card.get_motivation_for_tags(current_action.tags, context)
 
     var tween := create_tween()
     tween.set_parallel(true)
@@ -717,9 +786,18 @@ func _show_result(success: bool) -> void:
   for child in cards_added_container.get_children():
     child.queue_free()
 
+  if current_action.title not in game_state.attempted_actions:
+    game_state.attempted_actions.append(current_action.title)
+
   var score_gained := 0
   var cards_to_add: Array = []
+  var willpower_restored := 0
+
   if success:
+    game_state.success_streak += 1
+    game_state.succeeded_yesterday = true
+    last_action_succeeded = true
+
     for value_card in game_state.value_cards:
       score_gained += value_card.get_score_for_tags(current_action.tags)
     game_state.add_score(score_gained)
@@ -727,6 +805,8 @@ func _show_result(success: bool) -> void:
     for card in current_action.cards_on_success:
       game_state.add_motivation_card(card)
       cards_to_add.append(card)
+
+    _handle_success_special_effects()
 
     result_title.text = "Success!"
     result_title.add_theme_color_override("font_color", success_color)
@@ -739,10 +819,19 @@ func _show_result(success: bool) -> void:
     else:
       result_details.text = "\n".join(details_parts)
   else:
+    game_state.success_streak = 0
+    game_state.succeeded_yesterday = false
+    last_action_succeeded = false
+
+    willpower_restored = _handle_failure_special_effects()
+
     result_title.text = "Failed..."
     result_title.add_theme_color_override("font_color", failure_color)
     _play_sound(failure_sound)
-    result_details.text = "The action didn't succeed this time.\nBetter luck next time."
+    var details_text := "The action didn't succeed this time."
+    if willpower_restored > 0:
+      details_text += "\nRestored %d willpower from Adrenaline Junkie!" % willpower_restored
+    result_details.text = details_text
 
   await _fade_in(result_panel)
 
@@ -750,6 +839,28 @@ func _show_result(success: bool) -> void:
     await _animate_cards_added(cards_to_add)
 
   _update_top_bar()
+
+
+func _handle_success_special_effects() -> void:
+  for card in drawn_cards:
+    if not (card is MotivationCardRes):
+      continue
+    match card.special_effect:
+      MotivationCardRes.SpecialEffect.EXTRA_DRAW_FOR_TAG:
+        if card.special_target_tag in current_action.tags:
+          game_state.extra_draws_next_turn += 1
+
+
+func _handle_failure_special_effects() -> int:
+  var willpower_restored := 0
+  for card in drawn_cards:
+    if not (card is MotivationCardRes):
+      continue
+    match card.special_effect:
+      MotivationCardRes.SpecialEffect.RESTORE_WILLPOWER_ON_FAIL:
+        willpower_restored += card.special_value
+        game_state.willpower = mini(game_state.willpower_max, game_state.willpower + card.special_value)
+  return willpower_restored
 
 
 func _animate_cards_added(cards: Array) -> void:
