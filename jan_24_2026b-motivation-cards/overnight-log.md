@@ -365,3 +365,59 @@ Create 6 temporary motivation cards (high power, one-day duration):
 
 ### Step 4: Commit
 
+Committed: `36e0280` - "Add temporary event cards as action rewards"
+
+---
+
+## Loop 7: Value Card Activation
+
+### Step 1: Analysis
+
+**Gap: Passive Value Cards**
+
+Per emergent-game-design skill:
+> "Value cards don't create decisions during play. They're just a passive multiplier."
+> "Alternative Design: Value cards could grant special abilities"
+
+Current problem: Value cards are selected at start, then never interacted with again. No player agency during gameplay.
+
+**Design Goals:**
+1. Add one-time activatable abilities to value cards
+2. Create meaningful "save for the right moment" decisions
+3. Abilities refresh weekly to encourage strategic timing
+
+### Step 2: Implementation Plan
+
+1. Add AbilityType enum to ValueCardResource:
+   - NONE, EXTRA_DRAW, RESTORE_WILLPOWER, DOUBLE_NEXT_SCORE, REROLL_HAND, BONUS_MOTIVATION
+2. Track used abilities in motivation_cards.gd
+3. Show ability buttons on value cards during action selection
+4. Implement ability effects when activated
+5. Add abilities to 6 core archetype value cards
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `value_card_resource.gd` - Added ability system:
+  - AbilityType enum with 6 ability types
+  - `ability_type` and `ability_value` export vars
+  - `get_ability_description()` and `has_ability()` helpers
+
+- `motivation_cards.gd` - Implemented ability activation:
+  - Added `value_card_abilities_used`, `value_card_bonus_motivation`, `double_next_score` vars
+  - `_create_value_card_display()` now shows ability buttons
+  - `_activate_value_card_ability()` handles all ability effects
+  - Abilities reset at week start (day 1, 8, etc.)
+  - Score doubling applied when `double_next_score` is active
+
+**Value Cards Updated with Abilities:**
+1. `fitness_fanatic.tres` - Restore 20 willpower
+2. `social_networker.tres` - Draw 2 extra cards
+3. `workaholic.tres` - +30 to all tags this action
+4. `daredevil.tres` - Double next action's score
+5. `artist_at_heart.tres` - Reroll hand (draw 6 new cards)
+6. `creature_of_habit.tres` - Restore 25 willpower
+
+### Step 4: Commit
+

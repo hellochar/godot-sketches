@@ -3,6 +3,15 @@ extends Resource
 
 const CardData = preload("res://jan_24_2026b-motivation-cards/card_data.gd")
 
+enum AbilityType {
+  NONE,
+  EXTRA_DRAW,
+  RESTORE_WILLPOWER,
+  DOUBLE_NEXT_SCORE,
+  REROLL_HAND,
+  BONUS_MOTIVATION,
+}
+
 @export var title: String
 
 @export_group("Tag Scores")
@@ -12,6 +21,10 @@ const CardData = preload("res://jan_24_2026b-motivation-cards/card_data.gd")
 @export var effort_score: int = 0
 @export var risk_score: int = 0
 @export var creativity_score: int = 0
+
+@export_group("Ability")
+@export var ability_type: AbilityType = AbilityType.NONE
+@export var ability_value: int = 0
 
 
 func get_score(tag: CardData.Tag) -> int:
@@ -30,3 +43,22 @@ func get_score_for_tags(action_tags: Array) -> int:
   for tag in action_tags:
     total += get_score(tag)
   return total
+
+
+func get_ability_description() -> String:
+  match ability_type:
+    AbilityType.EXTRA_DRAW:
+      return "Draw %d extra cards" % ability_value
+    AbilityType.RESTORE_WILLPOWER:
+      return "Restore %d willpower" % ability_value
+    AbilityType.DOUBLE_NEXT_SCORE:
+      return "Double next action's score"
+    AbilityType.REROLL_HAND:
+      return "Discard hand, draw %d new cards" % ability_value
+    AbilityType.BONUS_MOTIVATION:
+      return "+%d to all tags this action" % ability_value
+  return ""
+
+
+func has_ability() -> bool:
+  return ability_type != AbilityType.NONE

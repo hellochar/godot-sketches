@@ -6,3 +6,5 @@
 script = ExtResource("1")
 title = "Social networker"
 social_score = 15
+ability_type = 1
+ability_value = 2

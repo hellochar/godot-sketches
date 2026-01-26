@@ -4,6 +4,7 @@ const CardData = preload("res://jan_24_2026b-motivation-cards/card_data.gd")
 const GameState = preload("res://jan_24_2026b-motivation-cards/game_state.gd")
 const StarterDeckResourceScript = preload("res://jan_24_2026b-motivation-cards/starter_deck_resource.gd")
 const MotivationCardRes = preload("res://jan_24_2026b-motivation-cards/motivation_card_resource.gd")
+const ValueCardRes = preload("res://jan_24_2026b-motivation-cards/value_card_resource.gd")
 const GenericCardScene = preload("res://common/generic_card.tscn")
 
 @export_group("Game Settings")
@@ -110,6 +111,9 @@ var last_action_succeeded: bool = false
 var discards_this_turn: int = 0
 var discarded_cards_this_turn: Array = []
 var is_animating: bool = false
+var value_card_abilities_used: Dictionary = {}
+var value_card_bonus_motivation: int = 0
+var double_next_score: bool = false
 
 
 func _build_context_for_action(action) -> Dictionary:
@@ -329,6 +333,7 @@ func _get_motivation_for_action(action) -> int:
   if current_world_modifier:
     motivation += current_world_modifier.get_motivation_for_tags(action.tags)
   motivation += _get_special_effect_bonus(action, context)
+  motivation += value_card_bonus_motivation
   return motivation
 
 
@@ -436,6 +441,9 @@ func _start_new_turn() -> void:
   drawn_cards = game_state.draw_motivation_cards(draw_count)
   discards_this_turn = 0
   discarded_cards_this_turn.clear()
+  value_card_bonus_motivation = 0
+  if (game_state.current_day - 1) % 7 == 0:
+    value_card_abilities_used.clear()
   if randf() < world_modifier_chance:
     current_world_modifier = game_state.get_random_world_modifier()
   else:
@@ -491,14 +499,33 @@ func _display_value_cards() -> void:
 
 
 func _create_value_card_display(card) -> PanelContainer:
+  var ability_used: bool = value_card_abilities_used.get(card.title, false)
+  var has_ability: bool = card.has_ability()
+
+  var bg_color := Color(0.25, 0.35, 0.45)
+  if has_ability and not ability_used:
+    bg_color = Color(0.35, 0.35, 0.55)
+
   var generic_card = GenericCardScene.instantiate()
   generic_card.card_size = motivation_card_size
-  generic_card.background_color = Color(0.25, 0.35, 0.45)
+  generic_card.background_color = bg_color
   generic_card.corner_radius = card_corner_radius
   generic_card.content_margin = card_margin
   generic_card.title = card.title
   generic_card.description = _format_value_card_scores(card)
   generic_card.description_color = success_color
+
+  if has_ability:
+    var ability_text: String = card.get_ability_description()
+    var ability_color := Color(0.8, 0.7, 1.0) if not ability_used else Color(0.5, 0.5, 0.5)
+    var status_text := ability_text if not ability_used else ability_text + " (used)"
+    generic_card.add_content_label(status_text, 10, ability_color)
+
+    if not ability_used:
+      generic_card.enable_hover = true
+      generic_card.pressed.connect(func() -> void: _activate_value_card_ability(card))
+      _setup_card_feedback(generic_card)
+
   return generic_card
 
 
@@ -517,6 +544,35 @@ func _format_value_card_scores(card) -> String:
   if card.creativity_score > 0:
     parts.append("+%d Creativity" % card.creativity_score)
   return "\n".join(parts)
+
+
+func _activate_value_card_ability(card) -> void:
+  if value_card_abilities_used.get(card.title, false):
+    return
+
+  value_card_abilities_used[card.title] = true
+  _play_sound(click_sound)
+
+  match card.ability_type:
+    ValueCardRes.AbilityType.EXTRA_DRAW:
+      var new_cards := game_state.draw_motivation_cards(card.ability_value)
+      for new_card in new_cards:
+        if new_card not in drawn_cards:
+          drawn_cards.append(new_card)
+    ValueCardRes.AbilityType.RESTORE_WILLPOWER:
+      game_state.willpower = mini(game_state.willpower_max, game_state.willpower + card.ability_value)
+      _update_top_bar()
+    ValueCardRes.AbilityType.DOUBLE_NEXT_SCORE:
+      double_next_score = true
+    ValueCardRes.AbilityType.REROLL_HAND:
+      drawn_cards = game_state.draw_motivation_cards(card.ability_value)
+    ValueCardRes.AbilityType.BONUS_MOTIVATION:
+      value_card_bonus_motivation += card.ability_value
+
+  _display_value_cards()
+  _display_drawn_cards_instant()
+  _calculate_motivation()
+  _update_willpower_display()
 
 
 func _populate_tags() -> void:
@@ -900,6 +956,9 @@ func _show_result(success: bool) -> void:
 
     for value_card in game_state.value_cards:
       score_gained += value_card.get_score_for_tags(current_action.tags)
+    if double_next_score:
+      score_gained *= 2
+      double_next_score = false
     game_state.add_score(score_gained)
 
     for card in current_action.cards_on_success:

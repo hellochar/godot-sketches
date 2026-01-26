@@ -6,3 +6,5 @@
 script = ExtResource("1")
 title = "Creature of habit"
 routine_score = 15
+ability_type = 2
+ability_value = 25
