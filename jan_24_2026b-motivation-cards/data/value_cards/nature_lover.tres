@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ValueCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://daiwk27taqnoo" path="res://jan_24_2026b-motivation-cards/value_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Nature Lover"
+health_score = 3
+social_score = 0
+routine_score = 1
+effort_score = 1
+risk_score = 1
+creativity_score = 2
+ability_type = 2
+ability_value = 8
+

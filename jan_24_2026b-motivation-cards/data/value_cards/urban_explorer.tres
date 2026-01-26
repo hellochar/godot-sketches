@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ValueCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://daiwk27taqnoo" path="res://jan_24_2026b-motivation-cards/value_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Urban Explorer"
+health_score = 1
+social_score = 2
+routine_score = 0
+effort_score = 2
+risk_score = 3
+creativity_score = 1
+ability_type = 1
+ability_value = 1
+

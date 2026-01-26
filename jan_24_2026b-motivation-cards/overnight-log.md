@@ -3250,3 +3250,37 @@ Need world modifiers representing different sleep states and their effects.
 **Updated starter_deck.tres** - Added all 4 world modifiers (IDs 398-401).
 
 ### Step 4: Commit
+
+Committed: `66e9cc9` - "Loop 84: Add sleep world modifiers"
+
+---
+
+## Loop 85: Explorer Value Cards
+
+### Step 1: Analysis
+
+**Gap: Adventure/Exploration Personality Types**
+
+Need value cards representing different exploration preferences.
+
+**Design Goals:**
+1. Contrast adventurous vs homebodied personalities
+2. Different risk tolerances
+3. Various ability types to match personalities
+
+### Step 2: Implementation Plan
+
+1. Create 4 explorer themed value cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Explorer Value Cards Created:**
+1. `urban_explorer.tres` - Urban Explorer: +1 Health, +2 Social, +2 Effort, +3 Risk, +1 Creativity. Extra draw ability.
+2. `nature_lover.tres` - Nature Lover: +3 Health, +1 Routine, +1 Effort, +1 Risk, +2 Creativity. Restore 8 willpower ability.
+3. `globetrotter.tres` - Globetrotter: +2 Social, +2 Effort, +4 Risk, +2 Creativity. +20 bonus motivation ability.
+4. `homebody.tres` - Homebody: +2 Health, +4 Routine, +1 Effort, +1 Creativity. Restore 15 willpower ability.
+
+**Updated starter_deck.tres** - Added all 4 value cards (IDs 402-405).
+
+### Step 4: Commit
