@@ -97,6 +97,7 @@ func set_corner_text(corner: Corner, text: String, color: Color = Color.WHITE) -
   var label := Label.new()
   label.text = text
   label.add_theme_font_size_override("font_size", 12)
+  label.mouse_filter = Control.MOUSE_FILTER_IGNORE
   if color != Color.WHITE:
     label.add_theme_color_override("font_color", color)
   if corner == Corner.TOP_RIGHT or corner == Corner.BOTTOM_RIGHT:
@@ -147,6 +148,8 @@ func add_tag(tag_name: String, color: Color) -> void:
 
   var panel := PanelContainer.new()
   panel.add_theme_stylebox_override("panel", style)
+  panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+  tag_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
   panel.add_child(tag_label)
   %TagsContainer.add_child(panel)
 
@@ -160,6 +163,7 @@ func add_content_label(text: String, font_size: int = 12, color: Color = Color.W
   var label := Label.new()
   label.text = text
   label.add_theme_font_size_override("font_size", font_size)
+  label.mouse_filter = Control.MOUSE_FILTER_IGNORE
   if color != Color.WHITE:
     label.add_theme_color_override("font_color", color)
   label.autowrap_mode = TextServer.AUTOWRAP_WORD
