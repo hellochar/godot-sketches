@@ -3624,3 +3624,37 @@ Need actions focused on self-improvement and personal development.
 **Updated starter_deck.tres** - Added all 4 actions (IDs 442-445).
 
 ### Step 4: Commit
+
+Committed: `26735fb` - "Loop 95: Add self-improvement actions"
+
+---
+
+## Loop 96: Daily Life World Modifiers
+
+### Step 1: Analysis
+
+**Gap: Daily Life/Home Environmental States**
+
+Need world modifiers representing everyday domestic scenarios.
+
+**Design Goals:**
+1. Positive and negative home states
+2. Impact on routine and wellbeing
+3. Relatable daily life scenarios
+
+### Step 2: Implementation Plan
+
+1. Create 4 daily life themed world modifiers
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Daily Life World Modifiers Created:**
+1. `laundry_pile.tres` - Laundry Pile: -5 Health, -5 Social, -15 Routine, -5 Creativity, -5 willpower.
+2. `clean_house.tres` - Clean House: +10 Health, +5 Social, +20 Routine, +5 Effort, +10 Creativity, +10 willpower.
+3. `fridge_empty.tres` - Fridge Empty: -10 Health, -10 Routine, -5 Effort, +5 Risk, -5 willpower.
+4. `home_cooked_meal.tres` - Home Cooked Meal: +15 Health, +10 Social, +10 Routine, +5 Effort, +5 Creativity, +10 willpower.
+
+**Updated starter_deck.tres** - Added all 4 world modifiers (IDs 446-449).
+
+### Step 4: Commit
