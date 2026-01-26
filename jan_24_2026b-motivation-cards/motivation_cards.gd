@@ -732,7 +732,7 @@ func _create_motivation_card_display(card) -> PanelContainer:
   if motivation_value != 0:
     var sign_str := "+" if motivation_value > 0 else ""
     var contrib_color := success_color if motivation_value > 0 else failure_color
-    generic_card.add_content_label("→ %s%d" % [sign_str, motivation_value], 16, contrib_color)
+    generic_card.add_content_label("-> %s%d" % [sign_str, motivation_value], 16, contrib_color)
 
   return generic_card
 
@@ -954,7 +954,7 @@ func _create_motivation_card_display_clickable(card, card_index: int) -> PanelCo
   if motivation_value != 0:
     var sign_str := "+" if motivation_value > 0 else ""
     var contrib_color := success_color if motivation_value > 0 else failure_color
-    generic_card.add_content_label("→ %s%d" % [sign_str, motivation_value], 16, contrib_color)
+    generic_card.add_content_label("-> %s%d" % [sign_str, motivation_value], 16, contrib_color)
 
   if discards_this_turn < _get_effective_max_discards():
     generic_card.pressed.connect(func() -> void: _discard_card(card_index))
@@ -1273,7 +1273,7 @@ func _show_end_screen() -> void:
     summary_parts.append("Best Day: %d points" % best_day_score)
   var deck_change: int = game_state.motivation_deck.size() - starting_deck_size
   var deck_change_str := "+%d" % deck_change if deck_change >= 0 else "%d" % deck_change
-  summary_parts.append("Deck: %d → %d (%s)" % [starting_deck_size, game_state.motivation_deck.size(), deck_change_str])
+  summary_parts.append("Deck: %d -> %d (%s)" % [starting_deck_size, game_state.motivation_deck.size(), deck_change_str])
   if cards_added_count > 0:
     summary_parts.append("Cards Added: %d" % cards_added_count)
   if cards_removed_count > 0:
