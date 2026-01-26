@@ -1474,8 +1474,42 @@ The game tracks success streaks but only a few cards use them.
 
 Create 4 new motivation cards:
 1. Streak Momentum - +5 per streak level to all tags
-2. Streak Doubler - 2x bonus when streak >= 3
-3. Streak Starter - Big bonus if no current streak
-4. Streak Harvester - +15 all, convert streak to willpower
+2. Winning Streak - 2x bonus when streak >= 3
+3. Fresh Start - Big bonus if no current streak
+4. Streak Harvester - +10 Health/Routine/Effort, +8 per streak
+
+### Step 3: Execution
+
+**Cards Created:**
+- `streak_momentum.tres` - +5 all tags, +5 per streak level
+- `winning_streak.tres` - +15 Health/Effort, 2x if streak >= 3
+- `fresh_start.tres` - +25 all tags, only works with 0 streak
+- `streak_harvester.tres` - +10 Health/Routine/Effort, +8 per streak
+
+**Updated starter_deck.tres** - Added all 4 cards.
+
+### Step 4: Commit
+
+Committed: (pending)
+
+---
+
+## Loop 35: Adrenaline High Card Rewards
+
+### Step 1: Analysis
+
+**Gap: Some Cards Reference Cards That Don't Exist**
+
+The "Adrenaline High" card is referenced in actions but may not exist.
+
+**Design Goals:**
+1. Create missing reward cards
+2. Ensure all action rewards reference existing cards
+
+### Step 2: Implementation Plan
+
+1. Check if adrenaline_high.tres exists
+2. Create it if missing
+3. Review other action reward references
 
 ### Step 3: Execution

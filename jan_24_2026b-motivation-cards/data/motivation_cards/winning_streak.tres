@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Winning Streak"
+health_modifier = 15
+effort_modifier = 15
+condition_type = 4
+condition_tag = 0
+condition_threshold = 3
+bonus_multiplier = 2.0
