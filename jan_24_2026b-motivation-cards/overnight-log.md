@@ -1673,4 +1673,52 @@ Actions have multiple tags, but no bonus for specific tag combinations. This lim
 
 ### Step 4: Commit
 
+Committed: `38c460b` - "Loop 39: Add ACTION_HAS_BOTH_TAGS condition for tag combo cards"
+
+---
+
+## Loop 40: Enhanced Discard Synergy
+
+### Step 1: Analysis
+
+**Gap: Weak Discard Payoffs**
+
+Discard mechanic exists but only 3 cards reward discarding. More cards needed to make discard a viable strategy.
+
+**Design Goals:**
+1. Add EXTRA_DISCARD special effect (gain more discards)
+2. Add DISCARD_DRAW special effect (draw when discarding)
+3. Create 4 discard-synergy motivation cards
+
+### Step 2: Implementation Plan
+
+1. Add EXTRA_DISCARD and DISCARD_DRAW special effects
+2. Implement in motivation_cards.gd
+3. Create 4 discard strategy cards
+4. Register in starter_deck.tres
+
+### Step 3: Execution
+
+**Files Modified:**
+- `motivation_card_resource.gd`:
+  - Added EXTRA_DISCARD special effect (+N discards this turn)
+  - Added DISCARD_DRAW_BONUS special effect (draw +N when discarding)
+  - Added text descriptions for both effects
+
+- `motivation_cards.gd`:
+  - Added `_get_effective_max_discards()` function
+  - Added `_get_discard_draw_bonus()` function
+  - Modified `_discard_card()` to draw extra cards with bonus
+  - Updated discard label and clickable checks to use effective max
+
+**Discard Cards Created:**
+1. `discard_master_plus.tres` - +5 Effort/Creativity, +2 extra discards
+2. `card_cycling.tres` - +10 Creativity, +5 Risk, draw +1 when discarding
+3. `shuffle_hand.tres` - -5 Routine, +15 Creativity, +1 extra discard
+4. `churn_engine.tres` - +5 Effort, +10 Risk, +8 per discard this turn
+
+**Updated starter_deck.tres** - Added all 4 cards (IDs 222-225).
+
+### Step 4: Commit
+
 Committed: (pending)

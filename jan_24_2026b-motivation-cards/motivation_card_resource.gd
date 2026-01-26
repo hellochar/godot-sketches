@@ -40,6 +40,8 @@ enum SpecialEffect {
   INVERT_NEGATIVES,
   BONUS_PER_NEGATIVE_CARD,
   SCORE_BONUS,
+  EXTRA_DISCARD,
+  DISCARD_DRAW_BONUS,
 }
 
 @export var title: String
@@ -212,6 +214,10 @@ func get_special_effect_text() -> String:
       return "+%d per negative card in hand" % special_value
     SpecialEffect.SCORE_BONUS:
       return "+%d score on success" % special_value
+    SpecialEffect.EXTRA_DISCARD:
+      return "+%d discards this turn" % special_value
+    SpecialEffect.DISCARD_DRAW_BONUS:
+      return "Draw %d extra when discarding" % special_value
   return ""
 
 

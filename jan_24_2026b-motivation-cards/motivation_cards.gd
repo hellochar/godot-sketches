@@ -838,8 +838,25 @@ func _update_willpower_display() -> void:
   attempt_button.text = "Attempt Action" if can_attempt else "Not enough willpower"
 
 
+func _get_effective_max_discards() -> int:
+  var bonus: int = 0
+  for card in drawn_cards:
+    if card is MotivationCardRes and card.special_effect == MotivationCardRes.SpecialEffect.EXTRA_DISCARD:
+      bonus += card.special_value
+  return max_discards_per_turn + bonus
+
+
+func _get_discard_draw_bonus() -> int:
+  var bonus: int = 0
+  for card in drawn_cards:
+    if card is MotivationCardRes and card.special_effect == MotivationCardRes.SpecialEffect.DISCARD_DRAW_BONUS:
+      bonus += card.special_value
+  return bonus
+
+
 func _update_discard_label() -> void:
-  var remaining := max_discards_per_turn - discards_this_turn
+  var effective_max := _get_effective_max_discards()
+  var remaining := effective_max - discards_this_turn
   if remaining > 0:
     discard_label.text = "Click a card to discard and redraw (%d remaining)" % remaining
     discard_label.modulate = Color.WHITE
@@ -849,7 +866,8 @@ func _update_discard_label() -> void:
 
 
 func _discard_card(card_index: int) -> void:
-  if is_animating or discards_this_turn >= max_discards_per_turn:
+  var effective_max := _get_effective_max_discards()
+  if is_animating or discards_this_turn >= effective_max:
     return
   if card_index < 0 or card_index >= drawn_cards.size():
     return
@@ -860,9 +878,13 @@ func _discard_card(card_index: int) -> void:
   discarded_cards_this_turn.append(discarded_card)
   drawn_cards.remove_at(card_index)
 
-  var new_card = game_state.draw_motivation_cards(1)
-  if new_card.size() > 0:
-    drawn_cards.insert(card_index, new_card[0])
+  var draw_count := 1 + _get_discard_draw_bonus()
+  var new_cards: Array = game_state.draw_motivation_cards(draw_count)
+  for i in new_cards.size():
+    if i == 0:
+      drawn_cards.insert(card_index, new_cards[i])
+    else:
+      drawn_cards.append(new_cards[i])
 
   _play_sound(card_reveal_sound)
 
@@ -918,7 +940,7 @@ func _create_motivation_card_display_clickable(card, card_index: int) -> PanelCo
     var contrib_color := success_color if motivation_value > 0 else failure_color
     generic_card.add_content_label("→ %s%d" % [sign_str, motivation_value], 16, contrib_color)
 
-  if discards_this_turn < max_discards_per_turn:
+  if discards_this_turn < _get_effective_max_discards():
     generic_card.pressed.connect(func() -> void: _discard_card(card_index))
 
   return generic_card
