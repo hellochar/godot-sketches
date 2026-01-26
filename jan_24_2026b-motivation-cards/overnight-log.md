@@ -272,3 +272,46 @@ Per emergent-game-design skill:
 
 ### Step 4: Commit
 
+Committed: `156e086` - "Add counter cards that interact with negative modifiers"
+
+---
+
+## Loop 5: World Modifier Expansion
+
+### Step 1: Analysis
+
+**Gap: Underutilized World Modifiers**
+
+Current state: Only 4 world modifiers exist. They appear randomly and provide simple tag bonuses. This is a missed opportunity for environmental storytelling and strategic variety.
+
+**Design Goals:**
+1. Triple the world modifier pool (4 → 12)
+2. Add conditional world modifiers (interact with card state)
+3. Create modifiers that synergize with specific archetypes
+
+### Step 2: Implementation Plan
+
+Add 8 new world modifiers across different themes:
+- Social: "Friend visiting", "Group event nearby"
+- Health: "Gym is empty", "Slept poorly"
+- Creativity: "Inspiring article", "Creative block"
+- Risk: "Opportunity knocking", "Deadline pressure"
+
+### Step 3: Execution
+
+**World Modifiers Created:**
+1. `friend_visiting.tres` - +20 Social, -10 Routine (social disrupts schedule)
+2. `group_event.tres` - +15 Social, +10 Risk (networking opportunity)
+3. `gym_empty.tres` - +15 Health, +10 Effort (ideal workout conditions)
+4. `slept_poorly.tres` - -15 Effort, -10 Health, +5 Creativity (tired but dreamy)
+5. `inspiring_article.tres` - +15 Creativity, +10 Effort (motivated to create)
+6. `creative_block.tres` - -20 Creativity, +10 Routine (stuck, fall back on habits)
+7. `opportunity_knocking.tres` - +20 Risk, +10 Effort (chance to seize)
+8. `deadline_pressure.tres` - +20 Effort, +15 Routine, -15 Social (crunch time)
+
+**Added to starter_deck.tres** - All 8 modifiers registered with ExtResource IDs 154-161.
+
+World modifier pool tripled: 4 → 12.
+
+### Step 4: Commit
+
