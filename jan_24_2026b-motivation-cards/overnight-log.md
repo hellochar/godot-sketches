@@ -669,3 +669,41 @@ Each day plays identically - no environmental variety beyond world modifiers.
   - `_get_potential_score()` and `_show_result()` apply bonus score
 
 ### Step 4: Commit
+
+Committed: `bc9b34e` - "Add daily bonus tag for varied daily scoring"
+
+---
+
+## Loop 13: Willpower Recovery Cards
+
+### Step 1: Analysis
+
+**Gap: Willpower Only Depletes**
+
+Players have limited ways to restore willpower during the day. The Adrenaline Junkie on fail and some value card abilities exist, but no motivation cards directly restore willpower on play.
+
+**Design Goals:**
+1. Create motivation cards that restore willpower when drawn
+2. Add trade-offs to make willpower restoration interesting
+3. Create "recovery" archetype synergy
+
+### Step 2: Implementation Plan
+
+1. Add new special effect: RESTORE_WILLPOWER_ON_DRAW
+2. Create 4 recovery-themed motivation cards:
+   - Rest Day: +10 Routine, restore 5 willpower
+   - Second Wind: +15 Effort, restore 10 willpower if streak > 2
+   - Calm Mind: +10 Health, restore 5 willpower, -10 Risk
+   - Renewed Focus: +20 to dominant tag, restore 5 willpower
+
+### Step 3: Execution
+
+**Recovery Cards Created:**
+1. `rest_day.tres` - +10 Routine, +5 Health, restore 5 willpower on success
+2. `second_wind.tres` - +15 Effort, restore 10 willpower on success (uses existing condition)
+3. `calm_mind.tres` - +10 Health, -10 Risk, restore 5 willpower on success
+4. `renewed_focus.tres` - +15 Creativity, restore 5 willpower on success
+
+**Added to starter_deck.tres** - All 4 cards registered with ExtResource IDs 162-165.
+
+### Step 4: Commit
