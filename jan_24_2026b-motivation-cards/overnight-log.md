@@ -2672,3 +2672,37 @@ Need actions representing common professional and career activities.
 **Updated starter_deck.tres** - Added all 4 actions (IDs 330-333).
 
 ### Step 4: Commit
+
+Committed: `47176d0` - "Loop 67: Add work/career actions"
+
+---
+
+## Loop 68: Hobby/Leisure Actions
+
+### Step 1: Analysis
+
+**Gap: Relaxation and Hobby Activities**
+
+Need actions representing leisure and hobby pursuits.
+
+**Design Goals:**
+1. Mix of solo and social hobbies
+2. Lower stress activities with high success rates
+3. Bridge different tag combinations
+
+### Step 2: Implementation Plan
+
+1. Create 4 hobby/leisure themed actions
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Hobby/Leisure Actions Created:**
+1. `board_game.tres` - Board Game Night: 50 cost, Social+Creativity, 90% success.
+2. `video_game.tres` - Video Game Session: 35 cost, Risk+Creativity, 95% success.
+3. `gardening.tres` - Tend Garden: 45 cost, Health+Routine, 85% success.
+4. `read_book.tres` - Read a Book: 40 cost, Routine+Creativity, 90% success.
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 334-337).
+
+### Step 4: Commit
