@@ -240,7 +240,7 @@ func _create_action_button(action) -> Button:
   btn.add_theme_stylebox_override("hover", hover_style)
 
   var tags_str := _format_tags(action.tags)
-  var willpower_str := "Willpower: %d" % willpower_needed if willpower_needed > 0 else "No willpower needed"
+  var willpower_str := "Willpower: %d" % willpower_needed if willpower_needed > 0 else ""
   if action.success_chance >= 1.0:
     btn.text = "%s\n%s\n%s" % [action.title, willpower_str, tags_str]
   else:
