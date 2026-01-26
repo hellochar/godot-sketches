@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://co7vj3u6vl7gg" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Drive to Win"
+effort_modifier = 10
+special_effect = 4
+special_value = 15
+
