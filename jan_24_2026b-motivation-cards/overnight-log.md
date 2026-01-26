@@ -2774,3 +2774,37 @@ Need value cards representing different financial approaches and mindsets.
 **Updated starter_deck.tres** - Added all 4 cards (IDs 342-345).
 
 ### Step 4: Commit
+
+Committed: `fdbba61` - "Loop 70: Add financial value cards"
+
+---
+
+## Loop 71: Nature World Modifiers
+
+### Step 1: Analysis
+
+**Gap: Nature/Outdoor Environmental States**
+
+Need world modifiers representing outdoor and nature experiences.
+
+**Design Goals:**
+1. Outdoor vs indoor contrast
+2. Health and creativity boosts from nature
+3. Variety of nature experiences
+
+### Step 2: Implementation Plan
+
+1. Create 4 nature-themed world modifiers
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Nature World Modifiers Created:**
+1. `fresh_air.tres` - Fresh Air: +15 Health, +5 Effort, +5 Risk, +10 Creativity, +5 willpower.
+2. `nature_walk.tres` - Nature Walk: +20 Health, +5 Social, +10 Routine, -5 Effort, +10 Creativity, +10 willpower.
+3. `bird_watching.tres` - Bird Watching: +5 Health, -5 Social, +15 Routine, -10 Effort, +15 Creativity, +5 willpower.
+4. `stuck_indoors.tres` - Stuck Indoors: -10 Health, -5 Social, +15 Routine, +10 Effort, -10 Risk, +5 Creativity, -5 willpower.
+
+**Updated starter_deck.tres** - Added all 4 modifiers (IDs 346-349).
+
+### Step 4: Commit
