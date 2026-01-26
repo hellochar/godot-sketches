@@ -7,3 +7,6 @@ const CardData = preload("res://jan_24_2026b-motivation-cards/card_data.gd")
 @export var motivation_cost: int = 50
 @export var tags: Array[CardData.Tag] = []
 @export_range(0.0, 1.0, 0.05) var success_chance: float = 0.8
+
+@export_group("Deck Evolution")
+@export var cards_on_success: Array[Resource] = []

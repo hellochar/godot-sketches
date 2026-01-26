@@ -8,6 +8,9 @@ const StarterDeckResourceScript = preload("res://jan_24_2026b-motivation-cards/s
 @export var cards_per_draw: int = 5
 @export_range(0.0, 1.0) var world_modifier_chance: float = 0.5
 @export var starting_willpower: int = 100
+@export var max_days: int = 7
+@export var card_reveal_delay: float = 0.15
+@export var willpower_burnout_threshold: int = 50
 
 @export_group("Card Visuals")
 @export var action_button_size: Vector2 = Vector2(200, 120)
@@ -32,6 +35,7 @@ const StarterDeckResourceScript = preload("res://jan_24_2026b-motivation-cards/s
 
 @onready var day_label: Label = %DayLabel
 @onready var score_label: Label = %ScoreLabel
+@onready var willpower_bar: ProgressBar = %WillpowerBar
 @onready var willpower_label: Label = %WillpowerLabel
 
 @onready var action_selection_screen: VBoxContainer = %ActionSelectionScreen
@@ -58,11 +62,19 @@ const StarterDeckResourceScript = preload("res://jan_24_2026b-motivation-cards/s
 @onready var result_details: Label = %ResultDetails
 @onready var continue_button: Button = %ContinueButton
 
+@onready var end_game_panel: PanelContainer = %EndGamePanel
+@onready var end_title: Label = %EndTitle
+@onready var final_score_label: Label = %FinalScore
+@onready var actions_summary: Label = %ActionsSummary
+@onready var play_again_button: Button = %PlayAgainButton
+
 var game_state
 var current_action
 var drawn_cards: Array = []
 var current_world_modifier
 var total_motivation: int = 0
+var actions_taken: Array = []
+var willpower_spent_today: int = 0
 
 
 func _ready() -> void:
@@ -81,12 +93,15 @@ func _connect_signals() -> void:
   attempt_button.pressed.connect(_on_attempt_pressed)
   continue_button.pressed.connect(_on_continue_pressed)
   willpower_slider.value_changed.connect(_on_willpower_slider_changed)
+  play_again_button.pressed.connect(_on_play_again_pressed)
 
 
 func _update_top_bar() -> void:
-  day_label.text = "Day %d" % game_state.current_day
+  day_label.text = "Day %d of %d" % [game_state.current_day, max_days]
   score_label.text = "Score: %d" % game_state.score
-  willpower_label.text = "Willpower: %d/%d" % [game_state.willpower, game_state.willpower_max]
+  willpower_bar.max_value = game_state.willpower_max
+  willpower_bar.value = game_state.willpower
+  willpower_label.text = "%d/%d" % [game_state.willpower, game_state.willpower_max]
 
 
 func _show_action_selection() -> void:
@@ -180,9 +195,19 @@ func _display_mood_cards() -> void:
   for child in mood_cards_container.get_children():
     child.queue_free()
 
-  for card in drawn_cards:
+  for i in range(drawn_cards.size()):
+    var card = drawn_cards[i]
     var card_panel := _create_mood_card_display(card)
+    card_panel.pivot_offset = motivation_card_size / 2
+    card_panel.scale = Vector2.ZERO
+    card_panel.modulate.a = 0.0
     mood_cards_container.add_child(card_panel)
+
+    var tween := create_tween()
+    tween.set_parallel(true)
+    var delay := i * card_reveal_delay
+    tween.tween_property(card_panel, "scale", Vector2.ONE, 0.2).set_delay(delay).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+    tween.tween_property(card_panel, "modulate:a", 1.0, 0.15).set_delay(delay)
 
 
 func _create_mood_card_display(card) -> PanelContainer:
@@ -364,6 +389,8 @@ func _on_back_pressed() -> void:
 func _on_attempt_pressed() -> void:
   var willpower_spent := int(willpower_slider.value)
   game_state.spend_willpower(willpower_spent)
+  willpower_spent_today += willpower_spent
+  actions_taken.append(current_action.title)
 
   var success: bool = randf() < current_action.success_chance
   _show_result(success)
@@ -374,17 +401,27 @@ func _show_result(success: bool) -> void:
   result_panel.visible = true
 
   var score_gained := 0
+  var cards_added := 0
   if success:
     for value_card in game_state.value_cards:
       score_gained += value_card.get_score_for_tags(current_action.tags)
     game_state.add_score(score_gained)
 
+    for card in current_action.cards_on_success:
+      game_state.add_motivation_card(card)
+      cards_added += 1
+
     result_title.text = "Success!"
     result_title.add_theme_color_override("font_color", success_color)
+    var details_parts: Array = []
     if score_gained > 0:
-      result_details.text = "You gained %d points!\nThis aligns with your values." % score_gained
-    else:
+      details_parts.append("You gained %d points!" % score_gained)
+    if cards_added > 0:
+      details_parts.append("Added %d card(s) to your motivation deck." % cards_added)
+    if details_parts.is_empty():
       result_details.text = "Action completed, but it didn't align with your values."
+    else:
+      result_details.text = "\n".join(details_parts)
   else:
     result_title.text = "Failed..."
     result_title.add_theme_color_override("font_color", failure_color)
@@ -394,4 +431,43 @@ func _show_result(success: bool) -> void:
 
 
 func _on_continue_pressed() -> void:
+  game_state.current_day += 1
+  if willpower_spent_today >= willpower_burnout_threshold:
+    var burnout_penalty := willpower_spent_today / 10
+    game_state.willpower_max = maxi(50, game_state.willpower_max - burnout_penalty)
+  game_state.willpower = game_state.willpower_max
+  willpower_spent_today = 0
+
+  if game_state.current_day > max_days:
+    _show_end_screen()
+  else:
+    _start_new_turn()
+    _update_top_bar()
+
+
+func _show_end_screen() -> void:
+  action_selection_screen.visible = false
+  motivation_phase_screen.visible = false
+  result_panel.visible = false
+  end_game_panel.visible = true
+
+  end_title.text = "Week Complete!"
+  final_score_label.text = "Final Score: %d" % game_state.score
+
+  if actions_taken.is_empty():
+    actions_summary.text = "You didn't take any actions this week."
+  else:
+    actions_summary.text = "Actions taken:\n" + "\n".join(actions_taken)
+
+
+func _on_play_again_pressed() -> void:
+  game_state = GameState.new()
+  if starter_deck:
+    game_state.load_from_deck(starter_deck)
+  game_state.willpower = starting_willpower
+  game_state.willpower_max = starting_willpower
+  actions_taken.clear()
+  willpower_spent_today = 0
+  end_game_panel.visible = false
   _start_new_turn()
+  _update_top_bar()
