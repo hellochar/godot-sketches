@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ActionResource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://d0jysd6hdr7j3" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Pilates"
+motivation_cost = 50
+tags = Array[int]([0, 2])
+success_chance = 0.90
+
