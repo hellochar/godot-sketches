@@ -6,3 +6,5 @@
 script = ExtResource("1")
 title = "Daredevil"
 risk_score = 15
+ability_type = 3
+ability_value = 0

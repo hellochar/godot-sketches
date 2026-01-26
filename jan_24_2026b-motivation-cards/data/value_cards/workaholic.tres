@@ -6,3 +6,5 @@
 script = ExtResource("1")
 title = "Workaholic"
 effort_score = 15
+ability_type = 5
+ability_value = 30

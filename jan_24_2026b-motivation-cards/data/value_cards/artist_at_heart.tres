@@ -6,3 +6,5 @@
 script = ExtResource("1")
 title = "Artist at heart"
 creativity_score = 15
+ability_type = 4
+ability_value = 6
