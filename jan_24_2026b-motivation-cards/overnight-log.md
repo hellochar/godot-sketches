@@ -2096,3 +2096,35 @@ Committed: `e83af76` - "Loop 50: Add routine archetype actions"
 ---
 
 **Session continues with loops 51+...**
+
+---
+
+## Loop 51: Effort Archetype Actions
+
+### Step 1: Analysis
+
+**Gap: Limited Effort-Only Actions**
+
+Most effort-tagged actions share tags with others. Need pure effort actions.
+
+**Design Goals:**
+1. Add effort-focused actions
+2. Include work and productivity themes
+3. Various difficulty levels
+
+### Step 2: Implementation Plan
+
+1. Create 4 effort-focused actions
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Effort Actions Created:**
+1. `complete_project.tres` - Complete Work Project: 95 cost, Effort+Creativity, 60% success
+2. `study_session.tres` - Study Session: 60 cost, Effort+Routine, 80% success
+3. `extra_hours.tres` - Put in Extra Hours: 80 cost, Effort only, 70% success
+4. `tackle_hard_task.tres` - Tackle Hard Task: 85 cost, Effort+Risk, 65% success
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 266-269).
+
+### Step 4: Commit
