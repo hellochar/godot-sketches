@@ -926,3 +926,36 @@ When an action fails, players might want to retry it. But there's no indicator o
   - Show "Failed before" label in `_create_action_button()` for failed actions
 
 ### Step 4: Commit
+
+Committed: `09c0c4d` - "Track and display failed actions on action buttons"
+
+---
+
+## Loop 20: Extended Week Length
+
+### Step 1: Analysis
+
+**Gap: Week Is Too Short**
+
+At 7 days, players barely have time to build synergies before the game ends. Deck building feels rushed.
+
+**Design Goals:**
+1. Extend week to 14 days
+2. Add week-end bonuses at day 7
+3. Create mid-week checkpoint feel
+
+### Step 2: Implementation Plan
+
+1. Change max_days from 7 to 14
+2. Add mid-week summary at day 7 (just text feedback)
+3. Restore some willpower max at mid-week
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `motivation_cards.gd`:
+  - Changed `max_days` default from 7 to 14
+  - Added mid-week boost at day 8: +20 willpower max (capped at 150)
+
+### Step 4: Commit
