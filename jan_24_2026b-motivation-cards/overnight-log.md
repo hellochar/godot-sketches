@@ -3318,3 +3318,37 @@ Need motivation cards representing different learning and growth mindsets.
 **Updated starter_deck.tres** - Added all 4 motivation cards (IDs 406-409).
 
 ### Step 4: Commit
+
+Committed: `435c3c7` - "Loop 86: Add learning motivation cards"
+
+---
+
+## Loop 87: Productivity Actions
+
+### Step 1: Analysis
+
+**Gap: Productivity/Time Management Actions**
+
+Need actions focused on productivity techniques and time management.
+
+**Design Goals:**
+1. Various productivity methods
+2. Focus on Routine and Effort tags
+3. Range of difficulty levels
+
+### Step 2: Implementation Plan
+
+1. Create 4 productivity themed actions
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Productivity Actions Created:**
+1. `pomodoro_session.tres` - Pomodoro Session: 45 cost, Routine+Effort tags, 90% success.
+2. `time_block.tres` - Time Block: 55 cost, Routine+Effort tags, 85% success.
+3. `inbox_zero.tres` - Inbox Zero: 60 cost, Routine+Effort+Social tags, 80% success.
+4. `plan_tomorrow.tres` - Plan Tomorrow: 30 cost, Routine tag, 95% success.
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 410-413).
+
+### Step 4: Commit
