@@ -1047,6 +1047,9 @@ func _show_result(success: bool) -> void:
       score_gained += value_card.get_score_for_tags(current_action.tags)
     if game_state.daily_bonus_tag in current_action.tags:
       score_gained += game_state.DAILY_BONUS_SCORE
+    for card in drawn_cards:
+      if card is MotivationCardRes and card.special_effect == MotivationCardRes.SpecialEffect.SCORE_BONUS:
+        score_gained += card.special_value
     var streak_bonus: int = game_state.success_streak
     score_gained += streak_bonus
     if double_next_score:

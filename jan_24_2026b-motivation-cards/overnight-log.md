@@ -847,3 +847,46 @@ The end screen just shows total score and actions taken. Players don't see their
   - Reset tracking vars in `_on_play_again_pressed()`
 
 ### Step 4: Commit
+
+Committed: `1924f00` - "Add detailed weekly summary with stats tracking"
+
+---
+
+## Loop 18: Score Multiplier Cards
+
+### Step 1: Analysis
+
+**Gap: No Score Manipulation Cards**
+
+Motivation cards affect willpower costs but not scoring. There's no way to boost score through card synergies.
+
+**Design Goals:**
+1. Add special effect for score multipliers
+2. Create 3 value-boosting motivation cards
+3. Enable score-focused builds
+
+### Step 2: Implementation Plan
+
+1. Add SCORE_BONUS special effect to motivation_card_resource
+2. Create cards: Score Focus, High Stakes, Perfectionist Drive
+3. Apply score bonuses in _show_result()
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `motivation_card_resource.gd`:
+  - Added SCORE_BONUS to SpecialEffect enum
+  - Added text description for score bonus effect
+
+- `motivation_cards.gd`:
+  - Applied SCORE_BONUS special effect in `_show_result()`
+
+**Score Cards Created:**
+1. `score_focus.tres` - +5 Effort/Routine, +3 score on success
+2. `high_stakes.tres` - +15 Risk, +5 score, 2x if success < 80%
+3. `perfectionist_drive.tres` - +10 Creativity/Effort, +4 score, 2x if succeeded yesterday
+
+**Added to starter_deck.tres** - All 3 cards registered with ExtResource IDs 166-168.
+
+### Step 4: Commit
