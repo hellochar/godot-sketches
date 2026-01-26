@@ -2808,3 +2808,37 @@ Need world modifiers representing outdoor and nature experiences.
 **Updated starter_deck.tres** - Added all 4 modifiers (IDs 346-349).
 
 ### Step 4: Commit
+
+Committed: `b554ac8` - "Loop 71: Add nature world modifiers"
+
+---
+
+## Loop 72: Learning/Education Actions
+
+### Step 1: Analysis
+
+**Gap: Learning and Educational Activities**
+
+Need actions representing learning and self-education.
+
+**Design Goals:**
+1. Mix of passive and active learning
+2. Effort and Creativity focused
+3. Various difficulty levels
+
+### Step 2: Implementation Plan
+
+1. Create 4 learning-themed actions
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Learning Actions Created:**
+1. `watch_documentary.tres` - Watch Documentary: 35 cost, Routine+Creativity, 95% success.
+2. `take_class.tres` - Take a Class: 60 cost, Effort+Creativity, 80% success.
+3. `language_practice.tres` - Practice Language: 50 cost, Routine+Effort, 85% success.
+4. `research_topic.tres` - Research Topic: 55 cost, Effort+Creativity, 85% success.
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 350-353).
+
+### Step 4: Commit
