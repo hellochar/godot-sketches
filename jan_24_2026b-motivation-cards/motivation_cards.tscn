@@ -209,26 +209,12 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Gap: 75"
 
-[node name="WillpowerSpend" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen"]
-layout_mode = 2
-theme_override_constants/separation = 15
-alignment = 1
-
-[node name="SpendLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/WillpowerSpend"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Spend Willpower:"
-
-[node name="WillpowerSlider" type="HSlider" parent="MainContainer/MotivationPhaseScreen/WillpowerSpend"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-
-[node name="WillpowerSpendValue" type="Label" parent="MainContainer/MotivationPhaseScreen/WillpowerSpend"]
+[node name="WillpowerCostLabel" type="Label" parent="MainContainer/MotivationPhaseScreen"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "0"
+text = "Willpower cost: 0"
+horizontal_alignment = 1
 
 [node name="ActionButtons" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen"]
 layout_mode = 2
