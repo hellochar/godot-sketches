@@ -1237,3 +1237,58 @@ Update 5 actions to grant motivation cards:
 - `full_workout.tres` - Now grants "Physical Energy" on success
 
 ### Step 4: Commit
+
+Committed: `5e1cb78` - "Add card rewards to 4 more actions for deck building variety"
+
+---
+
+## Loop 28: High-Risk High-Reward Actions
+
+### Step 1: Analysis
+
+**Gap: Few Risky Actions**
+
+Most actions have 85-100% success. Few actions offer the thrill of risk.
+
+**Design Goals:**
+1. Add 3 high-risk actions
+2. Give generous rewards for success
+3. Balance risk vs reward
+
+### Step 2: Implementation Plan
+
+Create 3 risky action resources:
+1. Wing It (50% success, 40 cost, Risk+Creativity)
+2. Double or Nothing (30% success, 30 cost, Risk, grants 2 cards on success)
+3. All In (20% success, 20 cost, Risk+Effort, grants 3 cards on success)
+
+### Step 3: Execution
+
+**Actions Created:**
+- `wing_it.tres` - 40 cost, Risk+Creativity, 50% success, grants "Adrenaline High"
+- `double_nothing.tres` - 30 cost, Risk, 30% success, grants "Feeling Bold" and "Ambitious Drive"
+- `all_in.tres` - 20 cost, Risk+Effort, 20% success, grants "Rebel Spirit", "Thrill Seeker", "Adrenaline Junkie"
+
+**Updated starter_deck.tres** - Added all 3 actions.
+
+### Step 4: Commit
+
+Committed: (pending)
+
+---
+
+## Loop 29: Bridge Cards Implementation (Plan Execution)
+
+### Step 1: Analysis
+
+**Gap: Low Bridge Card Ratio**
+
+From existing plan: bridge card ratio is at 16%, target is 40%. The plan file identifies 12 bridge cards to create connecting underserved archetype pairs.
+
+### Step 2: Implementation Plan
+
+Per existing plan, create bridge cards starting with Health+Risk pair:
+1. Calculated Risk - +15 Health, +15 Risk
+2. Adrenaline Workout - +10 Health, +10 Risk, restore willpower
+
+### Step 3: Execution
