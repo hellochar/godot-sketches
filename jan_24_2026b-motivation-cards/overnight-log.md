@@ -2706,3 +2706,37 @@ Need actions representing leisure and hobby pursuits.
 **Updated starter_deck.tres** - Added all 4 actions (IDs 334-337).
 
 ### Step 4: Commit
+
+Committed: `6c42a6a` - "Loop 68: Add hobby/leisure actions"
+
+---
+
+## Loop 69: Self-Care Motivation Cards
+
+### Step 1: Analysis
+
+**Gap: Self-Care and Wellness Mindsets**
+
+Need motivation cards representing self-care and nurturing mental states.
+
+**Design Goals:**
+1. Cards that support recovery and wellness
+2. Use conditions like FAILED_YESTERDAY for compassion themes
+3. Bridge Health with other tags
+
+### Step 2: Implementation Plan
+
+1. Create 4 self-care themed motivation cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Self-Care Motivation Cards Created:**
+1. `self_compassion.tres` - Self Compassion: +15 Health, +10 Social. 2x if failed yesterday.
+2. `treat_yourself.tres` - Treat Yourself: +10 Creativity, +10 Risk. Restores 10 willpower on success.
+3. `nurturing_spirit.tres` - Nurturing Spirit: +20 Health. 2x if action has Health tag.
+4. `inner_peace.tres` - Inner Peace: +15 Routine, +15 Creativity, -10 Risk.
+
+**Updated starter_deck.tres** - Added all 4 cards (IDs 338-341).
+
+### Step 4: Commit
