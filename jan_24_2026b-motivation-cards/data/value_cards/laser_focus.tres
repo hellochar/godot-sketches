@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ValueCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/value_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Laser Focus"
+effort_score = 15
+routine_score = 5
+ability_type = 5
+ability_value = 25

@@ -1436,9 +1436,46 @@ Many value cards have similar structures. Need more variety in scoring patterns.
 ### Step 2: Implementation Plan
 
 Create 4 new value card resources:
-1. Jack of All Trades - Low bonus to all tags
-2. Specialist - High bonus to one tag, penalty to others
-3. Contrarian Values - Bonus for tags other cards penalize
-4. Balanced Life - Bonus for actions with 2+ tags
+1. Jack of All Trades - Low bonus to all tags, reroll hand ability
+2. Laser Focus - High Effort bonus, bonus motivation ability
+3. Chaos Lover - Risk+Creativity scoring, double next score ability
+4. Harmony Seeker - Health+Social+Routine, restore willpower ability
+
+### Step 3: Execution
+
+**Value Cards Created:**
+- `jack_of_all.tres` - +2 to all tags, reroll hand (6 cards)
+- `laser_focus.tres` - +15 Effort, +5 Routine, +25 bonus motivation ability
+- `chaos_lover.tres` - +12 Risk, +8 Creativity, double next score ability
+- `harmony_seeker.tres` - +5 Health/Social/Routine, restore 15 willpower ability
+
+**Updated starter_deck.tres** - Added all 4 value cards.
+
+### Step 4: Commit
+
+Committed: (pending)
+
+---
+
+## Loop 34: Streak-Based Cards
+
+### Step 1: Analysis
+
+**Gap: Streaks Not Fully Utilized**
+
+The game tracks success streaks but only a few cards use them.
+
+**Design Goals:**
+1. Add 4 cards that interact with streak mechanics
+2. Create streak-building cards
+3. Create streak-protection cards
+
+### Step 2: Implementation Plan
+
+Create 4 new motivation cards:
+1. Streak Momentum - +5 per streak level to all tags
+2. Streak Doubler - 2x bonus when streak >= 3
+3. Streak Starter - Big bonus if no current streak
+4. Streak Harvester - +15 all, convert streak to willpower
 
 ### Step 3: Execution

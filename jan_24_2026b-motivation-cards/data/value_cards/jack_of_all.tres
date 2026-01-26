@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ValueCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/value_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Jack of All"
+health_score = 2
+social_score = 2
+routine_score = 2
+effort_score = 2
+risk_score = 2
+creativity_score = 2
+ability_type = 4
+ability_value = 6
