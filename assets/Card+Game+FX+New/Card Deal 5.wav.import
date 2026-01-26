@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://bk6q2qgjc1bth"
+path="res://.godot/imported/Card Deal 5.wav-825477e56841021777d1566df2e6c112.sample"
+
+[deps]
+
+source_file="res://assets/Card+Game+FX+New/Card Deal 5.wav"
+dest_files=["res://.godot/imported/Card Deal 5.wav-825477e56841021777d1566df2e6c112.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2
