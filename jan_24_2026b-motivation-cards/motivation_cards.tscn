@@ -1,7 +1,7 @@
 [gd_scene load_steps=11 format=3 uid="uid://djdbsow0rg5ol"]
 
 [ext_resource type="Script" uid="uid://cvxkgmerrohu7" path="res://jan_24_2026b-motivation-cards/motivation_cards.gd" id="1_main"]
-[ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/starter_deck.tres" id="2_deck"]
+[ext_resource type="Resource" uid="uid://bhaj16o6ydydq" path="res://jan_24_2026b-motivation-cards/data/starter_deck.tres" id="2_deck"]
 [ext_resource type="AudioStream" uid="uid://b2cac6accysfl" path="res://assets/Card+Game+FX+New/Card Deal 2.wav" id="3_65vhf"]
 [ext_resource type="AudioStream" uid="uid://csuk2adojlboi" path="res://jan_24_2026b-motivation-cards/audio/attempt.wav" id="4_attempt"]
 [ext_resource type="AudioStream" uid="uid://cgplsurhcdhde" path="res://jan_24_2026b-motivation-cards/audio/success.wav" id="5_success"]
@@ -101,39 +101,43 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 15
 
-[node name="ValuesSection" type="VBoxContainer" parent="MainContainer/ActionSelectionScreen"]
+[node name="YouSection" type="BoxContainer" parent="MainContainer/ActionSelectionScreen"]
+layout_mode = 2
+theme_override_constants/separation = 100
+
+[node name="ValuesSection" type="VBoxContainer" parent="MainContainer/ActionSelectionScreen/YouSection"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ValuesTitle" type="Label" parent="MainContainer/ActionSelectionScreen/ValuesSection"]
+[node name="ValuesTitle" type="Label" parent="MainContainer/ActionSelectionScreen/YouSection/ValuesSection"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Your Values"
 horizontal_alignment = 1
 
-[node name="ValuesCardsContainer" type="HBoxContainer" parent="MainContainer/ActionSelectionScreen/ValuesSection"]
+[node name="ValuesCardsContainer" type="HBoxContainer" parent="MainContainer/ActionSelectionScreen/YouSection/ValuesSection"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="MoodSection" type="VBoxContainer" parent="MainContainer/ActionSelectionScreen"]
+[node name="MoodSection" type="VBoxContainer" parent="MainContainer/ActionSelectionScreen/YouSection"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="MoodTitle" type="Label" parent="MainContainer/ActionSelectionScreen/MoodSection"]
+[node name="MoodTitle" type="Label" parent="MainContainer/ActionSelectionScreen/YouSection/MoodSection"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Today's Mood"
 horizontal_alignment = 1
 
-[node name="MoodCardsContainer" type="HBoxContainer" parent="MainContainer/ActionSelectionScreen/MoodSection"]
+[node name="MoodCardsContainer" type="HBoxContainer" parent="MainContainer/ActionSelectionScreen/YouSection/MoodSection"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="MoodWorldLabel" type="Label" parent="MainContainer/ActionSelectionScreen/MoodSection"]
+[node name="MoodWorldLabel" type="Label" parent="MainContainer/ActionSelectionScreen/YouSection"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
