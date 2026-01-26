@@ -513,6 +513,7 @@ func _start_new_turn() -> void:
   if (game_state.current_day - 1) % 7 == 0:
     value_card_abilities_used.clear()
     game_state.momentum = 0
+    game_state.total_successes_this_week = 0
   if randf() < world_modifier_chance:
     current_world_modifier = game_state.get_random_world_modifier()
   else:
