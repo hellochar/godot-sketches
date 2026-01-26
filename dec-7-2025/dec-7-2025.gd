@@ -86,7 +86,7 @@ func _input(event: InputEvent) -> void:
       tick(1)
 
 const STRUCTURE_INSTANCE = preload("res://dec-7-2025/structure_instance.tscn")
-const PICKER_SCENE = preload("res://dec-7-2025/picker.tscn")
+const PICKER_SCENE = preload("res://common/reward_picker.tscn")
 
 func assign_workers() -> void:
   var PEASANTS = preload("res://items/basic/peasants.tres")
@@ -130,16 +130,33 @@ func create_reward() -> void:
     var weights = reward_funcs.values()
     var index = rng.rand_weighted(weights)
     funcs[index].call()
-  
-  var picker = PICKER_SCENE.instantiate()
+
+  var options: Array[Node] = []
+  for item: Item in reward_inventory.dict.keys():
+    var amount: int = reward_inventory.dict[item]
+    var button := Button.new()
+    button.custom_minimum_size = Vector2(150, 40)
+    if amount <= 1:
+      button.text = item.name + " " + item.description
+    else:
+      button.text = "%s (x%d)" % [item.name + " " + item.description, amount]
+    button.set_meta("item", item)
+    button.set_meta("amount", amount)
+    options.append(button)
+
+  var picker := PICKER_SCENE.instantiate()
   add_child(picker)
-  picker.set_inventory(reward_inventory)
-  picker.item_selected.connect(func(item: Item, amount: int) -> void:
+  picker.set_options(options)
+  picker.item_selected.connect(func(node: Node) -> void:
+    var item: Item = node.get_meta("item")
+    var amount: int = node.get_meta("amount")
     if item is Structure:
       place(item as Structure)
-      # blueprints.add(item, amount)
     else:
       inventory.add(item, amount)
+    picker.queue_free()
+  )
+  picker.skipped.connect(func() -> void:
     picker.queue_free()
   )
 
