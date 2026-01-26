@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://co7vj3u6vl7gg" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Deadline Panic"
+routine_modifier = -10
+effort_modifier = 20
+risk_modifier = 15
+
