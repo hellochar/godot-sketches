@@ -1,7 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://djdbsow0rg5ol"]
+[gd_scene load_steps=7 format=3 uid="uid://djdbsow0rg5ol"]
 
 [ext_resource type="Script" uid="uid://cvxkgmerrohu7" path="res://jan_24_2026b-motivation-cards/motivation_cards.gd" id="1_main"]
 [ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/starter_deck.tres" id="2_deck"]
+[ext_resource type="AudioStream" path="res://jan_24_2026b-motivation-cards/audio/card_reveal.wav" id="3_card_reveal"]
+[ext_resource type="AudioStream" path="res://jan_24_2026b-motivation-cards/audio/attempt.wav" id="4_attempt"]
+[ext_resource type="AudioStream" path="res://jan_24_2026b-motivation-cards/audio/success.wav" id="5_success"]
+[ext_resource type="AudioStream" path="res://jan_24_2026b-motivation-cards/audio/failure.wav" id="6_failure"]
 
 [node name="MotivationCards" type="Control"]
 layout_mode = 3
@@ -14,6 +18,10 @@ script = ExtResource("1_main")
 action_button_size = Vector2(200, 300)
 motivation_card_size = Vector2(200, 300)
 starter_deck = ExtResource("2_deck")
+card_reveal_sound = ExtResource("3_card_reveal")
+attempt_sound = ExtResource("4_attempt")
+success_sound = ExtResource("5_success")
+failure_sound = ExtResource("6_failure")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
@@ -300,3 +308,6 @@ custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Play Again"
+
+[node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
