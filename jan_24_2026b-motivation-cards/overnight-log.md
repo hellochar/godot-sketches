@@ -2638,3 +2638,37 @@ Need world modifiers representing relationship dynamics and interpersonal situat
 **Updated starter_deck.tres** - Added all 4 modifiers (IDs 326-329).
 
 ### Step 4: Commit
+
+Committed: `26c7aa1` - "Loop 66: Add relationship world modifiers"
+
+---
+
+## Loop 67: Work/Career Actions
+
+### Step 1: Analysis
+
+**Gap: Professional/Workplace Activities**
+
+Need actions representing common professional and career activities.
+
+**Design Goals:**
+1. Mix of routine work tasks and high-pressure situations
+2. Focus on Effort, Social, and Risk combinations
+3. Relatable professional scenarios
+
+### Step 2: Implementation Plan
+
+1. Create 4 work/career themed actions
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Work/Career Actions Created:**
+1. `write_report.tres` - Write Report: 55 cost, Routine+Effort, 85% success.
+2. `office_presentation.tres` - Office Presentation: 70 cost, Social+Effort, 75% success.
+3. `cold_call.tres` - Cold Call Clients: 60 cost, Social+Risk, 60% success.
+4. `meet_deadline.tres` - Meet Tight Deadline: 75 cost, Effort+Risk, 65% success.
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 330-333).
+
+### Step 4: Commit
