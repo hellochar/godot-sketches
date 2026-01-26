@@ -1721,4 +1721,39 @@ Discard mechanic exists but only 3 cards reward discarding. More cards needed to
 
 ### Step 4: Commit
 
+Committed: `629d3b1` - "Loop 40: Add enhanced discard synergy mechanics"
+
+---
+
+## Loop 41: High-Risk High-Reward Actions
+
+### Step 1: Analysis
+
+**Gap: Insufficient Risk Variety**
+
+Current high-risk actions all have similar profiles. Need more variety in risk/reward trade-offs.
+
+**Design Goals:**
+1. Add actions with extreme risk profiles
+2. Create "all-or-nothing" actions
+3. Balance with high rewards
+
+### Step 2: Implementation Plan
+
+1. Create 4 extreme-risk actions (30-50% success rate)
+2. High motivation cost but high score reward
+3. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Actions Created:**
+1. `public_speech.tres` - Give Public Speech: 100 cost, Social+Effort+Risk, 40% success
+2. `marathon_training.tres` - Marathon Training: 120 cost, Health+Effort+Routine, 35% success
+3. `launch_business.tres` - Launch Side Business: 130 cost, Effort+Risk+Creativity, 30% success
+4. `ask_crush.tres` - Ask Crush Out: 80 cost, Social+Risk, 50% success
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 226-229).
+
+### Step 4: Commit
+
 Committed: (pending)
