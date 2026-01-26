@@ -3046,3 +3046,37 @@ Need motivation cards representing anxiety and stress-related mindsets.
 **Updated starter_deck.tres** - Added all 4 cards (IDs 374-377).
 
 ### Step 4: Commit
+
+Committed: `1c3c5f3` - "Loop 78: Add anxiety motivation cards"
+
+---
+
+## Loop 79: Pet-Related Actions
+
+### Step 1: Analysis
+
+**Gap: Pet Care Activities**
+
+Need actions representing pet-related activities.
+
+**Design Goals:**
+1. Mix of routine pet care and special situations
+2. Health and Social combinations
+3. Generally high success rates (pets are supportive)
+
+### Step 2: Implementation Plan
+
+1. Create 4 pet-related actions
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Pet-Related Actions Created:**
+1. `walk_dog.tres` - Walk the Dog: 35 cost, Health+Routine, 95% success.
+2. `play_with_pet.tres` - Play with Pet: 25 cost, Social+Creativity, 98% success.
+3. `pet_to_vet.tres` - Take Pet to Vet: 60 cost, Health+Effort+Risk, 80% success.
+4. `train_pet.tres` - Train Pet: 50 cost, Routine+Effort, 75% success.
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 378-381).
+
+### Step 4: Commit
