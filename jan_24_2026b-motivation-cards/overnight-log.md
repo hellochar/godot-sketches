@@ -1105,3 +1105,44 @@ Players start with one value card but never gain more during gameplay. Deck buil
   - Modified `_on_continue_pressed()` to check for pending reward
 
 ### Step 4: Commit
+
+Committed: `a87e878` - "Add value card rewards for completing expensive actions"
+
+---
+
+## Loop 25: World Modifier Variety
+
+### Step 1: Analysis
+
+**Gap: Limited World Modifiers**
+
+Only 12 world modifiers exist. After a few days, players see the same ones repeatedly.
+
+**Design Goals:**
+1. Add 6 more world modifiers
+2. Include both positive and negative effects
+3. Create more environmental variety
+
+### Step 2: Implementation Plan
+
+Create 6 new world modifier resources:
+1. Headache - Effort -15, Creativity -10
+2. Good News - Social +20
+3. Cold Weather - Health -10, Routine +10
+4. Full Moon - Risk +15, Creativity +10
+5. Quiet House - Creativity +15, Social -10
+6. Busy Day - Routine -10, Effort +15
+
+### Step 3: Execution
+
+**World Modifiers Created:**
+- `headache.tres` - Effort -15, Creativity -10
+- `good_news.tres` - Social +20
+- `cold_weather.tres` - Health -10, Routine +10
+- `full_moon.tres` - Risk +15, Creativity +10
+- `quiet_house.tres` - Creativity +15, Social -10
+- `busy_day.tres` - Routine -10, Effort +15
+
+**Updated starter_deck.tres** - Added all 6 world modifiers.
+
+### Step 4: Commit
