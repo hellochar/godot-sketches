@@ -2072,4 +2072,27 @@ Routine archetype needs more variety.
 
 ### Step 4: Commit
 
-Committed: (pending)
+Committed: `e83af76` - "Loop 50: Add routine archetype actions"
+
+---
+
+## Session Summary (Loops 38-50)
+
+**Total Commits:** 13
+**Total Content Added:**
+- 16 new motivation cards
+- 32 new actions
+- 4 new value cards
+- 8 new world modifiers
+- 2 new condition types
+- 2 new special effects
+
+**Key Features Implemented:**
+- ACTION_HAS_BOTH_TAGS condition for tag combo cards
+- Enhanced discard mechanics (EXTRA_DISCARD, DISCARD_DRAW_BONUS)
+- Willpower management cards
+- Comprehensive archetype action coverage (Social, Creativity, Health, Routine)
+
+---
+
+**Session continues with loops 51+...**
