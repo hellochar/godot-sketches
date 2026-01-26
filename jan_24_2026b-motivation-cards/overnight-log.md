@@ -3386,3 +3386,37 @@ Need world modifiers representing different stress and relaxation states.
 **Updated starter_deck.tres** - Added all 4 world modifiers (IDs 414-417).
 
 ### Step 4: Commit
+
+Committed: `345e9e8` - "Loop 88: Add stress world modifiers"
+
+---
+
+## Loop 89: Leadership Value Cards
+
+### Step 1: Analysis
+
+**Gap: Leadership/Influence Personality Types**
+
+Need value cards representing different leadership and social influence styles.
+
+**Design Goals:**
+1. Contrast leader vs lone wolf personalities
+2. Different social influence styles
+3. Varied ability types
+
+### Step 2: Implementation Plan
+
+1. Create 4 leadership themed value cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Leadership Value Cards Created:**
+1. `natural_leader.tres` - Natural Leader: +3 Social, +1 Routine, +3 Effort, +2 Risk. +15 bonus motivation ability.
+2. `quiet_influencer.tres` - Quiet Influencer: +1 Health, +2 Social, +2 Routine, +2 Effort, +2 Creativity. Restore 8 willpower ability.
+3. `mentor_spirit.tres` - Mentor Spirit: +1 Health, +4 Social, +1 Routine, +2 Effort, +1 Creativity. Extra draw ability.
+4. `lone_wolf.tres` - Lone Wolf: +2 Health, +1 Routine, +4 Effort, +2 Risk, +1 Creativity. Restore 12 willpower ability.
+
+**Updated starter_deck.tres** - Added all 4 value cards (IDs 418-421).
+
+### Step 4: Commit
