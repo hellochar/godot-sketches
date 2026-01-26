@@ -2944,3 +2944,37 @@ Need world modifiers representing energy and fatigue levels.
 **Updated starter_deck.tres** - Added all 4 modifiers (IDs 362-365).
 
 ### Step 4: Commit
+
+Committed: `7b4abd9` - "Loop 75: Add energy world modifiers"
+
+---
+
+## Loop 76: Community Value Cards
+
+### Step 1: Analysis
+
+**Gap: Community/Social Responsibility Values**
+
+Need value cards representing community involvement and social responsibility.
+
+**Design Goals:**
+1. Social-focused with various secondary tags
+2. Encourage helping others
+3. Some with abilities
+
+### Step 2: Implementation Plan
+
+1. Create 4 community-themed value cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Community Value Cards Created:**
+1. `community_builder.tres` - Community Builder: +2 Health, +4 Social, +1 Routine.
+2. `helping_hands.tres` - Helping Hands: +3 Social, +3 Effort. Restore willpower ability.
+3. `team_player.tres` - Team Player: +3 Social, +3 Routine, +1 Effort.
+4. `change_maker.tres` - Change Maker: +2 Social, +3 Risk, +2 Creativity.
+
+**Updated starter_deck.tres** - Added all 4 cards (IDs 366-369).
+
+### Step 4: Commit
