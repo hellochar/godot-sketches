@@ -421,3 +421,55 @@ Current problem: Value cards are selected at start, then never interacted with a
 
 ### Step 4: Commit
 
+Committed: `3a0cbca` - "Add activatable abilities to value cards"
+
+---
+
+## Loop 8: Card Removal Mechanic
+
+### Step 1: Analysis
+
+**Gap: Deck Dilution Without Direction**
+
+Per emergent-game-design skill:
+> "Deck evolution is dilution without direction"
+> "No way to remove cards"
+> "What Good Deck Evolution Looks Like: Choice on gain, Removal, Upgrade, Transform"
+
+Current problem: Deck grows with every successful action but there's no way to trim it. Player can't shape their deck toward an archetype.
+
+**Design Goals:**
+1. Allow card removal after successful actions
+2. Only show option when deck is large enough (>5 cards)
+3. Make removal optional (player can skip)
+
+### Step 2: Implementation Plan
+
+1. Add CardRemovalPanel with scrollable card display
+2. Add "Forget a Card" button to result panel (only on success)
+3. Display all deck cards for selection
+4. Player clicks card to remove it, or "Keep All" to skip
+5. Continue to next day after selection
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `motivation_cards.tscn` - Added card removal UI:
+  - CardRemovalPanel with title, hint, and scroll container
+  - CardRemovalContainer (HBoxContainer) for card display
+  - SkipRemovalButton ("Keep All")
+  - ForgetCardButton in result panel (moved ContinueButton to ResultButtons HBox)
+
+- `motivation_cards.gd` - Implemented card removal:
+  - Added @onready refs for new UI nodes
+  - Connected forget_card_button and skip_removal_button signals
+  - `_on_forget_card_pressed()` fades to removal panel
+  - `_show_card_removal()` displays all deck cards
+  - `_create_removal_card_display()` makes clickable card UI
+  - `_remove_card_from_deck()` removes selected card
+  - `_on_skip_removal_pressed()` skips removal
+  - Only shows forget button when deck.size() > 5
+
+### Step 4: Commit
+
