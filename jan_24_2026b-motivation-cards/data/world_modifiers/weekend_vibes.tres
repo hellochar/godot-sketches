@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="WorldModifierResource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://ddwdyslwsfpd8" path="res://jan_24_2026b-motivation-cards/world_modifier_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Weekend Vibes"
+description = "Time to relax and enjoy"
+health_bonus = 5
+social_bonus = 15
+routine_bonus = -10
+effort_bonus = -5
+risk_bonus = 10
+creativity_bonus = 10
+willpower_change = 5
+draw_change = 1
+
