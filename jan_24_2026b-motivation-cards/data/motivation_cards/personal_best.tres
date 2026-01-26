@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://byn44r1nv7hoc" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Personal Best"
+health_modifier = 12
+social_modifier = 0
+routine_modifier = 0
+effort_modifier = 12
+risk_modifier = 0
+creativity_modifier = 0
+condition_type = 7
+condition_threshold = 1
+condition_tag = 0
+bonus_multiplier = 3.0
+description = "Beat your record"
+special_effect = 0
+special_value = 0
+

@@ -2196,3 +2196,37 @@ The synergy web analysis showed Routine+Social as an underserved pair. Need brid
 **Updated starter_deck.tres** - Added all 4 cards (IDs 274-277).
 
 ### Step 4: Commit
+
+Committed: `244b80e` - "Loop 53: Add Routine+Social bridge motivation cards"
+
+---
+
+## Loop 54: Effort+Health Bridge Cards
+
+### Step 1: Analysis
+
+**Gap: Effort+Health Bridge Cards**
+
+Need more bridge cards connecting Effort and Health archetypes for fitness-themed builds.
+
+**Design Goals:**
+1. Create cards rewarding physical effort
+2. Fitness and training themes
+3. Varied conditions including streak, success chance, and new action bonus
+
+### Step 2: Implementation Plan
+
+1. Create 4 Effort+Health bridge motivation cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Effort+Health Bridge Cards Created:**
+1. `train_hard.tres` - Train Hard: +20 Health, +15 Effort. 1.5x if action has Health tag.
+2. `fitness_goals.tres` - Fitness Goals: +15 Health, +15 Effort. 2x if streak >= 3.
+3. `no_pain_no_gain.tres` - No Pain No Gain: +18 Health, +18 Effort. 1.5x if cost > 70, restores 5 willpower.
+4. `personal_best.tres` - Personal Best: +12 Health, +12 Effort. 3x if action is new.
+
+**Updated starter_deck.tres** - Added all 4 cards (IDs 278-281).
+
+### Step 4: Commit
