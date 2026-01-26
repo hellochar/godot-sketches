@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="MotivationCardResource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://byn44r1nv7hoc" path="res://jan_24_2026b-motivation-cards/motivation_card_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Weekly Meetup"
+health_modifier = 0
+social_modifier = 20
+routine_modifier = 10
+effort_modifier = 0
+risk_modifier = 0
+creativity_modifier = 0
+condition_type = 1
+condition_threshold = 1
+condition_tag = 1
+bonus_multiplier = 1.5
+description = "Regular social commitment"
+special_effect = 1
+special_value = 1
+

@@ -2162,3 +2162,37 @@ Risk archetype needs more diverse actions beyond the existing high-risk ones.
 **Updated starter_deck.tres** - Added all 4 actions (IDs 270-273).
 
 ### Step 4: Commit
+
+Committed: `9514c7a` - "Loop 52: Add risk archetype actions"
+
+---
+
+## Loop 53: Routine+Social Bridge Cards
+
+### Step 1: Analysis
+
+**Gap: Routine+Social Bridge Cards Missing**
+
+The synergy web analysis showed Routine+Social as an underserved pair. Need bridge cards connecting these archetypes.
+
+**Design Goals:**
+1. Create cards rewarding both routine and social play
+2. Varied conditions and effects
+3. Thematically coherent
+
+### Step 2: Implementation Plan
+
+1. Create 4 Routine+Social bridge motivation cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Routine+Social Bridge Cards Created:**
+1. `social_schedule.tres` - Social Schedule: +15 Social, +15 Routine. 2x if 2+ Routine cards in hand.
+2. `weekly_meetup.tres` - Weekly Meetup: +20 Social, +10 Routine. +1 draw on success if action is Social.
+3. `scheduled_call.tres` - Scheduled Call: +12 Social, +12 Routine. 2x if succeeded yesterday.
+4. `family_tradition.tres` - Family Tradition: +18 Social, +18 Routine. 1.5x if streak >= 2.
+
+**Updated starter_deck.tres** - Added all 4 cards (IDs 274-277).
+
+### Step 4: Commit
