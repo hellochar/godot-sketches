@@ -2910,3 +2910,37 @@ Need actions representing food-related activities.
 **Updated starter_deck.tres** - Added all 4 actions (IDs 358-361).
 
 ### Step 4: Commit
+
+Committed: `1960b30` - "Loop 74: Add food/eating actions"
+
+---
+
+## Loop 75: Energy World Modifiers
+
+### Step 1: Analysis
+
+**Gap: Energy Level States**
+
+Need world modifiers representing energy and fatigue levels.
+
+**Design Goals:**
+1. Caffeine effects (effort boost with routine penalty)
+2. Exercise afterglow effects
+3. Fatigue and rest states
+
+### Step 2: Implementation Plan
+
+1. Create 4 energy-themed world modifiers
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Energy World Modifiers Created:**
+1. `caffeine_buzz.tres` - Caffeine Buzz: -5 Health, +5 Social, -10 Routine, +20 Effort, +10 Risk/Creativity, +5 willpower.
+2. `post_workout_high.tres` - Post-Workout High: +20 Health, +5 Social/Routine/Risk, +15 Effort, +10 Creativity, +10 willpower.
+3. `energy_crash.tres` - Energy Crash: -10 Health, -5 Social, +10 Routine, -20 Effort, -15 Risk, -5 Creativity, -10 willpower.
+4. `well_rested_day.tres` - Well Rested Day: +15 Health, +10 Social/Routine/Effort/Creativity, +5 Risk, +15 willpower, +1 draw.
+
+**Updated starter_deck.tres** - Added all 4 modifiers (IDs 362-365).
+
+### Step 4: Commit
