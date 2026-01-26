@@ -3148,3 +3148,37 @@ Need value cards representing different spiritual and mindfulness approaches to 
 **Updated starter_deck.tres** - Added all 4 value cards (IDs 386-389).
 
 ### Step 4: Commit
+
+Committed: `896e31f` - "Loop 81: Add spirituality value cards"
+
+---
+
+## Loop 82: Focus Motivation Cards
+
+### Step 1: Analysis
+
+**Gap: Focus/Concentration States**
+
+Need motivation cards representing different mental focus states.
+
+**Design Goals:**
+1. Contrast focused vs distracted states
+2. Trade-offs between focus and creativity
+3. Different focus archetypes
+
+### Step 2: Implementation Plan
+
+1. Create 4 focus/concentration themed motivation cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Focus Motivation Cards Created:**
+1. `laser_concentration.tres` - Laser Concentration: +25 Effort, +15 Routine, -10 Creativity.
+2. `distracted_mind.tres` - Distracted Mind: -15 Effort, +10 Creativity, +5 Social, +5 Risk.
+3. `single_minded.tres` - Single-Minded: +20 Effort, +10 Routine, -15 Social, -5 Creativity.
+4. `open_awareness.tres` - Open Awareness: +15 Creativity, +10 Social, +5 Health, -10 Effort.
+
+**Updated starter_deck.tres** - Added all 4 motivation cards (IDs 390-393).
+
+### Step 4: Commit
