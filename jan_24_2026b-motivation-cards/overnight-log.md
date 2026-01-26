@@ -3352,3 +3352,37 @@ Need actions focused on productivity techniques and time management.
 **Updated starter_deck.tres** - Added all 4 actions (IDs 410-413).
 
 ### Step 4: Commit
+
+Committed: `ef3fde1` - "Loop 87: Add productivity actions"
+
+---
+
+## Loop 88: Stress World Modifiers
+
+### Step 1: Analysis
+
+**Gap: Stress/Pressure Environmental States**
+
+Need world modifiers representing different stress and relaxation states.
+
+**Design Goals:**
+1. Contrast high-stress vs relaxed states
+2. Trade-offs between effort and wellbeing
+3. Willpower impacts
+
+### Step 2: Implementation Plan
+
+1. Create 4 stress/relaxation themed world modifiers
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Stress World Modifiers Created:**
+1. `work_pressure.tres` - Work Pressure: -5 Health, -10 Social, +10 Routine, +20 Effort, +5 Risk, -10 Creativity, -10 willpower.
+2. `relaxed_weekend.tres` - Relaxed Weekend: +10 Health, +15 Social, -10 Routine, -5 Effort, +10 Risk, +15 Creativity, +10 willpower, +1 draw.
+3. `exam_week.tres` - Exam Week: -10 Health, -15 Social, +15 Routine, +25 Effort, -5 Creativity, -15 willpower.
+4. `mental_health_day.tres` - Mental Health Day: +20 Health, -15 Routine, -20 Effort, +10 Creativity, +20 willpower.
+
+**Updated starter_deck.tres** - Added all 4 world modifiers (IDs 414-417).
+
+### Step 4: Commit
