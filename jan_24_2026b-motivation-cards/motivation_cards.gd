@@ -33,6 +33,12 @@ const StarterDeckResourceScript = preload("res://jan_24_2026b-motivation-cards/s
 @export_group("Data")
 @export var starter_deck: Resource
 
+@export_group("Audio")
+@export var card_reveal_sound: AudioStream
+@export var attempt_sound: AudioStream
+@export var success_sound: AudioStream
+@export var failure_sound: AudioStream
+
 @onready var day_label: Label = %DayLabel
 @onready var score_label: Label = %ScoreLabel
 @onready var willpower_bar: ProgressBar = %WillpowerBar
@@ -66,6 +72,7 @@ const StarterDeckResourceScript = preload("res://jan_24_2026b-motivation-cards/s
 @onready var final_score_label: Label = %FinalScore
 @onready var actions_summary: Label = %ActionsSummary
 @onready var play_again_button: Button = %PlayAgainButton
+@onready var audio_player: AudioStreamPlayer = %AudioPlayer
 
 var game_state
 var current_action
@@ -92,6 +99,12 @@ func _connect_signals() -> void:
   attempt_button.pressed.connect(_on_attempt_pressed)
   continue_button.pressed.connect(_on_continue_pressed)
   play_again_button.pressed.connect(_on_play_again_pressed)
+
+
+func _play_sound(sound: AudioStream) -> void:
+  if sound and audio_player:
+    audio_player.stream = sound
+    audio_player.play()
 
 
 func _update_top_bar() -> void:
@@ -232,6 +245,7 @@ func _display_mood_cards() -> void:
     var delay := i * card_reveal_delay
     tween.tween_property(card_panel, "scale", Vector2.ONE, 0.2).set_delay(delay).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
     tween.tween_property(card_panel, "modulate:a", 1.0, 0.15).set_delay(delay)
+    tween.tween_callback(_play_sound.bind(card_reveal_sound)).set_delay(delay)
 
 
 func _create_mood_card_display(card) -> PanelContainer:
@@ -408,6 +422,7 @@ func _on_back_pressed() -> void:
 
 
 func _on_attempt_pressed() -> void:
+  _play_sound(attempt_sound)
   var gap := maxi(0, current_action.motivation_cost - total_motivation)
   var willpower_spent := mini(gap, game_state.willpower)
   game_state.spend_willpower(willpower_spent)
@@ -435,6 +450,7 @@ func _show_result(success: bool) -> void:
 
     result_title.text = "Success!"
     result_title.add_theme_color_override("font_color", success_color)
+    _play_sound(success_sound)
     var details_parts: Array = []
     if score_gained > 0:
       details_parts.append("You gained %d points!" % score_gained)
@@ -447,6 +463,7 @@ func _show_result(success: bool) -> void:
   else:
     result_title.text = "Failed..."
     result_title.add_theme_color_override("font_color", failure_color)
+    _play_sound(failure_sound)
     result_details.text = "The action didn't succeed this time.\nBetter luck next time."
 
   _update_top_bar()
