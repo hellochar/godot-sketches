@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ActionResource" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
+[ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/motivation_cards/rebel_spirit.tres" id="2"]
+[ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/motivation_cards/thrill_seeker.tres" id="3"]
+[ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/motivation_cards/adrenaline_junkie.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+title = "Go All In"
+motivation_cost = 20
+tags = [4, 3]
+success_chance = 0.2
+cards_on_success = [ExtResource("2"), ExtResource("3"), ExtResource("4")]

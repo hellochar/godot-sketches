@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ActionResource" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://jan_24_2026b-motivation-cards/action_resource.gd" id="1"]
+[ext_resource type="Resource" path="res://jan_24_2026b-motivation-cards/data/motivation_cards/adrenaline_high.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+title = "Wing It"
+motivation_cost = 40
+tags = [4, 5]
+success_chance = 0.5
+cards_on_success = [ExtResource("2")]
