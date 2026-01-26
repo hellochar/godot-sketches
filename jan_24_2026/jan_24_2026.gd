@@ -75,7 +75,6 @@ var feedback_message: String = ""
 var feedback_timer: float = 0.0
 var needs_redraw: bool = true
 
-var screen_shake: float = 0.0
 var smoke_spawn_timer: float = 0.0
 var last_milestone: int = 0
 
@@ -104,24 +103,6 @@ func _process(delta: float) -> void:
     if feedback_timer <= 0:
       feedback_message = ""
       needs_redraw = true
-
-  if screen_shake > 0:
-    screen_shake -= delta
-    var trauma := screen_shake * screen_shake
-    grid_view.shake_offset = Vector2(
-      randf_range(-shake_amplitude, shake_amplitude) * trauma,
-      randf_range(-shake_amplitude, shake_amplitude) * trauma
-    )
-    needs_redraw = true
-  else:
-    grid_view.shake_offset = Vector2.ZERO
-
-  for popup in grid_view.score_popups:
-    popup.pos += popup.velocity * delta
-    popup.life -= delta
-  grid_view.score_popups = grid_view.score_popups.filter(func(p): return p.life > 0)
-  if grid_view.score_popups.size() > 0:
-    needs_redraw = true
 
   if grid_view.sim_start_pulse > 0:
     grid_view.sim_start_pulse -= delta
@@ -280,13 +261,12 @@ func get_resource_name_for(res: GridView.ResourceType) -> String:
   return ""
 
 func add_screen_shake(amount: float) -> void:
-  screen_shake = maxf(screen_shake, amount)
+  Utils.screen_shake(amount, shake_amplitude)
 
 func spawn_score_popup(grid_pos: Vector2i, amount: int) -> void:
   var pixel_pos := grid_view.grid_to_pixel(grid_pos)
-  var popup := GridView.ScorePopup.new(pixel_pos, "+" + str(amount))
-  popup.velocity = Vector2(0, -score_popup_speed)
-  grid_view.score_popups.append(popup)
+  var global_pos := grid_view.global_position + pixel_pos
+  Utils.floating_text(global_pos, "+" + str(amount), Color(0.3, 1.0, 0.3), Vector2(0, -score_popup_speed))
 
 func spawn_absorb_particles(grid_pos: Vector2i, count: int) -> void:
   var center := grid_view.grid_to_pixel(grid_pos)
