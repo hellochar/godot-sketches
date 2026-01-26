@@ -2434,3 +2434,37 @@ Need more negative cards to create tension and interesting decisions (discarding
 **Updated starter_deck.tres** - Added all 4 cards (IDs 302-305).
 
 ### Step 4: Commit
+
+Committed: `cc5b115` - "Loop 60: Add negative/tension motivation cards"
+
+---
+
+## Loop 61: Conditional Reward Cards
+
+### Step 1: Analysis
+
+**Gap: More Playstyle-Specific Rewards**
+
+Need more cards that reward specific playstyles and action choices.
+
+**Design Goals:**
+1. Cards rewarding low-cost vs high-cost actions
+2. Cards rewarding safe vs risky choices
+3. Cards with special effects as rewards
+
+### Step 2: Implementation Plan
+
+1. Create 4 conditional reward motivation cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Conditional Reward Cards Created:**
+1. `early_bird.tres` - Early Bird: +15 Health, +20 Routine, +10 Effort. 2x if action cost < 30.
+2. `risk_taker_reward.tres` - Risk Taker: -10 Routine, +10 Effort, +25 Risk, +10 Creativity. 2x if success < 60%.
+3. `creature_comfort.tres` - Creature Comfort: +15 Health, +5 Social, +25 Routine, -5 Effort, -15 Risk. 1.5x if success >= 90%, restores 5 willpower.
+4. `crowd_pleaser.tres` - Crowd Pleaser: +25 Social, +10 Effort, +5 Risk, +10 Creativity. 2x if action is Social, +1 draw.
+
+**Updated starter_deck.tres** - Added all 4 cards (IDs 306-309).
+
+### Step 4: Commit
