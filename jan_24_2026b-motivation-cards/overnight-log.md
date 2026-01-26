@@ -1936,4 +1936,38 @@ Few cards interact with willpower as a strategic resource.
 
 ### Step 4: Commit
 
+Committed: `c232ef0` - "Loop 46: Add willpower management cards"
+
+---
+
+## Loop 47: Social Archetype Actions
+
+### Step 1: Analysis
+
+**Gap: Limited Social Actions**
+
+Social archetype needs more action variety.
+
+**Design Goals:**
+1. Add diverse social-tagged actions
+2. Mix solo and group social activities
+3. Various difficulty levels
+
+### Step 2: Implementation Plan
+
+1. Create 4 social-focused actions
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Social Actions Created:**
+1. `host_dinner.tres` - Host Dinner Party: 85 cost, Social+Effort+Creativity, 70% success
+2. `video_call.tres` - Video Call Friend: 35 cost, Social, 95% success
+3. `join_club.tres` - Join Local Club: 70 cost, Social+Risk+Routine, 60% success
+4. `help_neighbor.tres` - Help Neighbor: 45 cost, Social+Health+Effort, 90% success
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 250-253).
+
+### Step 4: Commit
+
 Committed: (pending)
