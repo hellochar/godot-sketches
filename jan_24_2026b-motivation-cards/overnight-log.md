@@ -2038,4 +2038,38 @@ Health archetype needs more variety.
 
 ### Step 4: Commit
 
+Committed: `8091e7d` - "Loop 49: Add health archetype actions"
+
+---
+
+## Loop 50: Routine Archetype Actions
+
+### Step 1: Analysis
+
+**Gap: Limited Routine Actions**
+
+Routine archetype needs more variety.
+
+**Design Goals:**
+1. Add diverse routine-tagged actions
+2. Focus on habit-forming activities
+3. Various difficulty levels
+
+### Step 2: Implementation Plan
+
+1. Create 4 routine-focused actions
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Routine Actions Created:**
+1. `morning_routine.tres` - Complete Morning Routine: 50 cost, Routine+Health, 90% success
+2. `budget_review.tres` - Review Budget: 40 cost, Routine+Effort, 95% success
+3. `deep_clean.tres` - Deep Clean Home: 75 cost, Routine+Effort+Health, 75% success
+4. `organize_closet.tres` - Organize Closet: 55 cost, Routine+Effort, 85% success
+
+**Updated starter_deck.tres** - Added all 4 actions (IDs 262-265).
+
+### Step 4: Commit
+
 Committed: (pending)
