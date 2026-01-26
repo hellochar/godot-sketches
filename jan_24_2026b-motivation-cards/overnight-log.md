@@ -3692,3 +3692,37 @@ Need value cards representing different lifestyle philosophies.
 **Updated starter_deck.tres** - Added all 4 value cards (IDs 450-453).
 
 ### Step 4: Commit
+
+Committed: `6f67ed5` - "Loop 97: Add balance value cards"
+
+---
+
+## Loop 98: Energy Motivation Cards
+
+### Step 1: Analysis
+
+**Gap: Energy/Momentum Mental States**
+
+Need motivation cards representing different energy states and momentum.
+
+**Design Goals:**
+1. Morning vs night energy contrast
+2. Momentum building effects
+3. Energy bursts with trade-offs
+
+### Step 2: Implementation Plan
+
+1. Create 4 energy/momentum themed motivation cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Energy Motivation Cards Created:**
+1. `morning_surge.tres` - Morning Surge: +15 Health, +20 Routine, +10 Effort, -5 Creativity.
+2. `night_owl_energy.tres` - Night Owl Energy: +25 Creativity, +10 Effort, -15 Routine, -5 Health.
+3. `building_momentum.tres` - Building Momentum: +15 Effort, +10 Routine, +5 Risk. 1.5x if succeeded yesterday.
+4. `burst_of_energy.tres` - Burst of Energy: +20 Health, +20 Effort, +5 Social, -10 Routine. Extra draw effect.
+
+**Updated starter_deck.tres** - Added all 4 motivation cards (IDs 454-457).
+
+### Step 4: Commit
