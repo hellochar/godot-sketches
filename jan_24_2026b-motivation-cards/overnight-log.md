@@ -2842,3 +2842,37 @@ Need actions representing learning and self-education.
 **Updated starter_deck.tres** - Added all 4 actions (IDs 350-353).
 
 ### Step 4: Commit
+
+Committed: `d6a1c91` - "Loop 72: Add learning/education actions"
+
+---
+
+## Loop 73: Competitive Motivation Cards
+
+### Step 1: Analysis
+
+**Gap: Competitive/Achievement Mindsets**
+
+Need motivation cards representing competitive drive and achievement focus.
+
+**Design Goals:**
+1. Effort and Risk focused
+2. Use conditions like HIGH_ACTION_COST, REPEATED_ACTION
+3. Reward pushing harder
+
+### Step 2: Implementation Plan
+
+1. Create 4 competitive-themed motivation cards
+2. Add to starter_deck.tres
+
+### Step 3: Execution
+
+**Competitive Motivation Cards Created:**
+1. `competitive_fire.tres` - Competitive Fire: +15 Effort, +10 Risk. 2x if action cost > 70.
+2. `one_up.tres` - One Up: +15 Social, +10 Risk. Extra draw on success.
+3. `drive_to_win.tres` - Drive to Win: +10 Effort. +15 per success streak.
+4. `must_beat_myself.tres` - Must Beat Myself: +10 Health, +15 Effort. 2x if repeated action.
+
+**Updated starter_deck.tres** - Added all 4 cards (IDs 354-357).
+
+### Step 4: Commit
