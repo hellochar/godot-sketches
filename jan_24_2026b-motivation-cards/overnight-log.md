@@ -959,3 +959,41 @@ At 7 days, players barely have time to build synergies before the game ends. Dec
   - Added mid-week boost at day 8: +20 willpower max (capped at 150)
 
 ### Step 4: Commit
+
+Committed: `df0c905` - "Extend week to 14 days with mid-week willpower boost"
+
+---
+
+## Loop 21: Value Card Selection
+
+### Step 1: Analysis
+
+**Gap: Random Starting Value Card**
+
+Players get one random value card at game start. This removes agency from build decisions.
+
+**Design Goals:**
+1. Let players choose from 3 random value cards at game start
+2. Create meaningful starting decision
+3. Set build direction early
+
+### Step 2: Implementation Plan
+
+1. Add value card selection screen
+2. Present 3 random value cards at game start
+3. Player picks one to start with
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `motivation_cards.tscn`:
+  - Added ValueSelectionPanel with title, hint, and container
+
+- `motivation_cards.gd`:
+  - Added @onready for value_selection_panel and value_selection_container
+  - Added `_show_value_selection()` to present 3 random value cards
+  - Added `_select_starting_value()` to set chosen card and start game
+  - Modified `_ready()` to show value selection instead of starting game directly
+
+### Step 4: Commit

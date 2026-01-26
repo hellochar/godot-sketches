@@ -100,6 +100,8 @@ const GenericCardScene = preload("res://common/generic_card.tscn")
 @onready var card_removal_panel: PanelContainer = %CardRemovalPanel
 @onready var card_removal_container: HBoxContainer = %CardRemovalContainer
 @onready var skip_removal_button: Button = %SkipRemovalButton
+@onready var value_selection_panel: PanelContainer = %ValueSelectionPanel
+@onready var value_selection_container: HBoxContainer = %ValueSelectionContainer
 
 @onready var end_game_panel: PanelContainer = %EndGamePanel
 @onready var end_title: Label = %EndTitle
@@ -165,7 +167,7 @@ func _ready() -> void:
   game_state.willpower_max = starting_willpower
   starting_deck_size = game_state.motivation_deck.size()
   _connect_signals()
-  _start_new_turn()
+  _show_value_selection()
   _update_top_bar()
 
 
@@ -1282,6 +1284,38 @@ func _create_removal_card_display(card) -> PanelContainer:
   generic_card.pressed.connect(func() -> void: _remove_card_from_deck(card))
   _setup_card_feedback(generic_card)
   return generic_card
+
+
+func _show_value_selection() -> void:
+  for child in value_selection_container.get_children():
+    child.queue_free()
+
+  var choices: Array = game_state.all_value_cards.duplicate()
+  choices.shuffle()
+  var selection := choices.slice(0, mini(3, choices.size()))
+
+  for value_card in selection:
+    var generic_card := GenericCardScene.instantiate()
+    value_selection_container.add_child(generic_card)
+    generic_card.card_size = motivation_card_size
+    generic_card.background_color = button_normal_color.lightened(0.1)
+    generic_card.corner_radius = card_corner_radius
+    generic_card.content_margin = card_margin
+    generic_card.title = value_card.title
+    generic_card.add_content_label(value_card.get_score_description(), 12, Color.WHITE)
+    if value_card.ability_type != ValueCardRes.AbilityType.NONE:
+      generic_card.add_content_label(value_card.get_ability_text(), 10, Color(0.8, 0.9, 1.0))
+    generic_card.clicked.connect(func(): _select_starting_value(value_card))
+
+  value_selection_panel.visible = true
+
+
+func _select_starting_value(value_card) -> void:
+  game_state.value_cards = [value_card]
+  _play_sound(click_sound)
+  await _fade_out(value_selection_panel)
+  _start_new_turn()
+  _update_top_bar()
 
 
 func _remove_card_from_deck(card) -> void:
