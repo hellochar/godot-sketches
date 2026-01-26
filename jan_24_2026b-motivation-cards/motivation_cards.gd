@@ -127,11 +127,14 @@ func _build_context_for_action(action) -> Dictionary:
     "action_tags": action.tags,
     "action_tag_count": action.tags.size(),
     "action_cost": action.motivation_cost,
+    "action_title": action.title,
     "success_chance": action.success_chance,
     "succeeded_yesterday": game_state.succeeded_yesterday,
     "success_streak": game_state.success_streak,
     "attempted_actions": game_state.attempted_actions,
     "discards_this_turn": discards_this_turn,
+    "total_successes_this_week": game_state.total_successes_this_week,
+    "last_successful_action_title": game_state.last_successful_action_title,
   }
 
 
@@ -321,6 +324,13 @@ func _get_potential_score(action) -> int:
 
 func _get_special_effect_bonus(action, context: Dictionary) -> int:
   var bonus := 0
+  var has_amplify := false
+  for card in drawn_cards:
+    if not (card is MotivationCardRes):
+      continue
+    if card.special_effect == MotivationCardRes.SpecialEffect.AMPLIFY_ALL:
+      has_amplify = true
+
   for card in drawn_cards:
     if not (card is MotivationCardRes):
       continue
@@ -330,8 +340,25 @@ func _get_special_effect_bonus(action, context: Dictionary) -> int:
           bonus += card.special_value
       MotivationCardRes.SpecialEffect.STREAK_SCALING:
         bonus += card.special_value * context.get("success_streak", 0)
+      MotivationCardRes.SpecialEffect.MOMENTUM_SCALING:
+        bonus += card.special_value * context.get("total_successes_this_week", 0)
+      MotivationCardRes.SpecialEffect.DISCARD_SCALING:
+        bonus += card.special_value * context.get("discards_this_turn", 0)
+      MotivationCardRes.SpecialEffect.EXHAUST_BONUS:
+        bonus += card.special_value
       MotivationCardRes.SpecialEffect.DOUBLE_TAG_ZERO_OTHER:
         pass
+      MotivationCardRes.SpecialEffect.AMPLIFY_ALL:
+        pass
+
+  if has_amplify:
+    var base_motivation := 0
+    for card in drawn_cards:
+      if card is MotivationCardRes and card.special_effect == MotivationCardRes.SpecialEffect.AMPLIFY_ALL:
+        continue
+      base_motivation += card.get_motivation_for_tags(action.tags, context)
+    bonus += base_motivation
+
   return bonus
 
 
@@ -839,6 +866,8 @@ func _show_result(success: bool) -> void:
   if success:
     game_state.success_streak += 1
     game_state.succeeded_yesterday = true
+    game_state.total_successes_this_week += 1
+    game_state.last_successful_action_title = current_action.title
     last_action_succeeded = true
 
     for value_card in game_state.value_cards:
@@ -850,6 +879,7 @@ func _show_result(success: bool) -> void:
       cards_to_add.append(card)
 
     willpower_restored = _handle_success_special_effects()
+    _handle_exhaust_cards()
 
     result_title.text = "Success!"
     result_title.add_theme_color_override("font_color", success_color)
@@ -913,6 +943,14 @@ func _handle_failure_special_effects() -> int:
         willpower_restored += card.special_value
         game_state.willpower = mini(game_state.willpower_max, game_state.willpower + card.special_value)
   return willpower_restored
+
+
+func _handle_exhaust_cards() -> void:
+  for card in drawn_cards:
+    if not (card is MotivationCardRes):
+      continue
+    if card.special_effect == MotivationCardRes.SpecialEffect.EXHAUST_BONUS:
+      game_state.remove_motivation_card(card)
 
 
 func _animate_cards_added(cards: Array) -> void:

@@ -75,3 +75,78 @@ The player draws 5 cards with zero agency over what appears. This eliminates:
 
 ### Step 4: Commit
 
+Committed: `fb7760d` - "Add discard-to-redraw deck manipulation mechanic"
+
+---
+
+## Loop 2: Build-Around Cards & Engine Strengthening
+
+### Step 1: Analysis
+
+**Gap: Weak Build-Arounds**
+
+Per emergent-game-design skill:
+> "Layer 3 - Build-arounds: Elements that define entire strategies. These are intentionally parasitic—they demand the player warp their deck around them."
+> "Only 5 engine cards out of 50."
+> "Current 'Build-Arounds' Are Weak"
+
+**Problem:**
+- Flow State is uncontrollable (can't choose draws)
+- Streak Keeper breaks on random failures
+- No cards that say "build your ENTIRE deck around me"
+
+**Design Goals:**
+1. Create cards that change deck-building priority drastically
+2. Add self-reinforcing engines that compound
+3. Make "all-in" strategies viable and exciting
+
+### Step 2: Implementation Plan
+
+1. Track `total_successes_this_week` and `last_successful_action_title` in game_state
+2. Add new condition type: `REPEATED_SUCCESS` (same action as yesterday)
+3. Add new special effects:
+   - `MOMENTUM_SCALING` (+X per total success this week)
+   - `DISCARD_SCALING` (+X per discard this turn)
+   - `AMPLIFY_ALL` (double all positive/negative modifiers from other cards)
+   - `EXHAUST_BONUS` (remove this card from deck for massive bonus)
+4. Create 6 build-around cards:
+   - Singularity (mono-tag payoff)
+   - Momentum Engine (success stacking)
+   - Glass Cannon (amplifier)
+   - Discard Master (discard engine payoff)
+   - Repeat Expert (consistency payoff)
+   - Desperation Play (exhaust for burst)
+
+### Step 3: Execution
+
+**Files Modified:**
+
+- `game_state.gd` - Added tracking variables:
+  - `total_successes_this_week: int = 0`
+  - `last_successful_action_title: String = ""`
+
+- `motivation_card_resource.gd` - Added new mechanics:
+  - ConditionType.REPEATED_ACTION (checks if same action as last success)
+  - SpecialEffect.MOMENTUM_SCALING (+X per total success this week)
+  - SpecialEffect.DISCARD_SCALING (+X per discard this turn)
+  - SpecialEffect.AMPLIFY_ALL (doubles all other card modifiers)
+  - SpecialEffect.EXHAUST_BONUS (huge bonus, removes card from deck)
+
+- `motivation_cards.gd` - Implemented new special effects:
+  - Context now includes `action_title`, `total_successes_this_week`, `last_successful_action_title`
+  - `_get_special_effect_bonus()` handles new scaling effects
+  - `_handle_exhaust_cards()` removes exhausted cards after success
+  - Tracks total successes and last successful action
+
+**Build-Around Cards Created:**
+1. `momentum_engine.tres` - +5 Effort, +5 per success this week. Snowballs over time.
+2. `glass_cannon.tres` - Double all other modifiers. High risk/reward amplifier.
+3. `discard_master.tres` - +15 per discard this turn. Rewards aggressive discarding.
+4. `repeat_expert.tres` - +10 all tags, 3x if same action as last success. Rewards consistency.
+5. `desperation_play.tres` - Exhaust: +100, then removed from deck. Emergency burst.
+6. `focused_specialist.tres` - +15 all tags, 2x if action has only 1 tag. Rewards simple actions.
+
+**Added to starter_deck.tres** - All 6 cards registered with ExtResource IDs 139-144.
+
+### Step 4: Commit
+
