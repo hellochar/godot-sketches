@@ -45,6 +45,7 @@ offset_top = 50.0
 offset_right = 180.0
 offset_bottom = -20.0
 grow_vertical = 2
+theme_override_constants/separation = 10
 
 [node name="BuildingsHeader" type="Label" parent="LeftPanel"]
 layout_mode = 2
@@ -98,10 +99,6 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
 label_settings = ExtResource("5_label_settings_small")
 
-[node name="Spacer1" type="Control" parent="LeftPanel"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-
 [node name="PipesHeader" type="Label" parent="LeftPanel"]
 layout_mode = 2
 text = "PIPES"
@@ -127,10 +124,6 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "H: Heat"
 label_settings = ExtResource("3_label_settings")
-
-[node name="Spacer2" type="Control" parent="LeftPanel"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
 
 [node name="ControlsHeader" type="Label" parent="LeftPanel"]
 layout_mode = 2
@@ -177,6 +170,7 @@ offset_right = -20.0
 offset_bottom = -20.0
 grow_horizontal = 0
 grow_vertical = 2
+theme_override_constants/separation = 10
 
 [node name="ScoreLabel" type="Label" parent="RightPanel"]
 unique_name_in_owner = true
@@ -191,19 +185,11 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 0, 1)
 label_settings = ExtResource("4_label_settings_header")
 
-[node name="Spacer1" type="Control" parent="RightPanel"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-
 [node name="FeedbackLabel" type="Label" parent="RightPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
 label_settings = ExtResource("3_label_settings")
-
-[node name="Spacer2" type="Control" parent="RightPanel"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
 
 [node name="PromptLabel" type="Label" parent="RightPanel"]
 unique_name_in_owner = true

@@ -34,35 +34,40 @@ extends Control
 @onready var tooltip_label: Label = %TooltipLabel
 @onready var resource_desc_label: Label = %ResourceDescLabel
 
-const BUILDING_COLORS := {
-  GridView.BuildingType.EXTRACTOR: Color.YELLOW,
-  GridView.BuildingType.GENERATOR: Color.ORANGE,
-  GridView.BuildingType.RADIATOR: Color.DEEP_SKY_BLUE,
-  GridView.BuildingType.HEAT_SINK: Color.SLATE_BLUE,
-  GridView.BuildingType.PIPE: Color.GRAY,
-}
+@export_group("Building Descriptions")
+@export var extractor_desc: String = "Produces 1 Fuel per tick."
+@export var extractor_hint: String = "Must be on edge cells."
+@export var generator_desc: String = "Consumes 1 Fuel -> 2 Power + 1 Heat."
+@export var generator_hint: String = "Must be in interior. Shuts down if heat not routed."
+@export var radiator_desc: String = "Absorbs 2 Heat total."
+@export var radiator_hint: String = "Must be on edge cells."
+@export var heat_sink_desc: String = "Absorbs 4 Heat total."
+@export var heat_sink_hint: String = "Must be in interior."
+@export var pipe_desc: String = "Carries resources between buildings."
+@export var pipe_hint: String = "Place anywhere. Auto-connects to adjacent pipes."
 
-const RESOURCE_COLORS := {
-  GridView.ResourceType.FUEL: Color.YELLOW,
-  GridView.ResourceType.POWER: Color.LIME_GREEN,
-  GridView.ResourceType.HEAT: Color.ORANGE_RED,
-}
+@export_group("Resource Descriptions")
+@export var fuel_desc: String = "Fuel pipes carry fuel from Extractors to Generators."
+@export var power_desc: String = "Power pipes carry power from Generators to Outports (green diamonds)."
+@export var heat_desc: String = "Heat pipes carry heat from Generators to Radiators/Heat Sinks."
 
-const BUILDING_DESCRIPTIONS := {
-  GridView.BuildingType.EXTRACTOR: ["Extractor", "Produces 1 Fuel per tick.", "Must be on edge cells."],
-  GridView.BuildingType.GENERATOR: ["Generator", "Consumes 1 Fuel -> 2 Power + 1 Heat.", "Must be in interior. Shuts down if heat not routed."],
-  GridView.BuildingType.RADIATOR: ["Radiator", "Absorbs 2 Heat total.", "Must be on edge cells."],
-  GridView.BuildingType.HEAT_SINK: ["Heat Sink", "Absorbs 4 Heat total.", "Must be in interior."],
-  GridView.BuildingType.PIPE: ["Pipe", "Carries resources between buildings.", "Place anywhere. Auto-connects to adjacent pipes."],
-}
+func get_building_desc(type: GridView.BuildingType) -> Array:
+  match type:
+    GridView.BuildingType.EXTRACTOR: return ["Extractor", extractor_desc, extractor_hint]
+    GridView.BuildingType.GENERATOR: return ["Generator", generator_desc, generator_hint]
+    GridView.BuildingType.RADIATOR: return ["Radiator", radiator_desc, radiator_hint]
+    GridView.BuildingType.HEAT_SINK: return ["Heat Sink", heat_sink_desc, heat_sink_hint]
+    GridView.BuildingType.PIPE: return ["Pipe", pipe_desc, pipe_hint]
+  return ["", "", ""]
 
-const RESOURCE_DESCRIPTIONS := {
-  GridView.ResourceType.FUEL: "Fuel pipes carry fuel from Extractors to Generators.",
-  GridView.ResourceType.POWER: "Power pipes carry power from Generators to Outports (green diamonds).",
-  GridView.ResourceType.HEAT: "Heat pipes carry heat from Generators to Radiators/Heat Sinks.",
-}
+func get_resource_desc(res: GridView.ResourceType) -> String:
+  match res:
+    GridView.ResourceType.FUEL: return fuel_desc
+    GridView.ResourceType.POWER: return power_desc
+    GridView.ResourceType.HEAT: return heat_desc
+  return ""
 
-var simulating: bool = true
+var simulating: bool = false
 var tick_timer: float = 0.0
 var total_score: int = 0
 
@@ -210,7 +215,7 @@ func show_feedback(msg: String) -> void:
 
 func get_contextual_prompt() -> String:
   if grid_view.selected_building != GridView.BuildingType.NONE:
-    var building_name: String = BUILDING_DESCRIPTIONS[grid_view.selected_building][0]
+    var building_name: String = get_building_desc(grid_view.selected_building)[0]
     if grid_view.selected_building == GridView.BuildingType.PIPE:
       return "Click to place " + building_name + " (" + get_resource_name() + "). Press Esc to cancel."
     return "Click a highlighted cell to place " + building_name + ". Press Esc to cancel."
@@ -252,7 +257,7 @@ func get_hover_tooltip() -> String:
   var element = grid_view.grid[grid_view.hovered_cell.x][grid_view.hovered_cell.y]
   if element is GridView.Building:
     var b: GridView.Building = element
-    var desc: Array = BUILDING_DESCRIPTIONS[b.type]
+    var desc: Array = get_building_desc(b.type)
     var status := ""
     if b.shutdown:
       status = " [SHUTDOWN]"
@@ -501,26 +506,26 @@ func check_milestones() -> void:
       break
 
 func update_ui() -> void:
-  extractor_label.add_theme_color_override("font_color", Color.WHITE if grid_view.selected_building == GridView.BuildingType.EXTRACTOR else BUILDING_COLORS[GridView.BuildingType.EXTRACTOR])
-  generator_label.add_theme_color_override("font_color", Color.WHITE if grid_view.selected_building == GridView.BuildingType.GENERATOR else BUILDING_COLORS[GridView.BuildingType.GENERATOR])
-  radiator_label.add_theme_color_override("font_color", Color.WHITE if grid_view.selected_building == GridView.BuildingType.RADIATOR else BUILDING_COLORS[GridView.BuildingType.RADIATOR])
-  heat_sink_label.add_theme_color_override("font_color", Color.WHITE if grid_view.selected_building == GridView.BuildingType.HEAT_SINK else BUILDING_COLORS[GridView.BuildingType.HEAT_SINK])
-  var pipe_color: Color = RESOURCE_COLORS[grid_view.pipe_resource] if grid_view.selected_building == GridView.BuildingType.PIPE else Color.GRAY
+  extractor_label.add_theme_color_override("font_color", Color.WHITE if grid_view.selected_building == GridView.BuildingType.EXTRACTOR else grid_view.extractor_color)
+  generator_label.add_theme_color_override("font_color", Color.WHITE if grid_view.selected_building == GridView.BuildingType.GENERATOR else grid_view.generator_color)
+  radiator_label.add_theme_color_override("font_color", Color.WHITE if grid_view.selected_building == GridView.BuildingType.RADIATOR else grid_view.radiator_color)
+  heat_sink_label.add_theme_color_override("font_color", Color.WHITE if grid_view.selected_building == GridView.BuildingType.HEAT_SINK else grid_view.heat_sink_color)
+  var pipe_color: Color = grid_view.get_resource_color(grid_view.pipe_resource) if grid_view.selected_building == GridView.BuildingType.PIPE else Color.GRAY
   pipe_label.add_theme_color_override("font_color", Color.WHITE if grid_view.selected_building == GridView.BuildingType.PIPE else pipe_color)
 
   var desc_line1: Label = building_desc.get_node("Line1")
   var desc_line2: Label = building_desc.get_node("Line2")
   if grid_view.selected_building != GridView.BuildingType.NONE:
-    var desc: Array = BUILDING_DESCRIPTIONS[grid_view.selected_building]
+    var desc: Array = get_building_desc(grid_view.selected_building)
     desc_line1.text = desc[1]
     desc_line2.text = desc[2]
     building_desc.visible = true
   else:
     building_desc.visible = false
 
-  fuel_label.add_theme_color_override("font_color", Color.WHITE if grid_view.pipe_resource == GridView.ResourceType.FUEL else RESOURCE_COLORS[GridView.ResourceType.FUEL])
-  power_label.add_theme_color_override("font_color", Color.WHITE if grid_view.pipe_resource == GridView.ResourceType.POWER else RESOURCE_COLORS[GridView.ResourceType.POWER])
-  heat_label.add_theme_color_override("font_color", Color.WHITE if grid_view.pipe_resource == GridView.ResourceType.HEAT else RESOURCE_COLORS[GridView.ResourceType.HEAT])
+  fuel_label.add_theme_color_override("font_color", Color.WHITE if grid_view.pipe_resource == GridView.ResourceType.FUEL else grid_view.fuel_color)
+  power_label.add_theme_color_override("font_color", Color.WHITE if grid_view.pipe_resource == GridView.ResourceType.POWER else grid_view.power_color)
+  heat_label.add_theme_color_override("font_color", Color.WHITE if grid_view.pipe_resource == GridView.ResourceType.HEAT else grid_view.heat_color)
 
   start_stop_label.text = "Space: " + ("Stop" if simulating else "Start")
 
@@ -546,6 +551,6 @@ func update_ui() -> void:
     tooltip_label.visible = false
 
   if grid_view.selected_building == GridView.BuildingType.NONE:
-    resource_desc_label.text = RESOURCE_DESCRIPTIONS[grid_view.pipe_resource]
+    resource_desc_label.text = get_resource_desc(grid_view.pipe_resource)
   else:
     resource_desc_label.text = ""
