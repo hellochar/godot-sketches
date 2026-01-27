@@ -1,0 +1,57 @@
+[gd_scene load_steps=8 format=3 uid="uid://5ltam60fe31d"]
+
+[ext_resource type="Texture2D" uid="uid://c3a4qwupximaa" path="res://common/white-circle.tres" id="1_ws8w3"]
+[ext_resource type="Script" uid="uid://shb4eu7klgp3" path="res://jan_26_2026-particles2d/circular_streaks_wiggle.gd" id="2_yv6dq"]
+
+[sub_resource type="Curve" id="Curve_50xqt"]
+_data = [Vector2(0, 0), 0.0, 1.4, 0, 0, Vector2(0.16582596, 1), 0.0, 0.0, 0, 0, Vector2(0.8379571, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_s6g4x"]
+curve = SubResource("Curve_50xqt")
+
+[sub_resource type="Gradient" id="Gradient_50xqt"]
+offsets = PackedFloat32Array(0, 0.06, 0.94, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_s6g4x"]
+gradient = SubResource("Gradient_50xqt")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_47aty"]
+particle_flag_disable_z = true
+emission_shape = 6
+emission_ring_axis = Vector3(0, 0, 1)
+emission_ring_height = 1.0
+emission_ring_radius = 300.0
+emission_ring_inner_radius = 0.0
+emission_ring_cone_angle = 90.0
+spread = 180.0
+initial_velocity_min = 26.189999
+initial_velocity_max = 26.189999
+orbit_velocity_min = 0.073000096
+orbit_velocity_max = 0.0830001
+radial_velocity_min = 849.99994
+radial_velocity_max = 928.2399
+gravity = Vector3(0, 0, 0)
+scale_min = 0.19999999
+scale_max = 0.19999999
+color_ramp = SubResource("GradientTexture1D_s6g4x")
+alpha_curve = SubResource("CurveTexture_s6g4x")
+hue_variation_min = -1.0
+hue_variation_max = 0.96
+turbulence_noise_strength = 0.15
+
+[node name="circular-streaks-wiggle" type="GPUParticles2D"]
+amount = 25
+texture = ExtResource("1_ws8w3")
+lifetime = 2.0
+preprocess = 3.0
+speed_scale = 0.85
+trail_enabled = true
+trail_lifetime = 1.0
+trail_sections = 40
+trail_section_subdivisions = 1
+process_material = SubResource("ParticleProcessMaterial_47aty")
+script = ExtResource("2_yv6dq")
+radius = 300.0
+frequency = 0.6

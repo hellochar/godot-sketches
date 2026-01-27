@@ -1,0 +1,48 @@
+[gd_scene load_steps=5 format=3 uid="uid://rvaqxj3vwx08"]
+
+[ext_resource type="Texture2D" uid="uid://c3a4qwupximaa" path="res://common/white-circle.tres" id="1_tg26y"]
+
+[sub_resource type="Curve" id="Curve_s6g4x"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_47aty"]
+curve = SubResource("Curve_s6g4x")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_s24wy"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(1000, 640, 1)
+angle_min = 1.0728835e-05
+angle_max = 1.0728835e-05
+spread = 11.603
+initial_velocity_min = 615.48
+initial_velocity_max = 615.48
+gravity = Vector3(0, 0, 0)
+scale_min = 0.19999999
+scale_max = 0.19999999
+color = Color(0.6216, 0.84, 0.81088, 1)
+emission_curve = SubResource("CurveTexture_47aty")
+hue_variation_min = -2.2351742e-08
+hue_variation_max = 0.32999998
+turbulence_enabled = true
+turbulence_noise_strength = 5.22
+turbulence_noise_scale = 9.95
+turbulence_noise_speed_random = 0.5
+turbulence_influence_min = 0.056
+turbulence_influence_max = 0.056
+turbulence_initial_displacement_min = 26.500002
+turbulence_initial_displacement_max = 26.500002
+collision_mode = 1
+collision_friction = 0.0
+collision_bounce = 0.51
+collision_use_scale = true
+
+[node name="thick-colorful-hair-in-wind" type="GPUParticles2D"]
+amount = 5000
+texture = ExtResource("1_tg26y")
+lifetime = 2.0
+trail_enabled = true
+trail_lifetime = 1.0
+trail_section_subdivisions = 1
+process_material = SubResource("ParticleProcessMaterial_s24wy")

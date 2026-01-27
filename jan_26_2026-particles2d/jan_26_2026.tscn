@@ -1,0 +1,142 @@
+[gd_scene load_steps=20 format=3 uid="uid://bibkb3yu3x81g"]
+
+[ext_resource type="Script" uid="uid://cal0yfbfnoj7o" path="res://jan_26_2026-particles2d/jan_26_2026.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://byx2jd0iwvlmq" path="res://jan_26_2026-particles2d/circular_streaks.tscn" id="2_50xqt"]
+[ext_resource type="Script" uid="uid://cll2ewhxarmmd" path="res://common/smooth_camera.gd" id="2_uquox"]
+[ext_resource type="PackedScene" uid="uid://5ltam60fe31d" path="res://jan_26_2026-particles2d/circular_streaks_wiggle.tscn" id="3_50xqt"]
+[ext_resource type="Texture2D" uid="uid://c0ipuia8hajwb" path="res://jan_26_2026-particles2d/crossfade-alpha-curve.tres" id="4_47aty"]
+[ext_resource type="PackedScene" uid="uid://rvaqxj3vwx08" path="res://jan_26_2026-particles2d/thick_colorful_hair_in_wind.tscn" id="5_50xqt"]
+[ext_resource type="Texture2D" uid="uid://cvctvon6mety7" path="res://jan_26_2026-particles2d/self-hq-thisyear.png" id="7_47aty"]
+[ext_resource type="Texture2D" uid="uid://cwvsetqclrg2y" path="res://jan_26_2026-particles2d/noto_color_emoji_spritesheet.png" id="8_s24wy"]
+
+[sub_resource type="Gradient" id="Gradient_q0ufj"]
+offsets = PackedFloat32Array(0, 0.06, 0.94, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_1t73k"]
+gradient = SubResource("Gradient_q0ufj")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_m0alm"]
+particle_flag_disable_z = true
+emission_shape = 6
+emission_ring_axis = Vector3(0, 0, 1)
+emission_ring_height = 1.0
+emission_ring_radius = 300.0
+emission_ring_inner_radius = 0.0
+emission_ring_cone_angle = 90.0
+spread = 180.0
+initial_velocity_min = 26.189999
+initial_velocity_max = 26.189999
+orbit_velocity_min = 0.073000096
+orbit_velocity_max = 0.0830001
+radial_velocity_min = 849.99994
+radial_velocity_max = 928.2399
+gravity = Vector3(0, 0, 0)
+scale_min = 0.19999999
+scale_max = 0.19999999
+color_ramp = SubResource("GradientTexture1D_1t73k")
+alpha_curve = ExtResource("4_47aty")
+hue_variation_min = -1.0
+hue_variation_max = 0.96
+turbulence_noise_strength = 0.15
+
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_50xqt"]
+polygon = PackedVector2Array(-168, -171, -244, 186, 211, 267, 192, -196)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_47aty"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_lay45"]
+particle_flag_disable_z = true
+emission_shape_offset = Vector3(0, -600, 0)
+emission_shape = 3
+emission_box_extents = Vector3(800, 1, 1)
+angle_min = -179.99998
+angle_max = 180.00002
+gravity = Vector3(0, 98, 0)
+color = Color(1, 1, 1, 0.2509804)
+alpha_curve = ExtResource("4_47aty")
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_q0ufj"]
+particles_animation = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1t73k"]
+atlas = ExtResource("8_s24wy")
+region = Rect2(426.63358, 96.90919, 76.36365, 76.36367)
+
+[sub_resource type="Curve" id="Curve_m0alm"]
+_limits = [0.0, 1.2, 0.0, 1.0]
+_data = [Vector2(0, 0.77912676), 0.0, 0.0, 0, 0, Vector2(0.077553585, 1.2), 0.0, 0.0, 0, 0, Vector2(0.15573768, 0.9978701), 0.0, 0.0, 0, 0, Vector2(0.9262294, 0.9978701), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 5
+
+[sub_resource type="CurveTexture" id="CurveTexture_lay45"]
+curve = SubResource("Curve_m0alm")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_hd56l"]
+lifetime_randomness = 0.09
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(1000, 600, 1)
+angle_min = -59.99999
+angle_max = 60.00001
+angular_velocity_min = -25.710016
+angular_velocity_max = 58.28998
+gravity = Vector3(0, 0, 0)
+damping_min = 44.643
+damping_max = 44.643
+scale_min = 0.9
+scale_max = 1.1
+scale_curve = SubResource("CurveTexture_lay45")
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="_SmoothCamera" type="Camera2D" parent="."]
+visible = false
+script = ExtResource("2_uquox")
+metadata/_custom_type_script = "uid://cll2ewhxarmmd"
+
+[node name="circular-streaks" parent="." instance=ExtResource("2_50xqt")]
+visible = false
+
+[node name="circular-streaks-wiggle" parent="." instance=ExtResource("3_50xqt")]
+visible = false
+position = Vector2(-182.37885, -238.19731)
+process_material = SubResource("ParticleProcessMaterial_m0alm")
+
+[node name="thick-colorful-hair-in-wind" parent="." instance=ExtResource("5_50xqt")]
+visible = false
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="thick-colorful-hair-in-wind"]
+visible = false
+occluder = SubResource("OccluderPolygon2D_50xqt")
+
+[node name="falling-xiaohan-portrait" type="GPUParticles2D" parent="."]
+visible = false
+material = SubResource("CanvasItemMaterial_47aty")
+amount = 400
+texture = ExtResource("7_47aty")
+lifetime = 9.0
+speed_scale = 2.32
+explosiveness = 0.5
+draw_order = 0
+process_material = SubResource("ParticleProcessMaterial_lay45")
+
+[node name="oneshot-emojis-all-over-the-screen" type="GPUParticles2D" parent="."]
+material = SubResource("CanvasItemMaterial_q0ufj")
+emitting = false
+amount = 125
+texture = SubResource("AtlasTexture_1t73k")
+lifetime = 2.0
+one_shot = true
+explosiveness = 0.8
+draw_order = 0
+process_material = SubResource("ParticleProcessMaterial_hd56l")
