@@ -1,0 +1,41 @@
+[gd_scene load_steps=5 format=3 uid="uid://byx2jd0iwvlmq"]
+
+[ext_resource type="Texture2D" uid="uid://c3a4qwupximaa" path="res://common/white-circle.tres" id="1_nd0k2"]
+
+[sub_resource type="Curve" id="Curve_r77cr"]
+_data = [Vector2(0, 0), 0.0, 1.4, 0, 0, Vector2(0.16582596, 1), 0.0, 0.0, 0, 0, Vector2(0.8379571, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_cciec"]
+curve = SubResource("Curve_r77cr")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_r77cr"]
+lifetime_randomness = 0.46
+particle_flag_disable_z = true
+emission_shape = 6
+emission_ring_axis = Vector3(0, 0, 1)
+emission_ring_height = 1.0
+emission_ring_radius = 300.0
+emission_ring_inner_radius = 0.0
+emission_ring_cone_angle = 90.0
+spread = 180.0
+initial_velocity_min = 26.189999
+initial_velocity_max = 101.189995
+orbit_velocity_min = 0.073000096
+orbit_velocity_max = 0.0830001
+radial_velocity_min = 849.99994
+radial_velocity_max = 928.2399
+gravity = Vector3(0, 0, 0)
+scale_min = 0.19999999
+scale_max = 0.19999999
+alpha_curve = SubResource("CurveTexture_cciec")
+hue_variation_min = -1.0
+hue_variation_max = 0.96
+
+[node name="circular-streaks" type="GPUParticles2D"]
+amount = 250
+texture = ExtResource("1_nd0k2")
+lifetime = 1.35
+preprocess = 3.0
+trail_enabled = true
+process_material = SubResource("ParticleProcessMaterial_r77cr")
