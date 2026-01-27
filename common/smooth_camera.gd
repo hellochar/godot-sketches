@@ -7,6 +7,9 @@ extends Camera2D
 @export var chase_speed: float = 300.0
 @export var max_speed: float = 500.0
 
+@export_group("Panning")
+@export var pan_speed: float = 200.0
+
 @export_group("Zoom")
 @export var zoom_enabled: bool = true
 @export var zoom_speed: float = 0.1
@@ -24,7 +27,11 @@ func _ready():
   if target:
     global_position = target.global_position
 
-func _physics_process(delta):
+func _physics_process(delta: float) -> void:
+  _follow_target_process(delta)
+  _pan_process(delta)
+
+func _follow_target_process(delta: float) -> void:
   if not target:
     return
 
@@ -38,6 +45,14 @@ func _physics_process(delta):
   total_move = total_move.limit_length(max_speed * delta)
 
   global_position += total_move
+
+func _pan_process(delta: float) -> void:
+  var input_vector = Vector2.ZERO
+  input_vector.x = Input.get_action_strength("camera_right") - Input.get_action_strength("camera_left")
+  input_vector.y = Input.get_action_strength("camera_down") - Input.get_action_strength("camera_up")
+  if input_vector != Vector2.ZERO:
+    input_vector = input_vector.normalized()
+    global_position += input_vector * pan_speed * delta
 
 func _unhandled_input(event):
   if not zoom_enabled:
