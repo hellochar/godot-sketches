@@ -15,6 +15,10 @@ A new player reads "Deal 6 damage" and understands immediately. That same player
 
 This principle applies beyond cards to any game with combinable elements: skills, items, units, abilities, buildings, upgrades, or status effects.
 
+Explore every corner of the design space (from straightforward to exotic) without bloating individual cards with text or complex keywords. Each piece of content is an easy-to-grasp unit, and it’s the player’s assembly of these units that yields strategic depth.
+
+Cards often solve one problem while introducing another, or only partially solve it.
+
 ---
 
 ## The Atomic Vocabulary
