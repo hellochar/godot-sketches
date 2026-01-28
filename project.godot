@@ -18,7 +18,6 @@ config/icon="res://icon.svg"
 [autoload]
 
 Utils="*res://common/utils.gd"
-ItemLibrary="*res://dec-7-2025/item_library.gd"
 HTags="*res://addons/htags/autoload/htag_system.gd"
 MultiplayerManager="*res://aug-9-2025/scripts/MultiplayerManager.gd"
 

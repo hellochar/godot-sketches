@@ -8,7 +8,7 @@ class_name Structure
 
 static func generate_random_producer() -> Structure:
   var structure = Structure.new()
-  var rand_basic: Item = ItemLibrary.get_by_tier(Item.ETier.Basic).pick_random()
+  var rand_basic: Item = ItemLibrary.instance.get_by_tier(Item.ETier.Basic).pick_random()
   structure.production[rand_basic] = 1 # randi_range(1, 3)
   structure.production_time = 1 # randi_range(1, 3)
   structure.workers_needed = 1
@@ -20,14 +20,14 @@ static func generate_random_producer() -> Structure:
 
 static func generate_random_transformer_sametier(in_tier: Item.ETier) -> Structure:
   var structure = Structure.new()
-  var inputs = ItemLibrary.get_by_tier(in_tier)
+  var inputs = ItemLibrary.instance.get_by_tier(in_tier)
   inputs.shuffle()
   var rand_basic_inputs: Array[Item] = inputs.slice(0, 2)
   var sum_ingredients = 0
   for res in rand_basic_inputs:
     structure.ingredients[res] = 1 # randi_range(1, 2)
     sum_ingredients += structure.ingredients[res]
-  var rand_advanced: Item = ItemLibrary.get_by_tier(in_tier).pick_random()
+  var rand_advanced: Item = ItemLibrary.instance.get_by_tier(in_tier).pick_random()
   structure.production[rand_advanced] = sum_ingredients
   structure.production_time = 1 # randi_range(2, 4)
   structure.workers_needed = 2 # randi_range(1, 2)
@@ -39,12 +39,12 @@ static func generate_random_transformer_sametier(in_tier: Item.ETier) -> Structu
 
 static func generate_random_upgrader(base_tier: Item.ETier, upgraded_tier: Item.ETier) -> Structure:
   var structure = Structure.new()
-  var inputs = ItemLibrary.get_by_tier(base_tier)
+  var inputs = ItemLibrary.instance.get_by_tier(base_tier)
   inputs.shuffle()
   var rand_advanced_inputs: Array[Item] = inputs.slice(0, 2)
   for res in rand_advanced_inputs:
     structure.ingredients[res] = 2 # randi_range(3, 5)
-  var rand_futuristic: Item = ItemLibrary.get_by_tier(upgraded_tier).pick_random()
+  var rand_futuristic: Item = ItemLibrary.instance.get_by_tier(upgraded_tier).pick_random()
   structure.production[rand_futuristic] = 1
   structure.production_time = 1 # randi_range(7, 10)
   structure.workers_needed = 5 # randi_range(2, 3)
