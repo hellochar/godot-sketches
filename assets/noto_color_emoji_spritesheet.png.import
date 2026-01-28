@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cwvsetqclrg2y"
-path="res://.godot/imported/noto_color_emoji_spritesheet.png-26aa70b1040cf4acad0e2660873dc1f7.ctex"
+path="res://.godot/imported/noto_color_emoji_spritesheet.png-dde57d4924165485bbec0b029819ec6a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://jan_26_2026-particles2d/noto_color_emoji_spritesheet.png"
-dest_files=["res://.godot/imported/noto_color_emoji_spritesheet.png-26aa70b1040cf4acad0e2660873dc1f7.ctex"]
+source_file="res://assets/noto_color_emoji_spritesheet.png"
+dest_files=["res://.godot/imported/noto_color_emoji_spritesheet.png-dde57d4924165485bbec0b029819ec6a.ctex"]
 
 [params]
 
