@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="Word" load_steps=2 format=3 uid="uid://dxw63k2c25wsf"]
 
-[ext_resource type="Script" uid="uid://dcqiq68f4h8mb" path="res://dec_22_2025/word.gd" id="1_k5rod"]
+[ext_resource type="Script" uid="uid://dcqiq68f4h8mb" path="res://dec_22_2025-wordresource-with-associations/word.gd" id="1_k5rod"]
 
 [resource]
 script = ExtResource("1_k5rod")

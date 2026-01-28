@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://domob5tf65xbo"]
 
-[ext_resource type="Script" uid="uid://ciq81awnho0yp" path="res://dec_22_2025/dec_22_2025.gd" id="1_jh44o"]
+[ext_resource type="Script" uid="uid://ciq81awnho0yp" path="res://dec_22_2025-wordresource-with-associations/dec_22_2025.gd" id="1_jh44o"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
