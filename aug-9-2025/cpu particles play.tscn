@@ -35,6 +35,7 @@ fill_to = Vector2(0.777778, 0.401709)
 repeat = 2
 
 [sub_resource type="Gradient" id="Gradient_nvyhp"]
+offsets = PackedFloat32Array(0, 0.50277776)
 colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 0)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_u6lh8"]
@@ -47,8 +48,7 @@ fill_from = Vector2(0.478632, 0.474359)
 [node name="Node3D" type="Node2D"]
 
 [node name="cool1" type="CPUParticles2D" parent="."]
-position = Vector2(503, 78)
-emitting = false
+position = Vector2(28, 0)
 amount = 400
 texture = SubResource("GradientTexture2D_vp5vx")
 lifetime = 10.0
@@ -68,9 +68,8 @@ orbit_velocity_min = 1.0
 orbit_velocity_max = 1.0
 
 [node name="cool2" type="CPUParticles2D" parent="."]
-position = Vector2(-1083, -149)
-emitting = false
-amount = 400
+position = Vector2(-943, -379)
+amount = 4000
 texture = SubResource("GradientTexture2D_nvyhp")
 lifetime = 10.0
 emission_shape = 5
@@ -89,8 +88,7 @@ orbit_velocity_min = -1.0
 orbit_velocity_max = 1.0
 
 [node name="cool3" type="CPUParticles2D" parent="."]
-position = Vector2(-2480, 1398)
-emitting = false
+position = Vector2(-2674, 1128)
 amount = 4000
 texture = SubResource("GradientTexture2D_2lv5n")
 lifetime = 3.0
@@ -110,8 +108,7 @@ orbit_velocity_min = -1.0
 orbit_velocity_max = 1.0
 
 [node name="cool4" type="CPUParticles2D" parent="."]
-position = Vector2(131, 1887)
-emitting = false
+position = Vector2(95, 1500)
 amount = 4000
 texture = SubResource("GradientTexture2D_31ihc")
 lifetime = 3.0
@@ -131,7 +128,6 @@ orbit_velocity_max = 1.0
 
 [node name="cool5" type="CPUParticles2D" parent="."]
 position = Vector2(-1458, 2938)
-emitting = false
 amount = 40000
 texture = SubResource("GradientTexture2D_u6lh8")
 lifetime = 5.0
@@ -150,6 +146,8 @@ orbit_velocity_min = 1.0
 orbit_velocity_max = 1.0
 linear_accel_min = 2000.0
 linear_accel_max = 2000.0
+scale_amount_min = 0.25
+scale_amount_max = 0.25
 
 [node name="cool6" type="CPUParticles2D" parent="."]
 position = Vector2(1037, 2798)
