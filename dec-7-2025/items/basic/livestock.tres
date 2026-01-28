@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="Livestock" load_steps=4 format=3 uid="uid://d15trh8oav0ky"]
 
-[ext_resource type="Script" uid="uid://c2jdpd7n5el2f" path="res://items/basic/livestock.gd" id="1_egfu1"]
+[ext_resource type="Script" uid="uid://c2jdpd7n5el2f" path="res://dec-7-2025/items/basic/livestock.gd" id="1_egfu1"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_egfu1"]
 load_path = "res://.godot/imported/icon_atlas.png-8ac5fc0cdf230613c0cf6203a3100554.ctex"
