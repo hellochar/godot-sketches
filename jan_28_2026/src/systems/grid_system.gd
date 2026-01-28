@@ -68,3 +68,65 @@ func get_adjacent_coords_in_radius(coord: Vector2i, radius: int) -> Array[Vector
       if is_valid_coord(check):
         result.append(check)
   return result
+
+# A* Pathfinding - only walks on road tiles
+func find_path(start: Vector2i, end: Vector2i, is_walkable_func: Callable) -> Array[Vector2i]:
+  if not is_valid_coord(start) or not is_valid_coord(end):
+    return []
+
+  var open_set: Array[Vector2i] = [start]
+  var came_from: Dictionary = {}
+  var g_score: Dictionary = {start: 0}
+  var f_score: Dictionary = {start: _heuristic(start, end)}
+
+  while open_set.size() > 0:
+    var current = _get_lowest_f(open_set, f_score)
+
+    if current == end:
+      return _reconstruct_path(came_from, current)
+
+    open_set.erase(current)
+
+    for neighbor in get_neighbors(current):
+      if not is_walkable_func.call(neighbor):
+        continue
+
+      var tentative_g = g_score.get(current, INF) + 1
+
+      if tentative_g < g_score.get(neighbor, INF):
+        came_from[neighbor] = current
+        g_score[neighbor] = tentative_g
+        f_score[neighbor] = tentative_g + _heuristic(neighbor, end)
+
+        if neighbor not in open_set:
+          open_set.append(neighbor)
+
+  return []  # No path found
+
+func _heuristic(a: Vector2i, b: Vector2i) -> int:
+  return absi(a.x - b.x) + absi(a.y - b.y)
+
+func _get_lowest_f(open_set: Array[Vector2i], f_score: Dictionary) -> Vector2i:
+  var lowest = open_set[0]
+  var lowest_f = f_score.get(lowest, INF)
+
+  for coord in open_set:
+    var f = f_score.get(coord, INF)
+    if f < lowest_f:
+      lowest_f = f
+      lowest = coord
+
+  return lowest
+
+func _reconstruct_path(came_from: Dictionary, current: Vector2i) -> Array[Vector2i]:
+  var path: Array[Vector2i] = [current]
+  while came_from.has(current):
+    current = came_from[current]
+    path.push_front(current)
+  return path
+
+func is_road_at(coord: Vector2i) -> bool:
+  var occupant = get_occupant(coord)
+  if occupant and occupant.has_method("is_road"):
+    return occupant.is_road()
+  return false

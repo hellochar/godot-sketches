@@ -52,16 +52,31 @@ func _update_visuals() -> void:
   sprite.size = pixel_size
   sprite.color = definition.get("color", Color.WHITE)
 
-  label.text = definition.get("name", building_id)
   label.size = pixel_size
   label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
   label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+  _update_storage_display()
+
+func _update_storage_display() -> void:
+  var name_text = definition.get("name", building_id)
+  if storage_capacity > 0:
+    var _total = _get_total_stored()
+    var storage_text = ""
+    for res_id in storage:
+      if storage[res_id] > 0:
+        storage_text += "\n%s: %d" % [res_id, storage[res_id]]
+    if storage_text == "":
+      storage_text = "\n(empty)"
+    label.text = name_text + storage_text
+  else:
+    label.text = name_text
 
 func _process(delta: float) -> void:
   if not definition:
     return
 
   _process_generation(delta)
+  _update_storage_display()
   _process_processing(delta)
   _process_coping(delta)
 

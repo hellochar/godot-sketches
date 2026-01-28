@@ -160,16 +160,16 @@ This document breaks down implementation into phases and granular tasks. Each ta
 ## Phase 4: Road & Pathfinding (Days 5-6)
 
 ### 4.1 Road Implementation
-- [ ] Create `src/entities/road.gd` (extends building or separate)
-- [ ] Roads are 1x1 tiles
+- [x] Create `src/entities/road.gd` (extends building or separate) - using building with INFRASTRUCTURE behavior
+- [x] Roads are 1x1 tiles
 - [ ] Roads visually connect to adjacent roads
 - [ ] Implement road sprite with connection variants (or simple for now)
 
 ### 4.2 Pathfinding Setup
-- [ ] Implement A* pathfinding in grid_system or separate file
-- [ ] Pathfinding only considers road tiles as walkable
-- [ ] Implement `find_path(start_coord, end_coord)` function
-- [ ] Return array of coords or empty if no path
+- [x] Implement A* pathfinding in grid_system or separate file
+- [x] Pathfinding only considers road tiles as walkable
+- [x] Implement `find_path(start_coord, end_coord)` function
+- [x] Return array of coords or empty if no path
 
 ### 4.3 Building Connection
 - [ ] Buildings need road adjacency to be "connected"
@@ -187,48 +187,48 @@ This document breaks down implementation into phases and granular tasks. Each ta
 ## Phase 5: Worker System (Days 6-8)
 
 ### 5.1 Worker Entity
-- [ ] Create `src/entities/worker.gd`
-- [ ] Create `worker.tscn` with visual (glowing mote sprite)
-- [ ] Properties: current_job, job_target_a, job_target_b, current_path, habituation_level
-- [ ] Worker states: idle, moving_to_pickup, carrying, moving_to_dropoff
+- [x] Create `src/entities/worker.gd`
+- [x] Create `worker.tscn` with visual (glowing mote sprite)
+- [x] Properties: current_job, job_target_a, job_target_b, current_path, habituation_level
+- [x] Worker states: idle, moving_to_pickup, carrying, moving_to_dropoff
 
 ### 5.2 Worker Movement
-- [ ] Implement path following
-- [ ] Workers move along path coords
-- [ ] Set movement speed constant
+- [x] Implement path following
+- [x] Workers move along path coords
+- [x] Set movement speed constant
 - [ ] Visual: worker leaves faint trail (optional, can defer)
-- [ ] Smooth interpolation between tiles
+- [x] Smooth interpolation between tiles
 
 ### 5.3 Worker Job Assignment
-- [ ] Create `src/systems/worker_system.gd`
-- [ ] Track all workers in array
-- [ ] Track attention pool (available, used)
-- [ ] Implement `assign_job(worker, job_type, target_a, target_b)` function
-- [ ] Job types: "transport" (carry from A to B), "operate" (stay at building)
-- [ ] Calculate attention cost based on habituation
-- [ ] Deduct attention from pool
+- [x] Create `src/systems/worker_system.gd`
+- [x] Track all workers in array
+- [x] Track attention pool (available, used)
+- [x] Implement `assign_job(worker, job_type, target_a, target_b)` function
+- [x] Job types: "transport" (carry from A to B), "operate" (stay at building)
+- [x] Calculate attention cost based on habituation
+- [x] Deduct attention from pool
 
 ### 5.4 Transport Job Logic
-- [ ] Worker assigned transport job: resource_type, source_building, dest_building
-- [ ] Worker pathfinds to source
-- [ ] Worker picks up resource (remove from source storage)
-- [ ] Worker pathfinds to destination
-- [ ] Worker drops off resource (add to dest storage)
-- [ ] Worker returns to idle (or repeats if job is persistent)
-- [ ] Increment job completion counter
+- [x] Worker assigned transport job: resource_type, source_building, dest_building
+- [x] Worker pathfinds to source
+- [x] Worker picks up resource (remove from source storage)
+- [x] Worker pathfinds to destination
+- [x] Worker drops off resource (add to dest storage)
+- [x] Worker returns to idle (or repeats if job is persistent)
+- [x] Increment job completion counter
 
 ### 5.5 Habituation System
-- [ ] Track completions per job (job identified by type + targets)
-- [ ] Implement habituation threshold checks
-- [ ] Reduce attention cost at each threshold
-- [ ] Refund attention to pool when cost decreases
+- [x] Track completions per job (job identified by type + targets)
+- [x] Implement habituation threshold checks
+- [x] Reduce attention cost at each threshold
+- [x] Refund attention to pool when cost decreases
 - [ ] Visual/UI indicator of habituation level
 
 ### 5.6 Worker Assignment UI
-- [ ] Click building to select
-- [ ] If building can be source (has output), show "assign worker to transport from here"
-- [ ] Click destination building
-- [ ] Create transport job
+- [x] Click building to select
+- [x] If building can be source (has output), show "assign worker to transport from here"
+- [x] Click destination building
+- [x] Create transport job
 - [ ] Show current worker assignments somehow
 
 ### 5.7 Test Worker System
@@ -243,41 +243,41 @@ This document breaks down implementation into phases and granular tasks. Each ta
 ## Phase 6: Building Behaviors (Days 8-10)
 
 ### 6.1 Storage Behavior
-- [ ] Buildings with storage behavior have inventory Dictionary
-- [ ] Inventory maps resource_type_id to amount
-- [ ] Capacity limits per type or total
-- [ ] Implement `add_to_storage(resource_type, amount)` - returns overflow
-- [ ] Implement `remove_from_storage(resource_type, amount)` - returns actual removed
-- [ ] Implement `get_storage_amount(resource_type)`
+- [x] Buildings with storage behavior have inventory Dictionary
+- [x] Inventory maps resource_type_id to amount
+- [x] Capacity limits per type or total
+- [x] Implement `add_to_storage(resource_type, amount)` - returns overflow
+- [x] Implement `remove_from_storage(resource_type, amount)` - returns actual removed
+- [x] Implement `get_storage_amount(resource_type)`
 - [ ] Implement `has_space_for(resource_type, amount)`
 
 ### 6.2 Generator Behavior
-- [ ] Buildings with generator behavior produce resources
-- [ ] Track generation timer
-- [ ] On timer complete: spawn resource into building's storage
-- [ ] If storage full, resource spawns in world nearby
-- [ ] Define generation rate in building definition
+- [x] Buildings with generator behavior produce resources
+- [x] Track generation timer
+- [x] On timer complete: spawn resource into building's storage
+- [x] If storage full, resource spawns in world nearby
+- [x] Define generation rate in building definition
 
 ### 6.3 Processor Behavior
-- [ ] Buildings with processor behavior transform resources
-- [ ] Check if input resources available in storage
-- [ ] If yes and worker assigned (if required): begin processing
-- [ ] Track processing timer
-- [ ] On complete: remove inputs, add outputs to storage
-- [ ] Define input/output/time in building definition
+- [x] Buildings with processor behavior transform resources
+- [x] Check if input resources available in storage
+- [x] If yes and worker assigned (if required): begin processing
+- [x] Track processing timer
+- [x] On complete: remove inputs, add outputs to storage
+- [x] Define input/output/time in building definition
 
 ### 6.4 Habit Behavior
-- [ ] Buildings with habit behavior run automatically each day
+- [x] Buildings with habit behavior run automatically each day
 - [ ] Trigger during day phase
-- [ ] Execute defined effect (spawn, process, etc.)
-- [ ] May consume energy
+- [x] Execute defined effect (spawn, process, etc.)
+- [x] May consume energy
 
 ### 6.5 Coping Behavior
-- [ ] Buildings with coping behavior activate on condition
-- [ ] Define trigger condition in building definition
+- [x] Buildings with coping behavior activate on condition
+- [x] Define trigger condition in building definition
 - [ ] Check condition each tick
 - [ ] When triggered: activate special behavior (faster processing, spawn calming resource, etc.)
-- [ ] May have cooldown
+- [x] May have cooldown
 
 ### 6.6 Global Effect Behavior
 - [ ] Buildings with global_effect provide city-wide modifiers

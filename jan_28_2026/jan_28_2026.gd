@@ -2,16 +2,23 @@ extends Control
 
 const ResourceSystemScript = preload("res://jan_28_2026/src/systems/resource_system.gd")
 const BuildingSystemScript = preload("res://jan_28_2026/src/systems/building_system.gd")
+const WorkerSystemScript = preload("res://jan_28_2026/src/systems/worker_system.gd")
 
 @onready var game_world = %GameWorld
 @onready var ui_layer: CanvasLayer = %UILayer
 
 var resource_system: Node
 var building_system: Node
+var worker_system: Node
 
 # Building placement state
 var selected_building_id: String = ""
 var is_placing: bool = false
+
+# Worker assignment state
+var selected_source_building: Node = null
+var is_assigning_transport: bool = false
+var transport_resource_type: String = ""
 
 func _ready() -> void:
   _setup_systems()
@@ -26,6 +33,10 @@ func _setup_systems() -> void:
   building_system = BuildingSystemScript.new()
   add_child(building_system)
   building_system.setup(game_world.get_grid(), game_world.get_buildings_layer())
+
+  worker_system = WorkerSystemScript.new()
+  add_child(worker_system)
+  worker_system.setup(game_world.get_grid())
 
 func _setup_ui() -> void:
   _create_building_toolbar()
@@ -88,6 +99,11 @@ func _create_info_panel() -> void:
   energy_label.text = "Energy: 10/20"
   vbox.add_child(energy_label)
 
+  var attention_label = Label.new()
+  attention_label.name = "AttentionLabel"
+  attention_label.text = "Attention: 0/10"
+  vbox.add_child(attention_label)
+
   var day_label = Label.new()
   day_label.name = "DayLabel"
   day_label.text = "Day 1"
@@ -121,6 +137,11 @@ func _unhandled_input(event: InputEvent) -> void:
     var key = event as InputEventKey
     if key.pressed and key.keycode == KEY_ESCAPE:
       _cancel_placement()
+    elif key.pressed and key.keycode == KEY_W:
+      var coord = game_world.hover_coord
+      if game_world.get_grid().is_road_at(coord):
+        spawn_worker_at(coord)
+        print("Spawned worker at ", coord)
 
 func _try_place_building() -> void:
   if not is_placing or selected_building_id == "":
@@ -138,13 +159,92 @@ func _try_place_building() -> void:
 func _handle_click() -> void:
   var coord = game_world.hover_coord
   var building = building_system.get_building_at(coord)
+
+  if is_assigning_transport:
+    if building and building != selected_source_building:
+      _complete_transport_assignment(building)
+    return
+
   if building:
-    print("Selected: ", building.building_id)
+    _select_building(building)
+
+func _select_building(building: Node) -> void:
+  var def = building.definition
+
+  var generates = def.get("generates", "")
+  var output = def.get("output", {})
+
+  var available_resources: Array = []
+  if generates != "":
+    available_resources.append(generates)
+  for res_id in output.keys():
+    if res_id not in available_resources:
+      available_resources.append(res_id)
+  for res_id in building.storage.keys():
+    if building.storage[res_id] > 0 and res_id not in available_resources:
+      available_resources.append(res_id)
+
+  if available_resources.size() > 0:
+    selected_source_building = building
+    transport_resource_type = available_resources[0]
+    is_assigning_transport = true
+    _update_instructions("Click destination building for transport\n(%s from %s)" % [transport_resource_type, building.building_id])
+  else:
+    _update_instructions("Selected: %s\n(No resources to transport)" % building.building_id)
+
+func _complete_transport_assignment(dest_building: Node) -> void:
+  if not selected_source_building or not dest_building:
+    _cancel_transport_assignment()
+    return
+
+  var road_coord = _find_road_near_building(selected_source_building)
+  if road_coord == Vector2i(-1, -1):
+    _update_instructions("No road adjacent to source building!")
+    _cancel_transport_assignment()
+    return
+
+  var worker = spawn_worker_at(road_coord)
+  if worker_system.assign_transport_job(worker, selected_source_building, dest_building, transport_resource_type):
+    _update_instructions("Worker assigned: %s\n%s -> %s" % [transport_resource_type, selected_source_building.building_id, dest_building.building_id])
+    _update_energy_display()
+  else:
+    _update_instructions("Not enough attention!")
+    worker_system.remove_worker(worker)
+
+  _cancel_transport_assignment()
+
+func _find_road_near_building(building: Node) -> Vector2i:
+  var grid = game_world.get_grid()
+  var building_coord = building.grid_coord
+  var building_size = building.size
+
+  for x in range(-1, building_size.x + 1):
+    for y in range(-1, building_size.y + 1):
+      if x >= 0 and x < building_size.x and y >= 0 and y < building_size.y:
+        continue
+      var check = building_coord + Vector2i(x, y)
+      if grid.is_valid_coord(check) and grid.is_road_at(check):
+        return check
+  return Vector2i(-1, -1)
+
+func _cancel_transport_assignment() -> void:
+  selected_source_building = null
+  is_assigning_transport = false
+  transport_resource_type = ""
+
+func _update_instructions(text: String) -> void:
+  var panel = ui_layer.get_node_or_null("InfoPanel")
+  if panel:
+    var vbox = panel.get_node_or_null("VBoxContainer")
+    if vbox and vbox.get_child_count() > 3:
+      vbox.get_child(3).text = text
 
 func _cancel_placement() -> void:
   is_placing = false
   selected_building_id = ""
   game_world.set_placement_mode(false, "")
+  _cancel_transport_assignment()
+  _update_instructions("Click building to select\nClick grid to place\nRight-click to cancel")
 
 func _update_energy_display() -> void:
   var panel = ui_layer.get_node_or_null("InfoPanel")
@@ -154,8 +254,21 @@ func _update_energy_display() -> void:
       var gs = get_node("/root/GameState")
       label.text = "Energy: %d/%d" % [gs.current_energy, gs.max_energy]
 
+    var att_label = panel.get_node_or_null("VBoxContainer/AttentionLabel")
+    if att_label and worker_system:
+      att_label.text = "Attention: %d/%d" % [worker_system.attention_used, worker_system.attention_pool]
+
 func get_resource_system() -> Node:
   return resource_system
 
 func get_building_system() -> Node:
   return building_system
+
+func get_worker_system() -> Node:
+  return worker_system
+
+func spawn_worker_at(coord: Vector2i) -> Node:
+  var world_pos = game_world.get_grid().grid_to_world(coord)
+  var worker = worker_system.spawn_worker(world_pos)
+  game_world.get_workers_layer().add_child(worker)
+  return worker

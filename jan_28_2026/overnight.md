@@ -83,3 +83,108 @@ resources/resource_types/anxiety.tres
 2. Phase 4: Road & Pathfinding - A* for worker movement
 3. Phase 5: Worker System - bring the city to life
 4. Connect generators/processors to actually produce/consume resources
+
+---
+
+## Session 2: Worker System Implementation
+
+### Completed
+
+**Phase 4: Pathfinding** - CORE COMPLETE
+- Implemented A* pathfinding in grid_system.gd
+- find_path() takes start, end, and walkability callable
+- is_road_at() checks if occupant has INFRASTRUCTURE behavior
+- Pathfinding only walks on road tiles
+
+**Phase 5: Worker System** - CORE COMPLETE
+- Created worker.gd with state machine:
+  - States: IDLE, MOVING_TO_PICKUP, PICKING_UP, CARRYING, MOVING_TO_DROPOFF, DROPPING_OFF
+  - Properties: job_type, source_building, dest_building, resource_type, carried_amount
+  - Habituation tracking: job_id, completions
+  - Programmatic mote texture (soft glowing circle)
+- Created worker.tscn scene
+- Created worker_system.gd:
+  - Attention pool tracking (used vs available)
+  - Habituation-based attention cost calculation
+  - Thresholds: [5, 15, 30, 50] completions
+  - Costs: [1.0, 0.5, 0.25, 0.1, 0.0] at each tier
+  - Transport and operate job assignment
+  - Attention refund on unassignment
+- Integrated worker_system into main game
+- Added attention display to info panel
+- Added debug key: W to spawn worker at hovered road tile
+
+**Resource: nostalgia.tres** - memory_well generates this
+
+### Files Created
+```
+src/entities/worker.gd
+src/entities/worker.tscn
+src/systems/worker_system.gd
+resources/resource_types/nostalgia.tres
+```
+
+### Files Modified
+```
+jan_28_2026.gd - added worker_system integration
+implementation-plan.md - checked off completed tasks
+```
+
+### Current State
+- Workers can be spawned on roads (press W)
+- Workers have visual (programmatic mote sprite)
+- Worker pathfinding to buildings implemented
+- Transport job logic: pickup, carry, dropoff, loop
+- Operate job logic: walk to building, assign self
+- Attention costs decrease with habituation
+
+### Next Priority Tasks
+1. Phase 5.6: Worker Assignment UI - click building to assign transport job
+2. Test worker transport between two buildings
+3. Phase 4.3: Building connection - unconnected buildings don't function
+4. Phase 6: Building Behaviors - make generators actually spawn resources
+
+---
+
+## Session 3: Worker UI & Building Behaviors
+
+### Completed
+
+**Phase 5.6: Worker Assignment UI** - COMPLETE
+- Click building to select it
+- If building has resources (generates, outputs, or stored), shows transport prompt
+- Click destination building to complete assignment
+- Worker spawns on adjacent road and starts transport job
+- Attention is consumed
+- Instructions panel updates with status
+
+**Phase 6: Building Behaviors** - CORE COMPLETE
+- Storage: add_to_storage, remove_from_storage, get_storage_amount all working
+- Generator: produces resources into storage over time (memory_well: nostalgia, comfort_hearth: calm)
+- Processor: transforms inputs to outputs when worker assigned (if required)
+- Habit: trigger_habit() runs on day start (morning_routine, exercise_yard)
+- Coping: cooldown-based reactive activation (emergency_calm_center)
+- Buildings display storage contents in their label
+
+**Building Definitions Updated**
+- memory_well: added STORAGE behavior, storage_capacity=10, increased rate to 0.2
+- comfort_hearth: added STORAGE behavior, storage_capacity=5, increased rate to 0.15
+
+### Files Modified
+```
+jan_28_2026.gd - worker assignment UI, transport_resource_type state
+src/entities/building.gd - _update_storage_display()
+src/data/building_definitions.gd - storage capacity for generators
+implementation-plan.md - checked off completed tasks
+```
+
+### Current State
+- Generators produce resources that show in building labels
+- Click generator -> click destination to assign transport worker
+- Workers spawn and begin transport job
+- Attention tracking works
+
+### Next Priority Tasks
+1. Phase 7: Time System - day/night cycle, triggers habits at day start
+2. Phase 4.3: Building connection check - buildings need adjacent road
+3. Visual feedback for workers carrying resources

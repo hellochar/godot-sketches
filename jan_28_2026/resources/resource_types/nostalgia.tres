@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://jan_28_2026/resources/resource_types/resource_type.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "nostalgia"
+display_name = "Nostalgia"
+description = "Bittersweet memories that can become either Joy or Grief."
+color = Color(0.7, 0.6, 0.8, 1)
+tags = ["emotion.neutral", "transient"]
+decay_rate = 0.1
+stack_size = 10
+spawn_amount = 1
