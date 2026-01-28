@@ -1,0 +1,94 @@
+[gd_scene load_steps=3 format=3 uid="uid://2sywl1e23v72"]
+
+[ext_resource type="Script" uid="uid://bv1p8onqeho4n" path="res://dec-7-2025-citybuilder-cards-only/dec-7-2025.gd" id="1_tq7fo"]
+[ext_resource type="PackedScene" uid="uid://dql4rkolmq8ud" path="res://dec-7-2025-citybuilder-cards-only/inventory_ui.tscn" id="2_1uo2h"]
+
+[node name="World" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_tq7fo")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 1440.0
+offset_bottom = 810.0
+theme_override_constants/separation = 20
+
+[node name="HBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="InventoryUI" parent="HBoxContainer/HBoxContainer" instance=ExtResource("2_1uo2h")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer/HBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MainInventory" type="RichTextLabel" parent="HBoxContainer/HBoxContainer/PanelContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 32
+bbcode_enabled = true
+text = "Inventory (cap 30):
+x30 Grass
+"
+fit_content = true
+
+[node name="BlueprintsUI" parent="HBoxContainer/HBoxContainer" instance=ExtResource("2_1uo2h")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PanelContainer2" type="PanelContainer" parent="HBoxContainer/HBoxContainer"]
+visible = false
+layout_mode = 2
+
+[node name="Blueprints" type="RichTextLabel" parent="HBoxContainer/HBoxContainer/PanelContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 32
+bbcode_enabled = true
+text = "Blueprints:
+
+1 - Producer: Livestock x4
+2 - Producer: Grass x3
+3 - Transformer: Livestock x2, Wood x1 -> Peasants x2
+4 - Transformer: Cloth x5, Livestock x4 -> [color=orange]Marble[/color] x1
+5 - Transformer: [color=orange]Horses[/color] x5, [color=orange]Marble[/color] x4 -> [color=purple]Nanofiber[/color] x1
+"
+fit_content = true
+
+[node name="Panel" type="PanelContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StructuresContainer" type="VBoxContainer" parent="HBoxContainer/Panel"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="TurnCounter" type="RichTextLabel" parent="HBoxContainer/Panel/StructuresContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 32
+bbcode_enabled = true
+text = "Turn: 0"
+fit_content = true
+horizontal_alignment = 1
+
+[node name="Title" type="RichTextLabel" parent="HBoxContainer/Panel/StructuresContainer"]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "Structures"
+fit_content = true
+horizontal_alignment = 1
