@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://jan_28_2026/resources/resource_types/resource_type.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "calm"
+display_name = "Calm"
+description = "A peaceful state that enables clear thinking and positive processes."
+color = Color(0.6, 0.85, 0.9, 1)
+tags = ["emotion.neutral", "persistent"]
+decay_rate = 0.05
+stack_size = 20
+spawn_amount = 1

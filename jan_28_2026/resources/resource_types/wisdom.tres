@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://jan_28_2026/resources/resource_types/resource_type.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "wisdom"
+display_name = "Wisdom"
+description = "Hard-won understanding distilled from processed pain. Permanent and valuable."
+color = Color(0.9, 0.75, 1, 1)
+tags = ["derived", "persistent"]
+decay_rate = 0.0
+stack_size = 5
+spawn_amount = 1

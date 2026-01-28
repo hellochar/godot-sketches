@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://jan_28_2026/resources/resource_types/resource_type.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "anxiety"
+display_name = "Anxiety"
+description = "Generates more of itself if not addressed. Spreads and multiplies."
+color = Color(0.8, 0.5, 0.3, 1)
+tags = ["emotion.negative", "transient"]
+decay_rate = 0.0
+stack_size = 20
+spawn_amount = 1

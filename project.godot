@@ -19,6 +19,9 @@ config/icon="res://icon.svg"
 
 Utils="*res://_common/utils.gd"
 HTags="*res://addons/htags/autoload/htag_system.gd"
+Config="*res://jan_28_2026/src/autoload/config.gd"
+EventBus="*res://jan_28_2026/src/autoload/event_bus.gd"
+GameState="*res://jan_28_2026/src/autoload/game_state.gd"
 
 [display]
 

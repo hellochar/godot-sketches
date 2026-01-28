@@ -1,0 +1,39 @@
+[gd_scene load_steps=3 format=3 uid="uid://c3h8r7game_world"]
+
+[ext_resource type="Script" path="res://jan_28_2026/src/scenes/game_world.gd" id="1_script"]
+
+[sub_resource type="TileSet" id="TileSet_1"]
+tile_size = Vector2i(64, 64)
+
+[node name="GameWorld" type="Node2D"]
+unique_name_in_owner = true
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 3200.0
+offset_bottom = 3200.0
+color = Color(0.15, 0.12, 0.18, 1)
+
+[node name="GridOverlay" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="HoverIndicator" type="ColorRect" parent="."]
+unique_name_in_owner = true
+visible = false
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+color = Color(0.3, 1, 0.3, 0.4)
+
+[node name="BuildingsLayer" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="ResourcesLayer" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="WorkersLayer" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="Camera" type="Camera2D" parent="."]
+unique_name_in_owner = true
+zoom = Vector2(0.5, 0.5)
