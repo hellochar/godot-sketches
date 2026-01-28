@@ -19,6 +19,10 @@ extends Camera2D
 var _min_zoom: float
 var _max_zoom: float
 
+func _validate_property(property: Dictionary) -> void:
+  if property.name in ["pan_speed"] and target:
+    property.usage = PROPERTY_USAGE_NO_EDITOR
+
 func _ready():
   var default_zoom = zoom.x
   _min_zoom = default_zoom * min_zoom_multiplier
@@ -47,6 +51,8 @@ func _follow_target_process(delta: float) -> void:
   global_position += total_move
 
 func _pan_process(delta: float) -> void:
+  if target:
+    return
   var input_vector = Vector2.ZERO
   input_vector.x = Input.get_action_strength("camera_right") - Input.get_action_strength("camera_left")
   input_vector.y = Input.get_action_strength("camera_down") - Input.get_action_strength("camera_up")
