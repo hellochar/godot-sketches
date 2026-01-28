@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://byd0xywpdrj1p"]
 
-[ext_resource type="Script" path="res://common/generic_card.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://c87a6p43m7ppy" path="res://_common/generic_card.gd" id="1_script"]
 
 [node name="GenericCard" type="PanelContainer"]
 custom_minimum_size = Vector2(140, 100)

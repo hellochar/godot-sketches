@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://wvygtgnhcpyu" path="res://jan_27_2026-emoji-bouncyballs/jan_27_2026.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://cwvsetqclrg2y" path="res://assets/noto_color_emoji_spritesheet.png" id="2_q0o4t"]
-[ext_resource type="Script" uid="uid://cll2ewhxarmmd" path="res://common/smooth_camera.gd" id="3_jfmii"]
+[ext_resource type="Script" uid="uid://cll2ewhxarmmd" path="res://_common/smooth_camera.gd" id="3_jfmii"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_jfmii"]
 friction = 0.06

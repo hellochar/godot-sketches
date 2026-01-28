@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://5ltam60fe31d"]
 
-[ext_resource type="Texture2D" uid="uid://c3a4qwupximaa" path="res://common/white-circle.tres" id="1_ws8w3"]
+[ext_resource type="Texture2D" uid="uid://c3a4qwupximaa" path="res://_common/white-circle.tres" id="1_ws8w3"]
 [ext_resource type="Script" uid="uid://shb4eu7klgp3" path="res://jan_26_2026-particles2d/circular_streaks_wiggle.gd" id="2_yv6dq"]
 
 [sub_resource type="Curve" id="Curve_50xqt"]

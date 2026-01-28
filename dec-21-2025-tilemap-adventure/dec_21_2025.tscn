@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dffm6nsm4o15f" path="res://dec-21-2025-tilemap-adventure/dec_21_2025.gd" id="1_0okp5"]
 [ext_resource type="TileSet" uid="uid://l77dh6fyg31k" path="res://dec-21-2025-tilemap-adventure/tileset_pr4nta_pixelascii.tres" id="2_ampl0"]
-[ext_resource type="Script" uid="uid://cll2ewhxarmmd" path="res://common/smooth_camera.gd" id="3_khtp6"]
+[ext_resource type="Script" uid="uid://cll2ewhxarmmd" path="res://_common/smooth_camera.gd" id="3_khtp6"]
 [ext_resource type="PackedScene" uid="uid://c8l4s74n3ubwu" path="res://dec-21-2025-tilemap-adventure/plant.tscn" id="4_7we1r"]
 [ext_resource type="Script" uid="uid://b0e85na0msy1a" path="res://dec-21-2025-tilemap-adventure/player_controller.gd" id="4_khtp6"]
 [ext_resource type="Texture2D" uid="uid://f8jsqgv44ymr" path="res://assets/hexanys_roguelike_tiles_0.3.0/Tilesheets/Transparent/creatures_transparent.png" id="4_ui3wy"]

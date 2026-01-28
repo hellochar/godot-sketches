@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cal0yfbfnoj7o" path="res://jan_26_2026-particles2d/jan_26_2026.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://byx2jd0iwvlmq" path="res://jan_26_2026-particles2d/circular_streaks.tscn" id="2_50xqt"]
-[ext_resource type="Script" uid="uid://cll2ewhxarmmd" path="res://common/smooth_camera.gd" id="2_uquox"]
+[ext_resource type="Script" uid="uid://cll2ewhxarmmd" path="res://_common/smooth_camera.gd" id="2_uquox"]
 [ext_resource type="PackedScene" uid="uid://5ltam60fe31d" path="res://jan_26_2026-particles2d/circular_streaks_wiggle.tscn" id="3_50xqt"]
 [ext_resource type="Texture2D" uid="uid://c0ipuia8hajwb" path="res://jan_26_2026-particles2d/crossfade-alpha-curve.tres" id="4_47aty"]
 [ext_resource type="PackedScene" uid="uid://rvaqxj3vwx08" path="res://jan_26_2026-particles2d/thick_colorful_hair_in_wind.tscn" id="5_50xqt"]
