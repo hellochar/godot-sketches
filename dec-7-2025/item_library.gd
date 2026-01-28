@@ -1,21 +1,28 @@
-extends Node
+class_name ItemLibrary
+extends RefCounted
 
 ## A library system for loading and querying Item resources
-## Autoload singleton that automatically loads all resources from res://items
+## Lazy singleton that loads all resources from res://dec-7-2025/items on first access
 ## Usage:
-##   var item = ItemLibrary.get_by_name("Health Potion")
-##   var basic_items = ItemLibrary.get_by_tier(Item.ETier.Basic)
-##   var weapons = ItemLibrary.get_by_tag(Item.ETag.Weapon)
+##   var item = ItemLibrary.instance.get_by_name("Health Potion")
+##   var basic_items = ItemLibrary.instance.get_by_tier(Item.ETier.Basic)
+##   var weapons = ItemLibrary.instance.get_by_tag(Item.ETag.Weapon)
 
 const RESOURCES_FOLDER = "res://items"
+
+static var _instance: ItemLibrary
+
+static var instance: ItemLibrary:
+  get:
+    if not _instance:
+      _instance = ItemLibrary.new()
+      _instance.load_from_folder(RESOURCES_FOLDER)
+    return _instance
 
 var _resources: Array[Item] = []
 var _resources_by_name: Dictionary[String, Item] = {}
 var _resources_by_tier: Dictionary[Item.ETier, Array] = {}
 var _resources_by_tag: Dictionary[Item.ETag, Array] = {}
-
-func _ready() -> void:
-  load_from_folder(RESOURCES_FOLDER)
 
 func load_from_folder(folder_path: String) -> void:
   clear()

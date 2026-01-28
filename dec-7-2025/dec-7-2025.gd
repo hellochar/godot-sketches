@@ -19,7 +19,7 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
   # # add three basic random resources
-  var _basic_resources = ItemLibrary.get_by_tier(Item.ETier.Basic).filter(
+  var _basic_resources = ItemLibrary.instance.get_by_tier(Item.ETier.Basic).filter(
     func(i: Item): return not (i is Structure or Item.ETag.Waste in i.tags)
   )
   # for i in range(3):
@@ -75,7 +75,7 @@ func _input(event: InputEvent) -> void:
       print ("Placing %s" % structure.name)
       place(structure.duplicate())
     if event.keycode == KEY_B:
-      var basic_resources = ItemLibrary.get_by_tier(Item.ETier.Basic)
+      var basic_resources = ItemLibrary.instance.get_by_tier(Item.ETier.Basic)
       var res = basic_resources.pick_random()
       inventory.add(res, 10)
     if event.keycode == KEY_R:
@@ -117,7 +117,7 @@ func create_reward() -> void:
       : 100,
     (func(): reward_inventory.add(Structure.generate_random_transformer_sametier(Item.ETier.Basic), 1))
       : 100,
-    # (func(): reward_inventory.add(ItemLibrary.get_by_tier(Item.ETier.Basic).pick_random(), 10))
+    # (func(): reward_inventory.add(ItemLibrary.instance.get_by_tier(Item.ETier.Basic).pick_random(), 10))
     #   : 20,
     (func(): reward_inventory.add(Structure.generate_random_upgrader(Item.ETier.Basic, Item.ETier.Advanced), 1))
       : 20,
@@ -260,14 +260,14 @@ class Inventory:
     add(item, -amount)
 
   func _get(property: StringName) -> Variant:
-    var res = ItemLibrary.get_by_name(property)
+    var res = ItemLibrary.instance.get_by_name(property)
     if res:
       return dict[res]
     return 0
   
   func _get_property_list() -> Array[Dictionary]:
     var plist: Array[Dictionary] = []
-    for res in ItemLibrary.get_all():
+    for res in ItemLibrary.instance.get_all():
       plist.append({
         "name": res.name,
         "type": "int",

@@ -186,7 +186,7 @@ class Enemy extends Unit:
   func die() -> void:
     super.die()
     if randf() < drop_chance:
-      var basic_items = ItemLibrary.get_by_tier(Item.ETier.Basic).filter(
+      var basic_items = ItemLibrary.instance.get_by_tier(Item.ETier.Basic).filter(
         func(i: Item): return i.pickupable
       )
       if basic_items.size() > 0:
