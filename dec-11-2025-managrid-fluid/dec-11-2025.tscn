@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://tx8nym70tx5m"]
 
-[ext_resource type="Script" uid="uid://cyug607nsjlxq" path="res://dec-11-2025/dec_11_2025.gd" id="1_ulu0a"]
+[ext_resource type="Script" uid="uid://cce1ftpe81n7w" path="res://dec-11-2025-managrid-fluid/dec_11_2025.gd" id="1_ulu0a"]
 
 [sub_resource type="Gradient" id="Gradient_ulu0a"]
 offsets = PackedFloat32Array(0, 0.25056434, 0.61173815, 1)
@@ -15,15 +15,13 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ulu0a")
 grid_size = 10
-cell_size = 40.0
-wave_stiffness = 1.0
-wave_damping = 0.1
-mana_decay_rate = 0.0
-simulations_per_tick = 1
-overheat_threshold = 200.0
+cell_size = 60.0
+wave_stiffness = 200.0
+wave_damping = 1.0
+overheat_threshold = 9999999.0
 generator_output = 3.0
 pulse_generator_interval = 5.0
 converter_consumption = 3.0
 converter_points_mult = 1.0
 mana_gradient = SubResource("Gradient_ulu0a")
-mana_color_scale = 3.0
+mana_color_scale = 0.2

@@ -5,8 +5,10 @@ extends Control
 @export var cell_size: float = 80.0
 @export var wave_stiffness: float = 50.0
 @export var wave_damping: float = 0.5
+@export var mana_drag_rate: float = 0.01
 @export var mana_decay_rate: float = 0.01
 @export var simulations_per_tick: int = 5
+@export var speed_scalar: float = 1.0
 @export var overheat_threshold: float = 50.0
 
 @export_group("Component Stats")
@@ -105,6 +107,7 @@ func _init_grid():
     velocity_grid.append(vel_col)
 
 func _process(delta):
+  delta *= speed_scalar
   for i in range(simulations_per_tick):
     _simulate_mana(delta / simulations_per_tick)
   _process_components(delta)
@@ -220,9 +223,10 @@ func _simulate_mana(delta):
         continue
 
       velocity_grid[x][y] += accel[x][y] * delta
+      velocity_grid[x][y] -= mana_decay_rate * mana_grid[x][y] * delta
       mana_grid[x][y] += velocity_grid[x][y] * delta
 
-      velocity_grid[x][y] -= velocity_grid[x][y] * mana_decay_rate * delta
+      velocity_grid[x][y] -= velocity_grid[x][y] * mana_drag_rate * delta
 
 func _get_empty_neighbors(x: int, y: int) -> Array:
   var neighbors = []
