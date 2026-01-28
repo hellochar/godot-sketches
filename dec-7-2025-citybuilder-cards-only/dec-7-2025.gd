@@ -1,0 +1,276 @@
+extends Control
+class_name World
+
+# you have a bunch of t1 resources
+# you have producers that construct such resources
+# you have converters that convert resources into others
+# structures can target other structures
+
+static var main: World
+
+var inventory: Inventory = Inventory.new(-1, "Inventory")
+var blueprints: Inventory = Inventory.new(1, "Blueprints")
+var board: Array[StructureInstance] = []
+var turn_count: int = 0
+var reward_inventory: Inventory = Inventory.new(30, "Rewards")
+
+func _enter_tree() -> void:
+  main = self
+
+func _ready() -> void:
+  # # add three basic random resources
+  var _basic_resources = ItemLibrary.instance.get_by_tier(Item.ETier.Basic).filter(
+    func(i: Item): return not (i is Structure or Item.ETag.Waste in i.tags)
+  )
+  # for i in range(3):
+  #   var res = basic_resources.pick_random()
+  #   inventory.add(res, 10)
+
+  inventory.add(preload("res://dec-7-2025-citybuilder-cards-only/items/basic/peasants.tres"), 10)
+  inventory.add(preload("res://dec-7-2025-citybuilder-cards-only/items/basic/food.tres"), 10)
+  inventory.add(preload("res://dec-7-2025-citybuilder-cards-only/items/basic/hut.tres"), 3)
+  inventory.add(preload("res://dec-7-2025-citybuilder-cards-only/items/basic/livestock.tres"), 3)
+
+  blueprints.prefix = true
+  # blueprints.add(Structure.generate_random_producer(), 1)
+  # blueprints.add(Structure.generate_random_producer(), 1)
+  # blueprints.add(Structure.generate_random_transformer_sametier(Item.ETier.Basic), 1)
+  # blueprints.add(Structure.generate_random_upgrader(Item.ETier.Basic, Item.ETier.Advanced), 1)
+  # blueprints.add(Structure.generate_random_upgrader(Item.ETier.Advanced, Item.ETier.Futuristic), 1)
+
+  if %InventoryUI:
+    %InventoryUI.set_inventory(inventory)
+  if %BlueprintsUI:
+    %BlueprintsUI.set_inventory(blueprints)
+
+  _process(0)
+  create_reward()
+
+func tick(ticks: int) -> void:
+  assign_workers()
+  inventory.tick(ticks)
+  for structure_instance in board:
+    structure_instance.tick(ticks)
+  
+  turn_count += ticks
+  if turn_count % 5 == 0:
+    create_reward()
+
+func _process(_delta: float) -> void:
+  %TurnCounter.text = "Turn: %d" % turn_count
+  %MainInventory.text = inventory._to_string()
+  %Blueprints.text = blueprints._to_string()
+  if %InventoryUI:
+    %InventoryUI.refresh()
+  if %BlueprintsUI:
+    %BlueprintsUI.refresh()
+
+func _input(event: InputEvent) -> void:
+  if event is InputEventKey and event.pressed and not event.echo:
+    if event.keycode >= KEY_1 and event.keycode <= KEY_9:
+      var index = event.keycode - KEY_1
+      if index >= blueprints.dict.size():
+        return
+      var structure: Structure = blueprints.dict.keys()[index] as Structure
+      print ("Placing %s" % structure.name)
+      place(structure.duplicate())
+    if event.keycode == KEY_B:
+      var basic_resources = ItemLibrary.instance.get_by_tier(Item.ETier.Basic)
+      var res = basic_resources.pick_random()
+      inventory.add(res, 10)
+    if event.keycode == KEY_R:
+      get_tree().reload_current_scene()
+    if event.keycode == KEY_Z:
+      create_reward()
+    if event.keycode == KEY_SPACE:
+      tick(1)
+
+const STRUCTURE_INSTANCE = preload("res://dec-7-2025-citybuilder-cards-only/structure_instance.tscn")
+const PICKER_SCENE = preload("res://common/reward_picker.tscn")
+
+func assign_workers() -> void:
+  var PEASANTS = preload("res://dec-7-2025-citybuilder-cards-only/items/basic/peasants.tres")
+  var available_peasants = inventory.num(PEASANTS)
+  
+  for structure_instance in board:
+    var needed = structure_instance.type.workers_needed
+    if available_peasants >= needed:
+      structure_instance.workers_assigned = needed
+      available_peasants -= needed
+    else:
+      structure_instance.workers_assigned = available_peasants
+      available_peasants = 0
+
+func place(structure: Structure) -> void:
+  var instance := STRUCTURE_INSTANCE.instantiate()
+  instance.type = structure
+  %StructuresContainer.add_child(instance)
+  board.append(instance)
+  assign_workers()
+
+func create_reward() -> void:
+  reward_inventory.dict.clear()
+
+  var rng = RandomNumberGenerator.new()
+  var reward_funcs = {
+    (func(): reward_inventory.add(Structure.generate_random_producer(), 1))
+      : 100,
+    (func(): reward_inventory.add(Structure.generate_random_transformer_sametier(Item.ETier.Basic), 1))
+      : 100,
+    # (func(): reward_inventory.add(ItemLibrary.instance.get_by_tier(Item.ETier.Basic).pick_random(), 10))
+    #   : 20,
+    (func(): reward_inventory.add(Structure.generate_random_upgrader(Item.ETier.Basic, Item.ETier.Advanced), 1))
+      : 20,
+    (func(): reward_inventory.add(Structure.generate_random_upgrader(Item.ETier.Advanced, Item.ETier.Futuristic), 1))
+      : 5,
+  }
+
+  for i in range(3):
+    var funcs = reward_funcs.keys()
+    var weights = reward_funcs.values()
+    var index = rng.rand_weighted(weights)
+    funcs[index].call()
+
+  var options: Array[Node] = []
+  for item: Item in reward_inventory.dict.keys():
+    var amount: int = reward_inventory.dict[item]
+    var button := Button.new()
+    button.custom_minimum_size = Vector2(150, 40)
+    if amount <= 1:
+      button.text = item.name + " " + item.description
+    else:
+      button.text = "%s (x%d)" % [item.name + " " + item.description, amount]
+    button.set_meta("item", item)
+    button.set_meta("amount", amount)
+    options.append(button)
+
+  var picker := PICKER_SCENE.instantiate()
+  add_child(picker)
+  picker.set_options(options)
+  picker.item_selected.connect(func(node: Node) -> void:
+    var item: Item = node.get_meta("item")
+    var amount: int = node.get_meta("amount")
+    if item is Structure:
+      place(item as Structure)
+    else:
+      inventory.add(item, amount)
+    picker.queue_free()
+  )
+  picker.skipped.connect(func() -> void:
+    picker.queue_free()
+  )
+
+static func dict_add_all(me: Dictionary, other: Dictionary) -> void:
+  for key in other.keys():
+    me[key] = me.get(key, 0) + other[key]
+
+static func dict_trim_zero(me: Dictionary) -> void:
+  var keys_to_remove: Array = []
+  for key in me.keys():
+    if me[key] == 0:
+      keys_to_remove.append(key)
+  for key in keys_to_remove:
+    me.erase(key)
+
+class Inventory:
+  var name: String = "Inventory"
+  var dict: Dictionary[Item, int] = {} # Resource and its amount
+  var cap: int
+  var prefix: bool = false
+  var max_entries: int = -1
+  signal on_changed()
+
+  func _init(_cap: int, _name: String = "Inventory", _max_entries: int = -1) -> void:
+    cap = _cap
+    name = _name
+    max_entries = _max_entries
+  
+  func compute_name() -> String:
+    var out := name
+    if max_entries != -1:
+      out += "%d/%d" % [dict.size(), max_entries]
+    if cap > 1:
+      out += " (cap %d)" % cap
+    return out
+
+  func _to_string() -> String:
+    var out := compute_name() + "\n"
+    var index = 1
+    for item in dict.keys():
+      var line: String = "%d - " % index if prefix else ""
+      index += 1
+      if cap != 1:
+        line += "x%d %s\n" % [dict[item], item.name]
+      else:
+        line += "%s\n" % item.name
+      out += line
+    return out
+  
+  func tick(ticks: int):
+    var total_diff: Dictionary[Item, int] = {}
+    for item: Item in dict.keys():
+      var diff := item.tick(self, dict[item], ticks)
+      World.dict_add_all(total_diff, diff)
+    add_all(total_diff)
+
+  # return how much was actually added
+  func add(item: Item, amount: int) -> int:
+    var prev := num(item)
+    var new_value = num(item) + amount
+    
+    if max_entries != -1 and not dict.has(item) and dict.size() >= max_entries:
+      return num(item) - prev
+    
+    if cap == -1:
+      dict[item] = max(new_value, 0)
+    else:
+      dict[item] = clamp(new_value, 0, cap)
+    if dict[item] == 0:
+      dict.erase(item)
+    on_changed.emit()
+    return num(item) - prev
+  
+  func add_all(other: Variant) -> void:
+    var other_dict: Dictionary[Item, int]
+    if other is Dictionary:
+      other_dict = other
+    if other is Inventory:
+      other_dict = other.dict
+    for item in other_dict.keys():
+      add(item, other_dict[item])
+
+  func take_from(other: Inventory, item: Item, amount: int) -> void:
+    var available = other.num(item)
+    var to_take = min(available, amount)
+    var added := add(item, to_take)
+    other.remove(item, added)
+  
+  func take_all_from(other: Inventory) -> void:
+    var other_dict = other.dict
+    for item in other_dict.keys():
+      take_from(other, item, other_dict[item])
+  
+  func num(item: Item) -> int:
+    return dict.get(item, 0)
+  
+  func clear() -> void:
+    dict.clear()
+  
+  func remove(item: Item, amount: int) -> void:
+    add(item, -amount)
+
+  func _get(property: StringName) -> Variant:
+    var res = ItemLibrary.instance.get_by_name(property)
+    if res:
+      return dict[res]
+    return 0
+  
+  func _get_property_list() -> Array[Dictionary]:
+    var plist: Array[Dictionary] = []
+    for res in ItemLibrary.instance.get_all():
+      plist.append({
+        "name": res.name,
+        "type": "int",
+        "usage": PROPERTY_USAGE_STORAGE | PROPERTY_USAGE_EDITOR,
+      })
+    return plist

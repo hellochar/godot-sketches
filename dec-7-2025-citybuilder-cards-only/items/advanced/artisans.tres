@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="Item" load_steps=2 format=3 uid="uid://8yat4jxw1nir"]
+
+[ext_resource type="Script" uid="uid://cdhbuu2d1xlss" path="res://dec-7-2025-citybuilder-cards-only/item.gd" id="1_artisans"]
+
+[resource]
+script = ExtResource("1_artisans")
+tier = 1

@@ -1,7 +1,0 @@
-[gd_resource type="Resource" script_class="Item" load_steps=2 format=3 uid="uid://j9i0k1l2m3n4o"]
-
-[ext_resource type="Script" uid="uid://cdhbuu2d1xlss" path="res://dec-7-2025/item.gd" id="1_clones"]
-
-[resource]
-script = ExtResource("1_clones")
-tier = 2

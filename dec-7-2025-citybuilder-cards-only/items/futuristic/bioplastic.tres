@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="Item" load_steps=2 format=3 uid="uid://bhehvxxe1k4xh"]
+
+[ext_resource type="Script" uid="uid://cdhbuu2d1xlss" path="res://dec-7-2025-citybuilder-cards-only/item.gd" id="1_bioplastic"]
+
+[resource]
+script = ExtResource("1_bioplastic")
+tier = 2
