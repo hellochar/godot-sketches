@@ -128,3 +128,11 @@ func increment_habituation(job_id: String) -> void:
   if not habituation_progress.has(job_id):
     habituation_progress[job_id] = 0
   habituation_progress[job_id] += 1
+
+func on_day_start() -> void:
+  var config = get_node("/root/Config")
+  add_energy(config.energy_regen_per_day)
+
+  for building in active_buildings:
+    if building.has_method("trigger_habit"):
+      building.trigger_habit()

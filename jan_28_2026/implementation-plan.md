@@ -296,27 +296,27 @@ This document breaks down implementation into phases and granular tasks. Each ta
 ## Phase 7: Time System (Days 10-11)
 
 ### 7.1 Day/Night Cycle Core
-- [ ] Create `src/systems/time_system.gd`
-- [ ] Track current day number
-- [ ] Track current phase: "day" or "night"
-- [ ] Track time within phase (0.0 to 1.0 or seconds)
-- [ ] Define day phase duration (e.g., 45 seconds)
+- [x] Create `src/systems/time_system.gd`
+- [x] Track current day number
+- [x] Track current phase: "day" or "night"
+- [x] Track time within phase (0.0 to 1.0 or seconds)
+- [x] Define day phase duration (e.g., 45 seconds)
 
 ### 7.2 Phase Transitions
-- [ ] Emit signal when day phase starts
-- [ ] Emit signal when night phase starts
-- [ ] During day: simulation runs
+- [x] Emit signal when day phase starts
+- [x] Emit signal when night phase starts
+- [x] During day: simulation runs
 - [ ] During night: simulation paused, planning allowed
 
 ### 7.3 Time Controls
-- [ ] Speed control: 1x, 2x, 3x
+- [x] Speed control: 1x, 2x, 3x
 - [ ] Pause button (during day - for events)
-- [ ] Manual advance button (during night - "End Planning Phase")
-- [ ] Show current day number in UI
+- [x] Manual advance button (during night - "End Planning Phase")
+- [x] Show current day number in UI
 
 ### 7.4 Time-Based Triggers
-- [ ] Hook habit buildings to day_started signal
-- [ ] Hook energy regeneration to day_started signal
+- [x] Hook habit buildings to day_started signal
+- [x] Hook energy regeneration to day_started signal
 - [ ] Hook resource decay to tick (or day-based)
 
 ### 7.5 Test Time System

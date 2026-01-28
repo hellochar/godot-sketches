@@ -188,3 +188,56 @@ implementation-plan.md - checked off completed tasks
 1. Phase 7: Time System - day/night cycle, triggers habits at day start
 2. Phase 4.3: Building connection check - buildings need adjacent road
 3. Visual feedback for workers carrying resources
+
+---
+
+## Session 4: Time System
+
+### Completed
+
+**Phase 7: Time System** - CORE COMPLETE
+- Created time_system.gd with day/night cycle
+- Day duration: 45 seconds (configurable)
+- Phase enum: DAY, NIGHT
+- Signals: day_started, night_started, phase_changed
+- Speed multiplier: 1x, 2x, 3x
+- "End Night" button appears during night phase
+- UI shows current day and phase
+- Energy regenerates on day start (via GameState.on_day_start())
+- Habit buildings trigger on day start
+
+**GameState Updated**
+- Added on_day_start() function
+- Triggers energy regeneration
+- Loops through active buildings and calls trigger_habit()
+
+**UI Added**
+- Time controls panel (top-right corner)
+- Speed buttons: 1x, 2x, 3x
+- Phase label: "Day X - Day/Night Phase"
+- End Night button (visible only at night)
+
+### Files Created
+```
+src/systems/time_system.gd
+```
+
+### Files Modified
+```
+jan_28_2026.gd - time system integration, time controls UI
+src/autoload/game_state.gd - on_day_start()
+implementation-plan.md - checked off Phase 7 tasks
+```
+
+### Current State
+- Day advances automatically every 45 seconds
+- Night shows "End Night" button
+- Clicking "End Night" advances to next day
+- Energy regenerates when day starts
+- Habit buildings execute on day start
+
+### Next Priority Tasks
+1. Test full day/night loop with habit buildings
+2. Add visual feedback for day/night (background color change)
+3. Phase 8: Energy System polish - show costs in UI
+4. Phase 9: Wellbeing calculation

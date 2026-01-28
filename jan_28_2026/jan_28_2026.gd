@@ -3,6 +3,7 @@ extends Control
 const ResourceSystemScript = preload("res://jan_28_2026/src/systems/resource_system.gd")
 const BuildingSystemScript = preload("res://jan_28_2026/src/systems/building_system.gd")
 const WorkerSystemScript = preload("res://jan_28_2026/src/systems/worker_system.gd")
+const TimeSystemScript = preload("res://jan_28_2026/src/systems/time_system.gd")
 
 @onready var game_world = %GameWorld
 @onready var ui_layer: CanvasLayer = %UILayer
@@ -10,6 +11,7 @@ const WorkerSystemScript = preload("res://jan_28_2026/src/systems/worker_system.
 var resource_system: Node
 var building_system: Node
 var worker_system: Node
+var time_system: Node
 
 # Building placement state
 var selected_building_id: String = ""
@@ -38,9 +40,14 @@ func _setup_systems() -> void:
   add_child(worker_system)
   worker_system.setup(game_world.get_grid())
 
+  time_system = TimeSystemScript.new()
+  add_child(time_system)
+  time_system.phase_changed.connect(_on_phase_changed)
+
 func _setup_ui() -> void:
   _create_building_toolbar()
   _create_info_panel()
+  _create_time_controls()
 
 func _create_building_toolbar() -> void:
   var toolbar = HBoxContainer.new()
@@ -272,3 +279,71 @@ func spawn_worker_at(coord: Vector2i) -> Node:
   var worker = worker_system.spawn_worker(world_pos)
   game_world.get_workers_layer().add_child(worker)
   return worker
+
+func _create_time_controls() -> void:
+  var panel = HBoxContainer.new()
+  panel.name = "TimeControls"
+  panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+  panel.offset_left = -250
+  panel.offset_top = 10
+  panel.offset_right = -10
+  panel.offset_bottom = 50
+
+  var phase_label = Label.new()
+  phase_label.name = "PhaseLabel"
+  phase_label.text = "Day 1 - Day Phase"
+  phase_label.custom_minimum_size = Vector2(120, 0)
+  panel.add_child(phase_label)
+
+  var speed_1x = Button.new()
+  speed_1x.text = "1x"
+  speed_1x.pressed.connect(func(): time_system.set_speed(1.0))
+  panel.add_child(speed_1x)
+
+  var speed_2x = Button.new()
+  speed_2x.text = "2x"
+  speed_2x.pressed.connect(func(): time_system.set_speed(2.0))
+  panel.add_child(speed_2x)
+
+  var speed_3x = Button.new()
+  speed_3x.text = "3x"
+  speed_3x.pressed.connect(func(): time_system.set_speed(3.0))
+  panel.add_child(speed_3x)
+
+  var end_night_btn = Button.new()
+  end_night_btn.name = "EndNightBtn"
+  end_night_btn.text = "End Night"
+  end_night_btn.visible = false
+  end_night_btn.pressed.connect(func(): time_system.end_night())
+  panel.add_child(end_night_btn)
+
+  ui_layer.add_child(panel)
+
+func _on_phase_changed(_is_day: bool) -> void:
+  _update_time_display()
+  _update_energy_display()
+
+func _update_time_display() -> void:
+  var controls = ui_layer.get_node_or_null("TimeControls")
+  if not controls:
+    return
+
+  var phase_label = controls.get_node_or_null("PhaseLabel")
+  var end_night_btn = controls.get_node_or_null("EndNightBtn")
+
+  if phase_label:
+    var phase_text = "Day" if time_system.is_day() else "Night"
+    phase_label.text = "Day %d - %s Phase" % [time_system.current_day, phase_text]
+
+  if end_night_btn:
+    end_night_btn.visible = time_system.is_night()
+
+  var panel = ui_layer.get_node_or_null("InfoPanel")
+  if panel:
+    var day_label = panel.get_node_or_null("VBoxContainer/DayLabel")
+    if day_label:
+      day_label.text = "Day %d" % time_system.current_day
+
+func _process(_delta: float) -> void:
+  if time_system:
+    _update_time_display()
