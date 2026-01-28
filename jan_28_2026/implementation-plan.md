@@ -371,15 +371,15 @@ This document breaks down implementation into phases and granular tasks. Each ta
 - [ ] Track attention used/available
 
 ### 9.2 Wellbeing Calculation
-- [ ] Implement wellbeing formula from spec
-- [ ] Recalculate on relevant changes (resource change, building change)
-- [ ] Clamp to 0-100 range
-- [ ] Store in game_state
+- [x] Implement wellbeing formula from spec
+- [x] Recalculate on relevant changes (resource change, building change)
+- [x] Clamp to 0-100 range
+- [x] Store in game_state
 
 ### 9.3 Wellbeing UI
-- [ ] Create prominent wellbeing meter
-- [ ] Show numerical value
-- [ ] Color gradient (red < yellow < green)
+- [x] Create prominent wellbeing meter
+- [x] Show numerical value
+- [x] Color gradient (red < yellow < green)
 - [ ] Optional: particle effects at high wellbeing
 
 ### 9.4 Metrics Dashboard

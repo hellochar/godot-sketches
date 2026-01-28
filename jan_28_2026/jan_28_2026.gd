@@ -116,6 +116,11 @@ func _create_info_panel() -> void:
   day_label.text = "Day 1"
   vbox.add_child(day_label)
 
+  var wellbeing_label = Label.new()
+  wellbeing_label.name = "WellbeingLabel"
+  wellbeing_label.text = "Wellbeing: 35"
+  vbox.add_child(wellbeing_label)
+
   var instructions = Label.new()
   instructions.text = "Click building to select\nClick grid to place\nRight-click to cancel"
   instructions.add_theme_font_size_override("font_size", 12)
@@ -256,14 +261,53 @@ func _cancel_placement() -> void:
 func _update_energy_display() -> void:
   var panel = ui_layer.get_node_or_null("InfoPanel")
   if panel:
+    var gs = get_node("/root/GameState")
+
     var label = panel.get_node_or_null("VBoxContainer/EnergyLabel")
     if label:
-      var gs = get_node("/root/GameState")
       label.text = "Energy: %d/%d" % [gs.current_energy, gs.max_energy]
 
     var att_label = panel.get_node_or_null("VBoxContainer/AttentionLabel")
     if att_label and worker_system:
       att_label.text = "Attention: %d/%d" % [worker_system.attention_used, worker_system.attention_pool]
+
+    var wb_label = panel.get_node_or_null("VBoxContainer/WellbeingLabel")
+    if wb_label:
+      _calculate_wellbeing()
+      var wb_color = _get_wellbeing_color(gs.wellbeing)
+      wb_label.text = "Wellbeing: %d" % int(gs.wellbeing)
+      wb_label.add_theme_color_override("font_color", wb_color)
+
+func _calculate_wellbeing() -> void:
+  var gs = get_node("/root/GameState")
+  var config = get_node("/root/Config")
+
+  var positive_total = 0
+  var negative_total = 0
+
+  for building in gs.active_buildings:
+    for res_id in building.storage:
+      var amount = building.storage[res_id]
+      if res_id in ["joy", "calm", "wisdom"]:
+        positive_total += amount
+      elif res_id in ["grief", "anxiety"]:
+        negative_total += amount
+
+  var base = 35.0
+  var positive_bonus = positive_total * config.positive_emotion_weight
+  var negative_penalty = negative_total * config.negative_emotion_weight
+  var building_bonus = gs.active_buildings.size() * config.habit_building_weight
+
+  var new_wellbeing = base + positive_bonus - negative_penalty + building_bonus
+  gs.set_wellbeing(new_wellbeing)
+
+func _get_wellbeing_color(value: float) -> Color:
+  if value >= 70:
+    return Color(0.3, 0.9, 0.3)
+  elif value >= 40:
+    return Color(0.9, 0.9, 0.3)
+  else:
+    return Color(0.9, 0.3, 0.3)
 
 func get_resource_system() -> Node:
   return resource_system
