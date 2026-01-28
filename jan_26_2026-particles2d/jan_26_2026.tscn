@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://c0ipuia8hajwb" path="res://jan_26_2026-particles2d/crossfade-alpha-curve.tres" id="4_47aty"]
 [ext_resource type="PackedScene" uid="uid://rvaqxj3vwx08" path="res://jan_26_2026-particles2d/thick_colorful_hair_in_wind.tscn" id="5_50xqt"]
 [ext_resource type="Texture2D" uid="uid://cvctvon6mety7" path="res://jan_26_2026-particles2d/self-hq-thisyear.png" id="7_47aty"]
-[ext_resource type="Texture2D" uid="uid://cwvsetqclrg2y" path="res://jan_26_2026-particles2d/noto_color_emoji_spritesheet.png" id="8_s24wy"]
+[ext_resource type="Texture2D" uid="uid://cwvsetqclrg2y" path="res://assets/noto_color_emoji_spritesheet.png" id="8_s24wy"]
 
 [sub_resource type="Gradient" id="Gradient_q0ufj"]
 offsets = PackedFloat32Array(0, 0.06, 0.94, 1)
