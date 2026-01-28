@@ -1,11 +1,12 @@
-[gd_scene load_steps=8 format=3 uid="uid://nmpbm4g3jim4"]
+[gd_scene load_steps=9 format=3 uid="uid://nmpbm4g3jim4"]
 
 [ext_resource type="Script" uid="uid://bigcfyacvshrd" path="res://addons/type_writer_label/classes/type_writer_label.gd" id="1_80nbo"]
-[ext_resource type="Script" uid="uid://dcgixhll7ycus" path="res://nov-23-2025/stage.gd" id="1_e2o6t"]
+[ext_resource type="Script" uid="uid://dcgixhll7ycus" path="res://nov-23-2025-cinematic-intro/stage.gd" id="1_e2o6t"]
+[ext_resource type="AudioStream" uid="uid://t86t7q4j10ii" path="res://assets/kenney_ui-audio/Audio/click5.ogg" id="4_7enoa"]
 [ext_resource type="AudioStream" uid="uid://bhupoqihw4hqb" path="res://assets/Nikko Hunt's Sound Design Essentials/Nature/Jungles of Sarawak - Nature - (Nikko Hunt's S.D.Essentials).wav" id="4_cibw0"]
-[ext_resource type="Texture2D" uid="uid://bljjjfveylcml" path="res://nov-23-2025/ChatGPT Image Nov 23, 2025, 11_37_31 AM.png" id="4_ryrav"]
+[ext_resource type="Texture2D" uid="uid://dbit13o6pcei4" path="res://nov-23-2025-cinematic-intro/ChatGPT Image Nov 23, 2025, 11_37_31 AM.png" id="4_ryrav"]
 [ext_resource type="AudioStream" uid="uid://0tdvgexchj1e" path="res://assets/Nikko Hunt's Sound Design Essentials/Sweeps/Dry - Sweeps - (Nikko Hunt's S.D.Essentials).wav" id="5_q36b4"]
-[ext_resource type="PackedScene" uid="uid://bb6pclx1od245" path="res://nov-23-2025/intro_cinematic.tscn" id="9_vef74"]
+[ext_resource type="PackedScene" uid="uid://bb6pclx1od245" path="res://nov-23-2025-cinematic-intro/intro_cinematic.tscn" id="9_vef74"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_80nbo"]
 bg_color = Color(0, 0, 0, 1)
@@ -73,8 +74,9 @@ scale_amount_max = 5.0
 color = Color(1, 1, 1, 0.3)
 
 [node name="Clack-85854" type="AudioStreamPlayer" parent="."]
-volume_db = -12.0
-pitch_scale = 4.0
+stream = ExtResource("4_7enoa")
+volume_db = -27.928
+pitch_scale = 0.39
 
 [node name="SynthyAmbientAtmospheric" type="AudioStreamPlayer" parent="."]
 volume_db = -80.0

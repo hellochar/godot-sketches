@@ -8,11 +8,11 @@ func _ready() -> void:
     camera_original_position = position
     pass
     # %Dialogue.pause_typing()
-    # # await set_overlay_opacity(0.0, 2)
-    # # await 2 seoncds
-    # await get_tree().create_timer(2.0).timeout
+    # await set_overlay_opacity(0.0, 2)
+    # await 2 seoncds
+    await get_tree().create_timer(2.0).timeout
 
-    # # %audio.play()
+    %audio.play()
 
     # %Dialogue.resume_typing()
 
