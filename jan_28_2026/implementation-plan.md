@@ -172,10 +172,10 @@ This document breaks down implementation into phases and granular tasks. Each ta
 - [x] Return array of coords or empty if no path
 
 ### 4.3 Building Connection
-- [ ] Buildings need road adjacency to be "connected"
-- [ ] Implement `is_building_connected(building)` function
-- [ ] Visual indicator for unconnected buildings (red tint?)
-- [ ] Unconnected buildings don't function
+- [x] Buildings need road adjacency to be "connected"
+- [x] Implement `is_building_connected(building)` function
+- [x] Visual indicator for unconnected buildings (red tint?)
+- [x] Unconnected buildings don't function
 
 ### 4.4 Test Pathfinding
 - [ ] Draw path visually for debugging

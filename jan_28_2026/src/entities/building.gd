@@ -6,6 +6,10 @@ var building_id: String
 var definition: Dictionary
 var grid_coord: Vector2i
 var size: Vector2i = Vector2i(1, 1)
+var grid: RefCounted
+
+# Connection
+var road_connected: bool = false
 
 # Storage
 var storage: Dictionary = {}  # resource_id -> amount
@@ -30,9 +34,10 @@ func _ready() -> void:
   if definition:
     _update_visuals()
 
-func initialize(p_building_id: String, p_grid_coord: Vector2i) -> void:
+func initialize(p_building_id: String, p_grid_coord: Vector2i, p_grid: RefCounted = null) -> void:
   building_id = p_building_id
   grid_coord = p_grid_coord
+  grid = p_grid
   definition = BuildingDefs.get_definition(building_id)
 
   if definition.is_empty():
@@ -41,6 +46,7 @@ func initialize(p_building_id: String, p_grid_coord: Vector2i) -> void:
 
   size = definition.get("size", Vector2i(1, 1))
   storage_capacity = definition.get("storage_capacity", 0)
+  _update_connection()
 
   if is_inside_tree():
     _update_visuals()
@@ -50,12 +56,39 @@ func _update_visuals() -> void:
   var pixel_size = Vector2(size) * tile_size
 
   sprite.size = pixel_size
-  sprite.color = definition.get("color", Color.WHITE)
+  _update_connection_visual()
 
   label.size = pixel_size
   label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
   label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
   _update_storage_display()
+
+func _update_connection() -> void:
+  if not grid:
+    road_connected = true
+    return
+
+  if is_road():
+    road_connected = true
+    return
+
+  for x in range(-1, size.x + 1):
+    for y in range(-1, size.y + 1):
+      if x >= 0 and x < size.x and y >= 0 and y < size.y:
+        continue
+      var check = grid_coord + Vector2i(x, y)
+      if grid.is_valid_coord(check) and grid.is_road_at(check):
+        road_connected = true
+        return
+
+  road_connected = false
+
+func _update_connection_visual() -> void:
+  var base_color = definition.get("color", Color.WHITE)
+  if road_connected or is_road():
+    sprite.color = base_color
+  else:
+    sprite.color = base_color.darkened(0.4)
 
 func _update_storage_display() -> void:
   var name_text = definition.get("name", building_id)
@@ -84,6 +117,9 @@ func _process_generation(delta: float) -> void:
   if not has_behavior(BuildingDefs.Behavior.GENERATOR):
     return
 
+  if not road_connected:
+    return
+
   var rate = definition.get("generation_rate", 0.0)
   if rate <= 0:
     return
@@ -100,6 +136,9 @@ func _process_generation(delta: float) -> void:
 
 func _process_processing(delta: float) -> void:
   if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    return
+
+  if not road_connected:
     return
 
   if not processing_active:

@@ -50,15 +50,19 @@ func place_building(building_id: String, coord: Vector2i) -> Node:
 
   # Create building
   var building = BuildingScene.instantiate()
-  building.initialize(building_id, coord)
+  building.initialize(building_id, coord, grid)
   building.position = grid.grid_to_world_top_left(coord)
 
   # Add to scene
   buildings_layer.add_child(building)
   active_buildings.append(building)
+  get_node("/root/GameState").active_buildings.append(building)
 
   # Mark grid as occupied
   grid.occupy_area(coord, size, building)
+
+  # Update connections for nearby buildings
+  _update_nearby_connections(coord, size)
 
   get_node("/root/EventBus").building_placed.emit(building, coord)
 
@@ -76,10 +80,14 @@ func remove_building(building: Node) -> void:
 
   # Remove from tracking
   active_buildings.erase(building)
+  get_node("/root/GameState").active_buildings.erase(building)
 
   get_node("/root/EventBus").building_removed.emit(building, coord)
 
   building.queue_free()
+
+  # Update connections for nearby buildings
+  _update_nearby_connections(coord, size)
 
 func get_building_at(coord: Vector2i) -> Node:
   var occupant = grid.get_occupant(coord)
@@ -125,3 +133,14 @@ func is_connected_to_road(coord: Vector2i) -> bool:
     if occupant and occupant.is_road():
       return true
   return false
+
+func _update_nearby_connections(coord: Vector2i, size: Vector2i) -> void:
+  for x in range(-2, size.x + 2):
+    for y in range(-2, size.y + 2):
+      var check = coord + Vector2i(x, y)
+      if grid.is_valid_coord(check):
+        var occupant = grid.get_occupant(check)
+        if occupant and occupant.has_method("_update_connection"):
+          occupant._update_connection()
+          if occupant.has_method("_update_connection_visual"):
+            occupant._update_connection_visual()
