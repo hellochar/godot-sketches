@@ -241,3 +241,41 @@ implementation-plan.md - checked off Phase 7 tasks
 2. Add visual feedback for day/night (background color change)
 3. Phase 8: Energy System polish - show costs in UI
 4. Phase 9: Wellbeing calculation
+
+---
+
+## Session 5: Building Connections
+
+### Completed
+
+**Phase 4.3: Building Connection** - COMPLETE
+- Buildings track `road_connected` state
+- `_update_connection()` checks for adjacent road tiles
+- Unconnected buildings display darkened color (40% darker)
+- Generators and processors only operate when connected
+- Connection updates automatically when roads placed/removed nearby
+- Buildings are added to GameState.active_buildings for habit triggers
+
+### Files Modified
+```
+src/entities/building.gd - road_connected tracking, visual indicator
+src/systems/building_system.gd - pass grid, update nearby connections
+implementation-plan.md - Phase 4.3 and Phase 8 progress marked
+```
+
+### Current State
+- Core game loop functional:
+  - Place roads and buildings
+  - Connect buildings to roads
+  - Generators produce resources when connected
+  - Day/night cycle with time controls
+  - Workers can be assigned to transport resources
+  - Energy consumed when placing buildings
+  - Energy regenerates each day
+  - Habits trigger on day start
+
+### Next Priority Tasks
+1. Phase 9: Wellbeing calculation and display
+2. Add more visual polish (day/night colors)
+3. Test full gameplay loop
+4. Add more resource types needed for processors

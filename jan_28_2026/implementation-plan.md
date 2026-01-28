@@ -330,25 +330,25 @@ This document breaks down implementation into phases and granular tasks. Each ta
 ## Phase 8: Energy System (Days 11-12)
 
 ### 8.1 Energy State
-- [ ] Add energy tracking to game_state
-- [ ] Properties: current_energy, max_energy
-- [ ] Initialize from config
+- [x] Add energy tracking to game_state
+- [x] Properties: current_energy, max_energy
+- [x] Initialize from config
 
 ### 8.2 Energy Regeneration
-- [ ] On day start: add base regeneration amount
-- [ ] Cap at max_energy
+- [x] On day start: add base regeneration amount
+- [x] Cap at max_energy
 - [ ] Modifiable by buildings (Sleep Chamber bonus)
 
 ### 8.3 Energy Consumption
-- [ ] Building placement costs energy
+- [x] Building placement costs energy
 - [ ] Some building operations cost energy
 - [ ] Starting new worker assignments costs energy (separate from attention?)
   - [ ] Note: Review if energy vs attention distinction is needed for workers
-- [ ] Implement `spend_energy(amount)` function
-- [ ] Returns false if insufficient
+- [x] Implement `spend_energy(amount)` function
+- [x] Returns false if insufficient
 
 ### 8.4 Energy UI
-- [ ] Display current/max energy prominently
+- [x] Display current/max energy prominently
 - [ ] Show regeneration amount
 - [ ] Warn when low
 - [ ] Show cost preview when placing buildings
