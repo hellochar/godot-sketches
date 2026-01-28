@@ -38,17 +38,31 @@ func _refresh() -> void:
 
 func _create_clickable_wrapper(node: Node, index: int) -> Control:
   var wrapper := MarginContainer.new()
-  wrapper.mouse_filter = Control.MOUSE_FILTER_STOP
   wrapper.set_meta("index", index)
-  wrapper.gui_input.connect(func(event: InputEvent):
-    if event is InputEventMouseButton:
-      if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-        _on_option_clicked(index)
-  )
   wrapper.add_child(node)
   wrapper.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
   wrapper.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+
+  var buttons := _find_buttons(node)
+  if buttons.is_empty():
+    wrapper.mouse_filter = Control.MOUSE_FILTER_STOP
+    wrapper.gui_input.connect(func(event: InputEvent):
+      if event is InputEventMouseButton:
+        if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+          _on_option_clicked(index)
+    )
+  else:
+    for button in buttons:
+      button.pressed.connect(func(): _on_option_clicked(index))
   return wrapper
+
+func _find_buttons(node: Node) -> Array[BaseButton]:
+  var result: Array[BaseButton] = []
+  if node is BaseButton:
+    result.append(node)
+  for child in node.get_children():
+    result.append_array(_find_buttons(child))
+  return result
 
 func _on_option_clicked(index: int) -> void:
   if index >= 0 and index < _options.size():
