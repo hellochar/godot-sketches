@@ -37,7 +37,7 @@ func _refresh() -> void:
     container.add_child(wrapper)
 
 func _create_clickable_wrapper(node: Node, index: int) -> Control:
-  var wrapper := Control.new()
+  var wrapper := MarginContainer.new()
   wrapper.mouse_filter = Control.MOUSE_FILTER_STOP
   wrapper.set_meta("index", index)
   wrapper.gui_input.connect(func(event: InputEvent):
@@ -46,9 +46,8 @@ func _create_clickable_wrapper(node: Node, index: int) -> Control:
         _on_option_clicked(index)
   )
   wrapper.add_child(node)
-  wrapper.custom_minimum_size = node.custom_minimum_size
-  if node is Control:
-    node.anchors_preset = Control.PRESET_FULL_RECT
+  wrapper.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+  wrapper.size_flags_vertical = Control.SIZE_SHRINK_CENTER
   return wrapper
 
 func _on_option_clicked(index: int) -> void:
