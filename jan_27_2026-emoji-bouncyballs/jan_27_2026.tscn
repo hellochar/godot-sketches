@@ -1,0 +1,75 @@
+[gd_scene load_steps=10 format=3 uid="uid://duc14t4mtr3q8"]
+
+[ext_resource type="Script" uid="uid://wvygtgnhcpyu" path="res://jan_27_2026-emoji-bouncyballs/jan_27_2026.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cwvsetqclrg2y" path="res://assets/noto_color_emoji_spritesheet.png" id="2_q0o4t"]
+[ext_resource type="Script" uid="uid://cll2ewhxarmmd" path="res://common/smooth_camera.gd" id="3_jfmii"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_jfmii"]
+friction = 0.06
+bounce = 0.46
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_c4vmq"]
+radius = 24.75
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cnivf"]
+atlas = ExtResource("2_q0o4t")
+region = Rect2(266.82684, 14.857021, 68.400604, 65.19916)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_jfmii"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jfmii"]
+size = Vector2(664, 370)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cnivf"]
+size = Vector2(301, 331)
+
+[node name="Control" type="Node2D" node_paths=PackedStringArray("smiley", "polygon")]
+script = ExtResource("1_script")
+smiley = NodePath("smiley")
+polygon = NodePath("spawn_zone")
+
+[node name="smiley" type="RigidBody2D" parent="."]
+physics_material_override = SubResource("PhysicsMaterial_jfmii")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="smiley"]
+shape = SubResource("CircleShape2D_c4vmq")
+
+[node name="Sprite2D" type="Sprite2D" parent="smiley"]
+scale = Vector2(0.75, 0.75)
+texture = SubResource("AtlasTexture_cnivf")
+
+[node name="SmoothCamera" type="Camera2D" parent="."]
+position_smoothing_enabled = true
+position_smoothing_speed = 40.0
+script = ExtResource("3_jfmii")
+metadata/_custom_type_script = "uid://cll2ewhxarmmd"
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+scale = Vector2(0.7, 0.7)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D"]
+material = SubResource("CanvasItemMaterial_jfmii")
+polygon = PackedVector2Array(-911, -537, -913, 486, 898, 479, 894, -538, 948.57135, -1021.4285, 950, 539, -959, 541, -954.28564, -915.71423)
+
+[node name="spawn_zone" type="Polygon2D" parent="."]
+position = Vector2(-6.1392136, 70)
+scale = Vector2(1.3607455, 1)
+color = Color(1, 1, 1, 0.050980393)
+polygon = PackedVector2Array(-310, -468, -457, -424, 455, -402, 257, -467)
+
+[node name="nograv" type="Area2D" parent="."]
+gravity_space_override = 3
+gravity = 0.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="nograv"]
+position = Vector2(55, -24)
+shape = SubResource("RectangleShape2D_jfmii")
+
+[node name="upwards_grav" type="Area2D" parent="."]
+gravity_space_override = 3
+gravity_point_center = Vector2(0, -2)
+gravity_direction = Vector2(0, -2)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="upwards_grav"]
+position = Vector2(-484.5, 167.5)
+shape = SubResource("RectangleShape2D_cnivf")

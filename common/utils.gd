@@ -188,3 +188,28 @@ func spring_pop(target: Node, overshoot: float = 1.3, duration: float = 0.3) -> 
   var tween := create_tween()
   tween.tween_property(target, "scale", Vector2.ONE, duration).from(Vector2.ONE * overshoot).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
   return tween
+
+func get_random_point_in_polygon(polygon: Polygon2D) -> Vector2:
+  return polygon.global_position + get_random_point_in_polygon_points(polygon.polygon)
+
+func get_random_point_in_polygon_points(points: PackedVector2Array) -> Vector2:
+  # Pick a random triangle using ear clipping approximation
+  # Simple approach: use bounding box rejection sampling
+  var min_x = points[0].x
+  var max_x = points[0].x
+  var min_y = points[0].y
+  var max_y = points[0].y
+  for point in points:
+    min_x = min(min_x, point.x)
+    max_x = max(max_x, point.x)
+    min_y = min(min_y, point.y)
+    max_y = max(max_y, point.y)
+  
+  while true:
+    var random_point = Vector2(
+      randf_range(min_x, max_x),
+      randf_range(min_y, max_y)
+    )
+    if Geometry2D.is_point_in_polygon(random_point, points):
+      return random_point
+  return Vector2.ZERO
