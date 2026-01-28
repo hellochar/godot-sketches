@@ -316,9 +316,36 @@ All core systems functional:
 4. Add building connection system
 5. Update progress tracking
 6. Add wellbeing calculation and display
+7. Add negative emotion sources and processor storage
+
+---
+
+## Session 7: Gameplay Loop Completion
+
+### Completed
+
+**Negative Emotion Sources**
+- Old Wound: generates Grief (0 energy cost, creates challenge)
+- Worry Loop: generates Anxiety (0 energy cost)
+- Mourning Chapel: now has storage_capacity=10 to receive grief
+- Anxiety Diffuser: now has storage_capacity=15 to receive anxiety
+
+### Core Gameplay Loop Now Functional
+1. Negative emotions generate from Wounds and Worry Loops
+2. Player builds roads to connect buildings
+3. Player places processors (Mourning Chapel, Anxiety Diffuser)
+4. Player assigns workers to transport negative emotions
+5. Processors convert negative -> positive (grief->wisdom, anxiety->calm)
+6. Wellbeing tracks balance of positive vs negative emotions
+7. Day/night cycle progresses with energy regeneration
+
+### Files Modified
+```
+src/data/building_definitions.gd - wound, worry_loop, storage capacities
+```
 
 ### Next Priority Tasks
-1. Test full gameplay loop manually
-2. Add grief resource for mourning chapel processor
-3. Phase 10: Events system (inciting incidents)
-4. Polish: day/night visual feedback
+1. Phase 10: Events system for inciting incidents
+2. Visual polish: day/night background colors
+3. Tutorial hints for new players
+4. Balance tuning: generation rates, processing times
