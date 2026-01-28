@@ -26,10 +26,10 @@ func _ready() -> void:
   #   var res = basic_resources.pick_random()
   #   inventory.add(res, 10)
 
-  inventory.add(preload("res://items/basic/peasants.tres"), 10)
-  inventory.add(preload("res://items/basic/food.tres"), 10)
-  inventory.add(preload("res://items/basic/hut.tres"), 3)
-  inventory.add(preload("res://items/basic/livestock.tres"), 3)
+  inventory.add(preload("res://dec-7-2025/items/basic/peasants.tres"), 10)
+  inventory.add(preload("res://dec-7-2025/items/basic/food.tres"), 10)
+  inventory.add(preload("res://dec-7-2025/items/basic/hut.tres"), 3)
+  inventory.add(preload("res://dec-7-2025/items/basic/livestock.tres"), 3)
 
   blueprints.prefix = true
   # blueprints.add(Structure.generate_random_producer(), 1)
@@ -89,7 +89,7 @@ const STRUCTURE_INSTANCE = preload("res://dec-7-2025/structure_instance.tscn")
 const PICKER_SCENE = preload("res://common/reward_picker.tscn")
 
 func assign_workers() -> void:
-  var PEASANTS = preload("res://items/basic/peasants.tres")
+  var PEASANTS = preload("res://dec-7-2025/items/basic/peasants.tres")
   var available_peasants = inventory.num(PEASANTS)
   
   for structure_instance in board:

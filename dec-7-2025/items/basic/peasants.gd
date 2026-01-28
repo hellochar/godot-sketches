@@ -1,13 +1,13 @@
 extends Item
 class_name Peasants
 
-const FOOD = preload("res://items/basic/food.tres")
-const GRASS = preload("res://items/basic/grass.tres")
-const HUT = preload("res://items/basic/hut.tres")
-const BONES = preload("res://items/basic/bones.tres")
-const STONE = preload("res://items/basic/stone.tres")
-const WOOD = preload("res://items/basic/wood.tres")
-const LIVESTOCK = preload("res://items/basic/livestock.tres")
+const FOOD = preload("res://dec-7-2025/items/basic/food.tres")
+const GRASS = preload("res://dec-7-2025/items/basic/grass.tres")
+const HUT = preload("res://dec-7-2025/items/basic/hut.tres")
+const BONES = preload("res://dec-7-2025/items/basic/bones.tres")
+const STONE = preload("res://dec-7-2025/items/basic/stone.tres")
+const WOOD = preload("res://dec-7-2025/items/basic/wood.tres")
+const LIVESTOCK = preload("res://dec-7-2025/items/basic/livestock.tres")
 
 func tick(inventory: World.Inventory, _amount: int, _ticks: int) -> Dictionary[Item, int]:
   var changes: Dictionary[Item, int] = {}

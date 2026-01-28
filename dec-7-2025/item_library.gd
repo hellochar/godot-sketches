@@ -8,7 +8,7 @@ extends RefCounted
 ##   var basic_items = ItemLibrary.instance.get_by_tier(Item.ETier.Basic)
 ##   var weapons = ItemLibrary.instance.get_by_tag(Item.ETag.Weapon)
 
-const RESOURCES_FOLDER = "res://items"
+const RESOURCES_FOLDER = "res://dec-7-2025/items"
 
 static var _instance: ItemLibrary
 

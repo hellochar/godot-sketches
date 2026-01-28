@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="Peasants" load_steps=4 format=3 uid="uid://7dy8nw3tmyvj"]
 
-[ext_resource type="Script" uid="uid://bllfebw3pn4wx" path="res://items/basic/peasants.gd" id="1_mv2qe"]
+[ext_resource type="Script" uid="uid://bllfebw3pn4wx" path="res://dec-7-2025/items/basic/peasants.gd" id="1_mv2qe"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_mv2qe"]
 load_path = "res://.godot/imported/icon_atlas.png-8ac5fc0cdf230613c0cf6203a3100554.ctex"
