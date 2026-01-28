@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3]
 
-[ext_resource type="Script" path="res://aug-9-2025/scripts/Fire.gd" id="1_1h8wr"]
+[ext_resource type="Script" uid="uid://bwbxijie5o0t1" path="res://aug-9-2025-3d-explorations/scripts/Fire.gd" id="1_1h8wr"]
 
 [sub_resource type="CircleShape2D" id="2_shape"]
 radius = 32.0

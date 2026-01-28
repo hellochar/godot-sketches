@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://d2nne6rn3ho6y"]
 
-[ext_resource type="Material" uid="uid://rjtoefm7ly6a" path="res://aug-9-2025/blue_material.material" id="1_vjr8j"]
-[ext_resource type="ArrayMesh" uid="uid://c4c7bhek7xhd6" path="res://aug-9-2025/new_array_mesh.tres" id="2_3c8cm"]
+[ext_resource type="Material" uid="uid://rjtoefm7ly6a" path="res://aug-9-2025-3d-explorations/blue_material.material" id="1_vjr8j"]
+[ext_resource type="ArrayMesh" uid="uid://c4c7bhek7xhd6" path="res://aug-9-2025-3d-explorations/new_array_mesh.tres" id="2_3c8cm"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4xowi"]
 
