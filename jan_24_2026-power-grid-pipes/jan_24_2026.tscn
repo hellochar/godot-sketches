@@ -1,11 +1,11 @@
 [gd_scene load_steps=7 format=3 uid="uid://3uwxrbrfv8h6"]
 
-[ext_resource type="Script" uid="uid://c1mr8ety4yubf" path="res://jan_24_2026/jan_24_2026.gd" id="1_script"]
-[ext_resource type="Script" uid="uid://bfaweodl0h47y" path="res://jan_24_2026/grid_view.gd" id="2_grid_view"]
-[ext_resource type="LabelSettings" uid="uid://dg5l8qp2vxk4r" path="res://jan_24_2026/label_settings.tres" id="3_label_settings"]
-[ext_resource type="LabelSettings" uid="uid://bh3kmam2nop5q" path="res://jan_24_2026/label_settings_header.tres" id="4_label_settings_header"]
-[ext_resource type="LabelSettings" uid="uid://ch4lm0n3opq6r" path="res://jan_24_2026/label_settings_small.tres" id="5_label_settings_small"]
-[ext_resource type="LabelSettings" uid="uid://di5mn1o4pqr7s" path="res://jan_24_2026/label_settings_large.tres" id="6_label_settings_large"]
+[ext_resource type="Script" uid="uid://c1mr8ety4yubf" path="res://jan_24_2026-power-grid-pipes/jan_24_2026.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://bfaweodl0h47y" path="res://jan_24_2026-power-grid-pipes/grid_view.gd" id="2_grid_view"]
+[ext_resource type="LabelSettings" uid="uid://dg5l8qp2vxk4r" path="res://jan_24_2026-power-grid-pipes/label_settings.tres" id="3_label_settings"]
+[ext_resource type="LabelSettings" uid="uid://bh3kmam2nop5q" path="res://jan_24_2026-power-grid-pipes/label_settings_header.tres" id="4_label_settings_header"]
+[ext_resource type="LabelSettings" uid="uid://ch4lm0n3opq6r" path="res://jan_24_2026-power-grid-pipes/label_settings_small.tres" id="5_label_settings_small"]
+[ext_resource type="LabelSettings" uid="uid://di5mn1o4pqr7s" path="res://jan_24_2026-power-grid-pipes/label_settings_large.tres" id="6_label_settings_large"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
