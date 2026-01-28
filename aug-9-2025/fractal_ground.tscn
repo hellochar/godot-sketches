@@ -3,7 +3,7 @@
 [ext_resource type="Material" uid="uid://rjtoefm7ly6a" path="res://aug-9-2025/blue_material.material" id="1_sge3k"]
 [ext_resource type="ArrayMesh" uid="uid://c4c7bhek7xhd6" path="res://aug-9-2025/new_array_mesh.tres" id="2_0f1g3"]
 [ext_resource type="Shader" uid="uid://bvn2icgnf34dy" path="res://aug-9-2025/fractal_ground.tres" id="3_vvs6j"]
-[ext_resource type="Material" uid="uid://dci3vssaaaqb6" path="res://materials/water/water.material" id="4_nhiyu"]
+[ext_resource type="Material" uid="uid://dci3vssaaaqb6" path="res://_materials/water/water.material" id="4_nhiyu"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4xowi"]
 
