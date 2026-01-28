@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://nuvg84pkx332"]
 
-[ext_resource type="Script" uid="uid://cgs62t3tqpdbw" path="res://jan_23_2026/jan_23_2026.gd" id="1_script"]
-[ext_resource type="Script" uid="uid://cotmu8th4wqir" path="res://jan_23_2026/element_diagram.gd" id="2_diagram"]
+[ext_resource type="Script" uid="uid://cgs62t3tqpdbw" path="res://jan_23_2026-sixway-rps/jan_23_2026.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://cotmu8th4wqir" path="res://jan_23_2026-sixway-rps/element_diagram.gd" id="2_diagram"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -123,6 +123,7 @@ alignment = 1
 
 [node name="ElementDiagram" type="Control" parent="."]
 layout_mode = 1
+anchors_preset = 0
 offset_left = 55.0
 offset_top = 67.0
 offset_right = 185.0
