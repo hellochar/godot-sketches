@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://c8l4s74n3ubwu"]
 
-[ext_resource type="Script" uid="uid://c2m6k7ksedx3g" path="res://dec-21-2025/plant.gd" id="1_plant"]
+[ext_resource type="Script" uid="uid://dcomggyp3q2xl" path="res://dec-21-2025-tilemap-adventure/plant.gd" id="1_plant"]
 [ext_resource type="Texture2D" uid="uid://b5lgiyo7wu2qk" path="res://assets/plant.png" id="2_4oa58"]
 [ext_resource type="Script" uid="uid://d03r0a2gs15ra" path="res://interactable.gd" id="3_qljma"]
 [ext_resource type="Material" uid="uid://bc64ytr0g15uo" path="res://outline_shader_material.tres" id="4_4oa58"]
