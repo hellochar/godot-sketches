@@ -19,7 +19,7 @@ config/icon="res://icon.svg"
 
 Utils="*res://_common/utils.gd"
 HTags="*res://addons/htags/autoload/htag_system.gd"
-MultiplayerManager="*res://aug-9-2025/scripts/MultiplayerManager.gd"
+MultiplayerManager="*res://aug-9-2025-3d-explorations/scripts/MultiplayerManager.gd"
 
 [display]
 
