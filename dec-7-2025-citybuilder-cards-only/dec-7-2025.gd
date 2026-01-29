@@ -86,7 +86,6 @@ func _input(event: InputEvent) -> void:
       tick(1)
 
 const STRUCTURE_INSTANCE = preload("res://dec-7-2025-citybuilder-cards-only/structure_instance.tscn")
-const PICKER_SCENE = preload("res://common/reward_picker.tscn")
 
 func assign_workers() -> void:
   var PEASANTS = preload("res://dec-7-2025-citybuilder-cards-only/items/basic/peasants.tres")
@@ -144,9 +143,7 @@ func create_reward() -> void:
     button.set_meta("amount", amount)
     options.append(button)
 
-  var picker := PICKER_SCENE.instantiate()
-  add_child(picker)
-  picker.set_options(options)
+  var picker := Utils.create_reward_picker(self, options)
   picker.item_selected.connect(func(node: Node) -> void:
     var item: Item = node.get_meta("item")
     var amount: int = node.get_meta("amount")

@@ -1,5 +1,15 @@
 extends Node
 
+const REWARD_PICKER_SCENE = preload("res://_common/reward_picker.tscn")
+
+static func create_reward_picker(parent: Node, options: Array[Node], title: String = "Select a Reward", skippable: bool = true) -> RewardPicker:
+  var picker: RewardPicker = REWARD_PICKER_SCENE.instantiate()
+  picker.title_text = title
+  picker.skippable = skippable
+  parent.add_child(picker)
+  picker.set_options(options)
+  return picker
+
 class ShakeHelper extends Node:
   var target: Node
   var original_offset: Vector2
