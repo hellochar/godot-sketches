@@ -8,17 +8,21 @@
 
 config_version=5
 
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
 [application]
 
 config/name="sketches"
 run/main_scene="uid://2sywl1e23v72"
-config/features=PackedStringArray("4.5", "Forward Plus")
+config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 Utils="*res://_common/utils.gd"
-HTags="*res://addons/htags/autoload/htag_system.gd"
+HTags="*uid://dfuf7asc72fs2"
 Config="*res://jan_28_2026/src/autoload/config.gd"
 EventBus="*res://jan_28_2026/src/autoload/event_bus.gd"
 GameState="*res://jan_28_2026/src/autoload/game_state.gd"
