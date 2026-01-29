@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="Grass" load_steps=4 format=3 uid="uid://mnjj8all4e1w"]
+[gd_resource type="Resource" script_class="Grass" format=3 uid="uid://mnjj8all4e1w"]
 
 [ext_resource type="Script" uid="uid://cf3h6rao1p7j1" path="res://dec-7-2025-citybuilder-cards-only/items/basic/grass.gd" id="1_xenjs"]
 
