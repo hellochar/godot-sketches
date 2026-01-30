@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c2sywl1e23v72"]
 
 [ext_resource type="Script" uid="uid://yka2ynw1ww7e" path="res://jan_28_2026-psychebuilder-ai/jan_28_2026.gd" id="1_script"]
-[ext_resource type="PackedScene" path="res://jan_28_2026-psychebuilder-ai/src/scenes/game_world.tscn" id="2_game_world"]
+[ext_resource type="Script" uid="uid://cbhf3jd20hhij" path="res://jan_28_2026-psychebuilder-ai/game_world.gd" id="2_c28ry"]
 
 [node name="PsycheBuilder" type="Control" unique_id=173724855]
 layout_mode = 3
@@ -13,7 +13,39 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_script")
 
-[node name="GameWorld" parent="." unique_id=931979143 instance=ExtResource("2_game_world")]
+[node name="GameWorld" type="Node2D" parent="." unique_id=931979143]
+unique_name_in_owner = true
+script = ExtResource("2_c28ry")
+
+[node name="Background" type="ColorRect" parent="GameWorld" unique_id=1389891957]
+offset_right = 3200.0
+offset_bottom = 3200.0
+mouse_filter = 2
+color = Color(0.15, 0.12, 0.18, 1)
+
+[node name="GridOverlay" type="Node2D" parent="GameWorld" unique_id=633751731]
+unique_name_in_owner = true
+
+[node name="HoverIndicator" type="ColorRect" parent="GameWorld" unique_id=192286207]
+unique_name_in_owner = true
+visible = false
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+color = Color(0.3, 1, 0.3, 0.4)
+
+[node name="BuildingsLayer" type="Node2D" parent="GameWorld" unique_id=1010913755]
+unique_name_in_owner = true
+
+[node name="ResourcesLayer" type="Node2D" parent="GameWorld" unique_id=2104514141]
+unique_name_in_owner = true
+
+[node name="WorkersLayer" type="Node2D" parent="GameWorld" unique_id=390161823]
+unique_name_in_owner = true
+
+[node name="Camera" type="Camera2D" parent="GameWorld" unique_id=43077420]
+unique_name_in_owner = true
+zoom = Vector2(0.5, 0.5)
 
 [node name="UILayer" type="CanvasLayer" parent="." unique_id=68908079]
 unique_name_in_owner = true
