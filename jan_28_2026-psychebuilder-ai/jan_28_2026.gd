@@ -100,6 +100,7 @@ func _create_info_panel() -> void:
   panel.offset_bottom = 150
 
   var vbox = VBoxContainer.new()
+  vbox.name = "VBoxContainer"
   panel.add_child(vbox)
 
   var energy_label = Label.new()
