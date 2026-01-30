@@ -91,20 +91,26 @@ Right-click to cancel"
 
 [node name="TimeControls" type="HBoxContainer" parent="UILayer" unique_id=1232977541]
 unique_name_in_owner = true
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -250.0
-offset_top = 10.0
-offset_right = -10.0
-offset_bottom = 50.0
-grow_horizontal = 0
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -120.0
+offset_right = 120.0
+offset_bottom = 40.0
+grow_horizontal = 2
 
 [node name="PhaseLabel" type="Label" parent="UILayer/TimeControls" unique_id=2015298302]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Day 1 - Day Phase"
+
+[node name="TimeLabel" type="Label" parent="UILayer/TimeControls" unique_id=1337836467]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "6:00 AM"
+horizontal_alignment = 1
 
 [node name="Speed1xBtn" type="Button" parent="UILayer/TimeControls" unique_id=1341145926]
 unique_name_in_owner = true

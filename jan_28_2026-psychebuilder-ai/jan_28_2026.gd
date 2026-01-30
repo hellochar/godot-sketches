@@ -14,6 +14,7 @@ const TimeSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems
 @onready var wellbeing_label: Label = %WellbeingLabel
 @onready var instructions_label: Label = %Instructions
 @onready var phase_label: Label = %PhaseLabel
+@onready var time_label: Label = %TimeLabel
 @onready var end_night_btn: Button = %EndNightBtn
 @onready var building_toolbar: HBoxContainer = %BuildingToolbar
 
@@ -278,6 +279,21 @@ func _update_time_display() -> void:
   phase_label.text = "Day %d - %s Phase" % [time_system.current_day, phase_text]
   end_night_btn.visible = time_system.is_night()
   day_label.text = "Day %d" % time_system.current_day
+  time_label.text = _format_clock_time(time_system.get_phase_progress(), time_system.is_day())
+
+func _format_clock_time(progress: float, is_day: bool) -> String:
+  var total_hours = 16.0 if is_day else 8.0
+  var start_hour = 6 if is_day else 22
+  var elapsed_hours = progress * total_hours
+  var hour = start_hour + int(elapsed_hours)
+  if hour >= 24:
+    hour -= 24
+  var minute = int(fmod(elapsed_hours, 1.0) * 60.0)
+  var suffix = "AM" if hour < 12 else "PM"
+  var display_hour = hour % 12
+  if display_hour == 0:
+    display_hour = 12
+  return "%d:%02d %s" % [display_hour, minute, suffix]
 
 func _process(_delta: float) -> void:
   if time_system:
