@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://yka2ynw1ww7e" path="res://jan_28_2026-psychebuilder-ai/jan_28_2026.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://jan_28_2026-psychebuilder-ai/src/scenes/game_world.tscn" id="2_game_world"]
-[ext_resource type="PackedScene" path="res://jan_28_2026-psychebuilder-ai/src/scenes/ui_layer.tscn" id="3_ui_layer"]
 
 [node name="PsycheBuilder" type="Control" unique_id=173724855]
 layout_mode = 3
@@ -16,4 +15,101 @@ script = ExtResource("1_script")
 
 [node name="GameWorld" parent="." unique_id=931979143 instance=ExtResource("2_game_world")]
 
-[node name="UILayer" parent="." unique_id=68908079 instance=ExtResource("3_ui_layer")]
+[node name="UILayer" type="CanvasLayer" parent="." unique_id=68908079]
+unique_name_in_owner = true
+layer = 10
+
+[node name="InfoPanel" type="PanelContainer" parent="UILayer" unique_id=1915629706]
+unique_name_in_owner = true
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 200.0
+offset_bottom = 150.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UILayer/InfoPanel" unique_id=152532775]
+layout_mode = 2
+
+[node name="EnergyLabel" type="Label" parent="UILayer/InfoPanel/VBoxContainer" unique_id=251109357]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Energy: 10/20"
+
+[node name="AttentionLabel" type="Label" parent="UILayer/InfoPanel/VBoxContainer" unique_id=750683920]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Attention: 0/10"
+
+[node name="DayLabel" type="Label" parent="UILayer/InfoPanel/VBoxContainer" unique_id=370669622]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Day 1"
+
+[node name="WellbeingLabel" type="Label" parent="UILayer/InfoPanel/VBoxContainer" unique_id=323671591]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Wellbeing: 35"
+
+[node name="Instructions" type="Label" parent="UILayer/InfoPanel/VBoxContainer" unique_id=1118386645]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Click building to select
+Click grid to place
+Right-click to cancel"
+
+[node name="TimeControls" type="HBoxContainer" parent="UILayer" unique_id=1232977541]
+unique_name_in_owner = true
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -250.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 50.0
+grow_horizontal = 0
+
+[node name="PhaseLabel" type="Label" parent="UILayer/TimeControls" unique_id=2015298302]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Day 1 - Day Phase"
+
+[node name="Speed1xBtn" type="Button" parent="UILayer/TimeControls" unique_id=1341145926]
+unique_name_in_owner = true
+layout_mode = 2
+text = "1x"
+
+[node name="Speed2xBtn" type="Button" parent="UILayer/TimeControls" unique_id=1880252205]
+unique_name_in_owner = true
+layout_mode = 2
+text = "2x"
+
+[node name="Speed3xBtn" type="Button" parent="UILayer/TimeControls" unique_id=2078874847]
+unique_name_in_owner = true
+layout_mode = 2
+text = "3x"
+
+[node name="EndNightBtn" type="Button" parent="UILayer/TimeControls" unique_id=1696295681]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "End Night"
+
+[node name="BuildingToolbar" type="HBoxContainer" parent="UILayer" unique_id=1684206290]
+unique_name_in_owner = true
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -60.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_vertical = 0
+
+[node name="Background" type="ColorRect" parent="UILayer/BuildingToolbar" unique_id=932989299]
+show_behind_parent = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+color = Color(0.1, 0.1, 0.15, 0.9)

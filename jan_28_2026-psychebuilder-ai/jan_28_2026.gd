@@ -8,6 +8,15 @@ const TimeSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems
 @onready var game_world = %GameWorld
 @onready var ui_layer: CanvasLayer = %UILayer
 
+@onready var energy_label: Label = %EnergyLabel
+@onready var attention_label: Label = %AttentionLabel
+@onready var day_label: Label = %DayLabel
+@onready var wellbeing_label: Label = %WellbeingLabel
+@onready var instructions_label: Label = %Instructions
+@onready var phase_label: Label = %PhaseLabel
+@onready var end_night_btn: Button = %EndNightBtn
+@onready var building_toolbar: HBoxContainer = %BuildingToolbar
+
 var resource_system: Node
 var building_system: Node
 var worker_system: Node
@@ -45,32 +54,14 @@ func _setup_systems() -> void:
   time_system.phase_changed.connect(_on_phase_changed)
 
 func _setup_ui() -> void:
-  _create_building_toolbar()
-  _create_info_panel()
-  _create_time_controls()
+  _populate_building_toolbar()
+  _connect_time_controls()
 
-func _create_building_toolbar() -> void:
-  var toolbar = HBoxContainer.new()
-  toolbar.name = "BuildingToolbar"
-  toolbar.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-  toolbar.offset_top = -60
-  toolbar.offset_bottom = -10
-  toolbar.offset_left = 10
-  toolbar.offset_right = -10
-
-  var bg = ColorRect.new()
-  bg.color = Color(0.1, 0.1, 0.15, 0.9)
-  bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-  bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-  toolbar.add_child(bg)
-  bg.show_behind_parent = true
-
+func _populate_building_toolbar() -> void:
   var unlocked = building_system.get_unlocked_buildings()
   for building_id in unlocked:
     var btn = _create_building_button(building_id)
-    toolbar.add_child(btn)
-
-  ui_layer.add_child(toolbar)
+    building_toolbar.add_child(btn)
 
 func _create_building_button(building_id: String) -> Button:
   var BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
@@ -90,45 +81,11 @@ func _create_building_button(building_id: String) -> Button:
   btn.pressed.connect(_on_building_selected.bind(building_id))
   return btn
 
-func _create_info_panel() -> void:
-  var panel = PanelContainer.new()
-  panel.name = "InfoPanel"
-  panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
-  panel.offset_left = 10
-  panel.offset_top = 10
-  panel.offset_right = 200
-  panel.offset_bottom = 150
-
-  var vbox = VBoxContainer.new()
-  vbox.name = "VBoxContainer"
-  panel.add_child(vbox)
-
-  var energy_label = Label.new()
-  energy_label.name = "EnergyLabel"
-  energy_label.text = "Energy: 10/20"
-  vbox.add_child(energy_label)
-
-  var attention_label = Label.new()
-  attention_label.name = "AttentionLabel"
-  attention_label.text = "Attention: 0/10"
-  vbox.add_child(attention_label)
-
-  var day_label = Label.new()
-  day_label.name = "DayLabel"
-  day_label.text = "Day 1"
-  vbox.add_child(day_label)
-
-  var wellbeing_label = Label.new()
-  wellbeing_label.name = "WellbeingLabel"
-  wellbeing_label.text = "Wellbeing: 35"
-  vbox.add_child(wellbeing_label)
-
-  var instructions = Label.new()
-  instructions.text = "Click building to select\nClick grid to place\nRight-click to cancel"
-  instructions.add_theme_font_size_override("font_size", 12)
-  vbox.add_child(instructions)
-
-  ui_layer.add_child(panel)
+func _connect_time_controls() -> void:
+  %Speed1xBtn.pressed.connect(func(): time_system.set_speed(1.0))
+  %Speed2xBtn.pressed.connect(func(): time_system.set_speed(2.0))
+  %Speed3xBtn.pressed.connect(func(): time_system.set_speed(3.0))
+  end_night_btn.pressed.connect(func(): time_system.end_night())
 
 func _on_building_selected(building_id: String) -> void:
   selected_building_id = building_id
@@ -247,11 +204,7 @@ func _cancel_transport_assignment() -> void:
   transport_resource_type = ""
 
 func _update_instructions(text: String) -> void:
-  var panel = ui_layer.get_node_or_null("InfoPanel")
-  if panel:
-    var vbox = panel.get_node_or_null("VBoxContainer")
-    if vbox and vbox.get_child_count() > 3:
-      vbox.get_child(3).text = text
+  instructions_label.text = text
 
 func _cancel_placement() -> void:
   is_placing = false
@@ -261,24 +214,14 @@ func _cancel_placement() -> void:
   _update_instructions("Click building to select\nClick grid to place\nRight-click to cancel")
 
 func _update_energy_display() -> void:
-  var panel = ui_layer.get_node_or_null("InfoPanel")
-  if panel:
-    var gs = get_node("/root/GameState")
-
-    var label = panel.get_node_or_null("VBoxContainer/EnergyLabel")
-    if label:
-      label.text = "Energy: %d/%d" % [gs.current_energy, gs.max_energy]
-
-    var att_label = panel.get_node_or_null("VBoxContainer/AttentionLabel")
-    if att_label and worker_system:
-      att_label.text = "Attention: %d/%d" % [worker_system.attention_used, worker_system.attention_pool]
-
-    var wb_label = panel.get_node_or_null("VBoxContainer/WellbeingLabel")
-    if wb_label:
-      _calculate_wellbeing()
-      var wb_color = _get_wellbeing_color(gs.wellbeing)
-      wb_label.text = "Wellbeing: %d" % int(gs.wellbeing)
-      wb_label.add_theme_color_override("font_color", wb_color)
+  var gs = get_node("/root/GameState")
+  energy_label.text = "Energy: %d/%d" % [gs.current_energy, gs.max_energy]
+  if worker_system:
+    attention_label.text = "Attention: %d/%d" % [worker_system.attention_used, worker_system.attention_pool]
+  _calculate_wellbeing()
+  var wb_color = _get_wellbeing_color(gs.wellbeing)
+  wellbeing_label.text = "Wellbeing: %d" % int(gs.wellbeing)
+  wellbeing_label.add_theme_color_override("font_color", wb_color)
 
 func _calculate_wellbeing() -> void:
   var gs = get_node("/root/GameState")
@@ -326,69 +269,15 @@ func spawn_worker_at(coord: Vector2i) -> Node:
   game_world.get_workers_layer().add_child(worker)
   return worker
 
-func _create_time_controls() -> void:
-  var panel = HBoxContainer.new()
-  panel.name = "TimeControls"
-  panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-  panel.offset_left = -250
-  panel.offset_top = 10
-  panel.offset_right = -10
-  panel.offset_bottom = 50
-
-  var phase_label = Label.new()
-  phase_label.name = "PhaseLabel"
-  phase_label.text = "Day 1 - Day Phase"
-  phase_label.custom_minimum_size = Vector2(120, 0)
-  panel.add_child(phase_label)
-
-  var speed_1x = Button.new()
-  speed_1x.text = "1x"
-  speed_1x.pressed.connect(func(): time_system.set_speed(1.0))
-  panel.add_child(speed_1x)
-
-  var speed_2x = Button.new()
-  speed_2x.text = "2x"
-  speed_2x.pressed.connect(func(): time_system.set_speed(2.0))
-  panel.add_child(speed_2x)
-
-  var speed_3x = Button.new()
-  speed_3x.text = "3x"
-  speed_3x.pressed.connect(func(): time_system.set_speed(3.0))
-  panel.add_child(speed_3x)
-
-  var end_night_btn = Button.new()
-  end_night_btn.name = "EndNightBtn"
-  end_night_btn.text = "End Night"
-  end_night_btn.visible = false
-  end_night_btn.pressed.connect(func(): time_system.end_night())
-  panel.add_child(end_night_btn)
-
-  ui_layer.add_child(panel)
-
 func _on_phase_changed(_is_day: bool) -> void:
   _update_time_display()
   _update_energy_display()
 
 func _update_time_display() -> void:
-  var controls = ui_layer.get_node_or_null("TimeControls")
-  if not controls:
-    return
-
-  var phase_label = controls.get_node_or_null("PhaseLabel")
-  var end_night_btn = controls.get_node_or_null("EndNightBtn")
-
-  if phase_label:
-    var phase_text = "Day" if time_system.is_day() else "Night"
-    phase_label.text = "Day %d - %s Phase" % [time_system.current_day, phase_text]
-
-  if end_night_btn:
-    end_night_btn.visible = time_system.is_night()
-
-  var panel = ui_layer.get_node_or_null("InfoPanel")
-  if panel:
-    var day_label = panel.get_node_or_null("VBoxContainer/DayLabel")
-    if day_label:
-      day_label.text = "Day %d" % time_system.current_day
+  var phase_text = "Day" if time_system.is_day() else "Night"
+  phase_label.text = "Day %d - %s Phase" % [time_system.current_day, phase_text]
+  end_night_btn.visible = time_system.is_night()
+  day_label.text = "Day %d" % time_system.current_day
 
 func _process(_delta: float) -> void:
   if time_system:
