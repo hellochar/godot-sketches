@@ -34,6 +34,10 @@ window/size/viewport_height=1080
 window/subwindows/embed_subwindows=false
 window/vsync/vsync_mode=0
 
+[debug]
+
+gdscript/warnings/unused_signal=0
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/daily_sketch/plugin.cfg", "res://addons/htags/plugin.cfg")
