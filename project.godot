@@ -23,9 +23,9 @@ config/icon="res://icon.svg"
 
 Utils="*res://_common/utils.gd"
 HTags="*uid://dfuf7asc72fs2"
-Config="*res://jan_28_2026/src/autoload/config.gd"
-EventBus="*res://jan_28_2026/src/autoload/event_bus.gd"
-GameState="*res://jan_28_2026/src/autoload/game_state.gd"
+Config="*res://jan_28_2026-psychebuilder-ai/src/autoload/config.gd"
+EventBus="*res://jan_28_2026-psychebuilder-ai/src/autoload/event_bus.gd"
+GameState="*res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd"
 
 [display]
 

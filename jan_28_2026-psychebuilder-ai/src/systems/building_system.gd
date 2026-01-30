@@ -1,8 +1,8 @@
 extends Node
 
-const BuildingScene = preload("res://jan_28_2026/src/entities/building.tscn")
-const BuildingDefs = preload("res://jan_28_2026/src/data/building_definitions.gd")
-const GridSystemScript = preload("res://jan_28_2026/src/systems/grid_system.gd")
+const BuildingScene = preload("res://jan_28_2026-psychebuilder-ai/src/entities/building.tscn")
+const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
+const GridSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems/grid_system.gd")
 
 var grid: RefCounted  # GridSystem
 var buildings_layer: Node2D

@@ -1,7 +1,7 @@
 extends Node2D
 
-const GridSystemScript = preload("res://jan_28_2026/src/systems/grid_system.gd")
-const BuildingDefs = preload("res://jan_28_2026/src/data/building_definitions.gd")
+const GridSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems/grid_system.gd")
+const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
 
 var grid: RefCounted  # GridSystem
 var hover_coord: Vector2i = Vector2i(-1, -1)

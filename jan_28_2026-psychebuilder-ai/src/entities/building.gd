@@ -1,6 +1,6 @@
 extends Node2D
 
-const BuildingDefs = preload("res://jan_28_2026/src/data/building_definitions.gd")
+const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
 
 var building_id: String
 var definition: Dictionary

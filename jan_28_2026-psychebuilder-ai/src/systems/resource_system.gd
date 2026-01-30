@@ -1,6 +1,6 @@
 extends Node
 
-const ResourceItemScene = preload("res://jan_28_2026/src/entities/resource_item.tscn")
+const ResourceItemScene = preload("res://jan_28_2026-psychebuilder-ai/src/entities/resource_item.tscn")
 
 var resource_types: Dictionary = {}  # id -> ResourceType
 var active_resources: Array[Node] = []
@@ -11,13 +11,13 @@ func _ready() -> void:
   _load_resource_types()
 
 func _load_resource_types() -> void:
-  var dir = DirAccess.open("res://jan_28_2026/resources/resource_types/")
+  var dir = DirAccess.open("res://jan_28_2026-psychebuilder-ai/resources/resource_types/")
   if dir:
     dir.list_dir_begin()
     var file_name = dir.get_next()
     while file_name != "":
       if file_name.ends_with(".tres"):
-        var res = load("res://jan_28_2026/resources/resource_types/" + file_name)
+        var res = load("res://jan_28_2026-psychebuilder-ai/resources/resource_types/" + file_name)
         if res and res.get("id"):
           resource_types[res.id] = res
       file_name = dir.get_next()

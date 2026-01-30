@@ -1,6 +1,6 @@
 extends Node
 
-const WorkerScene = preload("res://jan_28_2026/src/entities/worker.tscn")
+const WorkerScene = preload("res://jan_28_2026-psychebuilder-ai/src/entities/worker.tscn")
 
 var grid: RefCounted
 var workers: Array = []

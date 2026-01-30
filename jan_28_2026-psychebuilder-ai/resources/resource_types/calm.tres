@@ -1,6 +1,6 @@
-[gd_resource type="Resource" load_steps=2 format=3]
+[gd_resource type="Resource" format=3]
 
-[ext_resource type="Script" path="res://jan_28_2026/resources/resource_types/resource_type.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://0mjty1r6a1u5" path="res://jan_28_2026-psychebuilder-ai/resources/resource_types/resource_type.gd" id="1_script"]
 
 [resource]
 script = ExtResource("1_script")

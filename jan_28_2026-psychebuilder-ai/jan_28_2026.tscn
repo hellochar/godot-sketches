@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://c2sywl1e23v72"]
+
+[ext_resource type="Script" uid="uid://yka2ynw1ww7e" path="res://jan_28_2026-psychebuilder-ai/jan_28_2026.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://jan_28_2026-psychebuilder-ai/src/scenes/game_world.tscn" id="2_game_world"]
+[ext_resource type="PackedScene" path="res://jan_28_2026-psychebuilder-ai/src/scenes/ui_layer.tscn" id="3_ui_layer"]
+
+[node name="PsycheBuilder" type="Control" unique_id=173724855]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="GameWorld" parent="." unique_id=931979143 instance=ExtResource("2_game_world")]
+
+[node name="UILayer" parent="." unique_id=68908079 instance=ExtResource("3_ui_layer")]

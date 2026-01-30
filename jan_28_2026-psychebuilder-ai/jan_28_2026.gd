@@ -1,9 +1,9 @@
 extends Control
 
-const ResourceSystemScript = preload("res://jan_28_2026/src/systems/resource_system.gd")
-const BuildingSystemScript = preload("res://jan_28_2026/src/systems/building_system.gd")
-const WorkerSystemScript = preload("res://jan_28_2026/src/systems/worker_system.gd")
-const TimeSystemScript = preload("res://jan_28_2026/src/systems/time_system.gd")
+const ResourceSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems/resource_system.gd")
+const BuildingSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems/building_system.gd")
+const WorkerSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems/worker_system.gd")
+const TimeSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems/time_system.gd")
 
 @onready var game_world = %GameWorld
 @onready var ui_layer: CanvasLayer = %UILayer
@@ -72,7 +72,7 @@ func _create_building_toolbar() -> void:
   ui_layer.add_child(toolbar)
 
 func _create_building_button(building_id: String) -> Button:
-  var BuildingDefs = preload("res://jan_28_2026/src/data/building_definitions.gd")
+  var BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
   var def = BuildingDefs.get_definition(building_id)
 
   var btn = Button.new()
