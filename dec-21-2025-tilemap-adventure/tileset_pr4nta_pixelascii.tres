@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" load_steps=7 format=3 uid="uid://l77dh6fyg31k"]
+[gd_resource type="TileSet" format=3 uid="uid://l77dh6fyg31k"]
 
 [ext_resource type="Texture2D" uid="uid://d1o8wghdifppx" path="res://assets/pr4nta_pixelascii.png" id="1_38rm3"]
 
