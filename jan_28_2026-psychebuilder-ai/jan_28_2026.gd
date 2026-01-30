@@ -61,6 +61,7 @@ func _create_building_toolbar() -> void:
   var bg = ColorRect.new()
   bg.color = Color(0.1, 0.1, 0.15, 0.9)
   bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+  bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
   toolbar.add_child(bg)
   bg.show_behind_parent = true
 
