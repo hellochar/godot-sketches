@@ -5,6 +5,7 @@ signal resource_spawned(resource_type: String, location: Vector2, amount: int)
 signal resource_processed(input_type: String, output_type: String, building: Node)
 signal resource_decayed(resource_type: String, amount: int)
 signal resource_total_changed(resource_type: String, new_total: int)
+signal resource_overflow(resource_type: String, amount: int, building: Node, world_position: Vector2)
 
 # Building signals
 signal building_placed(building: Node, coord: Vector2i)

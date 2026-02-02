@@ -2,38 +2,40 @@ extends Node
 
 const BuildingScene = preload("res://jan_28_2026-psychebuilder-ai/src/entities/building.tscn")
 const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
-const GridSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems/grid_system.gd")
 
-var grid: RefCounted  # GridSystem
+@onready var game_state: Node = get_node("/root/GameState")
+@onready var event_bus: Node = get_node("/root/EventBus")
+
+var grid: Node  # GridSystem
 var buildings_layer: Node2D
-var active_buildings: Array[Node] = []
 var unlocked_buildings: Array = []
 
 func _ready() -> void:
   unlocked_buildings = BuildingDefs.get_all_unlocked()
 
-func setup(p_grid: RefCounted, p_buildings_layer: Node2D) -> void:
+func setup(p_grid: Node, p_buildings_layer: Node2D) -> void:
   grid = p_grid
   buildings_layer = p_buildings_layer
 
 func can_place(building_id: String, coord: Vector2i) -> bool:
+  return get_placement_failure_reason(building_id, coord) == ""
+
+func get_placement_failure_reason(building_id: String, coord: Vector2i) -> String:
   var def = BuildingDefs.get_definition(building_id)
   if def.is_empty():
-    return false
+    return "Unknown building type"
 
   var size = def.get("size", Vector2i(1, 1))
 
-  # Check if area is free
   if not grid.is_area_free(coord, size):
-    return false
+    return "Location is blocked"
 
-  # Check energy cost
   var cost = def.get("build_cost", {})
   var energy_cost = cost.get("energy", 0)
-  if energy_cost > get_node("/root/GameState").current_energy:
-    return false
+  if energy_cost > game_state.current_energy:
+    return "Not enough energy (%d needed)" % energy_cost
 
-  return true
+  return ""
 
 func place_building(building_id: String, coord: Vector2i) -> Node:
   if not can_place(building_id, coord):
@@ -46,7 +48,7 @@ func place_building(building_id: String, coord: Vector2i) -> Node:
   var cost = def.get("build_cost", {})
   var energy_cost = cost.get("energy", 0)
   if energy_cost > 0:
-    get_node("/root/GameState").spend_energy(energy_cost)
+    game_state.spend_energy(energy_cost)
 
   # Create building
   var building = BuildingScene.instantiate()
@@ -55,8 +57,7 @@ func place_building(building_id: String, coord: Vector2i) -> Node:
 
   # Add to scene
   buildings_layer.add_child(building)
-  active_buildings.append(building)
-  get_node("/root/GameState").active_buildings.append(building)
+  game_state.active_buildings.append(building)
 
   # Mark grid as occupied
   grid.occupy_area(coord, size, building)
@@ -64,12 +65,13 @@ func place_building(building_id: String, coord: Vector2i) -> Node:
   # Update connections for nearby buildings
   _update_nearby_connections(coord, size)
 
-  get_node("/root/EventBus").building_placed.emit(building, coord)
+  event_bus.building_placed.emit(building, coord)
 
   return building
 
 func remove_building(building: Node) -> void:
-  if building not in active_buildings:
+  var gs = game_state
+  if building not in gs.active_buildings:
     return
 
   var coord = building.grid_coord
@@ -79,10 +81,9 @@ func remove_building(building: Node) -> void:
   grid.clear_area(coord, size)
 
   # Remove from tracking
-  active_buildings.erase(building)
-  get_node("/root/GameState").active_buildings.erase(building)
+  gs.active_buildings.erase(building)
 
-  get_node("/root/EventBus").building_removed.emit(building, coord)
+  event_bus.building_removed.emit(building, coord)
 
   building.queue_free()
 
@@ -91,23 +92,23 @@ func remove_building(building: Node) -> void:
 
 func get_building_at(coord: Vector2i) -> Node:
   var occupant = grid.get_occupant(coord)
-  if occupant and occupant in active_buildings:
+  if occupant and occupant in game_state.active_buildings:
     return occupant
   return null
 
 func get_all_buildings() -> Array[Node]:
-  return active_buildings
+  return game_state.active_buildings
 
 func get_buildings_by_type(building_id: String) -> Array[Node]:
   var result: Array[Node] = []
-  for building in active_buildings:
+  for building in game_state.active_buildings:
     if building.building_id == building_id:
       result.append(building)
   return result
 
 func get_roads() -> Array[Node]:
   var result: Array[Node] = []
-  for building in active_buildings:
+  for building in game_state.active_buildings:
     if building.is_road():
       result.append(building)
   return result
@@ -123,7 +124,7 @@ func get_unlocked_buildings() -> Array:
   return unlocked_buildings
 
 func trigger_all_habits() -> void:
-  for building in active_buildings:
+  for building in game_state.active_buildings:
     building.trigger_habit()
 
 func is_connected_to_road(coord: Vector2i) -> bool:

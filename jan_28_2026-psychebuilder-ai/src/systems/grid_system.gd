@@ -1,10 +1,10 @@
-extends RefCounted
+extends Node
 
 var grid_size: Vector2i
 var tile_size: int
 var occupancy: Dictionary = {}  # Vector2i -> entity
 
-func _init(p_grid_size: Vector2i = Vector2i(50, 50), p_tile_size: int = 64) -> void:
+func setup(p_grid_size: Vector2i = Vector2i(50, 50), p_tile_size: int = 64) -> void:
   grid_size = p_grid_size
   tile_size = p_tile_size
 

@@ -3,7 +3,9 @@ extends Node2D
 const GridSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems/grid_system.gd")
 const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
 
-var grid: RefCounted  # GridSystem
+@onready var config: Node = get_node("/root/Config")
+
+var grid: Node  # GridSystem
 var hover_coord: Vector2i = Vector2i(-1, -1)
 
 @export var camera_speed: float = 500.0
@@ -30,7 +32,10 @@ var placement_building_id: String = ""
 var placement_size: Vector2i = Vector2i(1, 1)
 
 func _ready() -> void:
-  grid = GridSystemScript.new(get_node("/root/Config").grid_size, get_node("/root/Config").tile_size)
+  grid = GridSystemScript.new()
+  grid.name = "GridSystem"
+  add_child(grid)
+  grid.setup(config.grid_size, config.tile_size)
   _setup_background()
   _draw_grid_lines()
   _center_camera()
@@ -164,7 +169,7 @@ func set_placement_mode(enabled: bool, building_id: String = "") -> void:
 
   _update_hover_indicator()
 
-func get_grid() -> RefCounted:
+func get_grid() -> Node:
   return grid
 
 func get_buildings_layer() -> Node2D:
