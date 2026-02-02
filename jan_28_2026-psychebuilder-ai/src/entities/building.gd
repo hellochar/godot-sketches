@@ -26,6 +26,7 @@ enum SaturationState {
   WISDOM_SATURATED,
 }
 
+@export_group("Status Display")
 @export var status_colors: Dictionary = {
   Status.IDLE: Color(0.5, 0.5, 0.5),
   Status.PROCESSING: Color(0.2, 0.8, 0.2),
@@ -219,7 +220,9 @@ func _process_generation(delta: float) -> void:
   var resource_id = definition.get("generates", "")
   var grief_multiplier = _get_grief_speed_multiplier()
   var cascade_multiplier = 1.0 + (config.cascade_generator_boost_amount if cascade_boost_active else 0.0)
-  var effective_delta = delta * grief_multiplier * cascade_multiplier
+  var weather_modifier = game_state.get_weather_generation_modifier()
+  var belief_modifier = game_state.get_belief_generation_modifier()
+  var effective_delta = delta * grief_multiplier * cascade_multiplier * weather_modifier * belief_modifier
 
   if resource_id == "anxiety":
     var suppression = _get_calm_aura_suppression()
@@ -250,7 +253,9 @@ func _process_processing(delta: float) -> void:
   var wisdom_multiplier = _get_wisdom_efficiency_multiplier()
   var doubt_multiplier = _get_doubt_efficiency_multiplier()
   var resonance_multiplier = _get_resonance_speed_multiplier()
-  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier
+  var weather_modifier = game_state.get_weather_processing_modifier()
+  var belief_modifier = game_state.get_belief_processing_modifier()
+  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * weather_modifier * belief_modifier
   if process_timer <= 0:
     _complete_processing()
 
@@ -272,9 +277,12 @@ func _complete_processing() -> void:
   var inputs = definition.get("input", {})
   var processed_negative = false
   for input_resource in inputs:
-    if input_resource in ["anxiety", "grief"]:
+    if input_resource == "grief":
+      game_state.track_grief_processed(inputs[input_resource])
       processed_negative = true
-      break
+    elif input_resource == "anxiety":
+      game_state.track_anxiety_processed(inputs[input_resource])
+      processed_negative = true
 
   if processed_negative:
     _output_resource("tension", config.tension_from_processing)
@@ -284,11 +292,19 @@ func _complete_processing() -> void:
     for condition_resource in conditional_outputs:
       if storage.get(condition_resource, 0) > 0:
         var output_data = conditional_outputs[condition_resource]
+        _track_output_resource(output_data["output"], output_data["amount"])
         _cascade_output_resource(output_data["output"], output_data["amount"])
         return
   var outputs = definition.get("output", {})
   for resource_id in outputs:
+    _track_output_resource(resource_id, outputs[resource_id])
     _cascade_output_resource(resource_id, outputs[resource_id])
+
+func _track_output_resource(resource_id: String, amount: int) -> void:
+  if resource_id == "wisdom":
+    game_state.track_wisdom_generated(amount)
+  elif resource_id == "insight":
+    game_state.track_insight_generated(amount)
 
 func _process_coping(delta: float) -> void:
   if not has_behavior(BuildingDefs.Behavior.COPING):
@@ -452,43 +468,41 @@ func trigger_habit() -> void:
   if not has_behavior(BuildingDefs.Behavior.HABIT):
     return
 
-  # Consume resources if needed
   var consumes = definition.get("habit_consumes", {})
-  # For energy consumption, check global state
   var energy_cost = consumes.get("energy", 0)
   if energy_cost > 0:
     if not game_state.spend_energy(energy_cost):
       return
 
   var adjacency_multiplier = _get_habit_adjacency_multiplier()
+  var weather_modifier = game_state.get_weather_habit_modifier()
+  var belief_modifier = game_state.get_belief_habit_modifier()
+  var total_multiplier = adjacency_multiplier * weather_modifier * belief_modifier
 
-  # Cathartic release for exercise_yard
   if building_id == "exercise_yard":
     var release_result = _perform_cathartic_release()
     if release_result.calm_generated > 0:
       _output_resource("calm", release_result.calm_generated)
     if release_result.insight_generated > 0:
       _output_resource("insight", release_result.insight_generated)
+      game_state.track_insight_generated(release_result.insight_generated)
 
-  # Generate resources
   var generates = definition.get("habit_generates", {})
   for resource_id in generates:
-    var amount = int(generates[resource_id] * adjacency_multiplier)
+    var amount = int(generates[resource_id] * total_multiplier)
     _output_resource(resource_id, amount)
 
-  # Reduce resources (from storage first, then GameState totals)
   var reduces = definition.get("habit_reduces", {})
   for resource_id in reduces:
-    var to_reduce = int(reduces[resource_id] * adjacency_multiplier)
+    var to_reduce = int(reduces[resource_id] * total_multiplier)
     var removed = remove_from_storage(resource_id, to_reduce)
     var remaining = to_reduce - removed
     if remaining > 0:
       game_state.update_resource_total(resource_id, -remaining)
 
-  # Energy bonus
   var energy_bonus = definition.get("habit_energy_bonus", 0)
   if energy_bonus > 0:
-    var bonus_amount = int(energy_bonus * adjacency_multiplier)
+    var bonus_amount = int(energy_bonus * total_multiplier)
     game_state.add_energy(bonus_amount)
 
 func _update_status() -> void:

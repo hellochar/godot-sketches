@@ -16,13 +16,14 @@ var phase_time: float = 0.0
 var paused: bool = false
 var speed_multiplier: float = 1.0
 
-@export var day_duration: float = 45.0
-@export var night_duration: float = 10.0
-@export var total_days: int = 20
+var day_duration: float = 45.0
+var night_duration: float = 10.0
+var total_days: int = 20
 
 func _ready() -> void:
   if config:
     day_duration = config.day_duration_seconds
+    night_duration = config.night_duration_seconds
     total_days = config.total_days
 
 func _process(delta: float) -> void:
@@ -33,6 +34,7 @@ func _process(delta: float) -> void:
 
   match current_phase:
     Phase.DAY:
+      game_state.update_weather_momentum(delta * speed_multiplier)
       if phase_time >= day_duration:
         _transition_to_night()
     Phase.NIGHT:
@@ -41,6 +43,7 @@ func _process(delta: float) -> void:
 func _transition_to_night() -> void:
   current_phase = Phase.NIGHT
   phase_time = 0.0
+  game_state.on_day_end()
   _process_dream_recombinations()
   night_started.emit(current_day)
   phase_changed.emit(false)

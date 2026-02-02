@@ -45,3 +45,10 @@ signal nostalgia_crystallized(building: Node, output_type: String, amount: int)
 # Resonance signals
 signal resonance_formed(resource_type: String, buildings: Array, is_positive: bool)
 signal resonance_amplification(building: Node, resource_type: String, amount: int)
+
+# Belief signals
+signal belief_unlocked(belief: int)
+signal belief_progress_updated(belief: int, progress: float)
+
+# Weather signals
+signal weather_changed(old_weather: int, new_weather: int)

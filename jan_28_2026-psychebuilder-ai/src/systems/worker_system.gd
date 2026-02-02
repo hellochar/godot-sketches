@@ -11,12 +11,8 @@ var workers: Array = []
 var attention_pool: int = 10
 var attention_used: int = 0
 
-@export var habituation_thresholds: Array = [5, 15, 30, 50]
-@export var habituation_costs: Array = [1.0, 0.5, 0.25, 0.1, 0.0]
-
 func setup(p_grid: RefCounted) -> void:
   grid = p_grid
-  var config = config
   attention_pool = config.base_attention_pool if config else 10
 
 func get_available_attention() -> int:
@@ -63,10 +59,10 @@ func unassign_worker(worker: Node) -> void:
 
 func _calculate_attention_cost(worker: Node, job_type: String, target_a: Node, target_b: Node, resource_type: String) -> int:
   var job_id = _make_job_id(job_type, target_a, target_b, resource_type)
-  var game_state = game_state
-  var completions = game_state.habituation_progress.get(job_id, 0)
+  var gs = game_state
+  var completions = gs.habituation_progress.get(job_id, 0)
   var tier = _get_habituation_tier(completions)
-  var cost_multiplier = habituation_costs[tier]
+  var cost_multiplier = config.habituation_costs[tier]
   return ceili(cost_multiplier)
 
 func _make_job_id(job_type: String, target_a: Node, target_b: Node, resource_type: String) -> String:
@@ -77,10 +73,11 @@ func _make_job_id(job_type: String, target_a: Node, target_b: Node, resource_typ
   return ""
 
 func _get_habituation_tier(completions: int) -> int:
-  for i in range(habituation_thresholds.size()):
-    if completions < habituation_thresholds[i]:
+  var thresholds = config.habituation_thresholds
+  for i in range(thresholds.size()):
+    if completions < thresholds[i]:
       return i
-  return habituation_thresholds.size()
+  return thresholds.size()
 
 func _refund_attention(worker: Node) -> void:
   if worker.job_type == "":
@@ -94,8 +91,8 @@ func update_habituation(worker: Node) -> void:
   var old_cost = _calculate_attention_cost(worker, worker.job_type, target_a, worker.dest_building, worker.resource_type)
 
   var job_id = _make_job_id(worker.job_type, target_a, worker.dest_building, worker.resource_type)
-  var game_state = game_state
-  game_state.increment_habituation(job_id)
+  var gs = game_state
+  gs.increment_habituation(job_id)
 
   var new_cost = _calculate_attention_cost(worker, worker.job_type, target_a, worker.dest_building, worker.resource_type)
 

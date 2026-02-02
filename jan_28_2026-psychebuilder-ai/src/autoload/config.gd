@@ -1,48 +1,48 @@
 extends Node
 
-# Time
+@export_group("Time")
 @export var day_duration_seconds: float = 45.0
+@export var night_duration_seconds: float = 10.0
 @export var total_days: int = 20
 
-# Energy
+@export_group("Energy")
 @export var starting_energy: int = 10
 @export var max_energy: int = 20
 @export var energy_regen_per_day: int = 3
 
-# Attention
+@export_group("Attention")
 @export var base_attention_pool: int = 10
 @export var habituation_thresholds: Array[int] = [5, 15, 30, 50]
 @export var habituation_costs: Array[float] = [1.0, 0.5, 0.25, 0.1, 0.0]
 
-# Wellbeing
+@export_group("Wellbeing")
 @export var positive_emotion_weight: float = 2.0
 @export var negative_emotion_weight: float = 1.5
 @export var habit_building_weight: float = 1.0
 
-# Endings
+@export_group("Endings")
 @export var flourishing_threshold: int = 80
 @export var growing_threshold: int = 50
 @export var surviving_threshold: int = 20
 
-# Grid
+@export_group("Grid")
 @export var grid_size: Vector2i = Vector2i(50, 50)
 @export var tile_size: int = 64
 
-# Anxiety Spreading
+@export_group("Anxiety Spreading")
 @export var anxiety_overflow_threshold: int = 8
 @export var anxiety_spread_amount: int = 1
 @export var anxiety_spread_interval: float = 5.0
 
-# Grief Slowdown
+@export_group("Grief Slowdown")
 @export var grief_slowdown_threshold: int = 3
 @export var grief_slowdown_factor: float = 0.15
 @export var grief_max_slowdown: float = 0.7
 
-# Habit Adjacency
+@export_group("Habit Adjacency")
 @export var habit_adjacency_bonus: float = 0.25
 @export var habit_max_adjacency_multiplier: float = 2.0
 
-# Joy Speed Boost
 @export_group("Joy Speed Boost")
 @export var joy_carry_speed_bonus: float = 0.5
 @export var joy_proximity_speed_bonus: float = 0.3
@@ -167,3 +167,36 @@ extends Node
 @export var cascade_processor_transfer: int = 1
 @export var cascade_generator_boost_duration: float = 3.0
 @export var cascade_generator_boost_amount: float = 0.5
+
+@export_group("Core Beliefs")
+@export var belief_grief_required: int = 20
+@export var belief_joy_threshold: int = 10
+@export var belief_joy_days_required: int = 5
+@export var belief_calm_threshold: int = 8
+@export var belief_calm_days_required: int = 5
+@export var belief_wisdom_required: int = 15
+@export var belief_insight_required: int = 12
+@export var belief_handle_difficulty_bonus: float = 0.2
+@export var belief_joy_resilient_bonus: float = 0.15
+@export var belief_calm_foundation_bonus: float = 0.15
+@export var belief_growth_adversity_bonus: float = 0.2
+@export var belief_mindful_awareness_bonus: float = 0.1
+
+@export_group("Emotional Weather")
+@export var weather_resource_scale: float = 20.0
+@export var weather_momentum_lerp: float = 0.5
+@export var weather_storm_threshold: float = 1.5
+@export var weather_overcast_threshold: float = 1.0
+@export var weather_fog_threshold: float = 1.2
+@export var weather_stillness_threshold: float = 1.2
+@export var weather_clear_threshold: float = 1.0
+@export var weather_clear_processing_bonus: float = 0.15
+@export var weather_clear_joy_gen_bonus: float = 0.2
+@export var weather_clear_habit_bonus: float = 0.1
+@export var weather_storm_processing_penalty: float = 0.25
+@export var weather_storm_negative_gen_bonus: float = 0.3
+@export var weather_storm_habit_penalty: float = 0.2
+@export var weather_overcast_grief_gen_bonus: float = 0.15
+@export var weather_fog_processing_penalty: float = 0.1
+@export var weather_stillness_processing_bonus: float = 0.1
+@export var weather_stillness_habit_bonus: float = 0.15
