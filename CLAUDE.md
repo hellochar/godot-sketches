@@ -50,7 +50,7 @@
 
 ## Testing with gdUnit4
 - **When to write tests:** Write tests for logic-heavy code (state machines, calculations, game rules, utilities). Skip tests for UI-only or scene-setup code.
-- **Test location:** Place tests in `<sketch>/tests/` folder (e.g., `jan_28_2026-psychebuilder-ai/tests/test_game_state.gd`)
+- **Test location:** Place tests in `<sketch>/tests/` folder (e.g., `jan_28_2026-psychebuilder-ai/tests/test_game_state.gd`). gdUnit4 looks for folders named `tests/` by project setting.
 - **Run tests for a sketch:**
   ```bash
   "/c/Users/hello/godot/Godot_v4.6-stable_win64.exe/Godot_v4.6-stable_win64_console.exe" --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -rc 1 --add res://<sketch>/tests
