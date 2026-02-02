@@ -92,3 +92,21 @@ extends Node
 @export var wisdom_efficiency_bonus_per_unit: float = 0.1
 @export var wisdom_max_efficiency_bonus: float = 0.5
 @export var wisdom_aura_radius: int = 2
+
+# Worry Compounding
+@export_group("Worry Compounding")
+@export var worry_compounding_threshold: int = 3
+@export var worry_compounding_interval: float = 8.0
+@export var worry_compounding_amount: int = 1
+@export var worry_compounding_max: int = 15
+
+# Doubt Propagation
+@export_group("Doubt Propagation")
+@export var doubt_generation_interval: float = 10.0
+@export var doubt_from_waiting: int = 1
+@export var doubt_from_disconnected: int = 1
+@export var doubt_spread_radius: int = 2
+@export var doubt_efficiency_penalty: float = 0.1
+@export var doubt_max_efficiency_penalty: float = 0.4
+@export var doubt_insight_combine_threshold: int = 2
+@export var wisdom_from_answered_doubt: int = 1

@@ -206,6 +206,52 @@ static var definitions: Dictionary = {
     "storage_capacity": 12,
     "unlocked_by_default": true,
   },
+
+  "rumination_spiral": {
+    "id": "rumination_spiral",
+    "name": "Rumination Spiral",
+    "description": "Obsessive thought patterns that generate Worry. Left unchecked, Worry compounds on itself.",
+    "behaviors": [Behavior.GENERATOR, Behavior.STORAGE],
+    "build_cost": {"energy": 0},
+    "size": Vector2i(1, 1),
+    "color": Color(0.6, 0.4, 0.5),
+    "generates": "worry",
+    "generation_rate": 0.12,
+    "generation_amount": 1,
+    "storage_capacity": 8,
+    "unlocked_by_default": true,
+  },
+
+  "grounding_station": {
+    "id": "grounding_station",
+    "name": "Grounding Station",
+    "description": "Combines Worry and Calm to produce Insight through mindful awareness.",
+    "behaviors": [Behavior.PROCESSOR, Behavior.STORAGE],
+    "build_cost": {"energy": 5},
+    "size": Vector2i(2, 2),
+    "color": Color(0.5, 0.7, 0.6),
+    "input": {"worry": 2, "calm": 1},
+    "output": {"insight": 1},
+    "process_time": 6.0,
+    "requires_worker": false,
+    "storage_capacity": 10,
+    "unlocked_by_default": true,
+  },
+
+  "inner_critic": {
+    "id": "inner_critic",
+    "name": "Inner Critic",
+    "description": "A harsh internal voice that generates Doubt, slowing nearby buildings.",
+    "behaviors": [Behavior.GENERATOR, Behavior.STORAGE],
+    "build_cost": {"energy": 0},
+    "size": Vector2i(1, 1),
+    "color": Color(0.5, 0.4, 0.4),
+    "generates": "doubt",
+    "generation_rate": 0.1,
+    "generation_amount": 1,
+    "storage_capacity": 6,
+    "unlocked_by_default": true,
+  },
 }
 
 static func get_definition(building_id: String) -> Dictionary:

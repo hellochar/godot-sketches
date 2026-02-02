@@ -57,6 +57,12 @@ var coping_cooldown_timer: float = 0.0
 # Anxiety spreading state
 var anxiety_spread_timer: float = 0.0
 
+# Worry compounding state
+var worry_compounding_timer: float = 0.0
+
+# Doubt generation state
+var doubt_generation_timer: float = 0.0
+
 # Visual
 @onready var sprite: ColorRect = %ColorRect
 @onready var label: Label = %Label
@@ -155,6 +161,9 @@ func _process(delta: float) -> void:
   _process_processing(delta)
   _process_coping(delta)
   _process_anxiety_spreading(delta)
+  _process_worry_compounding(delta)
+  _process_doubt_generation(delta)
+  _process_doubt_insight_combination()
   _update_status()
   _update_status_visual()
 
@@ -200,7 +209,8 @@ func _process_processing(delta: float) -> void:
   var grief_multiplier = _get_grief_speed_multiplier()
   var tension_multiplier = _get_tension_speed_multiplier()
   var wisdom_multiplier = _get_wisdom_efficiency_multiplier()
-  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier
+  var doubt_multiplier = _get_doubt_efficiency_multiplier()
+  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier
   if process_timer <= 0:
     _complete_processing()
 
@@ -623,3 +633,84 @@ func _perform_cathartic_release() -> Dictionary:
     "calm_generated": calm_generated,
     "insight_generated": insight_generated
   }
+
+func _process_worry_compounding(delta: float) -> void:
+  if storage_capacity <= 0:
+    return
+
+  var worry_amount = storage.get("worry", 0)
+  if worry_amount < config.worry_compounding_threshold:
+    worry_compounding_timer = 0.0
+    return
+
+  if worry_amount >= config.worry_compounding_max:
+    return
+
+  worry_compounding_timer += delta
+  if worry_compounding_timer >= config.worry_compounding_interval:
+    worry_compounding_timer = 0.0
+    _output_resource("worry", config.worry_compounding_amount)
+
+func _process_doubt_generation(delta: float) -> void:
+  if storage_capacity <= 0:
+    return
+
+  var should_generate = false
+  if not road_connected and not is_road():
+    should_generate = true
+  if current_status == Status.WAITING_INPUT or current_status == Status.WAITING_WORKER:
+    should_generate = true
+
+  if not should_generate:
+    doubt_generation_timer = 0.0
+    return
+
+  doubt_generation_timer += delta
+  if doubt_generation_timer >= config.doubt_generation_interval:
+    doubt_generation_timer = 0.0
+    var amount = 0
+    if not road_connected and not is_road():
+      amount += config.doubt_from_disconnected
+    if current_status == Status.WAITING_INPUT or current_status == Status.WAITING_WORKER:
+      amount += config.doubt_from_waiting
+    if amount > 0:
+      _output_resource("doubt", amount)
+
+func _process_doubt_insight_combination() -> void:
+  if storage_capacity <= 0:
+    return
+
+  var doubt_amount = storage.get("doubt", 0)
+  var insight_amount = storage.get("insight", 0)
+
+  if doubt_amount >= config.doubt_insight_combine_threshold and insight_amount >= config.doubt_insight_combine_threshold:
+    remove_from_storage("doubt", config.doubt_insight_combine_threshold)
+    remove_from_storage("insight", config.doubt_insight_combine_threshold)
+    _output_resource("wisdom", config.wisdom_from_answered_doubt)
+
+func _get_doubt_efficiency_multiplier() -> float:
+  var doubt_amount = _get_nearby_doubt() + storage.get("doubt", 0)
+  if doubt_amount <= 0:
+    return 1.0
+  var penalty = doubt_amount * config.doubt_efficiency_penalty
+  penalty = minf(penalty, config.doubt_max_efficiency_penalty)
+  return 1.0 - penalty
+
+func _get_nearby_doubt() -> int:
+  if not grid:
+    return 0
+
+  var total_doubt = 0
+  var radius = config.doubt_spread_radius
+
+  for x in range(-radius, size.x + radius):
+    for y in range(-radius, size.y + radius):
+      if x >= 0 and x < size.x and y >= 0 and y < size.y:
+        continue
+      var check = grid_coord + Vector2i(x, y)
+      if grid.is_valid_coord(check):
+        var occupant = grid.get_occupant(check)
+        if occupant and occupant != self and occupant.has_method("get_storage_amount"):
+          total_doubt += occupant.get_storage_amount("doubt")
+
+  return total_doubt
