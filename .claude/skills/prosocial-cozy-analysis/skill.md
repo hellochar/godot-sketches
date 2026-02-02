@@ -1,11 +1,11 @@
 ---
 name: prosocial-cozy-analysis
-description: Analyze game designs for prosocial and cozy elements using Lost Garden frameworks—evaluate kindness, friendship formation, economic health, and identify toxicity risks
+description: Analyze game designs for prosocial and cozy elements—evaluate kindness, friendship formation, economic health, and identify toxicity risks
 ---
 
 # Prosocial & Cozy Game Analysis Skill
 
-Evaluate game designs against established frameworks for prosocial multiplayer and cozy game design, based on Daniel Cook's Lost Garden research and Project Horseshoe think tank findings.
+Evaluate game designs against established frameworks for prosocial multiplayer and cozy game design.
 
 ## When to Use This Skill
 
@@ -278,19 +278,3 @@ When evaluating social scale:
 
 Servers/groups exceeding 150 active players make repeated encounters rare, harming friendship formation.
 
----
-
-## Reference Framework Sources
-
-This skill synthesizes frameworks from:
-- Daniel Cook's Lost Garden blog
-- Project Horseshoe game design think tanks (2016-2022)
-- Polaris Game Design Retreat papers
-- GDC presentations on Kind Games
-
-Key articles:
-- "Kind Games: Designing for Prosocial Multiplayer" (2023)
-- "Cozy Games" (2018)
-- "Prosocial Economics for Game Design" (2020)
-- "Game Design Patterns for Building Friendships" (2017)
-- "Social Design Practices for Human-Scale Online Games" (2018)

@@ -1,11 +1,11 @@
 ---
 name: tightness-auditor
-description: Audit game mechanics for cause-and-effect clarity using Daniel Cook's tightness framework—identify feedback gaps, ambiguous systems, and recommend improvements
+description: Audit game mechanics for cause-and-effect clarity—identify feedback gaps, ambiguous systems, and recommend improvements
 ---
 
 # Tightness Auditor
 
-Audit game mechanics for "tightness" - the clarity of cause-and-effect relationships. Identify feedback gaps, ambiguous systems, and places where players can't form accurate mental models. Based on Daniel Cook's "Building Tight Game Systems" framework.
+Audit game mechanics for "tightness" - the clarity of cause-and-effect relationships. Identify feedback gaps, ambiguous systems, and places where players can't form accurate mental models.
 
 ## When to Use This Skill
 
@@ -47,7 +47,7 @@ Players learn through feedback loops. If they can't form accurate mental models:
 - They can't improve because they don't know what to improve
 - They quit
 
-**Cook's key insight**: "Feedback failures are the most common error in new designs."
+**Key insight**: "Feedback failures are the most common error in new designs."
 
 ---
 
@@ -428,10 +428,3 @@ FIXES RECOMMENDED:
    - Effort: Low (code only)
 ```
 
----
-
-## Reference
-
-Based on Daniel Cook's framework:
-- [Building Tight Game Systems of Cause and Effect](https://lostgarden.com/2012/07/01/building-tight-game-systems-of-cause-and-effect/)
-- [The Chemistry of Game Design](https://lostgarden.com/2007/07/19/the-chemistry-of-game-design/)

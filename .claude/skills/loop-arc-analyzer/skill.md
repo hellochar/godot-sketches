@@ -1,11 +1,11 @@
 ---
 name: loop-arc-analyzer
-description: Categorize game content as loops or arcs using Daniel Cook's framework—calculate replayability ratio, match content structure to business model, and identify filler
+description: Categorize game content as loops or arcs—calculate replayability ratio, match content structure to business model, and identify filler
 ---
 
 # Loop-Arc Analyzer
 
-Categorize game content as loops (repeatable skill-based gameplay) or arcs (consumable one-time content) using Daniel Cook's framework. Calculate replayability, match to business models, and identify what's core vs filler.
+Categorize game content as loops (repeatable skill-based gameplay) or arcs (consumable one-time content). Calculate replayability, match to business models, and identify what's core vs filler.
 
 ## When to Use This Skill
 
@@ -367,9 +367,3 @@ If pivoting to live service:
   - Reduce side quest investment, increase system depth
 ```
 
----
-
-## Reference
-
-Based on Daniel Cook's framework:
-- [Loops and Arcs](https://lostgarden.com/2012/04/30/loops-and-arcs/)

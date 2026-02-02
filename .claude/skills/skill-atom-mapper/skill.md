@@ -1,11 +1,11 @@
 ---
 name: skill-atom-mapper
-description: Map game mechanics as skill atoms and chains using Daniel Cook's Chemistry of Game Design framework—identify learning loops, burnout risks, and mastery paths
+description: Map game mechanics as skill atoms and chains—identify learning loops, burnout risks, and mastery paths
 ---
 
 # Skill Atom Mapper
 
-Diagram game mechanics as skill atoms and skill chains based on Daniel Cook's "Chemistry of Game Design" framework. Identify how players learn, where they might burn out, and how skills build on each other.
+Diagram game mechanics as skill atoms and skill chains. Identify how players learn, where they might burn out, and how skills build on each other.
 
 ## When to Use This Skill
 
@@ -351,11 +351,3 @@ graph TD
     SA6 --> SA7[SA-7: Tetris Setup]
 ```
 
----
-
-## Reference
-
-Based on Daniel Cook's frameworks:
-- [The Chemistry of Game Design](https://lostgarden.com/2007/07/19/the-chemistry-of-game-design/)
-- [Smashing the Game Design Atom](https://lostgarden.com/2007/11/17/project-horseshoe-2007-slides-smashing-the-game-design-atom/)
-- [Building Tight Game Systems of Cause and Effect](https://lostgarden.com/2012/07/01/building-tight-game-systems-of-cause-and-effect/)

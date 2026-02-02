@@ -5,7 +5,7 @@ description: Analyze game concepts against the genre lifecycle—identify lifecy
 
 # Genre Position Analyzer
 
-Analyze game concepts using Daniel Cook's genre lifecycle model. Identify where genres sit in their lifecycle, assess competitive landscape, and generate strategic recommendations tailored to indie developers.
+Analyze game concepts using the genre lifecycle model. Identify where genres sit in their lifecycle, assess competitive landscape, and generate strategic recommendations tailored to indie developers.
 
 ## When to Use This Skill
 
@@ -465,12 +465,3 @@ TEAM FIT: Solo/Small
   Risk is acceptable for experienced indie
 ```
 
----
-
-## Reference
-
-Based on Daniel Cook's frameworks:
-- [Game Genre Lifecycle: Part I](https://lostgarden.com/2005/05/06/game-genre-lifecycle-part-i/)
-- [Nintendo's Genre Innovation Strategy](http://www.lostgarden.com/2005/09/nintendos-genre-innovation-strategy.html)
-- [A Practical Definition of Innovation in Game Design](https://lostgarden.com/2005/04/03/a-practical-definition-of-innovation-in-game-design/)
-- [Playground Game Design as Sustainable Competitive Advantage](https://lostgarden.com/2006/07/15/playground-game-design-as-a-sustainable-competitive-advantage/)

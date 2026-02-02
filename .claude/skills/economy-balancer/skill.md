@@ -5,7 +5,7 @@ description: Model and balance game economies using the faucet-drain frameworkâ€
 
 # Economy Balancer
 
-Model game economies using Daniel Cook's faucet-drain (value chain) framework. Define resource sources, transforms, and sinks to calculate steady states, identify bottlenecks, and balance resource flows.
+Model game economies using the faucet-drain (value chain) framework. Define resource sources, transforms, and sinks to calculate steady states, identify bottlenecks, and balance resource flows.
 
 ## When to Use This Skill
 
@@ -419,10 +419,3 @@ STEADY STATE REQUIREMENT:
   Leather: 0.5/hour
 ```
 
----
-
-## Reference
-
-Based on Daniel Cook's frameworks:
-- [Value Chains](https://lostgarden.com/2021/12/12/value-chains/)
-- [Prosocial Economics for Game Design](https://lostgarden.com/2020/01/11/prosocial-economics-for-game-design/)
