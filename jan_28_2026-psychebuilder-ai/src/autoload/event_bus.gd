@@ -96,3 +96,7 @@ signal building_healed(building: Node, new_fragility: float)
 signal resource_stagnated(building: Node, resource_type: String, stagnation_level: float)
 signal resource_decayed_to_severe(building: Node, old_type: String, new_type: String)
 signal fresh_resource_bonus(building: Node, resource_type: String)
+
+signal attention_echo_refund(building: Node, stagnation_level: float, refund_amount: float)
+signal overflow_transmuted(building: Node, from_type: String, to_type: String, amount: int)
+signal suppression_field_created(building: Node, position: Vector2, radius: int, duration: float)

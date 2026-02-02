@@ -138,6 +138,13 @@ var fragility_leak_timer: float = 0.0
 var resource_age_data: Dictionary = {}
 var stagnation_decay_timer: float = 0.0
 
+# Attention echo state
+var attention_echo_cooldown_timer: float = 0.0
+
+# Suppression field state
+var suppression_field_active: bool = false
+var suppression_field_timer: float = 0.0
+
 # Visual
 @onready var sprite: ColorRect = %ColorRect
 @onready var label: Label = %Label
@@ -271,6 +278,8 @@ func _process(delta: float) -> void:
   _process_attunement(delta)
   _process_fragility(delta)
   _process_stagnation(delta)
+  _process_attention_echo_cooldown(delta)
+  _process_suppression_field(delta)
   _update_status()
   _update_status_visual()
 
@@ -382,6 +391,7 @@ func _complete_processing() -> void:
   _gain_fragility(inputs)
   _build_emotional_echo(inputs)
   _gain_awakening_experience()
+  _try_attention_echo_refund(inputs)
 
   var has_fresh = false
   for input_resource in inputs:
@@ -564,9 +574,12 @@ func _output_resource(resource_id: String, amount: int, purity: float = -1.0) ->
 
   var overflow = amount - to_store
   if overflow > 0:
-    var tile_size = config.tile_size
-    var spawn_pos = position + Vector2(size) * tile_size * 0.5 + Vector2(randf_range(-16, 16), randf_range(-16, 16))
-    event_bus.resource_overflow.emit(resource_id, overflow, self, spawn_pos)
+    var transmuted = _try_overflow_transmutation(resource_id, overflow)
+    var remaining_overflow = overflow - transmuted
+    if remaining_overflow > 0:
+      var tile_size = config.tile_size
+      var spawn_pos = position + Vector2(size) * tile_size * 0.5 + Vector2(randf_range(-16, 16), randf_range(-16, 16))
+      event_bus.resource_overflow.emit(resource_id, remaining_overflow, self, spawn_pos)
 
 func _cascade_output_resource(resource_id: String, amount: int) -> void:
   var remaining = _try_cascade_output(resource_id, amount)
@@ -756,8 +769,13 @@ func _get_habit_adjacency_multiplier() -> float:
   return minf(1.0 + bonus, config.habit_max_adjacency_multiplier)
 
 func _get_calm_aura_suppression() -> float:
+  var base_suppression = 0.0
+
+  if is_affected_by_suppression_field():
+    base_suppression = config.transmutation_suppression_strength
+
   if not grid:
-    return 0.0
+    return base_suppression
 
   var total_calm = 0
   var radius = config.calm_aura_radius
@@ -777,11 +795,13 @@ func _get_calm_aura_suppression() -> float:
           total_calm += int(calm_amount * saturation_mult)
 
   if total_calm < config.calm_aura_threshold:
-    return 0.0
+    return base_suppression
 
   var excess_calm = total_calm - config.calm_aura_threshold
-  var suppression = excess_calm * config.calm_aura_suppression
-  return minf(suppression, config.calm_aura_max_suppression)
+  var calm_suppression = excess_calm * config.calm_aura_suppression
+  calm_suppression = minf(calm_suppression, config.calm_aura_max_suppression)
+
+  return minf(base_suppression + calm_suppression, config.calm_aura_max_suppression)
 
 func _get_nearby_tension() -> int:
   if not grid:
@@ -1931,3 +1951,166 @@ func is_resource_fresh(resource_id: String) -> bool:
   if not resource_age_data.has(resource_id):
     return true
   return resource_age_data[resource_id].get("age", 0.0) < config.stagnation_fresh_threshold
+
+func _process_attention_echo_cooldown(delta: float) -> void:
+  if attention_echo_cooldown_timer > 0:
+    attention_echo_cooldown_timer -= delta
+
+func _try_attention_echo_refund(inputs: Dictionary) -> void:
+  if attention_echo_cooldown_timer > 0:
+    return
+
+  var max_stagnation = 0.0
+  for resource_id in inputs:
+    var stagnation = get_resource_stagnation(resource_id)
+    if stagnation > max_stagnation:
+      max_stagnation = stagnation
+
+  if max_stagnation < config.attention_echo_stagnation_threshold:
+    return
+
+  var stagnation_factor = (max_stagnation - config.attention_echo_stagnation_threshold) / (config.stagnation_max_level - config.attention_echo_stagnation_threshold)
+  var refund = config.attention_echo_base_refund + stagnation_factor * config.attention_echo_stagnation_multiplier
+
+  if is_awakened:
+    refund *= (1.0 + config.attention_echo_awakened_bonus)
+
+  refund = minf(refund, config.attention_echo_max_refund)
+
+  game_state.free_attention(refund)
+  attention_echo_cooldown_timer = config.attention_echo_cooldown
+  event_bus.attention_echo_refund.emit(self, max_stagnation, refund)
+
+func _try_overflow_transmutation(resource_id: String, overflow_amount: int) -> int:
+  if randf() > config.transmutation_chance:
+    return 0
+
+  var nearby_resources = _scan_nearby_resources_for_transmutation()
+  var transmuted_amount = 0
+
+  for recipe_key in config.transmutation_recipes:
+    var parts = recipe_key.split("+")
+    if parts.size() != 2:
+      continue
+
+    var overflow_type = parts[0]
+    var catalyst_type = parts[1]
+
+    if resource_id != overflow_type:
+      continue
+
+    var catalyst_amount = nearby_resources.get(catalyst_type, 0)
+    if catalyst_amount < config.transmutation_threshold:
+      continue
+
+    var result_type = config.transmutation_recipes[recipe_key]
+    var transmute_count = mini(overflow_amount - transmuted_amount, catalyst_amount / config.transmutation_threshold)
+
+    if transmute_count <= 0:
+      continue
+
+    if result_type == "suppression_field":
+      _create_suppression_field()
+      transmuted_amount += transmute_count
+      event_bus.overflow_transmuted.emit(self, resource_id, "suppression_field", transmute_count)
+    else:
+      _output_transmuted_resource(result_type, transmute_count)
+      transmuted_amount += transmute_count
+      event_bus.overflow_transmuted.emit(self, resource_id, result_type, transmute_count)
+
+    break
+
+  return transmuted_amount
+
+func _scan_nearby_resources_for_transmutation() -> Dictionary:
+  var result: Dictionary = {}
+  var radius = config.transmutation_radius
+
+  result[saturation_resource] = storage.get(saturation_resource, 0) if saturation_resource != "" else 0
+
+  for resource_id in storage:
+    result[resource_id] = result.get(resource_id, 0) + storage.get(resource_id, 0)
+
+  if not grid:
+    return result
+
+  for x in range(-radius, size.x + radius):
+    for y in range(-radius, size.y + radius):
+      if x >= 0 and x < size.x and y >= 0 and y < size.y:
+        continue
+      var check = grid_coord + Vector2i(x, y)
+      if grid.is_valid_coord(check):
+        var occupant = grid.get_occupant(check)
+        if occupant and occupant != self and occupant.has_method("get_storage_amount"):
+          for resource_id in ["joy", "grief", "calm", "anxiety", "wisdom", "insight", "worry", "doubt"]:
+            var amount = occupant.get_storage_amount(resource_id)
+            if amount > 0:
+              result[resource_id] = result.get(resource_id, 0) + amount
+
+  return result
+
+func _output_transmuted_resource(resource_id: String, amount: int) -> void:
+  var neighbors = _get_adjacent_buildings()
+  for neighbor in neighbors:
+    if neighbor.storage_capacity > 0:
+      var overflow = neighbor.add_to_storage(resource_id, amount)
+      if overflow < amount:
+        return
+
+  var tile_size = config.tile_size
+  var spawn_pos = position + Vector2(size) * tile_size * 0.5 + Vector2(randf_range(-16, 16), randf_range(-16, 16))
+  event_bus.resource_overflow.emit(resource_id, amount, self, spawn_pos)
+
+func _create_suppression_field() -> void:
+  suppression_field_active = true
+  suppression_field_timer = config.transmutation_suppression_duration
+  var tile_size = config.tile_size
+  var field_position = position + Vector2(size) * tile_size * 0.5
+  event_bus.suppression_field_created.emit(self, field_position, config.transmutation_suppression_radius, config.transmutation_suppression_duration)
+
+func _process_suppression_field(delta: float) -> void:
+  if not suppression_field_active:
+    return
+
+  suppression_field_timer -= delta
+  if suppression_field_timer <= 0:
+    suppression_field_active = false
+    return
+
+  if not grid:
+    return
+
+  var radius = config.transmutation_suppression_radius
+  for x in range(-radius, size.x + radius):
+    for y in range(-radius, size.y + radius):
+      if x >= 0 and x < size.x and y >= 0 and y < size.y:
+        continue
+      var check = grid_coord + Vector2i(x, y)
+      if grid.is_valid_coord(check):
+        var occupant = grid.get_occupant(check)
+        if occupant and occupant != self and occupant.has_method("get_storage_amount"):
+          var anxiety = occupant.get_storage_amount("anxiety")
+          if anxiety > 0:
+            var suppress_amount = int(anxiety * config.transmutation_suppression_strength * delta)
+            if suppress_amount > 0:
+              occupant.remove_from_storage("anxiety", suppress_amount)
+
+func get_suppression_field_strength() -> float:
+  if not suppression_field_active:
+    return 0.0
+  return config.transmutation_suppression_strength
+
+func is_affected_by_suppression_field() -> bool:
+  if not grid:
+    return false
+
+  var radius = config.transmutation_suppression_radius
+  for x in range(-radius, size.x + radius):
+    for y in range(-radius, size.y + radius):
+      var check = grid_coord + Vector2i(x, y)
+      if grid.is_valid_coord(check):
+        var occupant = grid.get_occupant(check)
+        if occupant and occupant != self and occupant.has_method("get_suppression_field_strength"):
+          if occupant.get_suppression_field_strength() > 0:
+            return true
+  return false

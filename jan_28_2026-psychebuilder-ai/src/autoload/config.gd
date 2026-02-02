@@ -337,3 +337,27 @@ extends Node
   "worry": "dread",
 }
 @export var stagnation_severe_emotions: Array[String] = ["despair", "panic", "dread", "numbness"]
+
+@export_group("Attention Echoes")
+@export var attention_echo_stagnation_threshold: float = 0.5
+@export var attention_echo_base_refund: float = 0.5
+@export var attention_echo_max_refund: float = 2.0
+@export var attention_echo_stagnation_multiplier: float = 1.5
+@export var attention_echo_cooldown: float = 10.0
+@export var attention_echo_awakened_bonus: float = 0.3
+
+@export_group("Overflow Transmutation")
+@export var transmutation_chance: float = 0.3
+@export var transmutation_radius: int = 2
+@export var transmutation_threshold: int = 3
+@export var transmutation_recipes: Dictionary = {
+  "joy+grief": "nostalgia",
+  "anxiety+calm": "tension",
+  "grief+wisdom": "insight",
+  "calm+anxiety": "suppression_field",
+  "worry+joy": "calm",
+  "doubt+insight": "wisdom",
+}
+@export var transmutation_suppression_duration: float = 8.0
+@export var transmutation_suppression_radius: int = 2
+@export var transmutation_suppression_strength: float = 0.5
