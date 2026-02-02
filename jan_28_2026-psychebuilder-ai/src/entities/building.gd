@@ -145,6 +145,19 @@ var attention_echo_cooldown_timer: float = 0.0
 var suppression_field_active: bool = false
 var suppression_field_timer: float = 0.0
 
+# Building mastery state (resource_type -> total processed)
+var mastery_processed: Dictionary = {}
+var mastery_levels: Dictionary = {}
+var dominant_mastery: String = ""
+var is_specialized: bool = false
+
+# Resource velocity state
+var velocity_history: Array[Dictionary] = []
+var velocity_current: float = 0.0
+var velocity_momentum: float = 0.0
+var velocity_sustained_timer: float = 0.0
+var velocity_last_process_time: float = 0.0
+
 # Visual
 @onready var sprite: ColorRect = %ColorRect
 @onready var label: Label = %Label
@@ -228,26 +241,36 @@ func _update_connection_visual() -> void:
 
 func _update_storage_display() -> void:
   var name_text = definition.get("name", building_id)
+  var status_indicators = ""
+  if attuned_partners.size() > 0:
+    status_indicators += "A"
+  if is_specialized:
+    status_indicators += "M"
+  if velocity_momentum >= 0.5:
+    status_indicators += "V"
+  if status_indicators != "":
+    name_text += " [%s]" % status_indicators
   if storage_capacity > 0:
     var _total = _get_total_stored()
     var storage_text = ""
     for res_id in storage:
       if storage[res_id] > 0:
         var purity = storage_purity.get(res_id, config.purity_initial_level)
-        var purity_indicator = ""
+        var mastery_level = get_mastery_level(res_id)
+        var indicator = ""
         if purity >= config.purity_output_bonus_threshold:
-          purity_indicator = "*"
+          indicator += "*"
         elif purity <= config.purity_min_level + 0.1:
-          purity_indicator = "~"
-        storage_text += "\n%s: %d%s" % [res_id, storage[res_id], purity_indicator]
+          indicator += "~"
+        if mastery_level >= config.mastery_max_level:
+          indicator += "!"
+        elif mastery_level > 0:
+          indicator += "+" + str(mastery_level)
+        storage_text += "\n%s: %d%s" % [res_id, storage[res_id], indicator]
     if storage_text == "":
       storage_text = "\n(empty)"
-    if attuned_partners.size() > 0:
-      name_text += " [A]"
     label.text = name_text + storage_text
   else:
-    if attuned_partners.size() > 0:
-      name_text += " [A]"
     label.text = name_text
 
 func _process(delta: float) -> void:
@@ -280,6 +303,8 @@ func _process(delta: float) -> void:
   _process_stagnation(delta)
   _process_attention_echo_cooldown(delta)
   _process_suppression_field(delta)
+  _process_mastery(delta)
+  _process_velocity(delta)
   _update_status()
   _update_status_visual()
 
@@ -347,7 +372,9 @@ func _process_processing(delta: float) -> void:
   var attunement_multiplier = get_attunement_speed_multiplier()
   var fragility_multiplier = _get_fragility_speed_multiplier()
   var stagnation_multiplier = _get_stagnation_speed_multiplier()
-  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier * fatigue_multiplier * echo_multiplier * harmony_multiplier * flow_multiplier * purity_multiplier * attunement_multiplier * fragility_multiplier * stagnation_multiplier
+  var mastery_multiplier = get_mastery_speed_multiplier()
+  var velocity_multiplier = get_velocity_speed_multiplier()
+  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier * fatigue_multiplier * echo_multiplier * harmony_multiplier * flow_multiplier * purity_multiplier * attunement_multiplier * fragility_multiplier * stagnation_multiplier * mastery_multiplier * velocity_multiplier
   if process_timer <= 0:
     _complete_processing()
 
@@ -392,6 +419,8 @@ func _complete_processing() -> void:
   _build_emotional_echo(inputs)
   _gain_awakening_experience()
   _try_attention_echo_refund(inputs)
+  _gain_mastery(inputs)
+  _record_velocity_event(inputs)
 
   var has_fresh = false
   for input_resource in inputs:
@@ -407,7 +436,8 @@ func _complete_processing() -> void:
   var harmony_bonus = get_harmony_output_bonus()
   var purity_bonus = get_purity_output_bonus()
   var attunement_bonus = get_attunement_output_bonus()
-  var total_bonus = awakening_bonus + harmony_bonus + purity_bonus + attunement_bonus
+  var mastery_bonus = get_mastery_output_bonus()
+  var total_bonus = awakening_bonus + harmony_bonus + purity_bonus + attunement_bonus + mastery_bonus
 
   var synergy = try_attunement_synergy()
   if synergy.get("triggered", false):
@@ -2114,3 +2144,170 @@ func is_affected_by_suppression_field() -> bool:
           if occupant.get_suppression_field_strength() > 0:
             return true
   return false
+
+func _process_mastery(delta: float) -> void:
+  if mastery_processed.is_empty():
+    return
+
+  for resource_id in mastery_processed.keys():
+    if resource_id != dominant_mastery:
+      mastery_processed[resource_id] = maxf(0.0, mastery_processed[resource_id] - config.mastery_decay_rate * delta)
+
+  _update_dominant_mastery()
+
+func _gain_mastery(inputs: Dictionary) -> void:
+  for resource_id in inputs:
+    var amount = inputs[resource_id]
+    var current = mastery_processed.get(resource_id, 0.0)
+    mastery_processed[resource_id] = current + amount
+
+    var old_level = mastery_levels.get(resource_id, 0)
+    var new_level = _calculate_mastery_level(resource_id)
+
+    if new_level > old_level:
+      mastery_levels[resource_id] = new_level
+      event_bus.mastery_level_gained.emit(self, resource_id, new_level)
+
+  _update_dominant_mastery()
+
+func _calculate_mastery_level(resource_id: String) -> int:
+  var processed = mastery_processed.get(resource_id, 0.0)
+  var level = 0
+  for threshold in config.mastery_thresholds:
+    if processed >= threshold:
+      level += 1
+    else:
+      break
+  return mini(level, config.mastery_max_level)
+
+func _update_dominant_mastery() -> void:
+  var max_processed = 0.0
+  var total_processed = 0.0
+  var new_dominant = ""
+
+  for resource_id in mastery_processed:
+    total_processed += mastery_processed[resource_id]
+    if mastery_processed[resource_id] > max_processed:
+      max_processed = mastery_processed[resource_id]
+      new_dominant = resource_id
+
+  var old_specialized = is_specialized
+  dominant_mastery = new_dominant
+
+  if total_processed > 0:
+    is_specialized = (max_processed / total_processed) >= config.mastery_specialization_threshold
+  else:
+    is_specialized = false
+
+  if is_specialized and not old_specialized and dominant_mastery != "":
+    event_bus.mastery_specialization_achieved.emit(self, dominant_mastery)
+
+func get_mastery_level(resource_id: String) -> int:
+  return mastery_levels.get(resource_id, 0)
+
+func get_mastery_speed_multiplier() -> float:
+  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    return 1.0
+
+  var inputs = definition.get("input", {})
+  if inputs.is_empty():
+    return 1.0
+
+  var total_bonus = 0.0
+  var total_penalty = 0.0
+  var count = 0
+
+  for resource_id in inputs:
+    var level = get_mastery_level(resource_id)
+    total_bonus += level * config.mastery_speed_bonus_per_level
+
+    if is_specialized and resource_id != dominant_mastery:
+      total_penalty += config.mastery_cross_penalty
+    count += 1
+
+  if count == 0:
+    return 1.0
+
+  return 1.0 + (total_bonus / count) - total_penalty
+
+func get_mastery_output_bonus() -> int:
+  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    return 0
+
+  var inputs = definition.get("input", {})
+  for resource_id in inputs:
+    if get_mastery_level(resource_id) >= config.mastery_max_level:
+      return config.mastery_output_bonus_at_max
+
+  return 0
+
+func _process_velocity(delta: float) -> void:
+  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    return
+
+  var current_time = Time.get_ticks_msec() / 1000.0
+  _cleanup_velocity_history(current_time)
+  _calculate_velocity()
+
+  if velocity_current >= config.velocity_high_threshold:
+    velocity_sustained_timer += delta
+    velocity_momentum = minf(velocity_momentum + config.velocity_momentum_gain * delta, config.velocity_momentum_max)
+
+    if velocity_sustained_timer >= config.velocity_sustained_threshold:
+      if velocity_momentum >= 0.5:
+        event_bus.velocity_burst_triggered.emit(self, velocity_current)
+  else:
+    velocity_sustained_timer = maxf(0.0, velocity_sustained_timer - delta * 2.0)
+    velocity_momentum = maxf(0.0, velocity_momentum - config.velocity_momentum_decay * delta)
+
+func _record_velocity_event(inputs: Dictionary) -> void:
+  var current_time = Time.get_ticks_msec() / 1000.0
+  var total_amount = 0
+  for resource_id in inputs:
+    total_amount += inputs[resource_id]
+
+  velocity_history.append({
+    "time": current_time,
+    "amount": total_amount
+  })
+  velocity_last_process_time = current_time
+
+func _cleanup_velocity_history(current_time: float) -> void:
+  var cutoff_time = current_time - config.velocity_sample_window
+  while velocity_history.size() > 0 and velocity_history[0]["time"] < cutoff_time:
+    velocity_history.pop_front()
+
+func _calculate_velocity() -> void:
+  if velocity_history.size() < 2:
+    velocity_current = 0.0
+    return
+
+  var total_amount = 0.0
+  for entry in velocity_history:
+    total_amount += entry["amount"]
+
+  velocity_current = total_amount / config.velocity_sample_window
+
+func get_velocity_speed_multiplier() -> float:
+  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    return 1.0
+
+  var base_multiplier = 1.0
+
+  if velocity_current >= config.velocity_high_threshold:
+    var excess = velocity_current - config.velocity_high_threshold
+    var normalized = minf(excess / config.velocity_high_threshold, 1.0)
+    base_multiplier += config.velocity_high_speed_bonus * normalized
+  elif velocity_current < config.velocity_low_threshold and velocity_history.size() > 0:
+    var deficit = config.velocity_low_threshold - velocity_current
+    var normalized = minf(deficit / config.velocity_low_threshold, 1.0)
+    base_multiplier -= config.velocity_low_speed_penalty * normalized
+
+  var momentum_bonus = velocity_momentum * config.velocity_burst_bonus
+  return base_multiplier + momentum_bonus
+
+func get_velocity() -> float:
+  return velocity_current
+
+func get_velocity_momentum() -> float:
+  return velocity_momentum

@@ -361,3 +361,24 @@ extends Node
 @export var transmutation_suppression_duration: float = 8.0
 @export var transmutation_suppression_radius: int = 2
 @export var transmutation_suppression_strength: float = 0.5
+
+@export_group("Building Mastery")
+@export var mastery_thresholds: Array[int] = [10, 30, 60, 100]
+@export var mastery_speed_bonus_per_level: float = 0.1
+@export var mastery_output_bonus_at_max: int = 1
+@export var mastery_max_level: int = 4
+@export var mastery_decay_rate: float = 0.001
+@export var mastery_cross_penalty: float = 0.05
+@export var mastery_specialization_threshold: float = 0.7
+
+@export_group("Resource Velocity")
+@export var velocity_sample_window: float = 10.0
+@export var velocity_high_threshold: float = 2.0
+@export var velocity_low_threshold: float = 0.3
+@export var velocity_high_speed_bonus: float = 0.25
+@export var velocity_low_speed_penalty: float = 0.15
+@export var velocity_sustained_threshold: float = 5.0
+@export var velocity_burst_bonus: float = 0.1
+@export var velocity_momentum_gain: float = 0.05
+@export var velocity_momentum_decay: float = 0.02
+@export var velocity_momentum_max: float = 1.0

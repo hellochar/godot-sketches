@@ -100,3 +100,8 @@ signal fresh_resource_bonus(building: Node, resource_type: String)
 signal attention_echo_refund(building: Node, stagnation_level: float, refund_amount: float)
 signal overflow_transmuted(building: Node, from_type: String, to_type: String, amount: int)
 signal suppression_field_created(building: Node, position: Vector2, radius: int, duration: float)
+
+signal mastery_level_gained(building: Node, resource_type: String, new_level: int)
+signal mastery_specialization_achieved(building: Node, resource_type: String)
+signal velocity_burst_triggered(building: Node, velocity: float)
+signal velocity_momentum_changed(building: Node, momentum: float)
