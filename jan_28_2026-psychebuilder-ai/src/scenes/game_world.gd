@@ -8,11 +8,21 @@ const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/buildi
 var grid: Node  # GridSystem
 var hover_coord: Vector2i = Vector2i(-1, -1)
 
+@export_group("Camera")
 @export var camera_speed: float = 500.0
 @export var zoom_speed: float = 0.1
 @export var min_zoom: float = 0.25
 @export var max_zoom: float = 2.0
+
+@export_group("Grid Display")
 @export var show_grid_lines: bool = true
+@export var grid_line_color: Color = Color(0.25, 0.22, 0.3, 0.5)
+@export var grid_line_width: float = 1.0
+
+@export_group("Hover Indicator")
+@export var hover_valid_color: Color = Color(0.3, 1, 0.3, 0.4)
+@export var hover_invalid_color: Color = Color(1, 0.3, 0.3, 0.4)
+@export var hover_selected_color: Color = Color(0.5, 0.5, 1, 0.4)
 
 @onready var camera: Camera2D = %Camera
 @onready var grid_overlay: Node2D = %GridOverlay
@@ -49,20 +59,19 @@ func _draw_grid_lines() -> void:
     return
 
   var world_size = Vector2(grid.grid_size) * grid.tile_size
-  var line_color = Color(0.25, 0.22, 0.3, 0.5)
 
   for x in range(grid.grid_size.x + 1):
     var line = Line2D.new()
-    line.width = 1.0
-    line.default_color = line_color
+    line.width = grid_line_width
+    line.default_color = grid_line_color
     line.add_point(Vector2(x * grid.tile_size, 0))
     line.add_point(Vector2(x * grid.tile_size, world_size.y))
     grid_overlay.add_child(line)
 
   for y in range(grid.grid_size.y + 1):
     var line = Line2D.new()
-    line.width = 1.0
-    line.default_color = line_color
+    line.width = grid_line_width
+    line.default_color = grid_line_color
     line.add_point(Vector2(0, y * grid.tile_size))
     line.add_point(Vector2(world_size.x, y * grid.tile_size))
     grid_overlay.add_child(line)
@@ -143,19 +152,18 @@ func _update_hover_indicator() -> void:
   var tile_size = grid.tile_size
   hover_indicator.size = Vector2(placement_size) * tile_size
 
-  # Color based on placement validity
   if placement_mode:
     var can_place = grid.is_area_free(hover_coord, placement_size)
     if can_place:
-      hover_indicator.color = Color(0.3, 1, 0.3, 0.4)
+      hover_indicator.color = hover_valid_color
     else:
-      hover_indicator.color = Color(1, 0.3, 0.3, 0.4)
+      hover_indicator.color = hover_invalid_color
   else:
     hover_indicator.size = Vector2(tile_size, tile_size)
     if grid.is_occupied(hover_coord):
-      hover_indicator.color = Color(0.5, 0.5, 1, 0.4)  # Blue for selected
+      hover_indicator.color = hover_selected_color
     else:
-      hover_indicator.color = Color(0.3, 1, 0.3, 0.4)
+      hover_indicator.color = hover_valid_color
 
 func set_placement_mode(enabled: bool, building_id: String = "") -> void:
   placement_mode = enabled

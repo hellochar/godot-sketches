@@ -6,9 +6,11 @@
 script = ExtResource("1_script")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+unique_name_in_owner = true
 scale = Vector2(0.5, 0.5)
 
 [node name="Label" type="Label" parent="."]
+unique_name_in_owner = true
 visible = false
 offset_left = -16.0
 offset_top = -24.0

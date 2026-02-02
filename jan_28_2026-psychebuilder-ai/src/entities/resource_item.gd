@@ -4,8 +4,8 @@ var resource_type: Resource  # ResourceType
 var amount: int = 1
 var carried_by: Node = null
 
-@onready var sprite: Sprite2D = $Sprite2D
-@onready var label: Label = $Label
+@onready var sprite: Sprite2D = %Sprite2D
+@onready var label: Label = %Label
 
 static var circle_texture: ImageTexture
 

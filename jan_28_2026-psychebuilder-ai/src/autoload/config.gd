@@ -75,3 +75,20 @@ extends Node
 @export var contamination_speed_negative: float = 0.2
 @export var contamination_speed_positive: float = 0.15
 @export var contamination_max_level: float = 5.0
+
+# Tension Accumulation
+@export_group("Tension Accumulation")
+@export var tension_from_processing: int = 1
+@export var tension_slowdown_threshold: int = 5
+@export var tension_slowdown_factor: float = 0.1
+@export var tension_max_slowdown: float = 0.5
+@export var tension_aura_radius: int = 2
+@export var cathartic_release_calm_per_tension: float = 0.5
+@export var cathartic_release_insight_chance: float = 0.2
+
+# Wisdom Efficiency Aura
+@export_group("Wisdom Efficiency")
+@export var wisdom_efficiency_threshold: int = 2
+@export var wisdom_efficiency_bonus_per_unit: float = 0.1
+@export var wisdom_max_efficiency_bonus: float = 0.5
+@export var wisdom_aura_radius: int = 2

@@ -33,16 +33,57 @@ var selected_building: Node = null
 @export_group("Building Removal")
 @export var removal_refund_percent: float = 0.5
 
-# Worker selection state
 var selected_worker: Node = null
 @export_group("Worker Selection")
 @export var worker_click_radius: float = 16.0
 
-# Building hover tooltip
 var hovered_building: Node = null
 var building_tooltip: PanelContainer = null
 @export_group("Tooltip")
 @export var tooltip_offset: Vector2 = Vector2(15, 15)
+@export var tooltip_name_font_size: int = 14
+@export var tooltip_desc_font_size: int = 11
+@export var tooltip_desc_color: Color = Color(0.7, 0.7, 0.7)
+@export var tooltip_status_font_size: int = 12
+@export var tooltip_min_width: float = 220.0
+
+@export_group("UI Toolbar")
+@export var toolbar_height: float = 50.0
+@export var toolbar_margin: float = 10.0
+@export var toolbar_bg_color: Color = Color(0.1, 0.1, 0.15, 0.9)
+@export var building_button_size: Vector2 = Vector2(80, 40)
+
+@export_group("Info Panel")
+@export var info_panel_size: Vector2 = Vector2(190, 140)
+@export var info_panel_margin: float = 10.0
+@export var instructions_font_size: int = 12
+
+@export_group("Time Controls")
+@export var phase_label_min_width: float = 120.0
+@export var speed_options: Array[float] = [1.0, 2.0, 3.0]
+
+@export_group("Wellbeing Colors")
+@export var wellbeing_high_color: Color = Color(0.3, 0.9, 0.3)
+@export var wellbeing_medium_color: Color = Color(0.9, 0.9, 0.3)
+@export var wellbeing_low_color: Color = Color(0.9, 0.3, 0.3)
+@export var wellbeing_high_threshold: float = 70.0
+@export var wellbeing_medium_threshold: float = 40.0
+
+@export_group("Game End")
+@export var end_overlay_color: Color = Color(0, 0, 0, 0.7)
+@export var end_panel_half_width: float = 200.0
+@export var end_panel_half_height: float = 180.0
+@export var end_panel_margin: int = 20
+@export var end_title_font_size: int = 28
+@export var end_tier_font_size: int = 36
+@export var end_desc_font_size: int = 14
+@export var end_wellbeing_font_size: int = 20
+@export var end_stats_font_size: int = 14
+@export var end_button_size: Vector2 = Vector2(120, 40)
+@export var tier_flourishing_color: Color = Color(0.2, 0.9, 0.4)
+@export var tier_growing_color: Color = Color(0.5, 0.8, 0.3)
+@export var tier_surviving_color: Color = Color(0.9, 0.7, 0.2)
+@export var tier_struggling_color: Color = Color(0.9, 0.3, 0.3)
 
 func _ready() -> void:
   _setup_systems()
@@ -80,13 +121,13 @@ func _create_building_toolbar() -> void:
   var toolbar = HBoxContainer.new()
   toolbar.name = "BuildingToolbar"
   toolbar.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-  toolbar.offset_top = -60
-  toolbar.offset_bottom = -10
-  toolbar.offset_left = 10
-  toolbar.offset_right = -10
+  toolbar.offset_top = -(toolbar_height + toolbar_margin)
+  toolbar.offset_bottom = -toolbar_margin
+  toolbar.offset_left = toolbar_margin
+  toolbar.offset_right = -toolbar_margin
 
   var bg = ColorRect.new()
-  bg.color = Color(0.1, 0.1, 0.15, 0.9)
+  bg.color = toolbar_bg_color
   bg.set_anchors_preset(Control.PRESET_FULL_RECT)
   toolbar.add_child(bg)
   bg.show_behind_parent = true
@@ -105,7 +146,7 @@ func _create_building_button(building_id: String) -> Button:
   var btn = Button.new()
   btn.name = building_id
   btn.text = def.get("name", building_id)
-  btn.custom_minimum_size = Vector2(80, 40)
+  btn.custom_minimum_size = building_button_size
   btn.tooltip_text = def.get("description", "")
 
   var cost = def.get("build_cost", {})
@@ -120,10 +161,10 @@ func _create_info_panel() -> void:
   var panel = PanelContainer.new()
   panel.name = "InfoPanel"
   panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
-  panel.offset_left = 10
-  panel.offset_top = 10
-  panel.offset_right = 200
-  panel.offset_bottom = 150
+  panel.offset_left = info_panel_margin
+  panel.offset_top = info_panel_margin
+  panel.offset_right = info_panel_margin + info_panel_size.x
+  panel.offset_bottom = info_panel_margin + info_panel_size.y
 
   var vbox = VBoxContainer.new()
   vbox.name = "VBoxContainer"
@@ -152,7 +193,7 @@ func _create_info_panel() -> void:
   var instructions = Label.new()
   instructions.name = "InstructionsLabel"
   instructions.text = "Click building to select\nClick grid to place\nRight-click to cancel"
-  instructions.add_theme_font_size_override("font_size", 12)
+  instructions.add_theme_font_size_override("font_size", instructions_font_size)
   vbox.add_child(instructions)
 
   ui_layer.add_child(panel)
@@ -447,12 +488,12 @@ func _calculate_wellbeing() -> void:
   game_state.set_wellbeing(new_wellbeing)
 
 func _get_wellbeing_color(value: float) -> Color:
-  if value >= 70:
-    return Color(0.3, 0.9, 0.3)
-  elif value >= 40:
-    return Color(0.9, 0.9, 0.3)
+  if value >= wellbeing_high_threshold:
+    return wellbeing_high_color
+  elif value >= wellbeing_medium_threshold:
+    return wellbeing_medium_color
   else:
-    return Color(0.9, 0.3, 0.3)
+    return wellbeing_low_color
 
 func get_resource_system() -> Node:
   return resource_system
@@ -474,30 +515,21 @@ func _create_time_controls() -> void:
   panel.name = "TimeControls"
   panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
   panel.offset_left = -250
-  panel.offset_top = 10
-  panel.offset_right = -10
+  panel.offset_top = info_panel_margin
+  panel.offset_right = -info_panel_margin
   panel.offset_bottom = 50
 
   var phase_label = Label.new()
   phase_label.name = "PhaseLabel"
   phase_label.text = "Day 1 - Day Phase"
-  phase_label.custom_minimum_size = Vector2(120, 0)
+  phase_label.custom_minimum_size = Vector2(phase_label_min_width, 0)
   panel.add_child(phase_label)
 
-  var speed_1x = Button.new()
-  speed_1x.text = "1x"
-  speed_1x.pressed.connect(func(): time_system.set_speed(1.0))
-  panel.add_child(speed_1x)
-
-  var speed_2x = Button.new()
-  speed_2x.text = "2x"
-  speed_2x.pressed.connect(func(): time_system.set_speed(2.0))
-  panel.add_child(speed_2x)
-
-  var speed_3x = Button.new()
-  speed_3x.text = "3x"
-  speed_3x.pressed.connect(func(): time_system.set_speed(3.0))
-  panel.add_child(speed_3x)
+  for speed_value in speed_options:
+    var speed_btn = Button.new()
+    speed_btn.text = "%dx" % int(speed_value)
+    speed_btn.pressed.connect(func(): time_system.set_speed(speed_value))
+    panel.add_child(speed_btn)
 
   var end_night_btn = Button.new()
   end_night_btn.name = "EndNightBtn"
@@ -556,15 +588,15 @@ func _create_building_tooltip() -> void:
 
   var name_label = Label.new()
   name_label.name = "NameLabel"
-  name_label.add_theme_font_size_override("font_size", 14)
+  name_label.add_theme_font_size_override("font_size", tooltip_name_font_size)
   vbox.add_child(name_label)
 
   var desc_label = Label.new()
   desc_label.name = "DescLabel"
-  desc_label.add_theme_font_size_override("font_size", 11)
-  desc_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+  desc_label.add_theme_font_size_override("font_size", tooltip_desc_font_size)
+  desc_label.add_theme_color_override("font_color", tooltip_desc_color)
   desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-  desc_label.custom_minimum_size.x = 220
+  desc_label.custom_minimum_size.x = tooltip_min_width
   vbox.add_child(desc_label)
 
   var separator = HSeparator.new()
@@ -572,22 +604,22 @@ func _create_building_tooltip() -> void:
 
   var status_label = Label.new()
   status_label.name = "StatusLabel"
-  status_label.add_theme_font_size_override("font_size", 12)
+  status_label.add_theme_font_size_override("font_size", tooltip_status_font_size)
   vbox.add_child(status_label)
 
   var storage_label = Label.new()
   storage_label.name = "StorageLabel"
-  storage_label.add_theme_font_size_override("font_size", 12)
+  storage_label.add_theme_font_size_override("font_size", tooltip_status_font_size)
   vbox.add_child(storage_label)
 
   var production_label = Label.new()
   production_label.name = "ProductionLabel"
-  production_label.add_theme_font_size_override("font_size", 12)
+  production_label.add_theme_font_size_override("font_size", tooltip_status_font_size)
   vbox.add_child(production_label)
 
   var connection_label = Label.new()
   connection_label.name = "ConnectionLabel"
-  connection_label.add_theme_font_size_override("font_size", 11)
+  connection_label.add_theme_font_size_override("font_size", tooltip_desc_font_size)
   vbox.add_child(connection_label)
 
   ui_layer.add_child(building_tooltip)
@@ -765,23 +797,23 @@ func _on_game_ended(ending_tier: String) -> void:
 func _create_game_end_screen(ending_tier: String) -> void:
   var overlay = ColorRect.new()
   overlay.name = "GameEndOverlay"
-  overlay.color = Color(0, 0, 0, 0.7)
+  overlay.color = end_overlay_color
   overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
   overlay.mouse_filter = Control.MOUSE_FILTER_STOP
 
   var center_panel = PanelContainer.new()
   center_panel.set_anchors_preset(Control.PRESET_CENTER)
-  center_panel.offset_left = -200
-  center_panel.offset_right = 200
-  center_panel.offset_top = -180
-  center_panel.offset_bottom = 180
+  center_panel.offset_left = -end_panel_half_width
+  center_panel.offset_right = end_panel_half_width
+  center_panel.offset_top = -end_panel_half_height
+  center_panel.offset_bottom = end_panel_half_height
   overlay.add_child(center_panel)
 
   var margin = MarginContainer.new()
-  margin.add_theme_constant_override("margin_left", 20)
-  margin.add_theme_constant_override("margin_right", 20)
-  margin.add_theme_constant_override("margin_top", 20)
-  margin.add_theme_constant_override("margin_bottom", 20)
+  margin.add_theme_constant_override("margin_left", end_panel_margin)
+  margin.add_theme_constant_override("margin_right", end_panel_margin)
+  margin.add_theme_constant_override("margin_top", end_panel_margin)
+  margin.add_theme_constant_override("margin_bottom", end_panel_margin)
   center_panel.add_child(margin)
 
   var vbox = VBoxContainer.new()
@@ -790,13 +822,13 @@ func _create_game_end_screen(ending_tier: String) -> void:
 
   var title = Label.new()
   title.text = "Game Complete"
-  title.add_theme_font_size_override("font_size", 28)
+  title.add_theme_font_size_override("font_size", end_title_font_size)
   title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
   vbox.add_child(title)
 
   var tier_label = Label.new()
   tier_label.text = ending_tier.capitalize()
-  tier_label.add_theme_font_size_override("font_size", 36)
+  tier_label.add_theme_font_size_override("font_size", end_tier_font_size)
   tier_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
   tier_label.add_theme_color_override("font_color", _get_tier_color(ending_tier))
   vbox.add_child(tier_label)
@@ -805,7 +837,7 @@ func _create_game_end_screen(ending_tier: String) -> void:
   desc_label.text = _get_ending_description(ending_tier)
   desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
   desc_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-  desc_label.add_theme_font_size_override("font_size", 14)
+  desc_label.add_theme_font_size_override("font_size", end_desc_font_size)
   vbox.add_child(desc_label)
 
   var separator = HSeparator.new()
@@ -813,7 +845,7 @@ func _create_game_end_screen(ending_tier: String) -> void:
 
   var wellbeing_label = Label.new()
   wellbeing_label.text = "Final Wellbeing: %d" % int(game_state.wellbeing)
-  wellbeing_label.add_theme_font_size_override("font_size", 20)
+  wellbeing_label.add_theme_font_size_override("font_size", end_wellbeing_font_size)
   wellbeing_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
   wellbeing_label.add_theme_color_override("font_color", _get_wellbeing_color(game_state.wellbeing))
   vbox.add_child(wellbeing_label)
@@ -821,7 +853,7 @@ func _create_game_end_screen(ending_tier: String) -> void:
   var stats = _gather_summary_stats()
   var stats_label = Label.new()
   stats_label.text = stats
-  stats_label.add_theme_font_size_override("font_size", 14)
+  stats_label.add_theme_font_size_override("font_size", end_stats_font_size)
   stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
   vbox.add_child(stats_label)
 
@@ -830,7 +862,7 @@ func _create_game_end_screen(ending_tier: String) -> void:
 
   var play_again_btn = Button.new()
   play_again_btn.text = "Play Again"
-  play_again_btn.custom_minimum_size = Vector2(120, 40)
+  play_again_btn.custom_minimum_size = end_button_size
   play_again_btn.pressed.connect(_on_play_again)
   vbox.add_child(play_again_btn)
 
@@ -839,13 +871,13 @@ func _create_game_end_screen(ending_tier: String) -> void:
 func _get_tier_color(tier: String) -> Color:
   match tier:
     "flourishing":
-      return Color(0.2, 0.9, 0.4)
+      return tier_flourishing_color
     "growing":
-      return Color(0.5, 0.8, 0.3)
+      return tier_growing_color
     "surviving":
-      return Color(0.9, 0.7, 0.2)
+      return tier_surviving_color
     "struggling":
-      return Color(0.9, 0.3, 0.3)
+      return tier_struggling_color
   return Color.WHITE
 
 func _get_ending_description(tier: String) -> String:

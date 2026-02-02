@@ -19,45 +19,50 @@ var dest_building: Node = null
 var resource_type: String = ""
 var carried_amount: int = 0
 
-# Movement
+@export_group("Movement")
 @export var move_speed: float = 100.0
 var target_position: Vector2
 
-# Joy speed boost
 var joy_boost_timer: float = 0.0
 var current_speed_multiplier: float = 1.0
 
-# Habituation tracking
 var job_id: String = ""
 var completions: int = 0
 
-# Selection state
 var is_selected: bool = false
-var base_modulate: Color = Color(1, 0.95, 0.7, 1)
-var selected_modulate: Color = Color(0.5, 1.0, 0.5, 1)
+@export_group("Appearance")
+@export var base_modulate: Color = Color(1, 0.95, 0.7, 1)
+@export var selected_modulate: Color = Color(0.5, 1.0, 0.5, 1)
+@export var selected_scale: float = 1.3
+@export var carrying_modulate: Color = Color(1.2, 1.1, 0.8, 1)
+@export var mote_texture_size: int = 24
 
-# Emotional contamination
+@export_group("Contamination Colors")
+@export var negative_contamination_color: Color = Color(0.6, 0.5, 0.7, 1)
+@export var positive_contamination_color: Color = Color(1.0, 1.0, 0.6, 1)
+@export var negative_color_blend: float = 0.5
+@export var positive_color_blend: float = 0.3
+
 var emotional_residue: Dictionary = {}
 
 # Visual
-@onready var sprite: Sprite2D = $Sprite2D
+@onready var sprite: Sprite2D = %Sprite2D
 
 static var mote_texture: ImageTexture
 
 func _ready() -> void:
   if not mote_texture:
-    mote_texture = _create_mote_texture()
+    mote_texture = _create_mote_texture_with_size(mote_texture_size)
   sprite.texture = mote_texture
   modulate = base_modulate
 
-static func _create_mote_texture() -> ImageTexture:
-  var size = 24
-  var image = Image.create(size, size, false, Image.FORMAT_RGBA8)
-  var center = Vector2(size / 2.0, size / 2.0)
-  var radius = size / 2.0 - 2
+func _create_mote_texture_with_size(tex_size: int) -> ImageTexture:
+  var image = Image.create(tex_size, tex_size, false, Image.FORMAT_RGBA8)
+  var center = Vector2(tex_size / 2.0, tex_size / 2.0)
+  var radius = tex_size / 2.0 - 2
 
-  for x in range(size):
-    for y in range(size):
+  for x in range(tex_size):
+    for y in range(tex_size):
       var dist = Vector2(x, y).distance_to(center)
       if dist <= radius:
         var alpha = 1.0 - (dist / radius) * 0.5
@@ -231,10 +236,8 @@ func _process_pickup() -> void:
     state = State.CARRYING
     _pathfind_to_building(dest_building)
 
-    # Visual feedback
-    modulate = Color(1.2, 1.1, 0.8, 1)
+    modulate = carrying_modulate
   else:
-    # Wait for resources
     pass
 
 func _process_dropoff() -> void:
@@ -305,7 +308,7 @@ func set_selected(selected: bool) -> void:
 func _update_selection_visual() -> void:
   if is_selected:
     modulate = selected_modulate
-    scale = Vector2(1.3, 1.3)
+    scale = Vector2(selected_scale, selected_scale)
   else:
     modulate = _get_contamination_modulate()
     scale = Vector2(1.0, 1.0)
@@ -355,8 +358,8 @@ func _get_contamination_modulate() -> Color:
 
   var result = base_modulate
   if negative_factor > positive_factor:
-    result = base_modulate.lerp(Color(0.6, 0.5, 0.7, 1), negative_factor * 0.5)
+    result = base_modulate.lerp(negative_contamination_color, negative_factor * negative_color_blend)
   elif positive_factor > negative_factor:
-    result = base_modulate.lerp(Color(1.0, 1.0, 0.6, 1), positive_factor * 0.3)
+    result = base_modulate.lerp(positive_contamination_color, positive_factor * positive_color_blend)
 
   return result

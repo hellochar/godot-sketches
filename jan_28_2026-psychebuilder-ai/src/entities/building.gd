@@ -58,8 +58,8 @@ var coping_cooldown_timer: float = 0.0
 var anxiety_spread_timer: float = 0.0
 
 # Visual
-@onready var sprite: ColorRect = $ColorRect
-@onready var label: Label = $Label
+@onready var sprite: ColorRect = %ColorRect
+@onready var label: Label = %Label
 @onready var progress_bar: ProgressBar = %ProgressBar
 @onready var status_indicator: ColorRect = %StatusIndicator
 @onready var disconnected_warning: Label = %DisconnectedWarning
@@ -198,7 +198,9 @@ func _process_processing(delta: float) -> void:
     return
 
   var grief_multiplier = _get_grief_speed_multiplier()
-  process_timer -= delta * grief_multiplier
+  var tension_multiplier = _get_tension_speed_multiplier()
+  var wisdom_multiplier = _get_wisdom_efficiency_multiplier()
+  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier
   if process_timer <= 0:
     _complete_processing()
 
@@ -216,6 +218,17 @@ func _try_start_processing() -> void:
 
 func _complete_processing() -> void:
   processing_active = false
+
+  var inputs = definition.get("input", {})
+  var processed_negative = false
+  for input_resource in inputs:
+    if input_resource in ["anxiety", "grief"]:
+      processed_negative = true
+      break
+
+  if processed_negative:
+    _output_resource("tension", config.tension_from_processing)
+
   var conditional_outputs = definition.get("conditional_outputs", {})
   if not conditional_outputs.is_empty():
     for condition_resource in conditional_outputs:
@@ -396,6 +409,14 @@ func trigger_habit() -> void:
 
   var adjacency_multiplier = _get_habit_adjacency_multiplier()
 
+  # Cathartic release for exercise_yard
+  if building_id == "exercise_yard":
+    var release_result = _perform_cathartic_release()
+    if release_result.calm_generated > 0:
+      _output_resource("calm", release_result.calm_generated)
+    if release_result.insight_generated > 0:
+      _output_resource("insight", release_result.insight_generated)
+
   # Generate resources
   var generates = definition.get("habit_generates", {})
   for resource_id in generates:
@@ -532,3 +553,73 @@ func _get_calm_aura_suppression() -> float:
   var excess_calm = total_calm - config.calm_aura_threshold
   var suppression = excess_calm * config.calm_aura_suppression
   return minf(suppression, config.calm_aura_max_suppression)
+
+func _get_nearby_tension() -> int:
+  if not grid:
+    return 0
+
+  var total_tension = 0
+  var radius = config.tension_aura_radius
+
+  for x in range(-radius, size.x + radius):
+    for y in range(-radius, size.y + radius):
+      if x >= 0 and x < size.x and y >= 0 and y < size.y:
+        continue
+      var check = grid_coord + Vector2i(x, y)
+      if grid.is_valid_coord(check):
+        var occupant = grid.get_occupant(check)
+        if occupant and occupant != self and occupant.has_method("get_storage_amount"):
+          total_tension += occupant.get_storage_amount("tension")
+
+  return total_tension
+
+func _get_tension_speed_multiplier() -> float:
+  var tension_amount = _get_nearby_tension() + storage.get("tension", 0)
+  if tension_amount < config.tension_slowdown_threshold:
+    return 1.0
+  var excess_tension = tension_amount - config.tension_slowdown_threshold
+  var slowdown = excess_tension * config.tension_slowdown_factor
+  slowdown = minf(slowdown, config.tension_max_slowdown)
+  return 1.0 - slowdown
+
+func _get_nearby_wisdom() -> int:
+  if not grid:
+    return 0
+
+  var total_wisdom = 0
+  var radius = config.wisdom_aura_radius
+
+  for x in range(-radius, size.x + radius):
+    for y in range(-radius, size.y + radius):
+      if x >= 0 and x < size.x and y >= 0 and y < size.y:
+        continue
+      var check = grid_coord + Vector2i(x, y)
+      if grid.is_valid_coord(check):
+        var occupant = grid.get_occupant(check)
+        if occupant and occupant != self and occupant.has_method("get_storage_amount"):
+          total_wisdom += occupant.get_storage_amount("wisdom")
+
+  return total_wisdom
+
+func _get_wisdom_efficiency_multiplier() -> float:
+  var wisdom_amount = _get_nearby_wisdom() + storage.get("wisdom", 0)
+  if wisdom_amount < config.wisdom_efficiency_threshold:
+    return 1.0
+  var excess_wisdom = wisdom_amount - config.wisdom_efficiency_threshold
+  var bonus = excess_wisdom * config.wisdom_efficiency_bonus_per_unit
+  bonus = minf(bonus, config.wisdom_max_efficiency_bonus)
+  return 1.0 + bonus
+
+func _perform_cathartic_release() -> Dictionary:
+  var tension_removed = remove_from_storage("tension", storage.get("tension", 0))
+  var calm_generated = int(tension_removed * config.cathartic_release_calm_per_tension)
+  var insight_generated = 0
+
+  if tension_removed > 0 and randf() < config.cathartic_release_insight_chance:
+    insight_generated = 1
+
+  return {
+    "tension_removed": tension_removed,
+    "calm_generated": calm_generated,
+    "insight_generated": insight_generated
+  }
