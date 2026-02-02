@@ -75,6 +75,11 @@ var breakthrough_cooldown_timer: float = 0.0
 var flow_state_level: float = 0.0
 var flow_insight_timer: float = 0.0
 
+# Emotional synchronization chain tracking
+var sync_chain_events: Dictionary = {}
+var active_sync_chains: Dictionary = {}
+var sync_chain_bonus_timers: Dictionary = {}
+
 # Wellbeing tier tracking
 enum WellbeingTier { STRUGGLING, BASELINE, STABLE, THRIVING, FLOURISHING }
 var current_wellbeing_tier: WellbeingTier = WellbeingTier.BASELINE
@@ -90,11 +95,12 @@ func reset_to_defaults() -> void:
   game_speed = 1.0
   is_paused = false
 
-  current_energy = get_node("/root/Config").starting_energy
-  max_energy = get_node("/root/Config").max_energy
-  attention_available = get_node("/root/Config").base_attention_pool
+  var cfg = get_node("/root/Config")
+  current_energy = cfg.starting_energy
+  max_energy = cfg.max_energy
+  attention_available = cfg.base_attention_pool
   attention_used = 0.0
-  wellbeing = 35.0
+  wellbeing = cfg.starting_wellbeing
 
   active_buildings.clear()
   active_workers.clear()
@@ -128,6 +134,10 @@ func reset_to_defaults() -> void:
 
   flow_state_level = 0.0
   flow_insight_timer = 0.0
+
+  sync_chain_events.clear()
+  active_sync_chains.clear()
+  sync_chain_bonus_timers.clear()
 
   current_wellbeing_tier = WellbeingTier.BASELINE
   flourishing_insight_timer = 0.0
@@ -525,3 +535,76 @@ func get_flow_state_multiplier() -> float:
 
 func is_in_flow_state() -> bool:
   return flow_state_level >= 0.5
+
+func record_processing_event(building: Node, emotion_type: String) -> void:
+  var cfg = get_node("/root/Config")
+  var event_bus = get_node("/root/EventBus")
+  var current_time = Time.get_ticks_msec() / 1000.0
+
+  if not sync_chain_events.has(emotion_type):
+    sync_chain_events[emotion_type] = []
+
+  sync_chain_events[emotion_type].append({
+    "building": building,
+    "time": current_time
+  })
+
+  var cutoff_time = current_time - cfg.sync_chain_window
+  sync_chain_events[emotion_type] = sync_chain_events[emotion_type].filter(
+    func(e): return e["time"] >= cutoff_time and is_instance_valid(e["building"])
+  )
+
+  var unique_buildings: Array[Node] = []
+  for event in sync_chain_events[emotion_type]:
+    if event["building"] not in unique_buildings:
+      unique_buildings.append(event["building"])
+
+  if unique_buildings.size() >= cfg.sync_chain_min_buildings:
+    _trigger_sync_chain(emotion_type, unique_buildings)
+
+func _trigger_sync_chain(emotion_type: String, buildings: Array[Node]) -> void:
+  var cfg = get_node("/root/Config")
+  var event_bus = get_node("/root/EventBus")
+
+  var bonus_level = minf(
+    (buildings.size() - cfg.sync_chain_min_buildings + 1) * cfg.sync_chain_bonus_per_building,
+    cfg.sync_chain_max_bonus
+  )
+
+  active_sync_chains[emotion_type] = {
+    "buildings": buildings,
+    "bonus": bonus_level
+  }
+  sync_chain_bonus_timers[emotion_type] = cfg.sync_chain_duration
+
+  event_bus.sync_chain_triggered.emit(emotion_type, buildings, bonus_level)
+
+  if randf() < cfg.sync_chain_insight_chance * buildings.size():
+    update_resource_total("insight", cfg.sync_chain_insight_amount)
+    track_insight_generated(cfg.sync_chain_insight_amount)
+    event_bus.sync_chain_insight.emit(emotion_type, cfg.sync_chain_insight_amount)
+
+func update_sync_chain_timers(delta: float) -> void:
+  var expired: Array[String] = []
+  for emotion_type in sync_chain_bonus_timers:
+    sync_chain_bonus_timers[emotion_type] -= delta
+    if sync_chain_bonus_timers[emotion_type] <= 0:
+      expired.append(emotion_type)
+
+  for emotion_type in expired:
+    sync_chain_bonus_timers.erase(emotion_type)
+    active_sync_chains.erase(emotion_type)
+
+func get_sync_chain_bonus(building: Node, emotion_type: String) -> float:
+  if not active_sync_chains.has(emotion_type):
+    return 0.0
+
+  var chain_data = active_sync_chains[emotion_type]
+  if building in chain_data["buildings"]:
+    return chain_data["bonus"]
+  return 0.0
+
+func is_in_sync_chain(building: Node, emotion_type: String) -> bool:
+  if not active_sync_chains.has(emotion_type):
+    return false
+  return building in active_sync_chains[emotion_type]["buildings"]

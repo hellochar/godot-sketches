@@ -38,6 +38,7 @@ func _process(delta: float) -> void:
       game_state.update_breakthrough_timers(delta * speed_multiplier)
       game_state.update_flow_state(delta * speed_multiplier)
       game_state.update_flourishing_insight(delta * speed_multiplier)
+      game_state.update_sync_chain_timers(delta * speed_multiplier)
       if phase_time >= day_duration:
         _transition_to_night()
     Phase.NIGHT:

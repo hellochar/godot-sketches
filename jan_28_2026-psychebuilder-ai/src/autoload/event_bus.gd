@@ -112,3 +112,8 @@ signal wellbeing_flourishing_insight(amount: int)
 signal worker_fatigued(worker: Node, fatigue_level: float)
 signal worker_rested(worker: Node)
 signal worker_dropped_resource(worker: Node, resource_type: String, amount: int)
+
+signal sync_chain_triggered(emotion_type: String, buildings: Array, bonus_level: float)
+signal sync_chain_insight(emotion_type: String, amount: int)
+signal legacy_status_achieved(building: Node)
+signal legacy_bonus_applied(building: Node, bonus_type: String)

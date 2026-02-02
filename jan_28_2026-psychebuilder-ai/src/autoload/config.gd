@@ -383,7 +383,8 @@ extends Node
 @export var velocity_momentum_decay: float = 0.02
 @export var velocity_momentum_max: float = 1.0
 
-@export_group("Wellbeing Thresholds")
+@export_group("Wellbeing")
+@export var starting_wellbeing: float = 35.0
 @export var wellbeing_struggling_threshold: float = 20.0
 @export var wellbeing_stable_threshold: float = 40.0
 @export var wellbeing_thriving_threshold: float = 60.0
@@ -406,3 +407,21 @@ extends Node
 @export var worker_fatigue_joy_recovery_bonus: float = 0.02
 @export var worker_fatigue_calm_recovery_bonus: float = 0.01
 @export var worker_fatigue_onset_threshold: float = 0.3
+
+@export_group("Emotional Synchronization")
+@export var sync_chain_window: float = 3.0
+@export var sync_chain_min_buildings: int = 2
+@export var sync_chain_bonus_per_building: float = 0.15
+@export var sync_chain_max_bonus: float = 0.6
+@export var sync_chain_insight_chance: float = 0.1
+@export var sync_chain_insight_amount: int = 1
+@export var sync_chain_duration: float = 5.0
+
+@export_group("Legacy Imprints")
+@export var legacy_mastery_threshold: int = 3
+@export var legacy_awakening_required: bool = true
+@export var legacy_time_required: float = 60.0
+@export var legacy_speed_bonus: float = 0.2
+@export var legacy_output_bonus: int = 1
+@export var legacy_resilience_factor: float = 0.5
+@export var legacy_decay_protection: float = 0.3

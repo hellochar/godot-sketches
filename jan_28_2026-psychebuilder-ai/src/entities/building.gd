@@ -158,6 +158,11 @@ var velocity_momentum: float = 0.0
 var velocity_sustained_timer: float = 0.0
 var velocity_last_process_time: float = 0.0
 
+# Legacy imprint state
+var is_legacy: bool = false
+var legacy_timer: float = 0.0
+var legacy_qualifying: bool = false
+
 # Visual
 @onready var sprite: ColorRect = %ColorRect
 @onready var label: Label = %Label
@@ -229,6 +234,9 @@ func _update_connection_visual() -> void:
   if is_disconnected:
     sprite.color = base_color.lerp(Color(0.8, 0.2, 0.2), 0.5)
     disconnected_warning.visible = true
+  elif is_legacy:
+    sprite.color = base_color.lerp(Color(1.0, 0.85, 0.4), 0.5)
+    disconnected_warning.visible = false
   elif attuned_partners.size() > 0:
     sprite.color = base_color.lerp(Color(1.0, 0.9, 0.5), 0.4)
     disconnected_warning.visible = false
@@ -248,6 +256,10 @@ func _update_storage_display() -> void:
     status_indicators += "M"
   if velocity_momentum >= 0.5:
     status_indicators += "V"
+  if is_legacy:
+    status_indicators += "L"
+  if _is_in_any_sync_chain():
+    status_indicators += "S"
   if status_indicators != "":
     name_text += " [%s]" % status_indicators
   if storage_capacity > 0:
@@ -305,6 +317,7 @@ func _process(delta: float) -> void:
   _process_suppression_field(delta)
   _process_mastery(delta)
   _process_velocity(delta)
+  _process_legacy(delta)
   _update_status()
   _update_status_visual()
 
@@ -377,7 +390,9 @@ func _process_processing(delta: float) -> void:
   var mastery_multiplier = get_mastery_speed_multiplier()
   var velocity_multiplier = get_velocity_speed_multiplier()
   var wellbeing_modifier = game_state.get_wellbeing_processing_modifier()
-  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier * fatigue_multiplier * echo_multiplier * harmony_multiplier * flow_multiplier * purity_multiplier * attunement_multiplier * fragility_multiplier * stagnation_multiplier * mastery_multiplier * velocity_multiplier * wellbeing_modifier
+  var sync_chain_multiplier = _get_sync_chain_speed_multiplier()
+  var legacy_multiplier = get_legacy_speed_multiplier()
+  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier * fatigue_multiplier * echo_multiplier * harmony_multiplier * flow_multiplier * purity_multiplier * attunement_multiplier * fragility_multiplier * stagnation_multiplier * mastery_multiplier * velocity_multiplier * wellbeing_modifier * sync_chain_multiplier * legacy_multiplier
   if process_timer <= 0:
     _complete_processing()
 
@@ -425,6 +440,9 @@ func _complete_processing() -> void:
   _gain_mastery(inputs)
   _record_velocity_event(inputs)
 
+  for input_resource in inputs:
+    game_state.record_processing_event(self, input_resource)
+
   var has_fresh = false
   for input_resource in inputs:
     if is_resource_fresh(input_resource):
@@ -440,7 +458,8 @@ func _complete_processing() -> void:
   var purity_bonus = get_purity_output_bonus()
   var attunement_bonus = get_attunement_output_bonus()
   var mastery_bonus = get_mastery_output_bonus()
-  var total_bonus = awakening_bonus + harmony_bonus + purity_bonus + attunement_bonus + mastery_bonus
+  var legacy_bonus = get_legacy_output_bonus()
+  var total_bonus = awakening_bonus + harmony_bonus + purity_bonus + attunement_bonus + mastery_bonus + legacy_bonus
 
   var synergy = try_attunement_synergy()
   if synergy.get("triggered", false):
@@ -1501,7 +1520,10 @@ func get_awakening_generator_rate_multiplier() -> float:
   return 1.0
 
 func _gain_fatigue() -> void:
-  fatigue_level = minf(fatigue_level + config.fatigue_gain_per_process, config.fatigue_max_level)
+  var gain_modifier = 1.0
+  if is_legacy:
+    gain_modifier = 1.0 - config.legacy_resilience_factor
+  fatigue_level = minf(fatigue_level + config.fatigue_gain_per_process * gain_modifier, config.fatigue_max_level)
 
 func _process_fatigue(delta: float) -> void:
   if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
@@ -1806,8 +1828,11 @@ func _gain_fragility(inputs: Dictionary) -> void:
       negative_count += inputs[resource_id]
 
   if negative_count > 0:
+    var gain_modifier = 1.0
+    if is_legacy:
+      gain_modifier = 1.0 - config.legacy_resilience_factor
     var old_level = fragility_level
-    fragility_level = minf(fragility_level + negative_count * config.fragility_gain_per_negative, config.fragility_max_level)
+    fragility_level = minf(fragility_level + negative_count * config.fragility_gain_per_negative * gain_modifier, config.fragility_max_level)
     if old_level < config.fragility_crack_threshold and fragility_level >= config.fragility_crack_threshold:
       is_cracked = true
       event_bus.building_cracked.emit(self, fragility_level)
@@ -2152,9 +2177,13 @@ func _process_mastery(delta: float) -> void:
   if mastery_processed.is_empty():
     return
 
+  var decay_modifier = 1.0
+  if is_legacy:
+    decay_modifier = 1.0 - config.legacy_decay_protection
+
   for resource_id in mastery_processed.keys():
     if resource_id != dominant_mastery:
-      mastery_processed[resource_id] = maxf(0.0, mastery_processed[resource_id] - config.mastery_decay_rate * delta)
+      mastery_processed[resource_id] = maxf(0.0, mastery_processed[resource_id] - config.mastery_decay_rate * decay_modifier * delta)
 
   _update_dominant_mastery()
 
@@ -2314,3 +2343,68 @@ func get_velocity() -> float:
 
 func get_velocity_momentum() -> float:
   return velocity_momentum
+
+func _get_sync_chain_speed_multiplier() -> float:
+  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    return 1.0
+
+  var max_bonus = 0.0
+  var inputs = definition.get("input", {})
+  for input_resource in inputs:
+    var bonus = game_state.get_sync_chain_bonus(self, input_resource)
+    if bonus > max_bonus:
+      max_bonus = bonus
+
+  return 1.0 + max_bonus
+
+func _is_in_any_sync_chain() -> bool:
+  var inputs = definition.get("input", {})
+  for input_resource in inputs:
+    if game_state.is_in_sync_chain(self, input_resource):
+      return true
+  return false
+
+func _process_legacy(delta: float) -> void:
+  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    return
+
+  if is_legacy:
+    return
+
+  var meets_mastery = false
+  for resource_type in mastery_levels:
+    if mastery_levels[resource_type] >= config.legacy_mastery_threshold:
+      meets_mastery = true
+      break
+
+  var meets_awakening = not config.legacy_awakening_required or is_awakened
+
+  legacy_qualifying = meets_mastery and meets_awakening
+
+  if legacy_qualifying:
+    legacy_timer += delta
+    if legacy_timer >= config.legacy_time_required:
+      is_legacy = true
+      event_bus.legacy_status_achieved.emit(self)
+  else:
+    legacy_timer = maxf(0.0, legacy_timer - delta * config.legacy_resilience_factor)
+
+func get_legacy_speed_multiplier() -> float:
+  if not is_legacy:
+    return 1.0
+  return 1.0 + config.legacy_speed_bonus
+
+func get_legacy_output_bonus() -> int:
+  if not is_legacy:
+    return 0
+  return config.legacy_output_bonus
+
+func is_legacy_building() -> bool:
+  return is_legacy
+
+func get_legacy_timer_progress() -> float:
+  if is_legacy:
+    return 1.0
+  if not legacy_qualifying:
+    return 0.0
+  return legacy_timer / config.legacy_time_required
