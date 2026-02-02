@@ -129,6 +129,15 @@ var attunement_levels: Dictionary = {}
 var attuned_partners: Array[Node] = []
 var attunement_timer: float = 0.0
 
+# Fragility state
+var fragility_level: float = 0.0
+var is_cracked: bool = false
+var fragility_leak_timer: float = 0.0
+
+# Stagnation state (resource_id -> {age: float, stagnation: float})
+var resource_age_data: Dictionary = {}
+var stagnation_decay_timer: float = 0.0
+
 # Visual
 @onready var sprite: ColorRect = %ColorRect
 @onready var label: Label = %Label
@@ -260,6 +269,8 @@ func _process(delta: float) -> void:
   _process_harmony()
   _process_purity_decay(delta)
   _process_attunement(delta)
+  _process_fragility(delta)
+  _process_stagnation(delta)
   _update_status()
   _update_status_visual()
 
@@ -325,7 +336,9 @@ func _process_processing(delta: float) -> void:
   var flow_multiplier = game_state.get_flow_state_multiplier()
   var purity_multiplier = _get_purity_speed_multiplier()
   var attunement_multiplier = get_attunement_speed_multiplier()
-  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier * fatigue_multiplier * echo_multiplier * harmony_multiplier * flow_multiplier * purity_multiplier * attunement_multiplier
+  var fragility_multiplier = _get_fragility_speed_multiplier()
+  var stagnation_multiplier = _get_stagnation_speed_multiplier()
+  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier * fatigue_multiplier * echo_multiplier * harmony_multiplier * flow_multiplier * purity_multiplier * attunement_multiplier * fragility_multiplier * stagnation_multiplier
   if process_timer <= 0:
     _complete_processing()
 
@@ -366,8 +379,16 @@ func _complete_processing() -> void:
     _output_resource("tension", config.tension_from_processing)
 
   _gain_fatigue()
+  _gain_fragility(inputs)
   _build_emotional_echo(inputs)
   _gain_awakening_experience()
+
+  var has_fresh = false
+  for input_resource in inputs:
+    if is_resource_fresh(input_resource):
+      has_fresh = true
+      event_bus.fresh_resource_bonus.emit(self, input_resource)
+    reset_resource_age(input_resource)
 
   var recipe_key = _get_recipe_key(inputs)
   _build_momentum(recipe_key)
@@ -1709,3 +1730,204 @@ func try_attunement_synergy() -> Dictionary:
       result["energy_bonus"] = synergy["energy_bonus"]
       event_bus.attunement_synergy_triggered.emit(self, partner, "energy_bonus")
   return result
+
+func _process_fragility(delta: float) -> void:
+  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    return
+
+  var was_cracked = is_cracked
+  is_cracked = fragility_level >= config.fragility_crack_threshold
+
+  if is_cracked and not was_cracked:
+    event_bus.building_cracked.emit(self, fragility_level)
+
+  if is_cracked:
+    _process_fragility_leak(delta)
+
+  _heal_fragility(delta)
+
+func _gain_fragility(inputs: Dictionary) -> void:
+  var negative_count = 0
+  for resource_id in inputs:
+    if resource_id in config.fragility_negative_emotions:
+      negative_count += inputs[resource_id]
+
+  if negative_count > 0:
+    var old_level = fragility_level
+    fragility_level = minf(fragility_level + negative_count * config.fragility_gain_per_negative, config.fragility_max_level)
+    if old_level < config.fragility_crack_threshold and fragility_level >= config.fragility_crack_threshold:
+      is_cracked = true
+      event_bus.building_cracked.emit(self, fragility_level)
+
+func _process_fragility_leak(delta: float) -> void:
+  if not grid:
+    return
+
+  fragility_leak_timer += delta
+  if fragility_leak_timer < config.fragility_leak_interval:
+    return
+
+  fragility_leak_timer = 0.0
+
+  var leak_candidates: Array[String] = []
+  for resource_id in storage:
+    if storage[resource_id] > 0:
+      leak_candidates.append(resource_id)
+
+  if leak_candidates.is_empty():
+    return
+
+  var leak_resource = leak_candidates[randi() % leak_candidates.size()]
+  var neighbors = _get_adjacent_buildings()
+
+  if neighbors.is_empty():
+    return
+
+  var target = neighbors[randi() % neighbors.size()]
+  var leaked = remove_from_storage(leak_resource, config.fragility_leak_amount)
+  if leaked > 0:
+    target.add_to_storage(leak_resource, leaked)
+    event_bus.building_leaked.emit(self, leak_resource, target)
+
+func _heal_fragility(delta: float) -> void:
+  if fragility_level <= 0:
+    return
+
+  var base_heal = config.fragility_heal_rate * delta
+  var calm_heal = _get_nearby_calm_for_fragility() * config.fragility_calm_heal_bonus * delta
+  var total_heal = base_heal + calm_heal
+
+  var old_level = fragility_level
+  fragility_level = maxf(0.0, fragility_level - total_heal)
+
+  if is_cracked and fragility_level < config.fragility_crack_threshold:
+    is_cracked = false
+    event_bus.building_healed.emit(self, fragility_level)
+
+func _get_nearby_calm_for_fragility() -> int:
+  var total_calm = storage.get("calm", 0)
+  if not grid:
+    return total_calm
+
+  var radius = config.fragility_calm_heal_radius
+  for x in range(-radius, size.x + radius):
+    for y in range(-radius, size.y + radius):
+      if x >= 0 and x < size.x and y >= 0 and y < size.y:
+        continue
+      var check = grid_coord + Vector2i(x, y)
+      if grid.is_valid_coord(check):
+        var occupant = grid.get_occupant(check)
+        if occupant and occupant != self and occupant.has_method("get_storage_amount"):
+          total_calm += occupant.get_storage_amount("calm")
+
+  return total_calm
+
+func _get_fragility_speed_multiplier() -> float:
+  if fragility_level <= 0:
+    return 1.0
+  var penalty = fragility_level * config.fragility_speed_penalty_at_max
+  return 1.0 - penalty
+
+func _process_stagnation(delta: float) -> void:
+  if storage_capacity <= 0:
+    return
+
+  for resource_id in storage:
+    if storage[resource_id] <= 0:
+      resource_age_data.erase(resource_id)
+      continue
+
+    if not resource_age_data.has(resource_id):
+      resource_age_data[resource_id] = {"age": 0.0, "stagnation": 0.0}
+
+    var data = resource_age_data[resource_id]
+    data["age"] += delta
+
+    if data["age"] >= config.stagnation_time_threshold:
+      var old_stagnation = data["stagnation"]
+      data["stagnation"] = minf(data["stagnation"] + config.stagnation_gain_rate * delta, config.stagnation_max_level)
+      if old_stagnation < 0.5 and data["stagnation"] >= 0.5:
+        event_bus.resource_stagnated.emit(self, resource_id, data["stagnation"])
+
+  _process_stagnation_decay(delta)
+
+func _process_stagnation_decay(delta: float) -> void:
+  stagnation_decay_timer += delta
+  if stagnation_decay_timer < config.stagnation_decay_interval:
+    return
+
+  stagnation_decay_timer = 0.0
+
+  for resource_id in resource_age_data:
+    var data = resource_age_data[resource_id]
+    if data["stagnation"] < config.stagnation_max_level * 0.8:
+      continue
+
+    if randf() >= config.stagnation_decay_chance:
+      continue
+
+    var transform_to = config.stagnation_decay_transforms.get(resource_id, "")
+    if transform_to == "":
+      continue
+
+    var amount = storage.get(resource_id, 0)
+    if amount <= 0:
+      continue
+
+    var decay_amount = mini(amount, 2)
+    remove_from_storage(resource_id, decay_amount)
+    _output_resource(transform_to, decay_amount)
+    event_bus.resource_decayed_to_severe.emit(self, resource_id, transform_to)
+    resource_age_data.erase(resource_id)
+
+func _get_stagnation_speed_multiplier() -> float:
+  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    return 1.0
+
+  var inputs = definition.get("input", {})
+  if inputs.is_empty():
+    return 1.0
+
+  var total_stagnation = 0.0
+  var total_freshness = 0.0
+  var count = 0
+
+  for resource_id in inputs:
+    if not resource_age_data.has(resource_id):
+      total_freshness += 1.0
+      count += 1
+      continue
+
+    var data = resource_age_data[resource_id]
+    if data["age"] < config.stagnation_fresh_threshold:
+      total_freshness += 1.0
+    else:
+      total_stagnation += data["stagnation"]
+    count += 1
+
+  if count == 0:
+    return 1.0
+
+  var avg_stagnation = total_stagnation / count
+  var avg_freshness = total_freshness / count
+
+  if avg_freshness > 0.5:
+    return 1.0 + config.stagnation_fresh_bonus * avg_freshness
+  elif avg_stagnation > 0:
+    return 1.0 - config.stagnation_process_penalty * avg_stagnation
+
+  return 1.0
+
+func reset_resource_age(resource_id: String) -> void:
+  if resource_age_data.has(resource_id):
+    resource_age_data[resource_id] = {"age": 0.0, "stagnation": 0.0}
+
+func get_resource_stagnation(resource_id: String) -> float:
+  if not resource_age_data.has(resource_id):
+    return 0.0
+  return resource_age_data[resource_id].get("stagnation", 0.0)
+
+func is_resource_fresh(resource_id: String) -> bool:
+  if not resource_age_data.has(resource_id):
+    return true
+  return resource_age_data[resource_id].get("age", 0.0) < config.stagnation_fresh_threshold

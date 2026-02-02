@@ -307,3 +307,33 @@ extends Node
 @export var weather_fog_processing_penalty: float = 0.1
 @export var weather_stillness_processing_bonus: float = 0.1
 @export var weather_stillness_habit_bonus: float = 0.15
+
+@export_group("Building Fragility")
+@export var fragility_gain_per_negative: float = 0.05
+@export var fragility_max_level: float = 1.0
+@export var fragility_crack_threshold: float = 0.7
+@export var fragility_leak_interval: float = 4.0
+@export var fragility_leak_amount: int = 1
+@export var fragility_heal_rate: float = 0.03
+@export var fragility_calm_heal_bonus: float = 0.02
+@export var fragility_calm_heal_radius: int = 2
+@export var fragility_speed_penalty_at_max: float = 0.3
+@export var fragility_negative_emotions: Array[String] = ["grief", "anxiety", "tension", "worry", "doubt"]
+
+@export_group("Emotional Stagnation")
+@export var stagnation_time_threshold: float = 20.0
+@export var stagnation_max_level: float = 1.0
+@export var stagnation_gain_rate: float = 0.02
+@export var stagnation_process_penalty: float = 0.25
+@export var stagnation_decay_interval: float = 15.0
+@export var stagnation_decay_chance: float = 0.2
+@export var stagnation_fresh_bonus: float = 0.2
+@export var stagnation_fresh_threshold: float = 5.0
+@export var stagnation_decay_transforms: Dictionary = {
+  "grief": "despair",
+  "anxiety": "panic",
+  "joy": "nostalgia",
+  "calm": "numbness",
+  "worry": "dread",
+}
+@export var stagnation_severe_emotions: Array[String] = ["despair", "panic", "dread", "numbness"]
