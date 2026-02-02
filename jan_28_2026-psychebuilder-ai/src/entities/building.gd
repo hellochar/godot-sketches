@@ -121,6 +121,14 @@ var dominant_echo: String = ""
 var harmony_partners: Array[Node] = []
 var is_in_harmony: bool = false
 
+# Resource purity state (resource_id -> purity level 0.0-1.0)
+var storage_purity: Dictionary = {}
+
+# Attunement state
+var attunement_levels: Dictionary = {}
+var attuned_partners: Array[Node] = []
+var attunement_timer: float = 0.0
+
 # Visual
 @onready var sprite: ColorRect = %ColorRect
 @onready var label: Label = %Label
@@ -192,6 +200,9 @@ func _update_connection_visual() -> void:
   if is_disconnected:
     sprite.color = base_color.lerp(Color(0.8, 0.2, 0.2), 0.5)
     disconnected_warning.visible = true
+  elif attuned_partners.size() > 0:
+    sprite.color = base_color.lerp(Color(1.0, 0.9, 0.5), 0.4)
+    disconnected_warning.visible = false
   elif is_in_harmony:
     sprite.color = base_color.lerp(Color(0.9, 0.95, 0.7), 0.3)
     disconnected_warning.visible = false
@@ -206,11 +217,21 @@ func _update_storage_display() -> void:
     var storage_text = ""
     for res_id in storage:
       if storage[res_id] > 0:
-        storage_text += "\n%s: %d" % [res_id, storage[res_id]]
+        var purity = storage_purity.get(res_id, config.purity_initial_level)
+        var purity_indicator = ""
+        if purity >= config.purity_output_bonus_threshold:
+          purity_indicator = "*"
+        elif purity <= config.purity_min_level + 0.1:
+          purity_indicator = "~"
+        storage_text += "\n%s: %d%s" % [res_id, storage[res_id], purity_indicator]
     if storage_text == "":
       storage_text = "\n(empty)"
+    if attuned_partners.size() > 0:
+      name_text += " [A]"
     label.text = name_text + storage_text
   else:
+    if attuned_partners.size() > 0:
+      name_text += " [A]"
     label.text = name_text
 
 func _process(delta: float) -> void:
@@ -237,6 +258,8 @@ func _process(delta: float) -> void:
   _process_fatigue(delta)
   _process_emotional_echo_decay(delta)
   _process_harmony()
+  _process_purity_decay(delta)
+  _process_attunement(delta)
   _update_status()
   _update_status_visual()
 
@@ -300,7 +323,9 @@ func _process_processing(delta: float) -> void:
   var echo_multiplier = _get_emotional_echo_multiplier()
   var harmony_multiplier = _get_harmony_speed_multiplier()
   var flow_multiplier = game_state.get_flow_state_multiplier()
-  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier * fatigue_multiplier * echo_multiplier * harmony_multiplier * flow_multiplier
+  var purity_multiplier = _get_purity_speed_multiplier()
+  var attunement_multiplier = get_attunement_speed_multiplier()
+  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier * fatigue_multiplier * echo_multiplier * harmony_multiplier * flow_multiplier * purity_multiplier * attunement_multiplier
   if process_timer <= 0:
     _complete_processing()
 
@@ -349,7 +374,18 @@ func _complete_processing() -> void:
 
   var awakening_bonus = get_awakening_output_bonus()
   var harmony_bonus = get_harmony_output_bonus()
-  var total_bonus = awakening_bonus + harmony_bonus
+  var purity_bonus = get_purity_output_bonus()
+  var attunement_bonus = get_attunement_output_bonus()
+  var total_bonus = awakening_bonus + harmony_bonus + purity_bonus + attunement_bonus
+
+  var synergy = try_attunement_synergy()
+  if synergy.get("triggered", false):
+    if synergy.has("output_type"):
+      _output_resource(synergy["output_type"], synergy.get("amount", 1))
+    if synergy.has("calm_bonus"):
+      _output_resource("calm", synergy["calm_bonus"])
+    if synergy.has("energy_bonus"):
+      game_state.add_energy(synergy["energy_bonus"])
 
   var conditional_outputs = definition.get("conditional_outputs", {})
   if not conditional_outputs.is_empty():
@@ -489,13 +525,21 @@ func _consume_inputs(inputs: Dictionary) -> void:
   for resource_id in inputs:
     storage[resource_id] = storage.get(resource_id, 0) - inputs[resource_id]
 
-func _output_resource(resource_id: String, amount: int) -> void:
-  var current = storage.get(resource_id, 0)
-  var space = storage_capacity - _get_total_stored()
+func _output_resource(resource_id: String, amount: int, purity: float = -1.0) -> void:
+  var effective_capacity = get_effective_storage_capacity()
+  var space = effective_capacity - _get_total_stored()
   var to_store = mini(amount, space)
+  var output_purity = purity if purity >= 0.0 else config.purity_initial_level
 
   if to_store > 0:
-    storage[resource_id] = current + to_store
+    var existing = storage.get(resource_id, 0)
+    var existing_purity = storage_purity.get(resource_id, config.purity_initial_level)
+    if existing > 0:
+      var total = existing + to_store
+      storage_purity[resource_id] = (existing_purity * existing + output_purity * to_store) / total
+    else:
+      storage_purity[resource_id] = output_purity
+    storage[resource_id] = existing + to_store
 
   var overflow = amount - to_store
   if overflow > 0:
@@ -514,17 +558,35 @@ func _get_total_stored() -> int:
     total += storage[resource_id]
   return total
 
-func add_to_storage(resource_id: String, amount: int) -> int:
-  var space = storage_capacity - _get_total_stored()
+func get_effective_storage_capacity() -> int:
+  return storage_capacity + get_attunement_storage_bonus()
+
+func add_to_storage(resource_id: String, amount: int, purity: float = -1.0) -> int:
+  var effective_capacity = get_effective_storage_capacity()
+  var space = effective_capacity - _get_total_stored()
   var to_add = mini(amount, space)
-  storage[resource_id] = storage.get(resource_id, 0) + to_add
-  return amount - to_add  # return overflow
+  var existing = storage.get(resource_id, 0)
+  var existing_purity = storage_purity.get(resource_id, config.purity_initial_level)
+  var incoming_purity = purity if purity >= 0.0 else config.purity_initial_level
+  incoming_purity = maxf(incoming_purity - config.purity_transfer_loss, config.purity_min_level)
+  if existing > 0 and to_add > 0:
+    var total = existing + to_add
+    storage_purity[resource_id] = (existing_purity * existing + incoming_purity * to_add) / total
+  elif to_add > 0:
+    storage_purity[resource_id] = incoming_purity
+  storage[resource_id] = existing + to_add
+  return amount - to_add
 
 func remove_from_storage(resource_id: String, amount: int) -> int:
   var available = storage.get(resource_id, 0)
   var to_remove = mini(amount, available)
   storage[resource_id] = available - to_remove
+  if storage[resource_id] <= 0:
+    storage_purity.erase(resource_id)
   return to_remove
+
+func get_storage_purity(resource_id: String) -> float:
+  return storage_purity.get(resource_id, config.purity_initial_level)
 
 func get_storage_amount(resource_id: String) -> int:
   return storage.get(resource_id, 0)
@@ -635,9 +697,10 @@ func _update_status_visual() -> void:
     progress_bar.visible = false
 
 func _is_storage_full() -> bool:
-  if storage_capacity <= 0:
+  var effective_capacity = get_effective_storage_capacity()
+  if effective_capacity <= 0:
     return false
-  return _get_total_stored() >= storage_capacity
+  return _get_total_stored() >= effective_capacity
 
 func _get_grief_speed_multiplier() -> float:
   var grief_amount = storage.get("grief", 0)
@@ -974,7 +1037,8 @@ func _get_resonance_speed_multiplier() -> float:
   return 1.0
 
 func _process_saturation(delta: float) -> void:
-  if storage_capacity <= 0:
+  var effective_capacity = get_effective_storage_capacity()
+  if effective_capacity <= 0:
     saturation_state = SaturationState.NONE
     saturation_timer = 0.0
     return
@@ -984,7 +1048,7 @@ func _process_saturation(delta: float) -> void:
 
   for resource_id in ["joy", "calm", "grief", "anxiety", "wisdom"]:
     var amount = storage.get(resource_id, 0)
-    var ratio = float(amount) / float(storage_capacity)
+    var ratio = float(amount) / float(effective_capacity)
     if ratio >= config.saturation_threshold and ratio > highest_ratio:
       highest_ratio = ratio
       saturated_resource = resource_id
@@ -1292,10 +1356,11 @@ func _process_network_load_sharing(delta: float) -> void:
   if support_network.size() < config.support_network_min_size:
     return
 
-  if storage_capacity <= 0:
+  var effective_capacity = get_effective_storage_capacity()
+  if effective_capacity <= 0:
     return
 
-  var fill_ratio = float(_get_total_stored()) / float(storage_capacity)
+  var fill_ratio = float(_get_total_stored()) / float(effective_capacity)
   if fill_ratio < config.support_network_load_share_threshold:
     support_network_transfer_timer = 0.0
     return
@@ -1310,9 +1375,10 @@ func _process_network_load_sharing(delta: float) -> void:
   var lowest_fill: float = 1.0
 
   for member in support_network:
-    if member.storage_capacity <= 0:
+    var member_capacity = member.get_effective_storage_capacity()
+    if member_capacity <= 0:
       continue
-    var member_fill = float(member._get_total_stored()) / float(member.storage_capacity)
+    var member_fill = float(member._get_total_stored()) / float(member_capacity)
     if member_fill < lowest_fill:
       lowest_fill = member_fill
       best_target = member
@@ -1454,6 +1520,7 @@ func _get_emotional_echo_multiplier() -> float:
 
 func _process_harmony() -> void:
   var was_in_harmony = is_in_harmony
+  var was_attuned_count = attuned_partners.size()
   harmony_partners.clear()
   is_in_harmony = false
 
@@ -1473,9 +1540,10 @@ func _process_harmony() -> void:
 
   is_in_harmony = harmony_partners.size() > 0
 
-  if is_in_harmony != was_in_harmony:
+  var visual_changed = is_in_harmony != was_in_harmony or attuned_partners.size() != was_attuned_count
+  if visual_changed:
     _update_connection_visual()
-    if is_in_harmony:
+    if is_in_harmony and not was_in_harmony:
       event_bus.harmony_formed.emit(self, harmony_partners)
 
 func _get_harmony_speed_multiplier() -> float:
@@ -1490,3 +1558,154 @@ func get_harmony_output_bonus() -> int:
   if is_in_harmony:
     return config.harmony_output_bonus
   return 0
+
+func _process_purity_decay(delta: float) -> void:
+  if storage_capacity <= 0:
+    return
+
+  var decay = config.purity_decay_rate * delta
+  for resource_id in storage_purity.keys():
+    if storage.get(resource_id, 0) <= 0:
+      storage_purity.erase(resource_id)
+      continue
+    var old_purity = storage_purity[resource_id]
+    storage_purity[resource_id] = maxf(old_purity - decay, config.purity_min_level)
+    if old_purity >= config.purity_output_bonus_threshold and storage_purity[resource_id] < config.purity_output_bonus_threshold:
+      event_bus.resource_purity_degraded.emit(self, resource_id, storage_purity[resource_id])
+
+  if is_awakened and has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    _try_refine_resources(delta)
+
+func _try_refine_resources(delta: float) -> void:
+  for resource_id in storage:
+    if storage[resource_id] <= 0:
+      continue
+    var purity = storage_purity.get(resource_id, config.purity_initial_level)
+    if purity < config.purity_refine_threshold:
+      var refine_gain = config.purity_refine_gain + config.purity_awakened_refine_bonus
+      storage_purity[resource_id] = minf(purity + refine_gain * delta, config.purity_initial_level)
+      if storage_purity[resource_id] >= config.purity_refine_threshold and purity < config.purity_refine_threshold:
+        event_bus.resource_refined.emit(self, resource_id, storage_purity[resource_id])
+
+func _get_purity_speed_multiplier() -> float:
+  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    return 1.0
+  var inputs = definition.get("input", {})
+  if inputs.is_empty():
+    return 1.0
+  var total_purity = 0.0
+  var count = 0
+  for resource_id in inputs:
+    total_purity += storage_purity.get(resource_id, config.purity_min_level)
+    count += 1
+  if count == 0:
+    return 1.0
+  var avg_purity = total_purity / count
+  if avg_purity >= config.purity_output_bonus_threshold:
+    return 1.0 + config.purity_speed_bonus_at_pure * (avg_purity - config.purity_output_bonus_threshold) / (1.0 - config.purity_output_bonus_threshold)
+  elif avg_purity <= config.purity_diluted_threshold:
+    var dilution_ratio = (config.purity_diluted_threshold - avg_purity) / (config.purity_diluted_threshold - config.purity_min_level)
+    return 1.0 - config.purity_diluted_penalty * dilution_ratio
+  return 1.0
+
+func get_purity_output_bonus() -> int:
+  var inputs = definition.get("input", {})
+  if inputs.is_empty():
+    return 0
+  var all_pure = true
+  for resource_id in inputs:
+    if storage_purity.get(resource_id, config.purity_min_level) < config.purity_output_bonus_threshold:
+      all_pure = false
+      break
+  if all_pure:
+    event_bus.pure_resource_processed.emit(self, inputs.keys()[0], config.purity_output_bonus_amount)
+    return config.purity_output_bonus_amount
+  return 0
+
+func _process_attunement(delta: float) -> void:
+  var old_attuned = attuned_partners.duplicate()
+
+  if not is_in_harmony:
+    for partner_id in attunement_levels.keys():
+      var was_above_threshold = attunement_levels[partner_id] >= config.attunement_threshold
+      attunement_levels[partner_id] = maxf(0.0, attunement_levels[partner_id] - config.attunement_decay_on_break * delta)
+      var is_above_threshold = attunement_levels[partner_id] >= config.attunement_threshold
+      if was_above_threshold and not is_above_threshold:
+        for old_partner in old_attuned:
+          if old_partner.get_instance_id() == partner_id:
+            event_bus.attunement_broken.emit(self, old_partner)
+            break
+      if attunement_levels[partner_id] <= 0:
+        attunement_levels.erase(partner_id)
+    _update_attuned_partners()
+    return
+
+  for partner in harmony_partners:
+    var partner_id = partner.get_instance_id()
+    var current = attunement_levels.get(partner_id, 0.0)
+    var new_level = minf(current + config.attunement_gain_rate * delta, config.attunement_max_level)
+    var was_attuned = current >= config.attunement_threshold
+    var is_attuned = new_level >= config.attunement_threshold
+    attunement_levels[partner_id] = new_level
+    if not was_attuned and is_attuned:
+      event_bus.attunement_achieved.emit(self, partner)
+    if new_level > current and int(new_level * 10) > int(current * 10):
+      event_bus.attunement_progress.emit(self, partner, new_level)
+
+  _update_attuned_partners()
+
+func _update_attuned_partners() -> void:
+  attuned_partners.clear()
+  for partner in harmony_partners:
+    var partner_id = partner.get_instance_id()
+    if attunement_levels.get(partner_id, 0.0) >= config.attunement_threshold:
+      attuned_partners.append(partner)
+
+func is_attuned_with(partner: Node) -> bool:
+  return partner in attuned_partners
+
+func get_attunement_speed_multiplier() -> float:
+  if attuned_partners.is_empty():
+    return 1.0
+  return 1.0 + config.attunement_speed_bonus * attuned_partners.size()
+
+func get_attunement_output_bonus() -> int:
+  if attuned_partners.is_empty():
+    return 0
+  return config.attunement_output_bonus * attuned_partners.size()
+
+func get_attunement_storage_bonus() -> int:
+  if attuned_partners.is_empty():
+    return 0
+  return config.attunement_storage_bonus * attuned_partners.size()
+
+func try_attunement_synergy() -> Dictionary:
+  var result = {"triggered": false}
+  if attuned_partners.is_empty():
+    return result
+  for partner in attuned_partners:
+    var pair_key = "%s+%s" % [building_id, partner.building_id]
+    var reverse_key = "%s+%s" % [partner.building_id, building_id]
+    var synergy = config.attunement_synergy_bonuses.get(pair_key, config.attunement_synergy_bonuses.get(reverse_key, {}))
+    if synergy.is_empty():
+      continue
+    if synergy.has("output_type") and synergy.has("chance"):
+      if randf() < synergy["chance"]:
+        result["triggered"] = true
+        result["output_type"] = synergy["output_type"]
+        result["amount"] = 1
+        event_bus.attunement_synergy_triggered.emit(self, partner, synergy["output_type"])
+    if synergy.has("tension_reduction"):
+      var reduced = remove_from_storage("tension", synergy["tension_reduction"])
+      if reduced > 0:
+        result["triggered"] = true
+        event_bus.attunement_synergy_triggered.emit(self, partner, "tension_reduction")
+    if synergy.has("calm_bonus"):
+      result["triggered"] = true
+      result["calm_bonus"] = synergy["calm_bonus"]
+      event_bus.attunement_synergy_triggered.emit(self, partner, "calm_bonus")
+    if synergy.has("energy_bonus"):
+      result["triggered"] = true
+      result["energy_bonus"] = synergy["energy_bonus"]
+      event_bus.attunement_synergy_triggered.emit(self, partner, "energy_bonus")
+  return result

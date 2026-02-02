@@ -260,6 +260,35 @@ extends Node
 @export var flow_insight_chance_per_second: float = 0.02
 @export var flow_insight_amount: int = 1
 
+@export_group("Resource Purity")
+@export var purity_initial_level: float = 1.0
+@export var purity_decay_rate: float = 0.02
+@export var purity_transfer_loss: float = 0.1
+@export var purity_min_level: float = 0.3
+@export var purity_diluted_threshold: float = 0.4
+@export var purity_diluted_penalty: float = 0.15
+@export var purity_output_bonus_threshold: float = 0.8
+@export var purity_output_bonus_amount: int = 1
+@export var purity_speed_bonus_at_pure: float = 0.2
+@export var purity_refine_threshold: float = 0.5
+@export var purity_refine_gain: float = 0.15
+@export var purity_awakened_refine_bonus: float = 0.1
+
+@export_group("Harmony Attunement")
+@export var attunement_gain_rate: float = 0.01
+@export var attunement_max_level: float = 1.0
+@export var attunement_threshold: float = 0.8
+@export var attunement_decay_on_break: float = 0.5
+@export var attunement_speed_bonus: float = 0.3
+@export var attunement_output_bonus: int = 1
+@export var attunement_storage_bonus: int = 3
+@export var attunement_synergy_bonuses: Dictionary = {
+  "memory_well+memory_processor": {"output_type": "insight", "chance": 0.15},
+  "wound+mourning_chapel": {"tension_reduction": 1},
+  "worry_loop+grounding_station": {"calm_bonus": 1},
+  "comfort_hearth+morning_routine": {"energy_bonus": 1},
+}
+
 @export_group("Emotional Weather")
 @export var weather_resource_scale: float = 20.0
 @export var weather_momentum_lerp: float = 0.5

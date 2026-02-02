@@ -75,3 +75,14 @@ signal harmony_bonus_applied(building: Node, output_bonus: int)
 signal flow_state_entered(level: float)
 signal flow_state_exited()
 signal flow_insight_generated(amount: int)
+
+# Purity signals
+signal resource_purity_degraded(building: Node, resource_type: String, new_purity: float)
+signal pure_resource_processed(building: Node, resource_type: String, bonus: int)
+signal resource_refined(building: Node, resource_type: String, new_purity: float)
+
+# Attunement signals
+signal attunement_progress(building: Node, partner: Node, level: float)
+signal attunement_achieved(building: Node, partner: Node)
+signal attunement_broken(building: Node, partner: Node)
+signal attunement_synergy_triggered(building: Node, partner: Node, bonus_type: String)

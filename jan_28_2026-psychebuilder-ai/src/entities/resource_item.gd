@@ -4,6 +4,9 @@ var resource_type: Resource  # ResourceType
 var amount: int = 1
 var carried_by: Node = null
 
+@export_group("Appearance")
+@export var texture_size: int = 32
+
 @onready var sprite: Sprite2D = %Sprite2D
 @onready var label: Label = %Label
 
@@ -11,13 +14,12 @@ static var circle_texture: ImageTexture
 
 func _ready() -> void:
   if not circle_texture:
-    circle_texture = _create_circle_texture()
+    circle_texture = _create_circle_texture_with_size(texture_size)
   sprite.texture = circle_texture
   if resource_type:
     _update_visuals()
 
-static func _create_circle_texture() -> ImageTexture:
-  var size = 32
+func _create_circle_texture_with_size(size: int) -> ImageTexture:
   var image = Image.create(size, size, false, Image.FORMAT_RGBA8)
   var center = Vector2(size / 2.0, size / 2.0)
   var radius = size / 2.0 - 2

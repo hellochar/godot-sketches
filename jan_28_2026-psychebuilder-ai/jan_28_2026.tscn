@@ -13,6 +13,6 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="GameWorld" parent="." unique_id=931979143 instance=ExtResource("2_game_world")]
+[node name="GameWorld" parent="." unique_name_in_owner=true instance=ExtResource("2_game_world")]
 
-[node name="UILayer" parent="." unique_id=68908079 instance=ExtResource("3_ui_layer")]
+[node name="UILayer" parent="." unique_name_in_owner=true instance=ExtResource("3_ui_layer")]
