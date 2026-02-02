@@ -98,6 +98,7 @@ offset_left = -120.0
 offset_right = 120.0
 offset_bottom = 40.0
 grow_horizontal = 2
+scale = Vector2(1.25, 1.25)
 
 [node name="PhaseLabel" type="Label" parent="UILayer/TimeControls" unique_id=2015298302]
 unique_name_in_owner = true
@@ -133,7 +134,7 @@ visible = false
 layout_mode = 2
 text = "End Night"
 
-[node name="BuildingToolbar" type="HBoxContainer" parent="UILayer" unique_id=1684206290]
+[node name="BuildingToolbar" type="FlowContainer" parent="UILayer" unique_id=1292038311]
 unique_name_in_owner = true
 anchors_preset = 12
 anchor_top = 1.0

@@ -5,16 +5,17 @@ const WorkerScene = preload("res://jan_28_2026-psychebuilder-ai/src/entities/wor
 var grid: RefCounted
 var workers: Array = []
 
-var attention_pool: int = 10
+var attention_pool: int
 var attention_used: int = 0
 
-@export var habituation_thresholds: Array = [5, 15, 30, 50]
-@export var habituation_costs: Array = [1.0, 0.5, 0.25, 0.1, 0.0]
+var habituation_thresholds: Array
+var habituation_costs: Array
 
-func setup(p_grid: RefCounted) -> void:
+func setup(p_grid: RefCounted, p_attention_pool: int, p_thresholds: Array, p_costs: Array) -> void:
   grid = p_grid
-  var config = get_node("/root/Config")
-  attention_pool = config.base_attention_pool if config else 10
+  attention_pool = p_attention_pool
+  habituation_thresholds = p_thresholds
+  habituation_costs = p_costs
 
 func get_available_attention() -> int:
   return attention_pool - attention_used

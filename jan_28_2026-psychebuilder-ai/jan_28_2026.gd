@@ -5,6 +5,59 @@ const BuildingSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/sys
 const WorkerSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems/worker_system.gd")
 const TimeSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems/time_system.gd")
 
+@export_group("Time")
+@export var day_duration_seconds: float = 45.0
+@export var night_duration_seconds: float = 10.0
+@export var total_days: int = 20
+
+@export_group("Energy")
+@export var starting_energy: int = 10
+@export var max_energy: int = 20
+@export var energy_regen_per_day: int = 3
+
+@export_group("Attention")
+@export var base_attention_pool: int = 10
+@export var habituation_thresholds: Array[int] = [5, 15, 30, 50]
+@export var habituation_costs: Array[float] = [1.0, 0.5, 0.25, 0.1, 0.0]
+
+@export_group("Wellbeing")
+@export var base_wellbeing: float = 35.0
+@export var positive_emotion_weight: float = 2.0
+@export var derived_resource_weight: float = 3.0
+@export var negative_emotion_weight: float = 1.5
+@export var unprocessed_negative_weight: float = 2.0
+@export var habit_building_weight: float = 1.0
+@export var adjacency_synergy_weight: float = 0.5
+@export var wellbeing_normalizer: float = 50.0
+@export var positive_emotions: Array[String] = ["joy", "calm", "wisdom"]
+@export var negative_emotions: Array[String] = ["grief", "anxiety"]
+
+@export_group("Wellbeing Display")
+@export var wellbeing_good_threshold: float = 70.0
+@export var wellbeing_warning_threshold: float = 40.0
+@export var wellbeing_good_color: Color = Color(0.3, 0.9, 0.3)
+@export var wellbeing_warning_color: Color = Color(0.9, 0.9, 0.3)
+@export var wellbeing_bad_color: Color = Color(0.9, 0.3, 0.3)
+
+@export_group("Endings")
+@export var flourishing_threshold: int = 80
+@export var growing_threshold: int = 50
+@export var surviving_threshold: int = 20
+
+@export_group("Grid")
+@export var grid_size: Vector2i = Vector2i(50, 50)
+@export var tile_size: int = 64
+
+@export_group("UI")
+@export var building_button_size: Vector2 = Vector2(80, 40)
+@export var speed_options: Array[float] = [1.0, 2.0, 3.0]
+
+@export_group("Clock Display")
+@export var day_hours: float = 16.0
+@export var night_hours: float = 8.0
+@export var day_start_hour: int = 6
+@export var night_start_hour: int = 22
+
 @onready var game_world = %GameWorld
 @onready var ui_layer: CanvasLayer = %UILayer
 
@@ -16,7 +69,7 @@ const TimeSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems
 @onready var phase_label: Label = %PhaseLabel
 @onready var time_label: Label = %TimeLabel
 @onready var end_night_btn: Button = %EndNightBtn
-@onready var building_toolbar: HBoxContainer = %BuildingToolbar
+@onready var building_toolbar: Container = %BuildingToolbar
 
 var resource_system: Node
 var building_system: Node
@@ -38,6 +91,8 @@ func _ready() -> void:
   get_node("/root/EventBus").game_started.emit()
 
 func _setup_systems() -> void:
+  game_world.setup(grid_size, tile_size)
+
   resource_system = ResourceSystemScript.new()
   add_child(resource_system)
   resource_system.set_resources_layer(game_world.get_resources_layer())
@@ -48,11 +103,14 @@ func _setup_systems() -> void:
 
   worker_system = WorkerSystemScript.new()
   add_child(worker_system)
-  worker_system.setup(game_world.get_grid())
+  worker_system.setup(game_world.get_grid(), base_attention_pool, habituation_thresholds, habituation_costs)
 
   time_system = TimeSystemScript.new()
   add_child(time_system)
+  time_system.setup(day_duration_seconds, night_duration_seconds, total_days, energy_regen_per_day)
   time_system.phase_changed.connect(_on_phase_changed)
+
+  get_node("/root/GameState").reset_to_defaults(starting_energy, max_energy, base_attention_pool, base_wellbeing, habituation_thresholds, habituation_costs)
 
 func _setup_ui() -> void:
   _populate_building_toolbar()
@@ -71,7 +129,7 @@ func _create_building_button(building_id: String) -> Button:
   var btn = Button.new()
   btn.name = building_id
   btn.text = def.get("name", building_id)
-  btn.custom_minimum_size = Vector2(80, 40)
+  btn.custom_minimum_size = building_button_size
   btn.tooltip_text = def.get("description", "")
 
   var cost = def.get("build_cost", {})
@@ -83,9 +141,9 @@ func _create_building_button(building_id: String) -> Button:
   return btn
 
 func _connect_time_controls() -> void:
-  %Speed1xBtn.pressed.connect(func(): time_system.set_speed(1.0))
-  %Speed2xBtn.pressed.connect(func(): time_system.set_speed(2.0))
-  %Speed3xBtn.pressed.connect(func(): time_system.set_speed(3.0))
+  %Speed1xBtn.pressed.connect(func(): time_system.set_speed(speed_options[0]))
+  %Speed2xBtn.pressed.connect(func(): time_system.set_speed(speed_options[1]))
+  %Speed3xBtn.pressed.connect(func(): time_system.set_speed(speed_options[2]))
   end_night_btn.pressed.connect(func(): time_system.end_night())
 
 func _on_building_selected(building_id: String) -> void:
@@ -226,7 +284,6 @@ func _update_energy_display() -> void:
 
 func _calculate_wellbeing() -> void:
   var gs = get_node("/root/GameState")
-  var config = get_node("/root/Config")
 
   var positive_total = 0
   var negative_total = 0
@@ -234,26 +291,25 @@ func _calculate_wellbeing() -> void:
   for building in gs.active_buildings:
     for res_id in building.storage:
       var amount = building.storage[res_id]
-      if res_id in ["joy", "calm", "wisdom"]:
+      if res_id in positive_emotions:
         positive_total += amount
-      elif res_id in ["grief", "anxiety"]:
+      elif res_id in negative_emotions:
         negative_total += amount
 
-  var base = 35.0
-  var positive_bonus = positive_total * config.positive_emotion_weight
-  var negative_penalty = negative_total * config.negative_emotion_weight
-  var building_bonus = gs.active_buildings.size() * config.habit_building_weight
+  var positive_bonus = positive_total * positive_emotion_weight
+  var negative_penalty = negative_total * negative_emotion_weight
+  var building_bonus = gs.active_buildings.size() * habit_building_weight
 
-  var new_wellbeing = base + positive_bonus - negative_penalty + building_bonus
+  var new_wellbeing = base_wellbeing + positive_bonus - negative_penalty + building_bonus
   gs.set_wellbeing(new_wellbeing)
 
 func _get_wellbeing_color(value: float) -> Color:
-  if value >= 70:
-    return Color(0.3, 0.9, 0.3)
-  elif value >= 40:
-    return Color(0.9, 0.9, 0.3)
+  if value >= wellbeing_good_threshold:
+    return wellbeing_good_color
+  elif value >= wellbeing_warning_threshold:
+    return wellbeing_warning_color
   else:
-    return Color(0.9, 0.3, 0.3)
+    return wellbeing_bad_color
 
 func get_resource_system() -> Node:
   return resource_system
@@ -282,8 +338,8 @@ func _update_time_display() -> void:
   time_label.text = _format_clock_time(time_system.get_phase_progress(), time_system.is_day())
 
 func _format_clock_time(progress: float, is_day: bool) -> String:
-  var total_hours = 16.0 if is_day else 8.0
-  var start_hour = 6 if is_day else 22
+  var total_hours = day_hours if is_day else night_hours
+  var start_hour = day_start_hour if is_day else night_start_hour
   var elapsed_hours = progress * total_hours
   var hour = start_hour + int(elapsed_hours)
   if hour >= 24:

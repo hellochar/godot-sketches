@@ -8,15 +8,19 @@ var game_speed: float = 1.0
 var is_paused: bool = false
 
 # Energy state
-var current_energy: int = 10
-var max_energy: int = 20
+var current_energy: int
+var max_energy: int
 
 # Attention state
-var attention_used: float = 0.0
-var attention_available: float = 10.0
+var attention_used: float
+var attention_available: float
 
 # Wellbeing
-var wellbeing: float = 35.0
+var wellbeing: float
+
+# Stored config values
+var habituation_thresholds: Array[int]
+var habituation_costs: Array[float]
 
 # Tracking collections
 var active_buildings: Array[Node] = []
@@ -45,21 +49,20 @@ var archetype_modifiers: Dictionary = {
   "anxiety_rate": 0.0
 }
 
-func _ready() -> void:
-  reset_to_defaults()
-
-func reset_to_defaults() -> void:
+func reset_to_defaults(p_starting_energy: int, p_max_energy: int, p_base_attention: float, p_base_wellbeing: float, p_habituation_thresholds: Array[int] = [], p_habituation_costs: Array[float] = []) -> void:
+  habituation_thresholds = p_habituation_thresholds
+  habituation_costs = p_habituation_costs
   current_day = 1
   current_phase = "night"
   phase_time = 0.0
   game_speed = 1.0
   is_paused = false
 
-  current_energy = get_node("/root/Config").starting_energy
-  max_energy = get_node("/root/Config").max_energy
-  attention_available = get_node("/root/Config").base_attention_pool
+  current_energy = p_starting_energy
+  max_energy = p_max_energy
+  attention_available = p_base_attention
   attention_used = 0.0
-  wellbeing = 35.0
+  wellbeing = p_base_wellbeing
 
   active_buildings.clear()
   active_workers.clear()
@@ -114,24 +117,22 @@ func set_wellbeing(value: float) -> void:
 
 func get_habituation_level(job_id: String) -> int:
   var completions = habituation_progress.get(job_id, 0)
-  var thresholds = get_node("/root/Config").habituation_thresholds
-  for i in range(thresholds.size() - 1, -1, -1):
-    if completions >= thresholds[i]:
+  for i in range(habituation_thresholds.size() - 1, -1, -1):
+    if completions >= habituation_thresholds[i]:
       return i + 1
   return 0
 
 func get_attention_cost(job_id: String) -> float:
   var level = get_habituation_level(job_id)
-  return get_node("/root/Config").habituation_costs[level]
+  return habituation_costs[level]
 
 func increment_habituation(job_id: String) -> void:
   if not habituation_progress.has(job_id):
     habituation_progress[job_id] = 0
   habituation_progress[job_id] += 1
 
-func on_day_start() -> void:
-  var config = get_node("/root/Config")
-  add_energy(config.energy_regen_per_day)
+func on_day_start(energy_regen: int) -> void:
+  add_energy(energy_regen)
 
   for building in active_buildings:
     if building.has_method("trigger_habit"):

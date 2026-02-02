@@ -1,5 +1,11 @@
 extends Node2D
 
+@export_group("Visual")
+@export var circle_size: int = 32
+
+@export_group("Stack")
+@export var default_stack_size: int = 10
+
 var resource_type: Resource  # ResourceType
 var amount: int = 1
 var carried_by: Node = null
@@ -76,7 +82,7 @@ func is_depleted() -> bool:
   return amount <= 0
 
 func add_amount(delta: int) -> int:
-  var max_stack = resource_type.stack_size if resource_type else 10
+  var max_stack = resource_type.stack_size if resource_type else default_stack_size
   var can_add = mini(delta, max_stack - amount)
   amount += can_add
   _update_visuals()

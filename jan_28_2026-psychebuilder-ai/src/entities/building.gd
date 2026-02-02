@@ -26,7 +26,9 @@ var generation_timer: float = 0.0
 # Coping state
 var coping_cooldown_timer: float = 0.0
 
-# Visual
+@export_group("Visual")
+@export var disconnected_darken_factor: float = 0.4
+
 @onready var sprite: ColorRect = $ColorRect
 @onready var label: Label = $Label
 
@@ -52,8 +54,8 @@ func initialize(p_building_id: String, p_grid_coord: Vector2i, p_grid: RefCounte
     _update_visuals()
 
 func _update_visuals() -> void:
-  var tile_size = get_node("/root/Config").tile_size
-  var pixel_size = Vector2(size) * tile_size
+  var ts = grid.tile_size if grid else 64
+  var pixel_size = Vector2(size) * ts
 
   sprite.size = pixel_size
   _update_connection_visual()
@@ -88,7 +90,7 @@ func _update_connection_visual() -> void:
   if road_connected or is_road():
     sprite.color = base_color
   else:
-    sprite.color = base_color.darkened(0.4)
+    sprite.color = base_color.darkened(disconnected_darken_factor)
 
 func _update_storage_display() -> void:
   var name_text = definition.get("name", building_id)

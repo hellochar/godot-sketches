@@ -14,8 +14,17 @@ var dest_building: Node = null
 var resource_type: String = ""
 var carried_amount: int = 0
 
-# Movement
+@export_group("Movement")
 @export var move_speed: float = 100.0
+
+@export_group("Visual")
+@export var idle_color: Color = Color(1, 0.95, 0.7, 1)
+@export var carrying_color: Color = Color(1.2, 1.1, 0.8, 1)
+@export var mote_size: int = 24
+
+@export_group("Carry")
+@export var max_carry_amount: int = 5
+
 var target_position: Vector2
 
 # Habituation tracking
@@ -31,7 +40,7 @@ func _ready() -> void:
   if not mote_texture:
     mote_texture = _create_mote_texture()
   sprite.texture = mote_texture
-  modulate = Color(1, 0.95, 0.7, 1)
+  modulate = idle_color
 
 static func _create_mote_texture() -> ImageTexture:
   var size = 24
@@ -178,12 +187,10 @@ func _process_pickup() -> void:
 
   var available = source_building.get_storage_amount(resource_type)
   if available > 0:
-    carried_amount = source_building.remove_from_storage(resource_type, mini(available, 5))
+    carried_amount = source_building.remove_from_storage(resource_type, mini(available, max_carry_amount))
     state = State.CARRYING
     _pathfind_to_building(dest_building)
-
-    # Visual feedback
-    modulate = Color(1.2, 1.1, 0.8, 1)
+    modulate = carrying_color
   else:
     # Wait for resources
     pass
@@ -198,7 +205,7 @@ func _process_dropoff() -> void:
     carried_amount = overflow
 
   if carried_amount == 0:
-    modulate = Color(1, 0.95, 0.7, 1)
+    modulate = idle_color
     completions += 1
 
     # Loop back to pickup
