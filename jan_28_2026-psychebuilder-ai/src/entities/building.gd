@@ -54,6 +54,9 @@ var generation_timer: float = 0.0
 # Coping state
 var coping_cooldown_timer: float = 0.0
 
+# Anxiety spreading state
+var anxiety_spread_timer: float = 0.0
+
 # Visual
 @onready var sprite: ColorRect = $ColorRect
 @onready var label: Label = $Label
@@ -151,6 +154,7 @@ func _process(delta: float) -> void:
   _update_storage_display()
   _process_processing(delta)
   _process_coping(delta)
+  _process_anxiety_spreading(delta)
   _update_status()
   _update_status_visual()
 
@@ -204,6 +208,13 @@ func _try_start_processing() -> void:
 
 func _complete_processing() -> void:
   processing_active = false
+  var conditional_outputs = definition.get("conditional_outputs", {})
+  if not conditional_outputs.is_empty():
+    for condition_resource in conditional_outputs:
+      if storage.get(condition_resource, 0) > 0:
+        var output_data = conditional_outputs[condition_resource]
+        _output_resource(output_data["output"], output_data["amount"])
+        return
   var outputs = definition.get("output", {})
   for resource_id in outputs:
     _output_resource(resource_id, outputs[resource_id])
@@ -230,6 +241,50 @@ func _process_coping(delta: float) -> void:
     for resource_id in outputs:
       _output_resource(resource_id, outputs[resource_id])
     coping_cooldown_timer = definition.get("coping_cooldown", 30.0)
+
+func _process_anxiety_spreading(delta: float) -> void:
+  if not has_behavior(BuildingDefs.Behavior.STORAGE):
+    return
+
+  var anxiety_amount = storage.get("anxiety", 0)
+  if anxiety_amount < config.anxiety_overflow_threshold:
+    return
+
+  anxiety_spread_timer += delta
+  if anxiety_spread_timer < config.anxiety_spread_interval:
+    return
+
+  anxiety_spread_timer = 0.0
+  _spread_anxiety_to_neighbors()
+
+func _spread_anxiety_to_neighbors() -> void:
+  if not grid:
+    return
+
+  var spread_amount = config.anxiety_spread_amount
+  var all_adjacent_coords: Array[Vector2i] = []
+
+  for x in range(-1, size.x + 1):
+    for y in range(-1, size.y + 1):
+      if x >= 0 and x < size.x and y >= 0 and y < size.y:
+        continue
+      var check = grid_coord + Vector2i(x, y)
+      if grid.is_valid_coord(check):
+        all_adjacent_coords.append(check)
+
+  var spread_targets: Array[Node] = []
+  for coord in all_adjacent_coords:
+    var occupant = grid.get_occupant(coord)
+    if occupant and occupant != self and occupant.has_method("add_to_storage"):
+      if occupant not in spread_targets:
+        spread_targets.append(occupant)
+
+  for target in spread_targets:
+    if target.storage_capacity > 0:
+      var removed = remove_from_storage("anxiety", spread_amount)
+      if removed > 0:
+        target.add_to_storage("anxiety", removed)
+        break
 
 func _evaluate_trigger(trigger: String) -> bool:
   if trigger.is_empty():

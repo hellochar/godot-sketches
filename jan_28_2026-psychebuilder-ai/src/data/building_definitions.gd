@@ -186,6 +186,26 @@ static var definitions: Dictionary = {
     "storage_capacity": 5,
     "unlocked_by_default": true,
   },
+
+  "memory_processor": {
+    "id": "memory_processor",
+    "name": "Memory Processor",
+    "description": "Transforms Nostalgia into Joy when Calm is present, or into Grief when Tension is present.",
+    "behaviors": [Behavior.PROCESSOR, Behavior.STORAGE],
+    "build_cost": {"energy": 5},
+    "size": Vector2i(2, 2),
+    "color": Color(0.7, 0.6, 0.9),
+    "input": {"nostalgia": 2},
+    "conditional_outputs": {
+      "calm": {"output": "joy", "amount": 2},
+      "tension": {"output": "grief", "amount": 2},
+    },
+    "output": {"grief": 1},
+    "process_time": 4.0,
+    "requires_worker": false,
+    "storage_capacity": 12,
+    "unlocked_by_default": true,
+  },
 }
 
 static func get_definition(building_id: String) -> Dictionary:

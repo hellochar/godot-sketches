@@ -27,3 +27,8 @@ extends Node
 # Grid
 @export var grid_size: Vector2i = Vector2i(50, 50)
 @export var tile_size: int = 64
+
+# Anxiety Spreading
+@export var anxiety_overflow_threshold: int = 8
+@export var anxiety_spread_amount: int = 1
+@export var anxiety_spread_interval: float = 5.0
