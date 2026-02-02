@@ -219,6 +219,23 @@ extends Node
 @export var breakthrough_cooldown: float = 30.0
 @export var breakthrough_negative_types: Array[String] = ["grief", "anxiety", "tension", "worry", "doubt"]
 
+@export_group("Building Fatigue")
+@export var fatigue_gain_per_process: float = 0.1
+@export var fatigue_max_level: float = 1.0
+@export var fatigue_recovery_rate: float = 0.05
+@export var fatigue_calm_recovery_bonus: float = 0.02
+@export var fatigue_calm_radius: int = 2
+@export var fatigue_speed_penalty_at_max: float = 0.4
+@export var fatigue_onset_threshold: float = 0.3
+
+@export_group("Emotional Echo")
+@export var echo_gain_per_process: float = 0.2
+@export var echo_max_level: float = 1.0
+@export var echo_decay_rate: float = 0.02
+@export var echo_same_type_bonus: float = 0.3
+@export var echo_different_type_penalty: float = 0.15
+@export var echo_threshold: float = 0.3
+
 @export_group("Emotional Weather")
 @export var weather_resource_scale: float = 20.0
 @export var weather_momentum_lerp: float = 0.5

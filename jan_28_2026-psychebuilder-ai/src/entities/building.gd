@@ -110,6 +110,13 @@ var support_network_transfer_timer: float = 0.0
 var awakening_experience: int = 0
 var is_awakened: bool = false
 
+# Fatigue state
+var fatigue_level: float = 0.0
+
+# Emotional echo state
+var emotional_echo: Dictionary = {}
+var dominant_echo: String = ""
+
 # Visual
 @onready var sprite: ColorRect = %ColorRect
 @onready var label: Label = %Label
@@ -220,6 +227,8 @@ func _process(delta: float) -> void:
   _process_emotional_momentum(delta)
   _process_support_network()
   _process_network_load_sharing(delta)
+  _process_fatigue(delta)
+  _process_emotional_echo_decay(delta)
   _update_status()
   _update_status_visual()
 
@@ -277,7 +286,9 @@ func _process_processing(delta: float) -> void:
   var belief_modifier = game_state.get_belief_processing_modifier()
   var awakening_multiplier = get_awakening_speed_multiplier()
   var breakthrough_modifier = game_state.get_breakthrough_speed_modifier()
-  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier
+  var fatigue_multiplier = _get_fatigue_speed_multiplier()
+  var echo_multiplier = _get_emotional_echo_multiplier()
+  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier * fatigue_multiplier * echo_multiplier
   if process_timer <= 0:
     _complete_processing()
 
@@ -317,6 +328,8 @@ func _complete_processing() -> void:
   if processed_negative:
     _output_resource("tension", config.tension_from_processing)
 
+  _gain_fatigue()
+  _build_emotional_echo(inputs)
   _gain_awakening_experience()
 
   var recipe_key = _get_recipe_key(inputs)
@@ -1332,3 +1345,95 @@ func get_awakening_generator_rate_multiplier() -> float:
   if is_awakened:
     return 1.0 + config.awakening_generator_rate_bonus
   return 1.0
+
+func _gain_fatigue() -> void:
+  fatigue_level = minf(fatigue_level + config.fatigue_gain_per_process, config.fatigue_max_level)
+
+func _process_fatigue(delta: float) -> void:
+  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    return
+
+  if processing_active:
+    return
+
+  var base_recovery = config.fatigue_recovery_rate * delta
+  var calm_bonus = _get_nearby_calm_for_fatigue() * config.fatigue_calm_recovery_bonus * delta
+  var total_recovery = base_recovery + calm_bonus
+
+  fatigue_level = maxf(0.0, fatigue_level - total_recovery)
+
+func _get_nearby_calm_for_fatigue() -> int:
+  var total_calm = storage.get("calm", 0)
+  if not grid:
+    return total_calm
+
+  var radius = config.fatigue_calm_radius
+  for x in range(-radius, size.x + radius):
+    for y in range(-radius, size.y + radius):
+      if x >= 0 and x < size.x and y >= 0 and y < size.y:
+        continue
+      var check = grid_coord + Vector2i(x, y)
+      if grid.is_valid_coord(check):
+        var occupant = grid.get_occupant(check)
+        if occupant and occupant != self and occupant.has_method("get_storage_amount"):
+          total_calm += occupant.get_storage_amount("calm")
+
+  return total_calm
+
+func _get_fatigue_speed_multiplier() -> float:
+  if fatigue_level < config.fatigue_onset_threshold:
+    return 1.0
+  var effective_fatigue = (fatigue_level - config.fatigue_onset_threshold) / (config.fatigue_max_level - config.fatigue_onset_threshold)
+  var penalty = effective_fatigue * config.fatigue_speed_penalty_at_max
+  return 1.0 - penalty
+
+func _build_emotional_echo(inputs: Dictionary) -> void:
+  for resource_id in inputs:
+    var current = emotional_echo.get(resource_id, 0.0)
+    emotional_echo[resource_id] = minf(current + config.echo_gain_per_process, config.echo_max_level)
+
+  _update_dominant_echo()
+
+func _process_emotional_echo_decay(delta: float) -> void:
+  if emotional_echo.is_empty():
+    return
+
+  var decay = config.echo_decay_rate * delta
+  for resource_id in emotional_echo.keys():
+    emotional_echo[resource_id] = maxf(0.0, emotional_echo[resource_id] - decay)
+
+  _update_dominant_echo()
+
+func _update_dominant_echo() -> void:
+  var max_value = 0.0
+  dominant_echo = ""
+
+  for resource_id in emotional_echo:
+    if emotional_echo[resource_id] > max_value:
+      max_value = emotional_echo[resource_id]
+      dominant_echo = resource_id
+
+func _get_emotional_echo_multiplier() -> float:
+  if dominant_echo == "" or emotional_echo.get(dominant_echo, 0.0) < config.echo_threshold:
+    return 1.0
+
+  var inputs = definition.get("input", {})
+  if inputs.is_empty():
+    return 1.0
+
+  var primary_input = ""
+  var max_amount = 0
+  for resource_id in inputs:
+    if inputs[resource_id] > max_amount:
+      max_amount = inputs[resource_id]
+      primary_input = resource_id
+
+  if primary_input == "":
+    return 1.0
+
+  var echo_strength = emotional_echo.get(dominant_echo, 0.0) / config.echo_max_level
+
+  if primary_input == dominant_echo:
+    return 1.0 + (echo_strength * config.echo_same_type_bonus)
+  else:
+    return 1.0 - (echo_strength * config.echo_different_type_penalty)

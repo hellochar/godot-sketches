@@ -58,3 +58,11 @@ signal building_awakened(building: Node)
 
 # Breakthrough signals
 signal breakthrough_triggered(insight_reward: int, wisdom_reward: int)
+
+# Fatigue signals
+signal building_fatigued(building: Node, fatigue_level: float)
+signal building_rested(building: Node)
+
+# Emotional echo signals
+signal echo_formed(building: Node, emotion_type: String, echo_level: float)
+signal echo_specialty_bonus(building: Node, emotion_type: String)
