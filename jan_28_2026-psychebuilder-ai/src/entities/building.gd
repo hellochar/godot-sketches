@@ -2,6 +2,34 @@ extends Node2D
 
 const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
 
+@onready var game_state: Node = get_node("/root/GameState")
+@onready var event_bus: Node = get_node("/root/EventBus")
+@onready var config: Node = get_node("/root/Config")
+
+enum Status {
+  IDLE,
+  PROCESSING,
+  WAITING_INPUT,
+  WAITING_WORKER,
+  STORAGE_FULL,
+  GENERATING,
+  COPING_READY,
+  COPING_COOLDOWN,
+}
+
+@export var status_colors: Dictionary = {
+  Status.IDLE: Color(0.5, 0.5, 0.5),
+  Status.PROCESSING: Color(0.2, 0.8, 0.2),
+  Status.WAITING_INPUT: Color(0.9, 0.6, 0.2),
+  Status.WAITING_WORKER: Color(0.8, 0.4, 0.8),
+  Status.STORAGE_FULL: Color(0.8, 0.2, 0.2),
+  Status.GENERATING: Color(0.2, 0.6, 0.9),
+  Status.COPING_READY: Color(0.9, 0.9, 0.2),
+  Status.COPING_COOLDOWN: Color(0.4, 0.4, 0.6),
+}
+
+var current_status: Status = Status.IDLE
+
 var building_id: String
 var definition: Dictionary
 var grid_coord: Vector2i
@@ -29,6 +57,9 @@ var coping_cooldown_timer: float = 0.0
 # Visual
 @onready var sprite: ColorRect = $ColorRect
 @onready var label: Label = $Label
+@onready var progress_bar: ProgressBar = %ProgressBar
+@onready var status_indicator: ColorRect = %StatusIndicator
+@onready var disconnected_warning: Label = %DisconnectedWarning
 
 func _ready() -> void:
   if definition:
@@ -52,7 +83,7 @@ func initialize(p_building_id: String, p_grid_coord: Vector2i, p_grid: RefCounte
     _update_visuals()
 
 func _update_visuals() -> void:
-  var tile_size = get_node("/root/Config").tile_size
+  var tile_size = config.tile_size
   var pixel_size = Vector2(size) * tile_size
 
   sprite.size = pixel_size
@@ -62,6 +93,11 @@ func _update_visuals() -> void:
   label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
   label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
   _update_storage_display()
+
+  progress_bar.size.x = pixel_size.x
+  progress_bar.visible = false
+
+  _update_status_visual()
 
 func _update_connection() -> void:
   if not grid:
@@ -85,10 +121,13 @@ func _update_connection() -> void:
 
 func _update_connection_visual() -> void:
   var base_color = definition.get("color", Color.WHITE)
-  if road_connected or is_road():
-    sprite.color = base_color
+  var is_disconnected = not road_connected and not is_road()
+  if is_disconnected:
+    sprite.color = base_color.lerp(Color(0.8, 0.2, 0.2), 0.5)
+    disconnected_warning.visible = true
   else:
-    sprite.color = base_color.darkened(0.4)
+    sprite.color = base_color
+    disconnected_warning.visible = false
 
 func _update_storage_display() -> void:
   var name_text = definition.get("name", building_id)
@@ -112,6 +151,8 @@ func _process(delta: float) -> void:
   _update_storage_display()
   _process_processing(delta)
   _process_coping(delta)
+  _update_status()
+  _update_status_visual()
 
 func _process_generation(delta: float) -> void:
   if not has_behavior(BuildingDefs.Behavior.GENERATOR):
@@ -190,10 +231,33 @@ func _process_coping(delta: float) -> void:
       _output_resource(resource_id, outputs[resource_id])
     coping_cooldown_timer = definition.get("coping_cooldown", 30.0)
 
-func _evaluate_trigger(_trigger: String) -> bool:
-  # Simplified: always false for now
-  # Full implementation would parse "anxiety > 10" etc.
-  return false
+func _evaluate_trigger(trigger: String) -> bool:
+  if trigger.is_empty():
+    return false
+
+  var parts = trigger.split(" ", false)
+  if parts.size() != 3:
+    return false
+
+  var resource_id = parts[0]
+  var operator = parts[1]
+  var threshold = parts[2].to_int()
+
+  var current_value = game_state.get_resource_total(resource_id)
+
+  match operator:
+    ">":
+      return current_value > threshold
+    ">=":
+      return current_value >= threshold
+    "<":
+      return current_value < threshold
+    "<=":
+      return current_value <= threshold
+    "==":
+      return current_value == threshold
+    _:
+      return false
 
 func has_behavior(behavior: int) -> bool:
   var behaviors = definition.get("behaviors", [])
@@ -218,11 +282,12 @@ func _output_resource(resource_id: String, amount: int) -> void:
   if to_store > 0:
     storage[resource_id] = current + to_store
 
-  # Overflow spawns in world (handled by building_system)
+  # Overflow spawns in world
   var overflow = amount - to_store
   if overflow > 0:
-    # Signal to spawn resource nearby
-    pass
+    var tile_size = config.tile_size
+    var spawn_pos = position + Vector2(size) * tile_size * 0.5 + Vector2(randf_range(-16, 16), randf_range(-16, 16))
+    event_bus.resource_overflow.emit(resource_id, overflow, self, spawn_pos)
 
 func _get_total_stored() -> int:
   var total = 0
@@ -263,7 +328,7 @@ func trigger_habit() -> void:
   # For energy consumption, check global state
   var energy_cost = consumes.get("energy", 0)
   if energy_cost > 0:
-    if not get_node("/root/GameState").spend_energy(energy_cost):
+    if not game_state.spend_energy(energy_cost):
       return
 
   # Generate resources
@@ -271,7 +336,76 @@ func trigger_habit() -> void:
   for resource_id in generates:
     _output_resource(resource_id, generates[resource_id])
 
+  # Reduce resources (from storage first, then GameState totals)
+  var reduces = definition.get("habit_reduces", {})
+  for resource_id in reduces:
+    var to_reduce = reduces[resource_id]
+    var removed = remove_from_storage(resource_id, to_reduce)
+    var remaining = to_reduce - removed
+    if remaining > 0:
+      game_state.update_resource_total(resource_id, -remaining)
+
   # Energy bonus
   var energy_bonus = definition.get("habit_energy_bonus", 0)
   if energy_bonus > 0:
-    get_node("/root/GameState").add_energy(energy_bonus)
+    game_state.add_energy(energy_bonus)
+
+func _update_status() -> void:
+  if is_road():
+    current_status = Status.IDLE
+    return
+
+  if _is_storage_full():
+    current_status = Status.STORAGE_FULL
+    return
+
+  if has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    if processing_active:
+      current_status = Status.PROCESSING
+      return
+    if definition.get("requires_worker", false) and not assigned_worker:
+      current_status = Status.WAITING_WORKER
+      return
+    var inputs = definition.get("input", {})
+    if not inputs.is_empty() and not _has_inputs(inputs):
+      current_status = Status.WAITING_INPUT
+      return
+
+  if has_behavior(BuildingDefs.Behavior.COPING):
+    if coping_cooldown_timer > 0:
+      current_status = Status.COPING_COOLDOWN
+      return
+    var trigger = definition.get("coping_trigger", "")
+    if _evaluate_trigger(trigger):
+      current_status = Status.COPING_READY
+      return
+
+  if has_behavior(BuildingDefs.Behavior.GENERATOR):
+    current_status = Status.GENERATING
+    return
+
+  current_status = Status.IDLE
+
+func _update_status_visual() -> void:
+  status_indicator.color = status_colors.get(current_status, Color.GRAY)
+
+  var is_processor = has_behavior(BuildingDefs.Behavior.PROCESSOR)
+  var is_coping = has_behavior(BuildingDefs.Behavior.COPING)
+
+  if is_processor and processing_active:
+    progress_bar.visible = true
+    var total_time = definition.get("process_time", 1.0)
+    var progress = 1.0 - (process_timer / total_time)
+    progress_bar.value = progress * 100.0
+  elif is_coping and coping_cooldown_timer > 0:
+    progress_bar.visible = true
+    var total_cooldown = definition.get("coping_cooldown", 30.0)
+    var progress = 1.0 - (coping_cooldown_timer / total_cooldown)
+    progress_bar.value = progress * 100.0
+  else:
+    progress_bar.visible = false
+
+func _is_storage_full() -> bool:
+  if storage_capacity <= 0:
+    return false
+  return _get_total_stored() >= storage_capacity

@@ -1,11 +1,13 @@
 extends Node2D
 
+signal job_cycle_completed
+
 enum State { IDLE, MOVING_TO_PICKUP, PICKING_UP, CARRYING, MOVING_TO_DROPOFF, DROPPING_OFF }
 
 var state: State = State.IDLE
 var current_path: Array[Vector2i] = []
 var path_index: int = 0
-var grid: RefCounted  # GridSystem
+var grid: Node  # GridSystem
 
 # Job info
 var job_type: String = ""  # "transport", "operate"
@@ -22,6 +24,11 @@ var target_position: Vector2
 var job_id: String = ""
 var completions: int = 0
 
+# Selection state
+var is_selected: bool = false
+var base_modulate: Color = Color(1, 0.95, 0.7, 1)
+var selected_modulate: Color = Color(0.5, 1.0, 0.5, 1)
+
 # Visual
 @onready var sprite: Sprite2D = $Sprite2D
 
@@ -31,7 +38,7 @@ func _ready() -> void:
   if not mote_texture:
     mote_texture = _create_mote_texture()
   sprite.texture = mote_texture
-  modulate = Color(1, 0.95, 0.7, 1)
+  modulate = base_modulate
 
 static func _create_mote_texture() -> ImageTexture:
   var size = 24
@@ -51,7 +58,7 @@ static func _create_mote_texture() -> ImageTexture:
 
   return ImageTexture.create_from_image(image)
 
-func setup(p_grid: RefCounted) -> void:
+func setup(p_grid: Node) -> void:
   grid = p_grid
 
 func assign_transport_job(p_source: Node, p_dest: Node, p_resource_type: String) -> bool:
@@ -198,17 +205,39 @@ func _process_dropoff() -> void:
     carried_amount = overflow
 
   if carried_amount == 0:
-    modulate = Color(1, 0.95, 0.7, 1)
-    completions += 1
+    _update_selection_visual()
+    job_cycle_completed.emit()
 
     # Loop back to pickup
     state = State.MOVING_TO_PICKUP
     _pathfind_to_building(source_building)
+  else:
+    # Destination full - return resources to source
+    _return_resources_to_source()
 
 func _arrive_at_operate() -> void:
   if dest_building:
     dest_building.assign_worker(self)
   state = State.IDLE
+
+func _return_resources_to_source() -> void:
+  if not source_building or carried_amount == 0:
+    state = State.IDLE
+    return
+
+  var overflow = source_building.add_to_storage(resource_type, carried_amount)
+  carried_amount = overflow
+
+  if carried_amount == 0:
+    _update_selection_visual()
+    # Try picking up again
+    state = State.MOVING_TO_PICKUP
+    _pathfind_to_building(source_building)
+  else:
+    # Both source and dest full - drop resources and go idle
+    carried_amount = 0
+    _update_selection_visual()
+    state = State.IDLE
 
 func unassign() -> void:
   if dest_building and job_type == "operate":
@@ -226,3 +255,15 @@ func get_job_id() -> String:
 
 func get_completions() -> int:
   return completions
+
+func set_selected(selected: bool) -> void:
+  is_selected = selected
+  _update_selection_visual()
+
+func _update_selection_visual() -> void:
+  if is_selected:
+    modulate = selected_modulate
+    scale = Vector2(1.3, 1.3)
+  else:
+    modulate = base_modulate
+    scale = Vector2(1.0, 1.0)
