@@ -110,3 +110,22 @@ extends Node
 @export var doubt_max_efficiency_penalty: float = 0.4
 @export var doubt_insight_combine_threshold: int = 2
 @export var wisdom_from_answered_doubt: int = 1
+
+# Nostalgia Crystallization
+@export_group("Nostalgia Crystallization")
+@export var nostalgia_crystallization_time: float = 30.0
+@export var nostalgia_crystallization_calm_threshold: int = 3
+@export var nostalgia_crystallization_negative_threshold: int = 3
+@export var nostalgia_crystallization_radius: int = 2
+@export var nostalgia_crystallization_amount: int = 1
+
+# Emotional Resonance
+@export_group("Emotional Resonance")
+@export var resonance_min_buildings: int = 3
+@export var resonance_resource_threshold: int = 3
+@export var resonance_radius: int = 3
+@export var resonance_positive_speed_bonus: float = 0.25
+@export var resonance_negative_amplification_interval: float = 8.0
+@export var resonance_negative_amplification_amount: int = 1
+@export var resonance_positive_resources: Array[String] = ["joy", "calm", "insight", "wisdom"]
+@export var resonance_negative_resources: Array[String] = ["anxiety", "grief", "doubt", "worry"]

@@ -63,6 +63,14 @@ var worry_compounding_timer: float = 0.0
 # Doubt generation state
 var doubt_generation_timer: float = 0.0
 
+# Nostalgia crystallization state
+var nostalgia_age_tracker: Dictionary = {}
+
+# Resonance state
+var resonance_timer: float = 0.0
+var is_in_positive_resonance: bool = false
+var is_in_negative_resonance: bool = false
+
 # Visual
 @onready var sprite: ColorRect = %ColorRect
 @onready var label: Label = %Label
@@ -164,6 +172,8 @@ func _process(delta: float) -> void:
   _process_worry_compounding(delta)
   _process_doubt_generation(delta)
   _process_doubt_insight_combination()
+  _process_nostalgia_crystallization(delta)
+  _process_resonance(delta)
   _update_status()
   _update_status_visual()
 
@@ -210,7 +220,8 @@ func _process_processing(delta: float) -> void:
   var tension_multiplier = _get_tension_speed_multiplier()
   var wisdom_multiplier = _get_wisdom_efficiency_multiplier()
   var doubt_multiplier = _get_doubt_efficiency_multiplier()
-  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier
+  var resonance_multiplier = _get_resonance_speed_multiplier()
+  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier
   if process_timer <= 0:
     _complete_processing()
 
@@ -714,3 +725,125 @@ func _get_nearby_doubt() -> int:
           total_doubt += occupant.get_storage_amount("doubt")
 
   return total_doubt
+
+func _process_nostalgia_crystallization(delta: float) -> void:
+  if storage_capacity <= 0:
+    return
+
+  var nostalgia_amount = storage.get("nostalgia", 0)
+  if nostalgia_amount <= 0:
+    nostalgia_age_tracker.clear()
+    return
+
+  var tracked_count = nostalgia_age_tracker.size()
+  while tracked_count < nostalgia_amount:
+    var batch_id = "batch_%d_%d" % [Time.get_ticks_msec(), tracked_count]
+    nostalgia_age_tracker[batch_id] = 0.0
+    tracked_count += 1
+
+  var crystallized_count = 0
+  var to_remove: Array[String] = []
+  for batch_id in nostalgia_age_tracker:
+    nostalgia_age_tracker[batch_id] += delta
+    if nostalgia_age_tracker[batch_id] >= config.nostalgia_crystallization_time:
+      crystallized_count += 1
+      to_remove.append(batch_id)
+
+  if crystallized_count <= 0:
+    return
+
+  var amount_to_crystallize = mini(crystallized_count, nostalgia_amount)
+  remove_from_storage("nostalgia", amount_to_crystallize)
+
+  for batch_id in to_remove:
+    nostalgia_age_tracker.erase(batch_id)
+    if to_remove.find(batch_id) >= amount_to_crystallize:
+      break
+
+  var nearby_calm = _count_nearby_resource("calm")
+  var nearby_negative = _count_nearby_resource("anxiety") + _count_nearby_resource("tension") + _count_nearby_resource("grief")
+
+  var output_type: String
+  var output_amount = amount_to_crystallize * config.nostalgia_crystallization_amount
+
+  if nearby_calm >= config.nostalgia_crystallization_calm_threshold and nearby_calm > nearby_negative:
+    output_type = "joy"
+  elif nearby_negative >= config.nostalgia_crystallization_negative_threshold:
+    output_type = "grief"
+  else:
+    output_type = "joy" if randf() < 0.5 else "grief"
+
+  _output_resource(output_type, output_amount)
+  event_bus.nostalgia_crystallized.emit(self, output_type, output_amount)
+
+func _count_nearby_resource(resource_id: String) -> int:
+  var total = storage.get(resource_id, 0)
+  if not grid:
+    return total
+
+  var radius = config.nostalgia_crystallization_radius
+
+  for x in range(-radius, size.x + radius):
+    for y in range(-radius, size.y + radius):
+      if x >= 0 and x < size.x and y >= 0 and y < size.y:
+        continue
+      var check = grid_coord + Vector2i(x, y)
+      if grid.is_valid_coord(check):
+        var occupant = grid.get_occupant(check)
+        if occupant and occupant != self and occupant.has_method("get_storage_amount"):
+          total += occupant.get_storage_amount(resource_id)
+
+  return total
+
+func _process_resonance(delta: float) -> void:
+  if storage_capacity <= 0:
+    return
+
+  is_in_positive_resonance = false
+  is_in_negative_resonance = false
+
+  for resource_id in storage:
+    if storage[resource_id] < config.resonance_resource_threshold:
+      continue
+
+    var resonating_buildings = _find_resonating_buildings(resource_id)
+    if resonating_buildings.size() >= config.resonance_min_buildings:
+      if resource_id in config.resonance_positive_resources:
+        is_in_positive_resonance = true
+      elif resource_id in config.resonance_negative_resources:
+        is_in_negative_resonance = true
+        _process_negative_resonance_amplification(delta, resource_id)
+
+func _find_resonating_buildings(resource_id: String) -> Array[Node]:
+  var result: Array[Node] = [self]
+  if not grid:
+    return result
+
+  var radius = config.resonance_radius
+  for x in range(-radius, size.x + radius):
+    for y in range(-radius, size.y + radius):
+      if x >= 0 and x < size.x and y >= 0 and y < size.y:
+        continue
+      var check = grid_coord + Vector2i(x, y)
+      if grid.is_valid_coord(check):
+        var occupant = grid.get_occupant(check)
+        if occupant and occupant != self and occupant.has_method("get_storage_amount"):
+          if occupant.get_storage_amount(resource_id) >= config.resonance_resource_threshold:
+            result.append(occupant)
+
+  return result
+
+func _process_negative_resonance_amplification(delta: float, resource_id: String) -> void:
+  resonance_timer += delta
+  if resonance_timer < config.resonance_negative_amplification_interval:
+    return
+
+  resonance_timer = 0.0
+  var amount = config.resonance_negative_amplification_amount
+  _output_resource(resource_id, amount)
+  event_bus.resonance_amplification.emit(self, resource_id, amount)
+
+func _get_resonance_speed_multiplier() -> float:
+  if is_in_positive_resonance:
+    return 1.0 + config.resonance_positive_speed_bonus
+  return 1.0

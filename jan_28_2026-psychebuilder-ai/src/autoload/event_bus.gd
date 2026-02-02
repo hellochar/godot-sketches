@@ -38,3 +38,10 @@ signal attention_changed(used: float, available: float)
 # Game flow signals
 signal game_started()
 signal game_ended(ending_tier: String)
+
+# Nostalgia crystallization signals
+signal nostalgia_crystallized(building: Node, output_type: String, amount: int)
+
+# Resonance signals
+signal resonance_formed(resource_type: String, buildings: Array, is_positive: bool)
+signal resonance_amplification(building: Node, resource_type: String, amount: int)
