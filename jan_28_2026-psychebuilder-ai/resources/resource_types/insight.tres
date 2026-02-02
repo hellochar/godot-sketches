@@ -1,0 +1,14 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" uid="uid://0mjty1r6a1u5" path="res://jan_28_2026-psychebuilder-ai/resources/resource_types/resource_type.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "insight"
+display_name = "Insight"
+description = "A flash of clarity that reveals hidden truths. Transforms understanding."
+color = Color(0.4, 0.9, 0.85, 1)
+tags = ["derived", "persistent"]
+decay_rate = 0.0
+stack_size = 5
+spawn_amount = 1

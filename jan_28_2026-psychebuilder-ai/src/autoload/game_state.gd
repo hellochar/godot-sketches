@@ -33,22 +33,6 @@ var resource_totals: Dictionary = {}
 # Habituation tracking (job_id -> completions)
 var habituation_progress: Dictionary = {}
 
-# Event history
-var triggered_events: Array[String] = []
-var completed_events: Array[String] = []
-var active_event: String = ""
-
-# Unlocks
-var unlocked_buildings: Array[String] = []
-var discovered_buildings: Array[String] = []
-
-# Archetype modifiers
-var archetype_modifiers: Dictionary = {
-  "productivity": 1.0,
-  "rest": 1.0,
-  "anxiety_rate": 0.0
-}
-
 func reset_to_defaults(p_starting_energy: int, p_max_energy: int, p_base_attention: float, p_base_wellbeing: float, p_habituation_thresholds: Array[int] = [], p_habituation_costs: Array[float] = []) -> void:
   habituation_thresholds = p_habituation_thresholds
   habituation_costs = p_habituation_costs
@@ -69,11 +53,6 @@ func reset_to_defaults(p_starting_energy: int, p_max_energy: int, p_base_attenti
   active_resources.clear()
   resource_totals.clear()
   habituation_progress.clear()
-  triggered_events.clear()
-  completed_events.clear()
-  active_event = ""
-  unlocked_buildings.clear()
-  discovered_buildings.clear()
 
 func spend_energy(amount: int) -> bool:
   if current_energy < amount:

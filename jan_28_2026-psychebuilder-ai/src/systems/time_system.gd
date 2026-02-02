@@ -6,6 +6,10 @@ signal phase_changed(is_day: bool)
 
 enum Phase { DAY, NIGHT }
 
+@onready var game_state: Node = get_node("/root/GameState")
+@onready var event_bus: Node = get_node("/root/EventBus")
+@onready var config: Node = get_node("/root/Config")
+
 var current_day: int = 1
 var current_phase: Phase = Phase.DAY
 var phase_time: float = 0.0
@@ -45,7 +49,7 @@ func _transition_to_night() -> void:
   phase_time = 0.0
   night_started.emit(current_day)
   phase_changed.emit(false)
-  get_node("/root/EventBus").night_started.emit(current_day)
+  event_bus.night_started.emit(current_day)
 
 func _transition_to_day() -> void:
   current_day += 1
@@ -58,11 +62,11 @@ func _transition_to_day() -> void:
 
   day_started.emit(current_day)
   phase_changed.emit(true)
-  get_node("/root/EventBus").day_started.emit(current_day)
+  event_bus.day_started.emit(current_day)
   _trigger_day_start_effects()
 
 func _trigger_day_start_effects() -> void:
-  var gs = get_node("/root/GameState")
+  var gs = game_state
   if gs:
     gs.on_day_start(energy_regen_per_day)
 
@@ -92,4 +96,16 @@ func is_night() -> bool:
 
 func _end_game() -> void:
   paused = true
-  get_node("/root/EventBus").game_ended.emit()
+  var ending_tier = _calculate_ending_tier()
+  event_bus.game_ended.emit(ending_tier)
+
+func _calculate_ending_tier() -> String:
+  var wb = game_state.wellbeing
+  if wb >= config.flourishing_threshold:
+    return "flourishing"
+  elif wb >= config.growing_threshold:
+    return "growing"
+  elif wb >= config.surviving_threshold:
+    return "surviving"
+  else:
+    return "struggling"
