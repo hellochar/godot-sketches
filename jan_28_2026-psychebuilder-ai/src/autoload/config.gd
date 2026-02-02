@@ -59,3 +59,19 @@ extends Node
   "grief+wisdom": "calm",
   "anxiety+joy": "calm",
 }
+
+# Calm Aura
+@export_group("Calm Aura")
+@export var calm_aura_radius: int = 2
+@export var calm_aura_threshold: int = 3
+@export var calm_aura_suppression: float = 0.15
+@export var calm_aura_max_suppression: float = 0.6
+
+# Worker Emotional Contamination
+@export_group("Worker Contamination")
+@export var contamination_absorb_rate: float = 0.1
+@export var contamination_deposit_rate: float = 0.05
+@export var contamination_decay_rate: float = 0.02
+@export var contamination_speed_negative: float = 0.2
+@export var contamination_speed_positive: float = 0.15
+@export var contamination_max_level: float = 5.0

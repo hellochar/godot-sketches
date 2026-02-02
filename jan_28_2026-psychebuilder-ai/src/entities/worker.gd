@@ -36,6 +36,9 @@ var is_selected: bool = false
 var base_modulate: Color = Color(1, 0.95, 0.7, 1)
 var selected_modulate: Color = Color(0.5, 1.0, 0.5, 1)
 
+# Emotional contamination
+var emotional_residue: Dictionary = {}
+
 # Visual
 @onready var sprite: Sprite2D = $Sprite2D
 
@@ -139,6 +142,7 @@ func _pathfind_to_building(building: Node) -> void:
 
 func _process(delta: float) -> void:
   _update_joy_speed_boost(delta)
+  _process_contamination(delta)
 
   match state:
     State.IDLE:
@@ -159,7 +163,8 @@ func _process_movement(delta: float) -> void:
 
   var move_dir = (target_position - position).normalized()
   var distance = position.distance_to(target_position)
-  var move_amount = move_speed * current_speed_multiplier * delta
+  var contamination_modifier = _get_contamination_speed_modifier()
+  var move_amount = move_speed * current_speed_multiplier * contamination_modifier * delta
 
   if move_amount >= distance:
     position = target_position
@@ -302,5 +307,56 @@ func _update_selection_visual() -> void:
     modulate = selected_modulate
     scale = Vector2(1.3, 1.3)
   else:
-    modulate = base_modulate
+    modulate = _get_contamination_modulate()
     scale = Vector2(1.0, 1.0)
+
+func _get_contamination_speed_modifier() -> float:
+  var negative_total = emotional_residue.get("anxiety", 0.0) + emotional_residue.get("grief", 0.0)
+  var positive_total = emotional_residue.get("joy", 0.0) + emotional_residue.get("calm", 0.0)
+
+  var negative_factor = minf(negative_total / config.contamination_max_level, 1.0)
+  var positive_factor = minf(positive_total / config.contamination_max_level, 1.0)
+
+  var slowdown = negative_factor * config.contamination_speed_negative
+  var speedup = positive_factor * config.contamination_speed_positive
+
+  return 1.0 - slowdown + speedup
+
+func _absorb_emotion(emotion: String, amount: float) -> void:
+  var absorbed = amount * config.contamination_absorb_rate
+  var current = emotional_residue.get(emotion, 0.0)
+  emotional_residue[emotion] = minf(current + absorbed, config.contamination_max_level)
+
+func _decay_emotions(delta: float) -> void:
+  var decay = config.contamination_decay_rate * delta
+  for emotion in emotional_residue.keys():
+    emotional_residue[emotion] = maxf(0.0, emotional_residue[emotion] - decay)
+
+func _process_contamination(delta: float) -> void:
+  _decay_emotions(delta)
+
+  for building in game_state.active_buildings:
+    var dist = position.distance_to(building.position)
+    if dist <= config.joy_proximity_radius:
+      for emotion in ["anxiety", "grief", "joy", "calm"]:
+        var amount = building.storage.get(emotion, 0)
+        if amount > 0:
+          _absorb_emotion(emotion, amount * delta)
+
+  if not is_selected:
+    modulate = _get_contamination_modulate()
+
+func _get_contamination_modulate() -> Color:
+  var negative_total = emotional_residue.get("anxiety", 0.0) + emotional_residue.get("grief", 0.0)
+  var positive_total = emotional_residue.get("joy", 0.0) + emotional_residue.get("calm", 0.0)
+
+  var negative_factor = minf(negative_total / config.contamination_max_level, 1.0)
+  var positive_factor = minf(positive_total / config.contamination_max_level, 1.0)
+
+  var result = base_modulate
+  if negative_factor > positive_factor:
+    result = base_modulate.lerp(Color(0.6, 0.5, 0.7, 1), negative_factor * 0.5)
+  elif positive_factor > negative_factor:
+    result = base_modulate.lerp(Color(1.0, 1.0, 0.6, 1), positive_factor * 0.3)
+
+  return result

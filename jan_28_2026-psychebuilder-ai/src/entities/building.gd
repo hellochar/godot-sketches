@@ -169,13 +169,19 @@ func _process_generation(delta: float) -> void:
   if rate <= 0:
     return
 
+  var resource_id = definition.get("generates", "")
   var grief_multiplier = _get_grief_speed_multiplier()
-  generation_timer += delta * grief_multiplier
+  var effective_delta = delta * grief_multiplier
+
+  if resource_id == "anxiety":
+    var suppression = _get_calm_aura_suppression()
+    effective_delta *= (1.0 - suppression)
+
+  generation_timer += effective_delta
   var interval = 1.0 / rate
 
   if generation_timer >= interval:
     generation_timer -= interval
-    var resource_id = definition.get("generates", "")
     var amount = definition.get("generation_amount", 1)
     if resource_id != "":
       _output_resource(resource_id, amount)
@@ -502,3 +508,27 @@ func _get_habit_adjacency_multiplier() -> float:
     return 1.0
   var bonus = adjacent_count * config.habit_adjacency_bonus
   return minf(1.0 + bonus, config.habit_max_adjacency_multiplier)
+
+func _get_calm_aura_suppression() -> float:
+  if not grid:
+    return 0.0
+
+  var total_calm = 0
+  var radius = config.calm_aura_radius
+
+  for x in range(-radius, size.x + radius):
+    for y in range(-radius, size.y + radius):
+      if x >= 0 and x < size.x and y >= 0 and y < size.y:
+        continue
+      var check = grid_coord + Vector2i(x, y)
+      if grid.is_valid_coord(check):
+        var occupant = grid.get_occupant(check)
+        if occupant and occupant != self and occupant.has_method("get_storage_amount"):
+          total_calm += occupant.get_storage_amount("calm")
+
+  if total_calm < config.calm_aura_threshold:
+    return 0.0
+
+  var excess_calm = total_calm - config.calm_aura_threshold
+  var suppression = excess_calm * config.calm_aura_suppression
+  return minf(suppression, config.calm_aura_max_suppression)
