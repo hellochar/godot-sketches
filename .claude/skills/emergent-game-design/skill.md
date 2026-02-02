@@ -381,13 +381,3 @@ If something is too consistent, add variance or counters. If something never wor
 - ❌ New players are overwhelmed by complexity
 - ❌ Veterans have "solved" the optimal path
 
----
-
-## Further Study
-
-- **Slay the Spire** (MegaCrit): The canonical example of modular card design
-- **GDC Talk**: "Slay the Spire: Metrics Driven Design and Balance" by Anthony Giovannetti
-- **Dominion** (Donald X. Vaccarino): Original deckbuilder that pioneered kingdom randomization
-- **Magic: The Gathering**: 30 years of keyword evolution and archetype design
-- **Into the Breach**: Deterministic tactics where every piece has exactly one job
-- **Hades**: Boon synergies as an action-game implementation of these principles
