@@ -96,6 +96,16 @@ var road_imprinted: bool = false
 var cascade_boost_timer: float = 0.0
 var cascade_boost_active: bool = false
 
+# Emotional momentum state
+var momentum_level: float = 0.0
+var momentum_last_recipe: String = ""
+var momentum_starvation_timer: float = 0.0
+var momentum_break_penalty_timer: float = 0.0
+
+# Support network state
+var support_network: Array[Node] = []
+var support_network_transfer_timer: float = 0.0
+
 # Visual
 @onready var sprite: ColorRect = %ColorRect
 @onready var label: Label = %Label
@@ -203,6 +213,9 @@ func _process(delta: float) -> void:
   _process_saturation_effects(delta)
   _process_road_memory_decay(delta)
   _process_cascade_boost(delta)
+  _process_emotional_momentum(delta)
+  _process_support_network()
+  _process_network_load_sharing(delta)
   _update_status()
   _update_status_visual()
 
@@ -253,9 +266,11 @@ func _process_processing(delta: float) -> void:
   var wisdom_multiplier = _get_wisdom_efficiency_multiplier()
   var doubt_multiplier = _get_doubt_efficiency_multiplier()
   var resonance_multiplier = _get_resonance_speed_multiplier()
+  var momentum_multiplier = _get_momentum_speed_multiplier()
+  var support_network_multiplier = _get_support_network_efficiency_multiplier()
   var weather_modifier = game_state.get_weather_processing_modifier()
   var belief_modifier = game_state.get_belief_processing_modifier()
-  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * weather_modifier * belief_modifier
+  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier
   if process_timer <= 0:
     _complete_processing()
 
@@ -287,6 +302,9 @@ func _complete_processing() -> void:
   if processed_negative:
     _output_resource("tension", config.tension_from_processing)
 
+  var recipe_key = _get_recipe_key(inputs)
+  _build_momentum(recipe_key)
+
   var conditional_outputs = definition.get("conditional_outputs", {})
   if not conditional_outputs.is_empty():
     for condition_resource in conditional_outputs:
@@ -305,6 +323,14 @@ func _track_output_resource(resource_id: String, amount: int) -> void:
     game_state.track_wisdom_generated(amount)
   elif resource_id == "insight":
     game_state.track_insight_generated(amount)
+
+func _get_recipe_key(inputs: Dictionary) -> String:
+  var sorted_keys = inputs.keys()
+  sorted_keys.sort()
+  var parts: Array[String] = []
+  for key in sorted_keys:
+    parts.append("%s:%d" % [key, inputs[key]])
+  return ":".join(parts)
 
 func _process_coping(delta: float) -> void:
   if not has_behavior(BuildingDefs.Behavior.COPING):
@@ -1137,3 +1163,124 @@ func _try_cascade_output(resource_id: String, amount: int) -> int:
       neighbor.trigger_cascade_boost(resource_id)
 
   return remaining
+
+func _process_emotional_momentum(delta: float) -> void:
+  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    return
+
+  if momentum_break_penalty_timer > 0:
+    momentum_break_penalty_timer -= delta
+
+  if not processing_active:
+    momentum_starvation_timer += delta
+    if momentum_starvation_timer >= config.momentum_starvation_timeout and momentum_level > 0:
+      _break_momentum()
+    return
+
+  momentum_starvation_timer = 0.0
+
+func _build_momentum(recipe_key: String) -> void:
+  if momentum_last_recipe != "" and momentum_last_recipe != recipe_key:
+    _break_momentum()
+    return
+
+  momentum_last_recipe = recipe_key
+  momentum_level = minf(momentum_level + config.momentum_gain_per_cycle, config.momentum_max_level)
+
+func _break_momentum() -> void:
+  momentum_level = maxf(0.0, momentum_level - config.momentum_decay_on_break)
+  momentum_break_penalty_timer = config.momentum_break_penalty_duration
+  if momentum_level <= 0:
+    momentum_last_recipe = ""
+
+func _get_momentum_speed_multiplier() -> float:
+  if momentum_break_penalty_timer > 0:
+    return 1.0 - config.momentum_break_penalty_amount
+  var momentum_ratio = momentum_level / config.momentum_max_level
+  return 1.0 + (momentum_ratio * config.momentum_speed_bonus_at_max)
+
+func _process_support_network() -> void:
+  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    support_network.clear()
+    return
+
+  if not grid:
+    support_network.clear()
+    return
+
+  support_network = _find_connected_buildings_of_same_type()
+
+func _find_connected_buildings_of_same_type() -> Array[Node]:
+  var result: Array[Node] = []
+  var visited: Dictionary = {}
+  var to_visit: Array[Vector2i] = []
+
+  for x in range(-1, size.x + 1):
+    for y in range(-1, size.y + 1):
+      if x >= 0 and x < size.x and y >= 0 and y < size.y:
+        continue
+      var check = grid_coord + Vector2i(x, y)
+      if grid.is_valid_coord(check) and grid.is_road_at(check):
+        to_visit.append(check)
+        visited[check] = true
+
+  while to_visit.size() > 0:
+    var current = to_visit.pop_front()
+    var occupant = grid.get_occupant(current)
+
+    if occupant and occupant != self and occupant.building_id == building_id:
+      if occupant not in result:
+        result.append(occupant)
+
+    if grid.is_road_at(current):
+      for neighbor in grid.get_neighbors(current):
+        if not visited.has(neighbor):
+          visited[neighbor] = true
+          to_visit.append(neighbor)
+
+  return result
+
+func _process_network_load_sharing(delta: float) -> void:
+  if support_network.size() < config.support_network_min_size:
+    return
+
+  if storage_capacity <= 0:
+    return
+
+  var fill_ratio = float(_get_total_stored()) / float(storage_capacity)
+  if fill_ratio < config.support_network_load_share_threshold:
+    support_network_transfer_timer = 0.0
+    return
+
+  support_network_transfer_timer += delta
+  if support_network_transfer_timer < config.support_network_transfer_interval:
+    return
+
+  support_network_transfer_timer = 0.0
+
+  var best_target: Node = null
+  var lowest_fill: float = 1.0
+
+  for member in support_network:
+    if member.storage_capacity <= 0:
+      continue
+    var member_fill = float(member._get_total_stored()) / float(member.storage_capacity)
+    if member_fill < lowest_fill:
+      lowest_fill = member_fill
+      best_target = member
+
+  if best_target and lowest_fill < fill_ratio - 0.1:
+    for resource_id in storage:
+      if storage[resource_id] > 0:
+        var to_transfer = mini(storage[resource_id], config.support_network_transfer_amount)
+        var removed = remove_from_storage(resource_id, to_transfer)
+        if removed > 0:
+          best_target.add_to_storage(resource_id, removed)
+          break
+
+func _get_support_network_efficiency_multiplier() -> float:
+  if support_network.size() < config.support_network_min_size:
+    return 1.0
+  var bonus = support_network.size() * config.support_network_efficiency_per_member
+  bonus = minf(bonus, config.support_network_max_efficiency_bonus)
+  return 1.0 + bonus

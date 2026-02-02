@@ -182,6 +182,23 @@ extends Node
 @export var belief_growth_adversity_bonus: float = 0.2
 @export var belief_mindful_awareness_bonus: float = 0.1
 
+@export_group("Emotional Momentum")
+@export var momentum_gain_per_cycle: float = 0.15
+@export var momentum_max_level: float = 1.0
+@export var momentum_speed_bonus_at_max: float = 0.5
+@export var momentum_decay_on_break: float = 0.5
+@export var momentum_starvation_timeout: float = 5.0
+@export var momentum_break_penalty_duration: float = 3.0
+@export var momentum_break_penalty_amount: float = 0.2
+
+@export_group("Support Network")
+@export var support_network_min_size: int = 2
+@export var support_network_efficiency_per_member: float = 0.1
+@export var support_network_max_efficiency_bonus: float = 0.4
+@export var support_network_load_share_threshold: float = 0.9
+@export var support_network_transfer_amount: int = 2
+@export var support_network_transfer_interval: float = 3.0
+
 @export_group("Emotional Weather")
 @export var weather_resource_scale: float = 20.0
 @export var weather_momentum_lerp: float = 0.5
