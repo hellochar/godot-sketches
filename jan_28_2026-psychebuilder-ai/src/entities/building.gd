@@ -17,6 +17,15 @@ enum Status {
   COPING_COOLDOWN,
 }
 
+enum SaturationState {
+  NONE,
+  JOY_SATURATED,
+  CALM_SATURATED,
+  GRIEF_SATURATED,
+  ANXIETY_SATURATED,
+  WISDOM_SATURATED,
+}
+
 @export var status_colors: Dictionary = {
   Status.IDLE: Color(0.5, 0.5, 0.5),
   Status.PROCESSING: Color(0.2, 0.8, 0.2),
@@ -70,6 +79,12 @@ var nostalgia_age_tracker: Dictionary = {}
 var resonance_timer: float = 0.0
 var is_in_positive_resonance: bool = false
 var is_in_negative_resonance: bool = false
+
+# Saturation state
+var saturation_state: SaturationState = SaturationState.NONE
+var saturation_timer: float = 0.0
+var saturation_resource: String = ""
+var joy_numbness_level: float = 0.0
 
 # Visual
 @onready var sprite: ColorRect = %ColorRect
@@ -174,6 +189,8 @@ func _process(delta: float) -> void:
   _process_doubt_insight_combination()
   _process_nostalgia_crystallization(delta)
   _process_resonance(delta)
+  _process_saturation(delta)
+  _process_saturation_effects(delta)
   _update_status()
   _update_status_visual()
 
@@ -566,7 +583,11 @@ func _get_calm_aura_suppression() -> float:
       if grid.is_valid_coord(check):
         var occupant = grid.get_occupant(check)
         if occupant and occupant != self and occupant.has_method("get_storage_amount"):
-          total_calm += occupant.get_storage_amount("calm")
+          var calm_amount = occupant.get_storage_amount("calm")
+          var saturation_mult = 1.0
+          if occupant.has_method("get_calm_saturation_multiplier"):
+            saturation_mult = occupant.get_calm_saturation_multiplier()
+          total_calm += int(calm_amount * saturation_mult)
 
   if total_calm < config.calm_aura_threshold:
     return 0.0
@@ -624,12 +645,13 @@ func _get_nearby_wisdom() -> int:
 
 func _get_wisdom_efficiency_multiplier() -> float:
   var wisdom_amount = _get_nearby_wisdom() + storage.get("wisdom", 0)
+  var saturation_bonus = get_wisdom_saturation_bonus()
   if wisdom_amount < config.wisdom_efficiency_threshold:
-    return 1.0
+    return 1.0 + saturation_bonus
   var excess_wisdom = wisdom_amount - config.wisdom_efficiency_threshold
   var bonus = excess_wisdom * config.wisdom_efficiency_bonus_per_unit
   bonus = minf(bonus, config.wisdom_max_efficiency_bonus)
-  return 1.0 + bonus
+  return 1.0 + bonus + saturation_bonus
 
 func _perform_cathartic_release() -> Dictionary:
   var tension_removed = remove_from_storage("tension", storage.get("tension", 0))
@@ -847,3 +869,129 @@ func _get_resonance_speed_multiplier() -> float:
   if is_in_positive_resonance:
     return 1.0 + config.resonance_positive_speed_bonus
   return 1.0
+
+func _process_saturation(delta: float) -> void:
+  if storage_capacity <= 0:
+    saturation_state = SaturationState.NONE
+    saturation_timer = 0.0
+    return
+
+  var saturated_resource = ""
+  var highest_ratio = 0.0
+
+  for resource_id in ["joy", "calm", "grief", "anxiety", "wisdom"]:
+    var amount = storage.get(resource_id, 0)
+    var ratio = float(amount) / float(storage_capacity)
+    if ratio >= config.saturation_threshold and ratio > highest_ratio:
+      highest_ratio = ratio
+      saturated_resource = resource_id
+
+  if saturated_resource == "":
+    saturation_state = SaturationState.NONE
+    saturation_timer = 0.0
+    saturation_resource = ""
+    return
+
+  if saturated_resource != saturation_resource:
+    saturation_timer = 0.0
+    saturation_resource = saturated_resource
+
+  saturation_timer += delta
+
+  if saturation_timer >= config.saturation_time_required:
+    match saturation_resource:
+      "joy":
+        saturation_state = SaturationState.JOY_SATURATED
+      "calm":
+        saturation_state = SaturationState.CALM_SATURATED
+      "grief":
+        saturation_state = SaturationState.GRIEF_SATURATED
+      "anxiety":
+        saturation_state = SaturationState.ANXIETY_SATURATED
+      "wisdom":
+        saturation_state = SaturationState.WISDOM_SATURATED
+  else:
+    saturation_state = SaturationState.NONE
+
+func _process_saturation_effects(delta: float) -> void:
+  match saturation_state:
+    SaturationState.JOY_SATURATED:
+      _process_joy_saturation(delta)
+    SaturationState.CALM_SATURATED:
+      pass
+    SaturationState.GRIEF_SATURATED:
+      _process_grief_saturation(delta)
+    SaturationState.ANXIETY_SATURATED:
+      _process_anxiety_saturation(delta)
+    SaturationState.WISDOM_SATURATED:
+      pass
+    SaturationState.NONE:
+      joy_numbness_level = maxf(0.0, joy_numbness_level - delta * 0.1)
+
+func _process_joy_saturation(delta: float) -> void:
+  joy_numbness_level = minf(1.0, joy_numbness_level + delta * config.saturation_joy_numbness_factor * 0.1)
+
+  if not grid:
+    return
+
+  var spread_amount = int(config.saturation_joy_spread_rate * delta)
+  if spread_amount <= 0 and randf() < config.saturation_joy_spread_rate * delta:
+    spread_amount = 1
+
+  if spread_amount <= 0:
+    return
+
+  var neighbors = _get_adjacent_buildings()
+  if neighbors.is_empty():
+    return
+
+  var target = neighbors[randi() % neighbors.size()]
+  var removed = remove_from_storage("joy", spread_amount)
+  if removed > 0:
+    target.add_to_storage("joy", removed)
+
+func _process_grief_saturation(delta: float) -> void:
+  if randf() < config.saturation_grief_wisdom_rate * delta:
+    _output_resource("wisdom", 1)
+
+func _process_anxiety_saturation(delta: float) -> void:
+  if randf() >= config.saturation_anxiety_panic_chance * delta:
+    return
+
+  if not grid:
+    return
+
+  var neighbors = _get_adjacent_buildings()
+  for neighbor in neighbors:
+    neighbor.add_to_storage("anxiety", config.saturation_anxiety_panic_spread)
+
+func _get_adjacent_buildings() -> Array[Node]:
+  var result: Array[Node] = []
+  if not grid:
+    return result
+
+  for x in range(-1, size.x + 1):
+    for y in range(-1, size.y + 1):
+      if x >= 0 and x < size.x and y >= 0 and y < size.y:
+        continue
+      var check = grid_coord + Vector2i(x, y)
+      if grid.is_valid_coord(check):
+        var occupant = grid.get_occupant(check)
+        if occupant and occupant != self and occupant.has_method("add_to_storage"):
+          if occupant not in result:
+            result.append(occupant)
+
+  return result
+
+func get_calm_saturation_multiplier() -> float:
+  if saturation_state == SaturationState.CALM_SATURATED:
+    return config.saturation_calm_aura_multiplier
+  return 1.0
+
+func get_wisdom_saturation_bonus() -> float:
+  if saturation_state == SaturationState.WISDOM_SATURATED:
+    return config.saturation_wisdom_efficiency_bonus
+  return 0.0
+
+func get_joy_numbness_factor() -> float:
+  return 1.0 - joy_numbness_level

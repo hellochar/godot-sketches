@@ -129,3 +129,24 @@ extends Node
 @export var resonance_negative_amplification_amount: int = 1
 @export var resonance_positive_resources: Array[String] = ["joy", "calm", "insight", "wisdom"]
 @export var resonance_negative_resources: Array[String] = ["anxiety", "grief", "doubt", "worry"]
+
+# Worker Focus Imprint
+@export_group("Worker Focus Imprint")
+@export var focus_imprint_gain_per_cycle: float = 0.05
+@export var focus_imprint_max_level: float = 1.0
+@export var focus_efficiency_bonus_at_max: float = 0.5
+@export var focus_unfamiliar_penalty: float = 0.3
+@export var focus_decay_rate: float = 0.01
+@export var focus_transfer_threshold: int = 10
+
+# Building Saturation
+@export_group("Building Saturation")
+@export var saturation_threshold: float = 0.8
+@export var saturation_time_required: float = 15.0
+@export var saturation_joy_spread_rate: float = 1.0
+@export var saturation_joy_numbness_factor: float = 0.5
+@export var saturation_calm_aura_multiplier: float = 2.0
+@export var saturation_grief_wisdom_rate: float = 0.2
+@export var saturation_anxiety_panic_chance: float = 0.1
+@export var saturation_anxiety_panic_spread: int = 3
+@export var saturation_wisdom_efficiency_bonus: float = 0.3

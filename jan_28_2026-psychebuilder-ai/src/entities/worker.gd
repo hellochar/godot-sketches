@@ -45,6 +45,9 @@ var is_selected: bool = false
 
 var emotional_residue: Dictionary = {}
 
+var focus_imprints: Dictionary = {}
+var dominant_focus: String = ""
+
 # Visual
 @onready var sprite: Sprite2D = %Sprite2D
 
@@ -169,7 +172,8 @@ func _process_movement(delta: float) -> void:
   var move_dir = (target_position - position).normalized()
   var distance = position.distance_to(target_position)
   var contamination_modifier = _get_contamination_speed_modifier()
-  var move_amount = move_speed * current_speed_multiplier * contamination_modifier * delta
+  var focus_modifier = get_focus_speed_multiplier()
+  var move_amount = move_speed * current_speed_multiplier * contamination_modifier * focus_modifier * delta
 
   if move_amount >= distance:
     position = target_position
@@ -251,6 +255,7 @@ func _process_dropoff() -> void:
 
   if carried_amount == 0:
     _update_selection_visual()
+    _update_focus_imprint()
     job_cycle_completed.emit()
 
     # Loop back to pickup
@@ -363,3 +368,35 @@ func _get_contamination_modulate() -> Color:
     result = base_modulate.lerp(positive_contamination_color, positive_factor * positive_color_blend)
 
   return result
+
+func _update_focus_imprint() -> void:
+  if job_id == "":
+    return
+
+  var current_level = focus_imprints.get(job_id, 0.0)
+  var new_level = minf(current_level + config.focus_imprint_gain_per_cycle, config.focus_imprint_max_level)
+  focus_imprints[job_id] = new_level
+
+  for other_job in focus_imprints:
+    if other_job != job_id:
+      focus_imprints[other_job] = maxf(0.0, focus_imprints[other_job] - config.focus_decay_rate)
+
+  var max_focus = 0.0
+  for fj in focus_imprints:
+    if focus_imprints[fj] > max_focus:
+      max_focus = focus_imprints[fj]
+      dominant_focus = fj
+
+func get_focus_speed_multiplier() -> float:
+  if job_id == "":
+    return 1.0
+
+  var current_focus = focus_imprints.get(job_id, 0.0)
+  var focus_ratio = current_focus / config.focus_imprint_max_level
+
+  if dominant_focus != "" and dominant_focus != job_id:
+    var dominant_level = focus_imprints.get(dominant_focus, 0.0)
+    if dominant_level > float(config.focus_transfer_threshold) * config.focus_imprint_gain_per_cycle:
+      return 1.0 - config.focus_unfamiliar_penalty * (1.0 - focus_ratio)
+
+  return 1.0 + config.focus_efficiency_bonus_at_max * focus_ratio
