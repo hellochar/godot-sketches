@@ -41,6 +41,7 @@ func _process(delta: float) -> void:
 func _transition_to_night() -> void:
   current_phase = Phase.NIGHT
   phase_time = 0.0
+  _process_dream_recombinations()
   night_started.emit(current_day)
   phase_changed.emit(false)
   event_bus.night_started.emit(current_day)
@@ -87,6 +88,31 @@ func is_day() -> bool:
 
 func is_night() -> bool:
   return current_phase == Phase.NIGHT
+
+func _process_dream_recombinations() -> void:
+  var recipes = config.dream_recipes
+  for building in game_state.active_buildings:
+    if building.storage_capacity <= 0:
+      continue
+
+    for recipe_key in recipes:
+      if randf() > config.dream_recombination_chance:
+        continue
+
+      var parts = recipe_key.split("+")
+      var resource_a = parts[0]
+      var resource_b = parts[1]
+      var output = recipes[recipe_key]
+
+      var amount_a = building.storage.get(resource_a, 0)
+      var amount_b = building.storage.get(resource_b, 0)
+
+      if amount_a > 0 and amount_b > 0:
+        var transform_amount = mini(amount_a, amount_b)
+        building.storage[resource_a] -= transform_amount
+        building.storage[resource_b] -= transform_amount
+        building.storage[output] = building.storage.get(output, 0) + transform_amount
+        break
 
 func _end_game() -> void:
   paused = true

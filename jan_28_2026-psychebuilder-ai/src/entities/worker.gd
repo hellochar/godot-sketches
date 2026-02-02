@@ -2,6 +2,9 @@ extends Node2D
 
 signal job_cycle_completed
 
+@onready var config: Node = get_node("/root/Config")
+@onready var game_state: Node = get_node("/root/GameState")
+
 enum State { IDLE, MOVING_TO_PICKUP, PICKING_UP, CARRYING, MOVING_TO_DROPOFF, DROPPING_OFF }
 
 var state: State = State.IDLE
@@ -19,6 +22,10 @@ var carried_amount: int = 0
 # Movement
 @export var move_speed: float = 100.0
 var target_position: Vector2
+
+# Joy speed boost
+var joy_boost_timer: float = 0.0
+var current_speed_multiplier: float = 1.0
 
 # Habituation tracking
 var job_id: String = ""
@@ -131,6 +138,8 @@ func _pathfind_to_building(building: Node) -> void:
     target_position = grid.grid_to_world(current_path[0])
 
 func _process(delta: float) -> void:
+  _update_joy_speed_boost(delta)
+
   match state:
     State.IDLE:
       pass
@@ -150,7 +159,7 @@ func _process_movement(delta: float) -> void:
 
   var move_dir = (target_position - position).normalized()
   var distance = position.distance_to(target_position)
-  var move_amount = move_speed * delta
+  var move_amount = move_speed * current_speed_multiplier * delta
 
   if move_amount >= distance:
     position = target_position
@@ -162,6 +171,34 @@ func _process_movement(delta: float) -> void:
       target_position = grid.grid_to_world(current_path[path_index])
   else:
     position += move_dir * move_amount
+
+func _update_joy_speed_boost(delta: float) -> void:
+  var carrying_joy = state == State.CARRYING and resource_type == "joy" and carried_amount > 0
+
+  if carrying_joy:
+    current_speed_multiplier = 1.0 + config.joy_carry_speed_bonus
+    joy_boost_timer = config.joy_boost_duration
+    return
+
+  var near_joy_building = false
+  for building in game_state.active_buildings:
+    if building.storage.get("joy", 0) > 0:
+      var dist = position.distance_to(building.position)
+      if dist <= config.joy_proximity_radius:
+        near_joy_building = true
+        break
+
+  if near_joy_building:
+    joy_boost_timer = config.joy_boost_duration
+    current_speed_multiplier = 1.0 + config.joy_proximity_speed_bonus
+    return
+
+  if joy_boost_timer > 0:
+    joy_boost_timer -= delta
+    if joy_boost_timer <= 0:
+      current_speed_multiplier = 1.0
+  else:
+    current_speed_multiplier = 1.0
 
 func _arrive_at_destination() -> void:
   current_path = []

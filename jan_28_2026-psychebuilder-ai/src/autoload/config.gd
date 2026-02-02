@@ -41,3 +41,21 @@ extends Node
 # Habit Adjacency
 @export var habit_adjacency_bonus: float = 0.25
 @export var habit_max_adjacency_multiplier: float = 2.0
+
+# Joy Speed Boost
+@export_group("Joy Speed Boost")
+@export var joy_carry_speed_bonus: float = 0.5
+@export var joy_proximity_speed_bonus: float = 0.3
+@export var joy_proximity_radius: float = 96.0
+@export var joy_boost_duration: float = 3.0
+
+# Dream Recombination
+@export_group("Dream Recombination")
+@export var dream_recombination_chance: float = 0.4
+@export var dream_recipes: Dictionary = {
+  "joy+grief": "nostalgia",
+  "calm+wisdom": "insight",
+  "nostalgia+calm": "joy",
+  "grief+wisdom": "calm",
+  "anxiety+joy": "calm",
+}
