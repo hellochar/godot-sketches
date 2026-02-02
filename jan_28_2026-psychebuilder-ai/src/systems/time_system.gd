@@ -37,6 +37,7 @@ func _process(delta: float) -> void:
       game_state.update_weather_momentum(delta * speed_multiplier)
       game_state.update_breakthrough_timers(delta * speed_multiplier)
       game_state.update_flow_state(delta * speed_multiplier)
+      game_state.update_flourishing_insight(delta * speed_multiplier)
       if phase_time >= day_duration:
         _transition_to_night()
     Phase.NIGHT:
@@ -47,6 +48,7 @@ func _transition_to_night() -> void:
   phase_time = 0.0
   game_state.on_day_end()
   _process_dream_recombinations()
+  _recover_worker_fatigue()
   night_started.emit(current_day)
   phase_changed.emit(false)
   event_bus.night_started.emit(current_day)
@@ -118,6 +120,11 @@ func _process_dream_recombinations() -> void:
         building.storage[resource_b] -= transform_amount
         building.storage[output] = building.storage.get(output, 0) + transform_amount
         break
+
+func _recover_worker_fatigue() -> void:
+  for worker in game_state.active_workers:
+    if worker.has_method("recover_fatigue_at_night"):
+      worker.recover_fatigue_at_night()
 
 func _end_game() -> void:
   paused = true

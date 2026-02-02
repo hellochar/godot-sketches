@@ -75,6 +75,11 @@ var breakthrough_cooldown_timer: float = 0.0
 var flow_state_level: float = 0.0
 var flow_insight_timer: float = 0.0
 
+# Wellbeing tier tracking
+enum WellbeingTier { STRUGGLING, BASELINE, STABLE, THRIVING, FLOURISHING }
+var current_wellbeing_tier: WellbeingTier = WellbeingTier.BASELINE
+var flourishing_insight_timer: float = 0.0
+
 func _ready() -> void:
   reset_to_defaults()
 
@@ -124,6 +129,9 @@ func reset_to_defaults() -> void:
   flow_state_level = 0.0
   flow_insight_timer = 0.0
 
+  current_wellbeing_tier = WellbeingTier.BASELINE
+  flourishing_insight_timer = 0.0
+
 func spend_energy(amount: int) -> bool:
   if current_energy < amount:
     return false
@@ -163,6 +171,85 @@ func set_wellbeing(value: float) -> void:
   wellbeing = clampf(value, 0.0, 100.0)
   if old != wellbeing:
     get_node("/root/EventBus").wellbeing_changed.emit(old, wellbeing)
+    _update_wellbeing_tier()
+
+func _update_wellbeing_tier() -> void:
+  var cfg = get_node("/root/Config")
+  var event_bus = get_node("/root/EventBus")
+  var old_tier = current_wellbeing_tier
+
+  if wellbeing >= cfg.wellbeing_flourishing_threshold:
+    current_wellbeing_tier = WellbeingTier.FLOURISHING
+  elif wellbeing >= cfg.wellbeing_thriving_threshold:
+    current_wellbeing_tier = WellbeingTier.THRIVING
+  elif wellbeing >= cfg.wellbeing_stable_threshold:
+    current_wellbeing_tier = WellbeingTier.STABLE
+  elif wellbeing >= cfg.wellbeing_struggling_threshold:
+    current_wellbeing_tier = WellbeingTier.BASELINE
+  else:
+    current_wellbeing_tier = WellbeingTier.STRUGGLING
+
+  if old_tier != current_wellbeing_tier:
+    event_bus.wellbeing_tier_changed.emit(old_tier, current_wellbeing_tier)
+
+func get_wellbeing_tier() -> WellbeingTier:
+  return current_wellbeing_tier
+
+func get_wellbeing_processing_modifier() -> float:
+  var cfg = get_node("/root/Config")
+  match current_wellbeing_tier:
+    WellbeingTier.STRUGGLING:
+      return 1.0 - cfg.wellbeing_struggling_processing_penalty
+    WellbeingTier.STABLE:
+      return 1.0 + cfg.wellbeing_stable_processing_bonus
+    WellbeingTier.THRIVING, WellbeingTier.FLOURISHING:
+      var base = 1.0 + cfg.wellbeing_stable_processing_bonus
+      if current_wellbeing_tier == WellbeingTier.FLOURISHING:
+        base *= 1.0 + cfg.wellbeing_flourishing_all_bonus
+      return base
+    _:
+      return 1.0
+
+func get_wellbeing_generation_modifier(is_positive: bool) -> float:
+  var cfg = get_node("/root/Config")
+  match current_wellbeing_tier:
+    WellbeingTier.STRUGGLING:
+      if not is_positive:
+        return 1.0 + cfg.wellbeing_struggling_negative_gen_bonus
+      return 1.0
+    WellbeingTier.THRIVING, WellbeingTier.FLOURISHING:
+      if is_positive:
+        var base = 1.0 + cfg.wellbeing_thriving_positive_gen_bonus
+        if current_wellbeing_tier == WellbeingTier.FLOURISHING:
+          base *= 1.0 + cfg.wellbeing_flourishing_all_bonus
+        return base
+      return 1.0
+    _:
+      return 1.0
+
+func get_wellbeing_energy_bonus() -> int:
+  var cfg = get_node("/root/Config")
+  match current_wellbeing_tier:
+    WellbeingTier.THRIVING, WellbeingTier.FLOURISHING:
+      return cfg.wellbeing_thriving_energy_regen_bonus
+    _:
+      return 0
+
+func update_flourishing_insight(delta: float) -> void:
+  if current_wellbeing_tier != WellbeingTier.FLOURISHING:
+    flourishing_insight_timer = 0.0
+    return
+
+  var cfg = get_node("/root/Config")
+  var event_bus = get_node("/root/EventBus")
+
+  flourishing_insight_timer += delta
+  if flourishing_insight_timer >= 1.0:
+    flourishing_insight_timer = 0.0
+    if randf() < cfg.wellbeing_flourishing_insight_chance:
+      update_resource_total("insight", 1)
+      track_insight_generated(1)
+      event_bus.wellbeing_flourishing_insight.emit(1)
 
 func get_habituation_level(job_id: String) -> int:
   var completions = habituation_progress.get(job_id, 0)
@@ -183,7 +270,7 @@ func increment_habituation(job_id: String) -> void:
 
 func on_day_start() -> void:
   var cfg = get_node("/root/Config")
-  add_energy(cfg.energy_regen_per_day)
+  add_energy(cfg.energy_regen_per_day + get_wellbeing_energy_bonus())
 
   for building in active_buildings:
     if building.has_method("trigger_habit"):

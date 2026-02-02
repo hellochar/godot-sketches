@@ -320,6 +320,7 @@ func _process_generation(delta: float) -> void:
     return
 
   var resource_id = definition.get("generates", "")
+  var is_positive = resource_id in config.resonance_positive_resources
   var grief_multiplier = _get_grief_speed_multiplier()
   var cascade_multiplier = 1.0 + (config.cascade_generator_boost_amount if cascade_boost_active else 0.0)
   var weather_modifier = game_state.get_weather_generation_modifier()
@@ -327,7 +328,8 @@ func _process_generation(delta: float) -> void:
   var awakening_multiplier = get_awakening_generator_rate_multiplier()
   var harmony_multiplier = _get_harmony_speed_multiplier()
   var flow_multiplier = game_state.get_flow_state_multiplier()
-  var effective_delta = delta * grief_multiplier * cascade_multiplier * weather_modifier * belief_modifier * awakening_multiplier * harmony_multiplier * flow_multiplier
+  var wellbeing_modifier = game_state.get_wellbeing_generation_modifier(is_positive)
+  var effective_delta = delta * grief_multiplier * cascade_multiplier * weather_modifier * belief_modifier * awakening_multiplier * harmony_multiplier * flow_multiplier * wellbeing_modifier
 
   if resource_id == "anxiety":
     var suppression = _get_calm_aura_suppression()
@@ -374,7 +376,8 @@ func _process_processing(delta: float) -> void:
   var stagnation_multiplier = _get_stagnation_speed_multiplier()
   var mastery_multiplier = get_mastery_speed_multiplier()
   var velocity_multiplier = get_velocity_speed_multiplier()
-  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier * fatigue_multiplier * echo_multiplier * harmony_multiplier * flow_multiplier * purity_multiplier * attunement_multiplier * fragility_multiplier * stagnation_multiplier * mastery_multiplier * velocity_multiplier
+  var wellbeing_modifier = game_state.get_wellbeing_processing_modifier()
+  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier * fatigue_multiplier * echo_multiplier * harmony_multiplier * flow_multiplier * purity_multiplier * attunement_multiplier * fragility_multiplier * stagnation_multiplier * mastery_multiplier * velocity_multiplier * wellbeing_modifier
   if process_timer <= 0:
     _complete_processing()
 

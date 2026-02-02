@@ -382,3 +382,27 @@ extends Node
 @export var velocity_momentum_gain: float = 0.05
 @export var velocity_momentum_decay: float = 0.02
 @export var velocity_momentum_max: float = 1.0
+
+@export_group("Wellbeing Thresholds")
+@export var wellbeing_struggling_threshold: float = 20.0
+@export var wellbeing_stable_threshold: float = 40.0
+@export var wellbeing_thriving_threshold: float = 60.0
+@export var wellbeing_flourishing_threshold: float = 80.0
+@export var wellbeing_struggling_negative_gen_bonus: float = 0.25
+@export var wellbeing_struggling_processing_penalty: float = 0.2
+@export var wellbeing_stable_processing_bonus: float = 0.1
+@export var wellbeing_thriving_positive_gen_bonus: float = 0.2
+@export var wellbeing_thriving_energy_regen_bonus: int = 1
+@export var wellbeing_flourishing_insight_chance: float = 0.02
+@export var wellbeing_flourishing_all_bonus: float = 0.15
+
+@export_group("Worker Fatigue")
+@export var worker_fatigue_gain_per_cycle: float = 0.08
+@export var worker_fatigue_max_level: float = 1.0
+@export var worker_fatigue_speed_penalty_at_max: float = 0.4
+@export var worker_fatigue_drop_chance_threshold: float = 0.7
+@export var worker_fatigue_drop_chance_per_tick: float = 0.01
+@export var worker_fatigue_night_recovery_rate: float = 0.5
+@export var worker_fatigue_joy_recovery_bonus: float = 0.02
+@export var worker_fatigue_calm_recovery_bonus: float = 0.01
+@export var worker_fatigue_onset_threshold: float = 0.3

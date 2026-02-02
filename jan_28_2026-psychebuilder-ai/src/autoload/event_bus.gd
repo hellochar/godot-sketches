@@ -105,3 +105,10 @@ signal mastery_level_gained(building: Node, resource_type: String, new_level: in
 signal mastery_specialization_achieved(building: Node, resource_type: String)
 signal velocity_burst_triggered(building: Node, velocity: float)
 signal velocity_momentum_changed(building: Node, momentum: float)
+
+signal wellbeing_tier_changed(old_tier: int, new_tier: int)
+signal wellbeing_flourishing_insight(amount: int)
+
+signal worker_fatigued(worker: Node, fatigue_level: float)
+signal worker_rested(worker: Node)
+signal worker_dropped_resource(worker: Node, resource_type: String, amount: int)

@@ -43,10 +43,17 @@ var is_selected: bool = false
 @export var negative_color_blend: float = 0.5
 @export var positive_color_blend: float = 0.3
 
+@export_group("Fatigue Colors")
+@export var fatigued_modulate: Color = Color(0.7, 0.7, 0.8, 1)
+@export var fatigued_color_blend: float = 0.4
+
 var emotional_residue: Dictionary = {}
 
 var focus_imprints: Dictionary = {}
 var dominant_focus: String = ""
+
+var fatigue_level: float = 0.0
+var is_fatigued: bool = false
 
 # Visual
 @onready var sprite: Sprite2D = %Sprite2D
@@ -151,6 +158,7 @@ func _pathfind_to_building(building: Node) -> void:
 func _process(delta: float) -> void:
   _update_joy_speed_boost(delta)
   _process_contamination(delta)
+  _process_fatigue(delta)
 
   match state:
     State.IDLE:
@@ -163,6 +171,7 @@ func _process(delta: float) -> void:
       _process_dropoff()
     State.CARRYING:
       _process_movement(delta)
+      _check_fatigue_drop(delta)
 
 func _process_movement(delta: float) -> void:
   if current_path.is_empty():
@@ -174,7 +183,8 @@ func _process_movement(delta: float) -> void:
   var contamination_modifier = _get_contamination_speed_modifier()
   var focus_modifier = get_focus_speed_multiplier()
   var road_modifier = _get_road_speed_modifier()
-  var move_amount = move_speed * current_speed_multiplier * contamination_modifier * focus_modifier * road_modifier * delta
+  var fatigue_modifier = _get_fatigue_speed_modifier()
+  var move_amount = move_speed * current_speed_multiplier * contamination_modifier * focus_modifier * road_modifier * fatigue_modifier * delta
 
   _record_road_traffic()
 
@@ -259,6 +269,7 @@ func _process_dropoff() -> void:
   if carried_amount == 0:
     _update_selection_visual()
     _update_focus_imprint()
+    _gain_fatigue()
     job_cycle_completed.emit()
 
     # Loop back to pickup
@@ -370,6 +381,10 @@ func _get_contamination_modulate() -> Color:
   elif positive_factor > negative_factor:
     result = base_modulate.lerp(positive_contamination_color, positive_factor * positive_color_blend)
 
+  if is_fatigued:
+    var fatigue_ratio = (fatigue_level - config.worker_fatigue_onset_threshold) / (config.worker_fatigue_max_level - config.worker_fatigue_onset_threshold)
+    result = result.lerp(fatigued_modulate, fatigue_ratio * fatigued_color_blend)
+
   return result
 
 func _update_focus_imprint() -> void:
@@ -422,3 +437,76 @@ func _record_road_traffic() -> void:
 
   if road_building and road_building.has_method("record_road_traffic"):
     road_building.record_road_traffic(resource_type, float(carried_amount))
+
+func _process_fatigue(delta: float) -> void:
+  _recover_fatigue_from_proximity(delta)
+  _update_fatigue_state()
+
+func _recover_fatigue_from_proximity(delta: float) -> void:
+  if fatigue_level <= 0:
+    return
+
+  var joy_recovery = 0.0
+  var calm_recovery = 0.0
+
+  for building in game_state.active_buildings:
+    var dist = position.distance_to(building.position)
+    if dist <= config.joy_proximity_radius:
+      if building.storage.get("joy", 0) > 0:
+        joy_recovery += config.worker_fatigue_joy_recovery_bonus
+      if building.storage.get("calm", 0) > 0:
+        calm_recovery += config.worker_fatigue_calm_recovery_bonus
+
+  var total_recovery = (joy_recovery + calm_recovery) * delta
+  if total_recovery > 0:
+    fatigue_level = maxf(0.0, fatigue_level - total_recovery)
+
+func _update_fatigue_state() -> void:
+  var was_fatigued = is_fatigued
+  is_fatigued = fatigue_level >= config.worker_fatigue_onset_threshold
+
+  if is_fatigued and not was_fatigued:
+    get_node("/root/EventBus").worker_fatigued.emit(self, fatigue_level)
+  elif not is_fatigued and was_fatigued:
+    get_node("/root/EventBus").worker_rested.emit(self)
+
+func _gain_fatigue() -> void:
+  var old_level = fatigue_level
+  fatigue_level = minf(fatigue_level + config.worker_fatigue_gain_per_cycle, config.worker_fatigue_max_level)
+  if fatigue_level > old_level:
+    _update_fatigue_state()
+
+func _get_fatigue_speed_modifier() -> float:
+  if fatigue_level < config.worker_fatigue_onset_threshold:
+    return 1.0
+
+  var fatigue_ratio = (fatigue_level - config.worker_fatigue_onset_threshold) / (config.worker_fatigue_max_level - config.worker_fatigue_onset_threshold)
+  return 1.0 - (fatigue_ratio * config.worker_fatigue_speed_penalty_at_max)
+
+func _check_fatigue_drop(delta: float) -> void:
+  if fatigue_level < config.worker_fatigue_drop_chance_threshold:
+    return
+
+  if carried_amount <= 0:
+    return
+
+  var drop_chance = config.worker_fatigue_drop_chance_per_tick * delta
+  var fatigue_factor = (fatigue_level - config.worker_fatigue_drop_chance_threshold) / (config.worker_fatigue_max_level - config.worker_fatigue_drop_chance_threshold)
+  drop_chance *= fatigue_factor
+
+  if randf() < drop_chance:
+    var drop_amount = mini(carried_amount, 1)
+    carried_amount -= drop_amount
+    var event_bus = get_node("/root/EventBus")
+    event_bus.worker_dropped_resource.emit(self, resource_type, drop_amount)
+    var spawn_pos = position + Vector2(randf_range(-16, 16), randf_range(-16, 16))
+    event_bus.resource_overflow.emit(resource_type, drop_amount, null, spawn_pos)
+
+func recover_fatigue_at_night() -> void:
+  var old_level = fatigue_level
+  fatigue_level = maxf(0.0, fatigue_level - config.worker_fatigue_night_recovery_rate)
+  if old_level != fatigue_level:
+    _update_fatigue_state()
+
+func get_fatigue_level() -> float:
+  return fatigue_level
