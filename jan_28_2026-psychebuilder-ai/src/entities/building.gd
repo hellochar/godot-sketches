@@ -117,6 +117,10 @@ var fatigue_level: float = 0.0
 var emotional_echo: Dictionary = {}
 var dominant_echo: String = ""
 
+# Harmony state
+var harmony_partners: Array[Node] = []
+var is_in_harmony: bool = false
+
 # Visual
 @onready var sprite: ColorRect = %ColorRect
 @onready var label: Label = %Label
@@ -188,6 +192,9 @@ func _update_connection_visual() -> void:
   if is_disconnected:
     sprite.color = base_color.lerp(Color(0.8, 0.2, 0.2), 0.5)
     disconnected_warning.visible = true
+  elif is_in_harmony:
+    sprite.color = base_color.lerp(Color(0.9, 0.95, 0.7), 0.3)
+    disconnected_warning.visible = false
   else:
     sprite.color = base_color
     disconnected_warning.visible = false
@@ -229,6 +236,7 @@ func _process(delta: float) -> void:
   _process_network_load_sharing(delta)
   _process_fatigue(delta)
   _process_emotional_echo_decay(delta)
+  _process_harmony()
   _update_status()
   _update_status_visual()
 
@@ -249,7 +257,9 @@ func _process_generation(delta: float) -> void:
   var weather_modifier = game_state.get_weather_generation_modifier()
   var belief_modifier = game_state.get_belief_generation_modifier()
   var awakening_multiplier = get_awakening_generator_rate_multiplier()
-  var effective_delta = delta * grief_multiplier * cascade_multiplier * weather_modifier * belief_modifier * awakening_multiplier
+  var harmony_multiplier = _get_harmony_speed_multiplier()
+  var flow_multiplier = game_state.get_flow_state_multiplier()
+  var effective_delta = delta * grief_multiplier * cascade_multiplier * weather_modifier * belief_modifier * awakening_multiplier * harmony_multiplier * flow_multiplier
 
   if resource_id == "anxiety":
     var suppression = _get_calm_aura_suppression()
@@ -288,7 +298,9 @@ func _process_processing(delta: float) -> void:
   var breakthrough_modifier = game_state.get_breakthrough_speed_modifier()
   var fatigue_multiplier = _get_fatigue_speed_multiplier()
   var echo_multiplier = _get_emotional_echo_multiplier()
-  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier * fatigue_multiplier * echo_multiplier
+  var harmony_multiplier = _get_harmony_speed_multiplier()
+  var flow_multiplier = game_state.get_flow_state_multiplier()
+  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier * fatigue_multiplier * echo_multiplier * harmony_multiplier * flow_multiplier
   if process_timer <= 0:
     _complete_processing()
 
@@ -336,19 +348,21 @@ func _complete_processing() -> void:
   _build_momentum(recipe_key)
 
   var awakening_bonus = get_awakening_output_bonus()
+  var harmony_bonus = get_harmony_output_bonus()
+  var total_bonus = awakening_bonus + harmony_bonus
 
   var conditional_outputs = definition.get("conditional_outputs", {})
   if not conditional_outputs.is_empty():
     for condition_resource in conditional_outputs:
       if storage.get(condition_resource, 0) > 0:
         var output_data = conditional_outputs[condition_resource]
-        var amount = output_data["amount"] + awakening_bonus
+        var amount = output_data["amount"] + total_bonus
         _track_output_resource(output_data["output"], amount)
         _cascade_output_resource(output_data["output"], amount)
         return
   var outputs = definition.get("output", {})
   for resource_id in outputs:
-    var amount = outputs[resource_id] + awakening_bonus
+    var amount = outputs[resource_id] + total_bonus
     _track_output_resource(resource_id, amount)
     _cascade_output_resource(resource_id, amount)
 
@@ -1437,3 +1451,42 @@ func _get_emotional_echo_multiplier() -> float:
     return 1.0 + (echo_strength * config.echo_same_type_bonus)
   else:
     return 1.0 - (echo_strength * config.echo_different_type_penalty)
+
+func _process_harmony() -> void:
+  var was_in_harmony = is_in_harmony
+  harmony_partners.clear()
+  is_in_harmony = false
+
+  if not grid:
+    return
+
+  var my_pairs = config.harmony_pairs.get(building_id, [])
+  var neighbors = _get_adjacent_buildings()
+
+  for neighbor in neighbors:
+    if neighbor.building_id in my_pairs:
+      harmony_partners.append(neighbor)
+
+    var neighbor_pairs = config.harmony_pairs.get(neighbor.building_id, [])
+    if building_id in neighbor_pairs and neighbor not in harmony_partners:
+      harmony_partners.append(neighbor)
+
+  is_in_harmony = harmony_partners.size() > 0
+
+  if is_in_harmony != was_in_harmony:
+    _update_connection_visual()
+    if is_in_harmony:
+      event_bus.harmony_formed.emit(self, harmony_partners)
+
+func _get_harmony_speed_multiplier() -> float:
+  if not is_in_harmony:
+    return 1.0
+  var bonus = config.harmony_speed_bonus
+  if harmony_partners.size() > 1:
+    bonus += (harmony_partners.size() - 1) * config.harmony_mutual_bonus
+  return 1.0 + bonus
+
+func get_harmony_output_bonus() -> int:
+  if is_in_harmony:
+    return config.harmony_output_bonus
+  return 0

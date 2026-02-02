@@ -71,6 +71,10 @@ var breakthrough_types_processed: Dictionary = {}
 var breakthrough_speed_buff_timer: float = 0.0
 var breakthrough_cooldown_timer: float = 0.0
 
+# Flow state tracking
+var flow_state_level: float = 0.0
+var flow_insight_timer: float = 0.0
+
 func _ready() -> void:
   reset_to_defaults()
 
@@ -116,6 +120,9 @@ func reset_to_defaults() -> void:
   breakthrough_types_processed.clear()
   breakthrough_speed_buff_timer = 0.0
   breakthrough_cooldown_timer = 0.0
+
+  flow_state_level = 0.0
+  flow_insight_timer = 0.0
 
 func spend_energy(amount: int) -> bool:
   if current_energy < amount:
@@ -390,3 +397,44 @@ func get_breakthrough_speed_modifier() -> float:
   if breakthrough_speed_buff_timer > 0:
     return 1.0 + cfg.breakthrough_speed_buff_amount
   return 1.0
+
+func update_flow_state(delta: float) -> void:
+  var cfg = get_node("/root/Config")
+  var event_bus = get_node("/root/EventBus")
+
+  var attention_ratio = attention_used / attention_available if attention_available > 0 else 1.0
+  var active_processing_count = 0
+
+  for building in active_buildings:
+    if building.processing_active:
+      active_processing_count += 1
+
+  var in_flow_conditions = attention_ratio <= cfg.flow_attention_threshold and active_processing_count >= cfg.flow_active_buildings_required
+
+  if in_flow_conditions:
+    var old_level = flow_state_level
+    flow_state_level = minf(flow_state_level + cfg.flow_buildup_rate * delta, cfg.flow_max_level)
+    if old_level < 0.5 and flow_state_level >= 0.5:
+      event_bus.flow_state_entered.emit(flow_state_level)
+
+    flow_insight_timer += delta
+    if flow_insight_timer >= 1.0:
+      flow_insight_timer = 0.0
+      if randf() < cfg.flow_insight_chance_per_second * flow_state_level:
+        update_resource_total("insight", cfg.flow_insight_amount)
+        track_insight_generated(cfg.flow_insight_amount)
+        event_bus.flow_insight_generated.emit(cfg.flow_insight_amount)
+  else:
+    if flow_state_level > 0:
+      flow_state_level = maxf(0.0, flow_state_level - cfg.flow_decay_rate * delta)
+      if flow_state_level <= 0:
+        event_bus.flow_state_exited.emit()
+    flow_insight_timer = 0.0
+
+func get_flow_state_multiplier() -> float:
+  var cfg = get_node("/root/Config")
+  var flow_ratio = flow_state_level / cfg.flow_max_level
+  return 1.0 + (flow_ratio * cfg.flow_speed_bonus_at_max)
+
+func is_in_flow_state() -> bool:
+  return flow_state_level >= 0.5

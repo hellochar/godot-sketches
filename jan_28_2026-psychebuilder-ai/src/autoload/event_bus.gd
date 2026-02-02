@@ -66,3 +66,12 @@ signal building_rested(building: Node)
 # Emotional echo signals
 signal echo_formed(building: Node, emotion_type: String, echo_level: float)
 signal echo_specialty_bonus(building: Node, emotion_type: String)
+
+# Harmony signals
+signal harmony_formed(building: Node, partners: Array)
+signal harmony_bonus_applied(building: Node, output_bonus: int)
+
+# Flow state signals
+signal flow_state_entered(level: float)
+signal flow_state_exited()
+signal flow_insight_generated(amount: int)

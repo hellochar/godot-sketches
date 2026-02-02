@@ -236,6 +236,30 @@ extends Node
 @export var echo_different_type_penalty: float = 0.15
 @export var echo_threshold: float = 0.3
 
+@export_group("Harmony Bonus")
+@export var harmony_pairs: Dictionary = {
+  "memory_well": ["memory_processor", "mourning_chapel"],
+  "wound": ["mourning_chapel"],
+  "worry_loop": ["anxiety_diffuser", "grounding_station"],
+  "rumination_spiral": ["reflection_pool", "grounding_station"],
+  "inner_critic": ["reflection_pool"],
+  "comfort_hearth": ["morning_routine", "exercise_yard"],
+  "morning_routine": ["exercise_yard", "comfort_hearth"],
+}
+@export var harmony_speed_bonus: float = 0.2
+@export var harmony_output_bonus: int = 1
+@export var harmony_mutual_bonus: float = 0.15
+
+@export_group("Flow State")
+@export var flow_attention_threshold: float = 0.3
+@export var flow_active_buildings_required: int = 3
+@export var flow_buildup_rate: float = 0.1
+@export var flow_decay_rate: float = 0.2
+@export var flow_max_level: float = 1.0
+@export var flow_speed_bonus_at_max: float = 0.4
+@export var flow_insight_chance_per_second: float = 0.02
+@export var flow_insight_amount: int = 1
+
 @export_group("Emotional Weather")
 @export var weather_resource_scale: float = 20.0
 @export var weather_momentum_lerp: float = 0.5
