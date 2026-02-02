@@ -86,6 +86,15 @@ var saturation_timer: float = 0.0
 var saturation_resource: String = ""
 var joy_numbness_level: float = 0.0
 
+# Road emotional memory state
+var road_traffic_memory: Dictionary = {}
+var road_dominant_emotion: String = ""
+var road_imprinted: bool = false
+
+# Cascade boost state
+var cascade_boost_timer: float = 0.0
+var cascade_boost_active: bool = false
+
 # Visual
 @onready var sprite: ColorRect = %ColorRect
 @onready var label: Label = %Label
@@ -191,6 +200,8 @@ func _process(delta: float) -> void:
   _process_resonance(delta)
   _process_saturation(delta)
   _process_saturation_effects(delta)
+  _process_road_memory_decay(delta)
+  _process_cascade_boost(delta)
   _update_status()
   _update_status_visual()
 
@@ -207,7 +218,8 @@ func _process_generation(delta: float) -> void:
 
   var resource_id = definition.get("generates", "")
   var grief_multiplier = _get_grief_speed_multiplier()
-  var effective_delta = delta * grief_multiplier
+  var cascade_multiplier = 1.0 + (config.cascade_generator_boost_amount if cascade_boost_active else 0.0)
+  var effective_delta = delta * grief_multiplier * cascade_multiplier
 
   if resource_id == "anxiety":
     var suppression = _get_calm_aura_suppression()
@@ -272,11 +284,11 @@ func _complete_processing() -> void:
     for condition_resource in conditional_outputs:
       if storage.get(condition_resource, 0) > 0:
         var output_data = conditional_outputs[condition_resource]
-        _output_resource(output_data["output"], output_data["amount"])
+        _cascade_output_resource(output_data["output"], output_data["amount"])
         return
   var outputs = definition.get("output", {})
   for resource_id in outputs:
-    _output_resource(resource_id, outputs[resource_id])
+    _cascade_output_resource(resource_id, outputs[resource_id])
 
 func _process_coping(delta: float) -> void:
   if not has_behavior(BuildingDefs.Behavior.COPING):
@@ -388,7 +400,6 @@ func _consume_inputs(inputs: Dictionary) -> void:
     storage[resource_id] = storage.get(resource_id, 0) - inputs[resource_id]
 
 func _output_resource(resource_id: String, amount: int) -> void:
-  # Try to add to storage first
   var current = storage.get(resource_id, 0)
   var space = storage_capacity - _get_total_stored()
   var to_store = mini(amount, space)
@@ -396,12 +407,16 @@ func _output_resource(resource_id: String, amount: int) -> void:
   if to_store > 0:
     storage[resource_id] = current + to_store
 
-  # Overflow spawns in world
   var overflow = amount - to_store
   if overflow > 0:
     var tile_size = config.tile_size
     var spawn_pos = position + Vector2(size) * tile_size * 0.5 + Vector2(randf_range(-16, 16), randf_range(-16, 16))
     event_bus.resource_overflow.emit(resource_id, overflow, self, spawn_pos)
+
+func _cascade_output_resource(resource_id: String, amount: int) -> void:
+  var remaining = _try_cascade_output(resource_id, amount)
+  if remaining > 0:
+    _output_resource(resource_id, remaining)
 
 func _get_total_stored() -> int:
   var total = 0
@@ -995,3 +1010,116 @@ func get_wisdom_saturation_bonus() -> float:
 
 func get_joy_numbness_factor() -> float:
   return 1.0 - joy_numbness_level
+
+func record_road_traffic(emotion: String, amount: float) -> void:
+  if not is_road():
+    return
+
+  var gain = config.road_memory_gain_per_pass * amount
+  road_traffic_memory[emotion] = road_traffic_memory.get(emotion, 0.0) + gain
+  _update_road_dominant_emotion()
+  _update_road_visual()
+
+func get_road_speed_modifier() -> float:
+  if not road_imprinted:
+    return 1.0
+
+  if road_dominant_emotion in config.road_positive_emotions:
+    return 1.0 + config.road_imprint_speed_bonus
+  elif road_dominant_emotion in config.road_negative_emotions:
+    return 1.0 - config.road_imprint_speed_penalty
+
+  return 1.0
+
+func _process_road_memory_decay(delta: float) -> void:
+  if not is_road():
+    return
+
+  var decay = config.road_memory_decay_rate * delta
+  var any_remaining = false
+  for emotion in road_traffic_memory.keys():
+    road_traffic_memory[emotion] = maxf(0.0, road_traffic_memory[emotion] - decay)
+    if road_traffic_memory[emotion] > 0:
+      any_remaining = true
+
+  if any_remaining:
+    _update_road_dominant_emotion()
+    _update_road_visual()
+  else:
+    road_imprinted = false
+    road_dominant_emotion = ""
+
+func _update_road_dominant_emotion() -> void:
+  var max_value = 0.0
+  var dominant = ""
+
+  for emotion in road_traffic_memory:
+    if road_traffic_memory[emotion] > max_value:
+      max_value = road_traffic_memory[emotion]
+      dominant = emotion
+
+  road_dominant_emotion = dominant
+  road_imprinted = max_value >= config.road_memory_threshold
+
+func _update_road_visual() -> void:
+  if not is_road():
+    return
+
+  var base_color = definition.get("color", Color.WHITE)
+
+  if not road_imprinted:
+    sprite.color = base_color
+    return
+
+  var emotion_color = base_color
+  if road_dominant_emotion in config.road_positive_emotions:
+    emotion_color = Color(0.6, 0.8, 0.6)
+  elif road_dominant_emotion in config.road_negative_emotions:
+    emotion_color = Color(0.7, 0.5, 0.6)
+
+  sprite.color = base_color.lerp(emotion_color, 0.4)
+
+func _process_cascade_boost(delta: float) -> void:
+  if not cascade_boost_active:
+    return
+
+  cascade_boost_timer -= delta
+  if cascade_boost_timer <= 0:
+    cascade_boost_active = false
+    cascade_boost_timer = 0.0
+
+func trigger_cascade_boost(resource_id: String) -> void:
+  if not has_behavior(BuildingDefs.Behavior.GENERATOR):
+    return
+
+  var generates = definition.get("generates", "")
+  if generates == resource_id:
+    cascade_boost_active = true
+    cascade_boost_timer = config.cascade_generator_boost_duration
+
+func _try_cascade_output(resource_id: String, amount: int) -> int:
+  if not grid:
+    return amount
+
+  var remaining = amount
+  var neighbors = _get_adjacent_buildings()
+
+  for neighbor in neighbors:
+    if remaining <= 0:
+      break
+
+    if config.cascade_direct_storage and neighbor.has_behavior(BuildingDefs.Behavior.STORAGE):
+      var overflow = neighbor.add_to_storage(resource_id, remaining)
+      remaining = overflow
+
+    if remaining > 0 and neighbor.has_behavior(BuildingDefs.Behavior.PROCESSOR):
+      var inputs = neighbor.definition.get("input", {})
+      if resource_id in inputs:
+        var transfer = mini(remaining, config.cascade_processor_transfer)
+        var overflow = neighbor.add_to_storage(resource_id, transfer)
+        remaining -= (transfer - overflow)
+
+    if neighbor.has_behavior(BuildingDefs.Behavior.GENERATOR):
+      neighbor.trigger_cascade_boost(resource_id)
+
+  return remaining

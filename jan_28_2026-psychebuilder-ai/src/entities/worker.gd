@@ -173,7 +173,10 @@ func _process_movement(delta: float) -> void:
   var distance = position.distance_to(target_position)
   var contamination_modifier = _get_contamination_speed_modifier()
   var focus_modifier = get_focus_speed_multiplier()
-  var move_amount = move_speed * current_speed_multiplier * contamination_modifier * focus_modifier * delta
+  var road_modifier = _get_road_speed_modifier()
+  var move_amount = move_speed * current_speed_multiplier * contamination_modifier * focus_modifier * road_modifier * delta
+
+  _record_road_traffic()
 
   if move_amount >= distance:
     position = target_position
@@ -400,3 +403,22 @@ func get_focus_speed_multiplier() -> float:
       return 1.0 - config.focus_unfamiliar_penalty * (1.0 - focus_ratio)
 
   return 1.0 + config.focus_efficiency_bonus_at_max * focus_ratio
+
+func _get_road_speed_modifier() -> float:
+  var my_coord = grid.world_to_grid(position)
+  var road_building = grid.get_occupant(my_coord)
+
+  if road_building and road_building.has_method("get_road_speed_modifier"):
+    return road_building.get_road_speed_modifier()
+
+  return 1.0
+
+func _record_road_traffic() -> void:
+  if resource_type == "" or carried_amount <= 0:
+    return
+
+  var my_coord = grid.world_to_grid(position)
+  var road_building = grid.get_occupant(my_coord)
+
+  if road_building and road_building.has_method("record_road_traffic"):
+    road_building.record_road_traffic(resource_type, float(carried_amount))

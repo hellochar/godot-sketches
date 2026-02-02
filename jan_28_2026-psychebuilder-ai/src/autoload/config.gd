@@ -150,3 +150,20 @@ extends Node
 @export var saturation_anxiety_panic_chance: float = 0.1
 @export var saturation_anxiety_panic_spread: int = 3
 @export var saturation_wisdom_efficiency_bonus: float = 0.3
+
+# Road Emotional Memory
+@export_group("Road Emotional Memory")
+@export var road_memory_threshold: int = 10
+@export var road_memory_decay_rate: float = 0.1
+@export var road_imprint_speed_bonus: float = 0.25
+@export var road_imprint_speed_penalty: float = 0.15
+@export var road_memory_gain_per_pass: float = 1.0
+@export var road_positive_emotions: Array[String] = ["joy", "calm", "insight", "wisdom"]
+@export var road_negative_emotions: Array[String] = ["anxiety", "grief", "doubt", "worry"]
+
+# Processing Cascade
+@export_group("Processing Cascade")
+@export var cascade_direct_storage: bool = true
+@export var cascade_processor_transfer: int = 1
+@export var cascade_generator_boost_duration: float = 3.0
+@export var cascade_generator_boost_amount: float = 0.5
