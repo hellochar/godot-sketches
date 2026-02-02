@@ -48,6 +48,29 @@
 4. Update [autoload] paths in project.godot
 5. Check for load() calls with hardcoded paths
 
+## Testing with gdUnit4
+- **When to write tests:** Write tests for logic-heavy code (state machines, calculations, game rules, utilities). Skip tests for UI-only or scene-setup code.
+- **Test location:** Place tests in `<sketch>/tests/` folder (e.g., `jan_28_2026-psychebuilder-ai/tests/test_game_state.gd`)
+- **Run tests for a sketch:**
+  ```bash
+  "/c/Users/hello/godot/Godot_v4.6-stable_win64.exe/Godot_v4.6-stable_win64_console.exe" --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -rc 1 --add res://<sketch>/tests
+  ```
+- **Run all tests:**
+  ```bash
+  "/c/Users/hello/godot/Godot_v4.6-stable_win64.exe/Godot_v4.6-stable_win64_console.exe" --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -rc 1 --add res://
+  ```
+- **Exit codes:** 0 = all pass, non-zero = failures
+- **After implementing features:** Write tests, run them, fix failures before committing
+- **Test file template:**
+  ```gdscript
+  extends GdUnitTestSuite
+
+  func test_example() -> void:
+    assert_int(2 + 2).is_equal(4)
+    assert_str("hello").contains("ell")
+    assert_bool(true).is_true()
+  ```
+
 ### How to get audio assets
 Option 1 - Use rfxgen to generate short sfx audio assets. It's located in _tools\rfxgen_v5.0_win_x64\rfxgen.exe. Use this for short sfx that provide clear feedback for the player.
 Option 2 - use the cc0-music skill to download background music.
