@@ -199,6 +199,26 @@ extends Node
 @export var support_network_transfer_amount: int = 2
 @export var support_network_transfer_interval: float = 3.0
 
+@export_group("Building Awakening")
+@export var awakening_experience_per_process: int = 1
+@export var awakening_threshold: int = 20
+@export var awakening_speed_bonus: float = 0.5
+@export var awakening_output_bonus: int = 1
+@export var awakening_storage_bonus: int = 5
+@export var awakening_generator_rate_bonus: float = 0.25
+
+@export_group("Emotional Breakthrough")
+@export var breakthrough_window_duration: float = 8.0
+@export var breakthrough_types_required: int = 3
+@export var breakthrough_process_amount_required: int = 2
+@export var breakthrough_insight_reward: int = 3
+@export var breakthrough_wisdom_reward: int = 2
+@export var breakthrough_conversion_rate: float = 0.5
+@export var breakthrough_speed_buff_duration: float = 10.0
+@export var breakthrough_speed_buff_amount: float = 0.3
+@export var breakthrough_cooldown: float = 30.0
+@export var breakthrough_negative_types: Array[String] = ["grief", "anxiety", "tension", "worry", "doubt"]
+
 @export_group("Emotional Weather")
 @export var weather_resource_scale: float = 20.0
 @export var weather_momentum_lerp: float = 0.5

@@ -52,3 +52,9 @@ signal belief_progress_updated(belief: int, progress: float)
 
 # Weather signals
 signal weather_changed(old_weather: int, new_weather: int)
+
+# Awakening signals
+signal building_awakened(building: Node)
+
+# Breakthrough signals
+signal breakthrough_triggered(insight_reward: int, wisdom_reward: int)

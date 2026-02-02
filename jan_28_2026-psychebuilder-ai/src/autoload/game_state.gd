@@ -64,6 +64,13 @@ var weather_momentum: Dictionary = {
   "wisdom": 0.0
 }
 
+# Breakthrough tracking
+var breakthrough_window_active: bool = false
+var breakthrough_window_timer: float = 0.0
+var breakthrough_types_processed: Dictionary = {}
+var breakthrough_speed_buff_timer: float = 0.0
+var breakthrough_cooldown_timer: float = 0.0
+
 func _ready() -> void:
   reset_to_defaults()
 
@@ -103,6 +110,12 @@ func reset_to_defaults() -> void:
     "anxiety": 0.0,
     "wisdom": 0.0
   }
+
+  breakthrough_window_active = false
+  breakthrough_window_timer = 0.0
+  breakthrough_types_processed.clear()
+  breakthrough_speed_buff_timer = 0.0
+  breakthrough_cooldown_timer = 0.0
 
 func spend_energy(amount: int) -> bool:
   if current_energy < amount:
@@ -308,3 +321,72 @@ func get_belief_habit_modifier() -> float:
   if has_belief(Belief.MINDFUL_AWARENESS):
     modifier *= 1.0 + cfg.belief_mindful_awareness_bonus
   return modifier
+
+func record_negative_processed(negative_type: String, amount: int) -> void:
+  var cfg = get_node("/root/Config")
+
+  if breakthrough_cooldown_timer > 0:
+    return
+
+  if not breakthrough_window_active:
+    breakthrough_window_active = true
+    breakthrough_window_timer = cfg.breakthrough_window_duration
+    breakthrough_types_processed.clear()
+
+  var current = breakthrough_types_processed.get(negative_type, 0)
+  breakthrough_types_processed[negative_type] = current + amount
+  check_breakthrough()
+
+func check_breakthrough() -> void:
+  var cfg = get_node("/root/Config")
+
+  var qualifying_types = 0
+  for neg_type in breakthrough_types_processed:
+    if breakthrough_types_processed[neg_type] >= cfg.breakthrough_process_amount_required:
+      qualifying_types += 1
+
+  if qualifying_types >= cfg.breakthrough_types_required:
+    trigger_breakthrough()
+
+func trigger_breakthrough() -> void:
+  var cfg = get_node("/root/Config")
+  var event_bus = get_node("/root/EventBus")
+
+  var total_negative = 0
+  for neg_type in breakthrough_types_processed:
+    total_negative += breakthrough_types_processed[neg_type]
+
+  var bonus_insight = int(total_negative * cfg.breakthrough_conversion_rate)
+  var insight_reward = cfg.breakthrough_insight_reward + bonus_insight
+  var wisdom_reward = cfg.breakthrough_wisdom_reward
+
+  update_resource_total("insight", insight_reward)
+  update_resource_total("wisdom", wisdom_reward)
+  track_insight_generated(insight_reward)
+  track_wisdom_generated(wisdom_reward)
+
+  breakthrough_speed_buff_timer = cfg.breakthrough_speed_buff_duration
+  breakthrough_cooldown_timer = cfg.breakthrough_cooldown
+  breakthrough_window_active = false
+  breakthrough_types_processed.clear()
+
+  event_bus.breakthrough_triggered.emit(insight_reward, wisdom_reward)
+
+func update_breakthrough_timers(delta: float) -> void:
+  if breakthrough_cooldown_timer > 0:
+    breakthrough_cooldown_timer -= delta
+
+  if breakthrough_speed_buff_timer > 0:
+    breakthrough_speed_buff_timer -= delta
+
+  if breakthrough_window_active:
+    breakthrough_window_timer -= delta
+    if breakthrough_window_timer <= 0:
+      breakthrough_window_active = false
+      breakthrough_types_processed.clear()
+
+func get_breakthrough_speed_modifier() -> float:
+  var cfg = get_node("/root/Config")
+  if breakthrough_speed_buff_timer > 0:
+    return 1.0 + cfg.breakthrough_speed_buff_amount
+  return 1.0

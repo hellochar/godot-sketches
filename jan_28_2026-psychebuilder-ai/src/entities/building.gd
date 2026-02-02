@@ -106,6 +106,10 @@ var momentum_break_penalty_timer: float = 0.0
 var support_network: Array[Node] = []
 var support_network_transfer_timer: float = 0.0
 
+# Awakening state
+var awakening_experience: int = 0
+var is_awakened: bool = false
+
 # Visual
 @onready var sprite: ColorRect = %ColorRect
 @onready var label: Label = %Label
@@ -235,7 +239,8 @@ func _process_generation(delta: float) -> void:
   var cascade_multiplier = 1.0 + (config.cascade_generator_boost_amount if cascade_boost_active else 0.0)
   var weather_modifier = game_state.get_weather_generation_modifier()
   var belief_modifier = game_state.get_belief_generation_modifier()
-  var effective_delta = delta * grief_multiplier * cascade_multiplier * weather_modifier * belief_modifier
+  var awakening_multiplier = get_awakening_generator_rate_multiplier()
+  var effective_delta = delta * grief_multiplier * cascade_multiplier * weather_modifier * belief_modifier * awakening_multiplier
 
   if resource_id == "anxiety":
     var suppression = _get_calm_aura_suppression()
@@ -270,7 +275,9 @@ func _process_processing(delta: float) -> void:
   var support_network_multiplier = _get_support_network_efficiency_multiplier()
   var weather_modifier = game_state.get_weather_processing_modifier()
   var belief_modifier = game_state.get_belief_processing_modifier()
-  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier
+  var awakening_multiplier = get_awakening_speed_multiplier()
+  var breakthrough_modifier = game_state.get_breakthrough_speed_modifier()
+  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier
   if process_timer <= 0:
     _complete_processing()
 
@@ -291,32 +298,46 @@ func _complete_processing() -> void:
 
   var inputs = definition.get("input", {})
   var processed_negative = false
+  var processed_negative_types: Array[String] = []
   for input_resource in inputs:
     if input_resource == "grief":
       game_state.track_grief_processed(inputs[input_resource])
       processed_negative = true
+      processed_negative_types.append("grief")
     elif input_resource == "anxiety":
       game_state.track_anxiety_processed(inputs[input_resource])
       processed_negative = true
+      processed_negative_types.append("anxiety")
+    elif input_resource in config.breakthrough_negative_types:
+      processed_negative_types.append(input_resource)
+
+  for neg_type in processed_negative_types:
+    game_state.record_negative_processed(neg_type, inputs.get(neg_type, 1))
 
   if processed_negative:
     _output_resource("tension", config.tension_from_processing)
 
+  _gain_awakening_experience()
+
   var recipe_key = _get_recipe_key(inputs)
   _build_momentum(recipe_key)
+
+  var awakening_bonus = get_awakening_output_bonus()
 
   var conditional_outputs = definition.get("conditional_outputs", {})
   if not conditional_outputs.is_empty():
     for condition_resource in conditional_outputs:
       if storage.get(condition_resource, 0) > 0:
         var output_data = conditional_outputs[condition_resource]
-        _track_output_resource(output_data["output"], output_data["amount"])
-        _cascade_output_resource(output_data["output"], output_data["amount"])
+        var amount = output_data["amount"] + awakening_bonus
+        _track_output_resource(output_data["output"], amount)
+        _cascade_output_resource(output_data["output"], amount)
         return
   var outputs = definition.get("output", {})
   for resource_id in outputs:
-    _track_output_resource(resource_id, outputs[resource_id])
-    _cascade_output_resource(resource_id, outputs[resource_id])
+    var amount = outputs[resource_id] + awakening_bonus
+    _track_output_resource(resource_id, amount)
+    _cascade_output_resource(resource_id, amount)
 
 func _track_output_resource(resource_id: String, amount: int) -> void:
   if resource_id == "wisdom":
@@ -1284,3 +1305,30 @@ func _get_support_network_efficiency_multiplier() -> float:
   var bonus = support_network.size() * config.support_network_efficiency_per_member
   bonus = minf(bonus, config.support_network_max_efficiency_bonus)
   return 1.0 + bonus
+
+func _gain_awakening_experience() -> void:
+  if is_awakened:
+    return
+  awakening_experience += config.awakening_experience_per_process
+  if awakening_experience >= config.awakening_threshold:
+    _awaken()
+
+func _awaken() -> void:
+  is_awakened = true
+  storage_capacity += config.awakening_storage_bonus
+  event_bus.building_awakened.emit(self)
+
+func get_awakening_speed_multiplier() -> float:
+  if is_awakened:
+    return 1.0 + config.awakening_speed_bonus
+  return 1.0
+
+func get_awakening_output_bonus() -> int:
+  if is_awakened:
+    return config.awakening_output_bonus
+  return 0
+
+func get_awakening_generator_rate_multiplier() -> float:
+  if is_awakened:
+    return 1.0 + config.awakening_generator_rate_bonus
+  return 1.0

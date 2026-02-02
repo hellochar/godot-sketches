@@ -35,6 +35,7 @@ func _process(delta: float) -> void:
   match current_phase:
     Phase.DAY:
       game_state.update_weather_momentum(delta * speed_multiplier)
+      game_state.update_breakthrough_timers(delta * speed_multiplier)
       if phase_time >= day_duration:
         _transition_to_night()
     Phase.NIGHT:
