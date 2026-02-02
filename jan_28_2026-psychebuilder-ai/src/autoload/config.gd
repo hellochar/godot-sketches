@@ -32,3 +32,12 @@ extends Node
 @export var anxiety_overflow_threshold: int = 8
 @export var anxiety_spread_amount: int = 1
 @export var anxiety_spread_interval: float = 5.0
+
+# Grief Slowdown
+@export var grief_slowdown_threshold: int = 3
+@export var grief_slowdown_factor: float = 0.15
+@export var grief_max_slowdown: float = 0.7
+
+# Habit Adjacency
+@export var habit_adjacency_bonus: float = 0.25
+@export var habit_max_adjacency_multiplier: float = 2.0

@@ -169,7 +169,8 @@ func _process_generation(delta: float) -> void:
   if rate <= 0:
     return
 
-  generation_timer += delta
+  var grief_multiplier = _get_grief_speed_multiplier()
+  generation_timer += delta * grief_multiplier
   var interval = 1.0 / rate
 
   if generation_timer >= interval:
@@ -190,7 +191,8 @@ func _process_processing(delta: float) -> void:
     _try_start_processing()
     return
 
-  process_timer -= delta
+  var grief_multiplier = _get_grief_speed_multiplier()
+  process_timer -= delta * grief_multiplier
   if process_timer <= 0:
     _complete_processing()
 
@@ -386,15 +388,18 @@ func trigger_habit() -> void:
     if not game_state.spend_energy(energy_cost):
       return
 
+  var adjacency_multiplier = _get_habit_adjacency_multiplier()
+
   # Generate resources
   var generates = definition.get("habit_generates", {})
   for resource_id in generates:
-    _output_resource(resource_id, generates[resource_id])
+    var amount = int(generates[resource_id] * adjacency_multiplier)
+    _output_resource(resource_id, amount)
 
   # Reduce resources (from storage first, then GameState totals)
   var reduces = definition.get("habit_reduces", {})
   for resource_id in reduces:
-    var to_reduce = reduces[resource_id]
+    var to_reduce = int(reduces[resource_id] * adjacency_multiplier)
     var removed = remove_from_storage(resource_id, to_reduce)
     var remaining = to_reduce - removed
     if remaining > 0:
@@ -403,7 +408,8 @@ func trigger_habit() -> void:
   # Energy bonus
   var energy_bonus = definition.get("habit_energy_bonus", 0)
   if energy_bonus > 0:
-    game_state.add_energy(energy_bonus)
+    var bonus_amount = int(energy_bonus * adjacency_multiplier)
+    game_state.add_energy(bonus_amount)
 
 func _update_status() -> void:
   if is_road():
@@ -464,3 +470,35 @@ func _is_storage_full() -> bool:
   if storage_capacity <= 0:
     return false
   return _get_total_stored() >= storage_capacity
+
+func _get_grief_speed_multiplier() -> float:
+  var grief_amount = storage.get("grief", 0)
+  if grief_amount < config.grief_slowdown_threshold:
+    return 1.0
+  var excess_grief = grief_amount - config.grief_slowdown_threshold
+  var slowdown = excess_grief * config.grief_slowdown_factor
+  slowdown = minf(slowdown, config.grief_max_slowdown)
+  return 1.0 - slowdown
+
+func _count_adjacent_habits() -> int:
+  if not grid:
+    return 0
+  var count = 0
+  for x in range(-1, size.x + 1):
+    for y in range(-1, size.y + 1):
+      if x >= 0 and x < size.x and y >= 0 and y < size.y:
+        continue
+      var check = grid_coord + Vector2i(x, y)
+      if grid.is_valid_coord(check):
+        var occupant = grid.get_occupant(check)
+        if occupant and occupant != self and occupant.has_method("has_behavior"):
+          if occupant.has_behavior(BuildingDefs.Behavior.HABIT):
+            count += 1
+  return count
+
+func _get_habit_adjacency_multiplier() -> float:
+  var adjacent_count = _count_adjacent_habits()
+  if adjacent_count == 0:
+    return 1.0
+  var bonus = adjacent_count * config.habit_adjacency_bonus
+  return minf(1.0 + bonus, config.habit_max_adjacency_multiplier)
