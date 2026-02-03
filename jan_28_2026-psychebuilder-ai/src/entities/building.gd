@@ -4,6 +4,7 @@ const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/buildi
 
 @onready var game_state: Node = get_node("/root/GameState")
 @onready var event_bus: Node = get_node("/root/EventBus")
+@onready var config: Node = get_node("/root/Config")
 
 enum Status {
   IDLE,
@@ -175,7 +176,7 @@ func _ready() -> void:
   if definition:
     _update_visuals()
 
-func initialize(p_building_id: String, p_grid_coord: Vector2i, p_grid: RefCounted = null) -> void:
+func initialize(p_building_id: String, p_grid_coord: Vector2i, p_grid: Node = null) -> void:
   building_id = p_building_id
   grid_coord = p_grid_coord
   grid = p_grid

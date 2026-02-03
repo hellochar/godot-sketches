@@ -54,7 +54,8 @@ var aura_overlay: Node2D = null
 @export var aura_arc_points: int = 32
 
 func setup(p_grid_size: Vector2i, p_tile_size: int) -> void:
-  grid = GridSystemScript.new(p_grid_size, p_tile_size)
+  grid = GridSystemScript.new()
+  grid.setup(p_grid_size, p_tile_size)
   _setup_background()
   _draw_grid_lines()
   _center_camera()

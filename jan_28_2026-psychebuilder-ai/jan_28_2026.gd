@@ -114,7 +114,6 @@ var building_tooltip: PanelContainer = null
 @export var toolbar_height: float = 50.0
 @export var toolbar_margin: float = 10.0
 @export var toolbar_bg_color: Color = Color(0.1, 0.1, 0.15, 0.9)
-@export var building_button_size: Vector2 = Vector2(80, 40)
 
 @export_group("Info Panel")
 @export var info_panel_size: Vector2 = Vector2(220, 220)
@@ -123,7 +122,6 @@ var building_tooltip: PanelContainer = null
 
 @export_group("Time Controls")
 @export var phase_label_min_width: float = 120.0
-@export var speed_options: Array[float] = [1.0, 2.0, 3.0]
 
 @export_group("Wellbeing Colors")
 @export var wellbeing_high_color: Color = Color(0.3, 0.9, 0.3)
@@ -191,7 +189,6 @@ func _populate_building_toolbar() -> void:
     building_toolbar.add_child(btn)
 
 func _create_building_button(building_id: String) -> Button:
-  var BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
   var def = BuildingDefs.get_definition(building_id)
 
   var btn = Button.new()
@@ -903,12 +900,12 @@ func _create_game_end_screen(ending_tier: String) -> void:
   var separator = HSeparator.new()
   vbox.add_child(separator)
 
-  var wellbeing_label = Label.new()
-  wellbeing_label.text = "Final Wellbeing: %d" % int(game_state.wellbeing)
-  wellbeing_label.add_theme_font_size_override("font_size", end_wellbeing_font_size)
-  wellbeing_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-  wellbeing_label.add_theme_color_override("font_color", _get_wellbeing_color(game_state.wellbeing))
-  vbox.add_child(wellbeing_label)
+  var final_wellbeing_label = Label.new()
+  final_wellbeing_label.text = "Final Wellbeing: %d" % int(game_state.wellbeing)
+  final_wellbeing_label.add_theme_font_size_override("font_size", end_wellbeing_font_size)
+  final_wellbeing_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+  final_wellbeing_label.add_theme_color_override("font_color", _get_wellbeing_color(game_state.wellbeing))
+  vbox.add_child(final_wellbeing_label)
 
   var stats = _gather_summary_stats()
   var stats_label = Label.new()

@@ -24,6 +24,7 @@ config/icon="res://icon.svg"
 GodotMCPInput="*uid://djeriu2380rj2"
 HTags="*uid://dfuf7asc72fs2"
 Utils="*res://_common/utils.gd"
+Config="*res://jan_28_2026-psychebuilder-ai/src/autoload/config.gd"
 EventBus="*res://jan_28_2026-psychebuilder-ai/src/autoload/event_bus.gd"
 GameState="*res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd"
 
