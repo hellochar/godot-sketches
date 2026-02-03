@@ -49,18 +49,16 @@ func _create_option_panel(building_id: String, def: Dictionary, _index: int) -> 
   var panel = PanelContainer.new()
   panel.custom_minimum_size = Vector2(180, 200)
 
-  var vbox = VBoxContainer.new()
-  vbox.add_theme_constant_override("separation", 8)
-  panel.add_child(vbox)
-
   var margin = MarginContainer.new()
   margin.add_theme_constant_override("margin_left", 10)
   margin.add_theme_constant_override("margin_right", 10)
   margin.add_theme_constant_override("margin_top", 10)
   margin.add_theme_constant_override("margin_bottom", 10)
+  panel.add_child(margin)
 
   var inner_vbox = VBoxContainer.new()
   inner_vbox.add_theme_constant_override("separation", 6)
+  margin.add_child(inner_vbox)
 
   var color_rect = ColorRect.new()
   color_rect.custom_minimum_size = Vector2(40, 40)
@@ -89,9 +87,6 @@ func _create_option_panel(building_id: String, def: Dictionary, _index: int) -> 
   choose_btn.text = "Choose"
   choose_btn.pressed.connect(_on_choice_pressed.bind(building_id))
   inner_vbox.add_child(choose_btn)
-
-  margin.add_child(inner_vbox)
-  panel.add_child(margin)
 
   return panel
 

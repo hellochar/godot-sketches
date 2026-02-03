@@ -1324,6 +1324,8 @@ func _on_start_game() -> void:
     main_menu = null
   game_world.visible = true
   for child in ui_layer.get_children():
+    if child == event_popup or child == discovery_popup or child == tutorial_hint_popup:
+      continue
     child.visible = true
   game_started = true
   game_flow_manager.initialize_game()
