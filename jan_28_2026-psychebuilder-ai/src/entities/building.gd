@@ -170,6 +170,8 @@ var adjacency_output_bonus: int = 0
 var adjacency_transport_bonus: float = 0.0
 var adjacent_neighbors: Array[Node] = []
 
+var _components: Dictionary = {}
+
 @export_group("Visual")
 @export var disconnected_darken_factor: float = 0.4
 
@@ -192,6 +194,57 @@ func _exit_tree() -> void:
   if event_bus.building_removed.is_connected(_on_building_removed):
     event_bus.building_removed.disconnect(_on_building_removed)
 
+func _add_component(component_name: String, component: Node) -> void:
+  _components[component_name] = component
+  add_child(component)
+
+func get_component(component_name: String) -> Node:
+  return _components.get(component_name)
+
+func has_component(component_name: String) -> bool:
+  return _components.has(component_name)
+
+func get_components() -> Array:
+  return _components.values()
+
+func notify_resource_added(resource_id: String, amount: int) -> void:
+  for component in _components.values():
+    if component.has_method("on_resource_added"):
+      component.on_resource_added(resource_id, amount)
+
+func _setup_components() -> void:
+  var behaviors = definition.get("behaviors", [])
+
+  if definition.get("storage_capacity", 0) > 0:
+    var storage_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/storage_component.gd").new()
+    _add_component("storage", storage_comp)
+
+  if BuildingDefs.Behavior.GENERATOR in behaviors:
+    var generator_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/generator_component.gd").new()
+    _add_component("generator", generator_comp)
+
+  if BuildingDefs.Behavior.PROCESSOR in behaviors:
+    var processor_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/processor_component.gd").new()
+    _add_component("processor", processor_comp)
+
+  if BuildingDefs.Behavior.COPING in behaviors:
+    var coping_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/coping_component.gd").new()
+    _add_component("coping", coping_comp)
+
+  if BuildingDefs.Behavior.HABIT in behaviors:
+    var habit_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/habit_component.gd").new()
+    _add_component("habit", habit_comp)
+
+  if BuildingDefs.Behavior.INFRASTRUCTURE in behaviors:
+    var infra_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/infrastructure_component.gd").new()
+    _add_component("infrastructure", infra_comp)
+
+  for component in _components.values():
+    if component.has_method("_init_component"):
+      component._init_component(self)
+    if component.has_method("on_initialize"):
+      component.on_initialize()
+
 func initialize(p_building_id: String, p_grid_coord: Vector2i, p_grid: Node = null) -> void:
   building_id = p_building_id
   grid_coord = p_grid_coord
@@ -205,6 +258,7 @@ func initialize(p_building_id: String, p_grid_coord: Vector2i, p_grid: Node = nu
   size = definition.get("size", Vector2i(1, 1))
   storage_capacity = definition.get("storage_capacity", 0)
   _update_connection()
+  _setup_components()
 
   if is_inside_tree():
     _update_visuals()
@@ -322,6 +376,10 @@ func _process(delta: float) -> void:
   if not definition:
     return
 
+  for component in _components.values():
+    if component.has_method("on_process"):
+      component.on_process(delta)
+
   _process_generation(delta)
   _update_storage_display()
   _process_processing(delta)
@@ -355,6 +413,9 @@ func _process(delta: float) -> void:
   _update_status_visual()
 
 func _process_generation(delta: float) -> void:
+  if has_component("generator"):
+    return
+
   if not has_behavior(BuildingDefs.Behavior.GENERATOR):
     return
 
@@ -392,6 +453,9 @@ func _process_generation(delta: float) -> void:
       _output_resource(resource_id, amount)
 
 func _process_processing(delta: float) -> void:
+  if has_component("processor"):
+    return
+
   if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
     return
 
@@ -531,6 +595,85 @@ func _track_output_resource(resource_id: String, amount: int) -> void:
   elif resource_id == "insight":
     game_state.track_insight_generated(amount)
 
+func _complete_processing_effects() -> void:
+  var inputs = definition.get("input", {})
+  var processed_negative = false
+  var processed_negative_types: Array[String] = []
+  for input_resource in inputs:
+    if input_resource == "grief":
+      game_state.track_grief_processed(inputs[input_resource])
+      processed_negative = true
+      processed_negative_types.append("grief")
+    elif input_resource == "anxiety":
+      game_state.track_anxiety_processed(inputs[input_resource])
+      processed_negative = true
+      processed_negative_types.append("anxiety")
+    elif input_resource in config.breakthrough_negative_types:
+      processed_negative_types.append(input_resource)
+
+  for neg_type in processed_negative_types:
+    game_state.record_negative_processed(neg_type, inputs.get(neg_type, 1))
+
+  if processed_negative:
+    _output_resource("tension", config.tension_from_processing)
+
+  _gain_fatigue()
+  _gain_fragility(inputs)
+  _build_emotional_echo(inputs)
+  _gain_awakening_experience()
+  _try_attention_echo_refund(inputs)
+  _gain_mastery(inputs)
+  _record_velocity_event(inputs)
+
+  for input_resource in inputs:
+    game_state.record_processing_event(self, input_resource)
+
+  for input_resource in inputs:
+    if is_resource_fresh(input_resource):
+      event_bus.fresh_resource_bonus.emit(self, input_resource)
+    reset_resource_age(input_resource)
+
+  var recipe_key = _get_recipe_key(inputs)
+  _build_momentum(recipe_key)
+
+  var awakening_bonus = get_awakening_output_bonus()
+  var harmony_bonus = get_harmony_output_bonus()
+  var purity_bonus = get_purity_output_bonus()
+  var attunement_bonus = get_attunement_output_bonus()
+  var mastery_bonus = get_mastery_output_bonus()
+  var legacy_bonus = get_legacy_output_bonus()
+  var adjacency_bonus = get_adjacency_output_bonus()
+  var total_bonus = awakening_bonus + harmony_bonus + purity_bonus + attunement_bonus + mastery_bonus + legacy_bonus + adjacency_bonus
+
+  var spillover = get_adjacency_spillover()
+  for spillover_resource in spillover:
+    _output_resource(spillover_resource, spillover[spillover_resource])
+
+  var synergy = try_attunement_synergy()
+  if synergy.get("triggered", false):
+    if synergy.has("output_type"):
+      _output_resource(synergy["output_type"], synergy.get("amount", 1))
+    if synergy.has("calm_bonus"):
+      _output_resource("calm", synergy["calm_bonus"])
+    if synergy.has("energy_bonus"):
+      game_state.add_energy(synergy["energy_bonus"])
+
+  var conditional_outputs = definition.get("conditional_outputs", {})
+  if not conditional_outputs.is_empty():
+    for condition_resource in conditional_outputs:
+      if storage.get(condition_resource, 0) > 0:
+        var output_data = conditional_outputs[condition_resource]
+        var amount = output_data["amount"] + total_bonus
+        _track_output_resource(output_data["output"], amount)
+        _cascade_output_resource(output_data["output"], amount)
+        return
+
+  var outputs = definition.get("output", {})
+  for resource_id in outputs:
+    var amount = outputs[resource_id] + total_bonus
+    _track_output_resource(resource_id, amount)
+    _cascade_output_resource(resource_id, amount)
+
 func _get_recipe_key(inputs: Dictionary) -> String:
   var sorted_keys = inputs.keys()
   sorted_keys.sort()
@@ -540,6 +683,9 @@ func _get_recipe_key(inputs: Dictionary) -> String:
   return ":".join(parts)
 
 func _process_coping(delta: float) -> void:
+  if has_component("coping"):
+    return
+
   if not has_behavior(BuildingDefs.Behavior.COPING):
     return
 
@@ -687,7 +833,10 @@ func _get_total_stored() -> int:
   return total
 
 func get_effective_storage_capacity() -> int:
-  return storage_capacity + get_attunement_storage_bonus()
+  var bonus = get_attunement_storage_bonus()
+  for component in _components.values():
+    bonus += component.get_storage_bonus()
+  return storage_capacity + bonus
 
 func add_to_storage(resource_id: String, amount: int, purity: float = -1.0) -> int:
   var effective_capacity = get_effective_storage_capacity()
@@ -731,9 +880,14 @@ func unassign_worker() -> void:
   assigned_worker = null
 
 func is_road() -> bool:
-  return has_behavior(BuildingDefs.Behavior.INFRASTRUCTURE)
+  return has_component("infrastructure") or has_behavior(BuildingDefs.Behavior.INFRASTRUCTURE)
 
 func trigger_habit() -> void:
+  var habit_comp = get_component("habit")
+  if habit_comp:
+    habit_comp.trigger()
+    return
+
   if not has_behavior(BuildingDefs.Behavior.HABIT):
     return
 
@@ -1326,6 +1480,9 @@ func get_road_speed_modifier() -> float:
   return 1.0
 
 func _process_road_memory_decay(delta: float) -> void:
+  if has_component("infrastructure"):
+    return
+
   if not is_road():
     return
 
