@@ -101,6 +101,28 @@ func _build_ui(ending_tier: String, final_wellbeing: float, stats: Dictionary) -
   stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
   vbox.add_child(stats_label)
 
+  var tips = _generate_tips(stats, final_wellbeing)
+  if tips.size() > 0:
+    var tips_sep = HSeparator.new()
+    vbox.add_child(tips_sep)
+
+    var tips_header = Label.new()
+    tips_header.text = "Tips for Next Run:"
+    tips_header.add_theme_font_size_override("font_size", 14)
+    tips_header.add_theme_color_override("font_color", Color(0.6, 0.8, 0.9))
+    tips_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    vbox.add_child(tips_header)
+
+    var tips_label = Label.new()
+    var tip_lines: Array[String] = []
+    for tip in tips.slice(0, 3):
+      tip_lines.append("• " + tip)
+    tips_label.text = "\n".join(tip_lines)
+    tips_label.add_theme_font_size_override("font_size", 12)
+    tips_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    tips_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+    vbox.add_child(tips_label)
+
   var sep3 = HSeparator.new()
   vbox.add_child(sep3)
 
@@ -157,6 +179,27 @@ func _format_stats(stats: Dictionary) -> String:
     lines.append("Beliefs Unlocked: %d" % beliefs.size())
 
   return "\n".join(lines)
+
+func _generate_tips(stats: Dictionary, final_wellbeing: float) -> Array[String]:
+  var tips: Array[String] = []
+
+  var negative = stats.get("negative_resources", 0)
+  var positive = stats.get("positive_resources", 0)
+  var buildings = stats.get("buildings", 0)
+  var workers = stats.get("workers", 0)
+
+  if negative > positive * 2:
+    tips.append("Build more Processors (like Mourning Chapel or Anxiety Diffuser) to convert negative emotions")
+  if workers < 3:
+    tips.append("More workers help transport resources faster between buildings")
+  if buildings < 6:
+    tips.append("Try placing more buildings to increase your emotional toolkit")
+  if final_wellbeing < 40:
+    tips.append("Focus on processing grief and anxiety early - they drag down wellbeing")
+  if positive < 5:
+    tips.append("Generators like Comfort Hearth produce positive resources passively")
+
+  return tips
 
 func _on_play_again() -> void:
   play_again_pressed.emit()
