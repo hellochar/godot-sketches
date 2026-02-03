@@ -7,6 +7,7 @@ const TimeSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems
 const GameFlowManagerScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems/game_flow_manager.gd")
 const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
 const EventPopupScene = preload("res://jan_28_2026-psychebuilder-ai/src/ui/event_popup.tscn")
+const DiscoveryPopupScene = preload("res://jan_28_2026-psychebuilder-ai/src/ui/discovery_popup.tscn")
 const MainMenuScene = preload("res://jan_28_2026-psychebuilder-ai/src/ui/main_menu.tscn")
 const EndScreenScene = preload("res://jan_28_2026-psychebuilder-ai/src/ui/end_screen.tscn")
 const WellbeingShader = preload("res://jan_28_2026-psychebuilder-ai/src/shaders/wellbeing_effects.gdshader")
@@ -96,6 +97,7 @@ var time_system: Node
 var event_system: Node
 var game_flow_manager: Node
 var event_popup: PanelContainer
+var discovery_popup: PanelContainer
 var tutorial_hint_popup: PanelContainer
 var main_menu: Control
 var end_screen: Control
@@ -224,7 +226,7 @@ func _setup_systems() -> void:
   time_system.day_started.connect(_on_day_started)
 
   event_system = get_node("/root/EventSystem")
-  event_system.setup(resource_system, game_world.get_grid())
+  event_system.setup(resource_system, game_world.get_grid(), building_system)
   event_system.event_popup_requested.connect(_on_event_popup_requested)
 
   event_bus.resource_overflow.connect(_on_resource_overflow)
@@ -237,6 +239,8 @@ func _setup_systems() -> void:
   _setup_wellbeing_effects()
   game_flow_manager.setup(building_system, resource_system, game_world.get_grid())
   game_flow_manager.tutorial_hint_requested.connect(_on_tutorial_hint_requested)
+  game_flow_manager.discovery_available.connect(_on_discovery_available)
+  event_bus.night_started.connect(_on_night_started)
   game_flow_manager.initialize_game()
 
 func _setup_ui() -> void:
@@ -244,10 +248,12 @@ func _setup_ui() -> void:
   _connect_time_controls()
   _create_building_tooltip()
   _create_event_popup()
+  _create_discovery_popup()
   _create_tutorial_hint_popup()
   _populate_resource_list()
   _connect_building_info_buttons()
   event_bus.resource_total_changed.connect(_on_resource_total_changed)
+  event_bus.building_unlocked.connect(_on_building_unlocked)
 
 func _populate_building_toolbar() -> void:
   var unlocked = building_system.get_unlocked_buildings()
@@ -741,6 +747,12 @@ func _create_event_popup() -> void:
   event_popup.dismissed.connect(_on_event_dismissed)
   ui_layer.add_child(event_popup)
 
+func _create_discovery_popup() -> void:
+  discovery_popup = DiscoveryPopupScene.instantiate()
+  discovery_popup.building_chosen.connect(_on_discovery_building_chosen)
+  discovery_popup.dismissed.connect(_on_discovery_dismissed)
+  ui_layer.add_child(discovery_popup)
+
 func _create_tutorial_hint_popup() -> void:
   tutorial_hint_popup = PanelContainer.new()
   tutorial_hint_popup.name = "TutorialHintPopup"
@@ -1013,6 +1025,30 @@ func _on_event_choice_made(choice_index: int) -> void:
 
 func _on_event_dismissed() -> void:
   event_system.dismiss_event()
+
+func _on_discovery_available(options: Array) -> void:
+  discovery_popup.show_discovery(options, time_system)
+
+func _on_discovery_building_chosen(building_id: String) -> void:
+  game_flow_manager.apply_discovery(building_id)
+  _add_building_to_toolbar(building_id)
+  show_toast("Unlocked: %s" % BuildingDefs.get_definition(building_id).get("name", building_id), "success")
+
+func _on_discovery_dismissed() -> void:
+  pass
+
+func _on_night_started(day_number: int) -> void:
+  game_flow_manager.check_discovery(day_number)
+
+func _on_building_unlocked(building_id: String) -> void:
+  _add_building_to_toolbar(building_id)
+
+func _add_building_to_toolbar(building_id: String) -> void:
+  for child in building_toolbar.get_children():
+    if child.name == building_id:
+      return
+  var btn = _create_building_button(building_id)
+  building_toolbar.add_child(btn)
 
 func _update_building_tooltip() -> void:
   if is_placing:

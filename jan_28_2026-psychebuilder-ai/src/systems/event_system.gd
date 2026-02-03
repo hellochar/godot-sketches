@@ -16,10 +16,12 @@ var energy_regen_modifier: int = 0
 
 var resource_system: Node
 var grid_system: Node
+var building_system: Node
 
-func setup(p_resource_system: Node, p_grid_system: Node) -> void:
+func setup(p_resource_system: Node, p_grid_system: Node, p_building_system: Node = null) -> void:
   resource_system = p_resource_system
   grid_system = p_grid_system
+  building_system = p_building_system
 
 func _ready() -> void:
   event_bus.day_started.connect(_on_day_started)
@@ -222,8 +224,9 @@ func _grant_completion_reward(event: Dictionary) -> void:
   var event_id = event.get("id", "")
 
   var unlock_building = reward.get("unlock_building", "")
-  if unlock_building != "":
-    pass
+  if unlock_building != "" and building_system:
+    building_system.unlock_building(unlock_building)
+    game_state.grant_event_reward(event_id)
 
   var spawn = reward.get("spawn", {})
   if spawn.size() > 0:
