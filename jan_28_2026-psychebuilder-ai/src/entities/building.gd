@@ -266,6 +266,20 @@ func _setup_components() -> void:
     _add_component("awakening", awakening_comp)
     var fragility_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/fragility_component.gd").new()
     _add_component("fragility", fragility_comp)
+    var network_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/network_component.gd").new()
+    _add_component("network", network_comp)
+
+  if definition.get("storage_capacity", 0) > 0:
+    var purity_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/purity_component.gd").new()
+    _add_component("purity", purity_comp)
+    var stagnation_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/stagnation_component.gd").new()
+    _add_component("stagnation", stagnation_comp)
+
+  var adjacency_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/adjacency_component.gd").new()
+  _add_component("adjacency", adjacency_comp)
+
+  var suppression_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/suppression_component.gd").new()
+  _add_component("suppression", suppression_comp)
 
   for component in _components.values():
     if component.has_method("_init_component"):
@@ -1651,6 +1665,8 @@ func _get_momentum_speed_multiplier() -> float:
   return 1.0 + (momentum_ratio * config.momentum_speed_bonus_at_max)
 
 func _process_support_network() -> void:
+  if has_component("network"):
+    return
   if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
     support_network.clear()
     return
@@ -1692,6 +1708,8 @@ func _find_connected_buildings_of_same_type() -> Array[Node]:
   return result
 
 func _process_network_load_sharing(delta: float) -> void:
+  if has_component("network"):
+    return
   if support_network.size() < config.support_network_min_size:
     return
 
@@ -1911,6 +1929,8 @@ func get_harmony_output_bonus() -> int:
   return 0
 
 func _process_purity_decay(delta: float) -> void:
+  if has_component("purity"):
+    return
   if storage_capacity <= 0:
     return
 
@@ -2169,6 +2189,8 @@ func _get_fragility_speed_multiplier() -> float:
   return 1.0 - penalty
 
 func _process_stagnation(delta: float) -> void:
+  if has_component("stagnation"):
+    return
   if storage_capacity <= 0:
     return
 
@@ -2389,6 +2411,8 @@ func _create_suppression_field() -> void:
   event_bus.suppression_field_created.emit(self, field_position, config.transmutation_suppression_radius, config.transmutation_suppression_duration)
 
 func _process_suppression_field(delta: float) -> void:
+  if has_component("suppression"):
+    return
   if not suppression_field_active:
     return
 
@@ -2679,16 +2703,20 @@ func get_legacy_timer_progress() -> float:
     return 0.0
   return legacy_timer / config.legacy_time_required
 
-func _on_building_placed(building: Node, _coord: Vector2i) -> void:
-  if building == self:
+func _on_building_placed(placed_building: Node, _coord: Vector2i) -> void:
+  if has_component("adjacency"):
+    return
+  if placed_building == self:
     recalculate_adjacency()
-  elif _is_within_adjacency_radius(building):
+  elif _is_within_adjacency_radius(placed_building):
     recalculate_adjacency()
 
-func _on_building_removed(building: Node, _coord: Vector2i) -> void:
-  if building == self:
+func _on_building_removed(removed_building: Node, _coord: Vector2i) -> void:
+  if has_component("adjacency"):
     return
-  if building in adjacent_neighbors:
+  if removed_building == self:
+    return
+  if removed_building in adjacent_neighbors:
     recalculate_adjacency()
 
 func _is_within_adjacency_radius(other: Node) -> bool:
@@ -2735,6 +2763,9 @@ func get_buildings_in_adjacency_radius() -> Array[Node]:
   return result
 
 func recalculate_adjacency() -> void:
+  if has_component("adjacency"):
+    get_component("adjacency").recalculate_adjacency()
+    return
   adjacency_effects.clear()
   adjacency_efficiency_multiplier = 1.0
   adjacency_output_bonus = 0
