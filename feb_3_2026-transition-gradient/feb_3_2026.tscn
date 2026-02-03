@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://ynaib8gsoe7n"]
+
+[ext_resource type="Script" uid="uid://b0s5cmncaajux" path="res://feb_3_2026-transition-gradient/feb_3_2026.gd" id="1_script"]
+[ext_resource type="Material" uid="uid://d23v414d4tsvp" path="res://_materials/smooth_transition_material.material" id="2_novnf"]
+
+[node name="Control" type="Control" unique_id=202818609]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="BG" type="ColorRect" parent="." unique_id=1712773392]
+layout_mode = 0
+offset_left = -2015.0
+offset_top = -598.0
+offset_right = 4344.0
+offset_bottom = 2240.0
+color = Color(0, 0, 0, 1)
+
+[node name="Control" type="ColorRect" parent="." unique_id=1462040627]
+material = ExtResource("2_novnf")
+layout_mode = 0
+offset_right = 1913.0741
+offset_bottom = 1099.0
