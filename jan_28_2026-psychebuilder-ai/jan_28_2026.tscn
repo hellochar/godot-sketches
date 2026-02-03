@@ -329,7 +329,7 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 10.0
-offset_top = -60.0
+offset_top = -90.0
 offset_right = -10.0
 offset_bottom = -10.0
 grow_vertical = 0
@@ -344,13 +344,14 @@ theme_override_constants/margin_bottom = 4
 
 [node name="ScrollContainer" type="ScrollContainer" parent="UILayer/BottomToolbar/MarginContainer" unique_id=1783622417]
 layout_mode = 2
-vertical_scroll_mode = 0
+horizontal_scroll_mode = 0
 
-[node name="BuildingToolbar" type="HBoxContainer" parent="UILayer/BottomToolbar/MarginContainer/ScrollContainer" unique_id=1437189348]
+[node name="BuildingToolbar" type="FlowContainer" parent="UILayer/BottomToolbar/MarginContainer/ScrollContainer" unique_id=1437189348]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 8
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 4
 
 [node name="ToastContainer" type="VBoxContainer" parent="UILayer" unique_id=467804259]
 unique_name_in_owner = true

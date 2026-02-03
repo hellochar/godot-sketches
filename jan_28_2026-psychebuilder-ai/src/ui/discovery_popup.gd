@@ -36,12 +36,16 @@ func show_discovery(options: Array, p_time_system: Node = null) -> void:
     var option_panel = _create_option_panel(building_id, def, i)
     choices_container.add_child(option_panel)
 
+  if choices_container.get_child_count() == 0:
+    dismissed.emit()
+    return
+
   visible = true
 
   if time_system:
     time_system.set_paused(true)
 
-func _create_option_panel(building_id: String, def: Dictionary, index: int) -> Control:
+func _create_option_panel(building_id: String, def: Dictionary, _index: int) -> Control:
   var panel = PanelContainer.new()
   panel.custom_minimum_size = Vector2(180, 200)
 
