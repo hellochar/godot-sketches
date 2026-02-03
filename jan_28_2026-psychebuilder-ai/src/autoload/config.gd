@@ -425,3 +425,9 @@ extends Node
 @export var legacy_output_bonus: int = 1
 @export var legacy_resilience_factor: float = 0.5
 @export var legacy_decay_protection: float = 0.3
+
+@export_group("Events")
+@export var random_event_chance: float = 0.3
+@export var inciting_incident_day: int = 5
+@export var allow_repeat_events: bool = true
+@export var event_completion_check_interval: float = 5.0

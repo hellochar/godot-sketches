@@ -1,0 +1,14 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" uid="uid://0mjty1r6a1u5" path="res://jan_28_2026-psychebuilder-ai/resources/resource_types/resource_type.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "fatigue"
+display_name = "Fatigue"
+description = "Physical and mental exhaustion that slows everything down."
+color = Color(0.45, 0.45, 0.4, 1)
+tags = ["emotion.negative", "transient"]
+decay_rate = 0.08
+stack_size = 8
+spawn_amount = 1

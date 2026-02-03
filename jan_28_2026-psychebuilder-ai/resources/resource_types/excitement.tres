@@ -1,0 +1,14 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" uid="uid://0mjty1r6a1u5" path="res://jan_28_2026-psychebuilder-ai/resources/resource_types/resource_type.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "excitement"
+display_name = "Excitement"
+description = "Energizing anticipation of something new."
+color = Color(0.95, 0.75, 0.3, 1)
+tags = ["emotion.positive", "transient"]
+decay_rate = 0.06
+stack_size = 10
+spawn_amount = 1

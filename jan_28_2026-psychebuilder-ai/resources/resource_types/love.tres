@@ -1,0 +1,14 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" uid="uid://0mjty1r6a1u5" path="res://jan_28_2026-psychebuilder-ai/resources/resource_types/resource_type.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "love"
+display_name = "Love"
+description = "Deep warmth and connection that nurtures wellbeing."
+color = Color(0.9, 0.5, 0.6, 1)
+tags = ["emotion.positive", "persistent"]
+decay_rate = 0.0
+stack_size = 15
+spawn_amount = 1
