@@ -6,11 +6,74 @@ const WorkerSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/syste
 const TimeSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems/time_system.gd")
 const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
 
+@export_group("Time")
+@export var day_duration_seconds: float = 45.0
+@export var night_duration_seconds: float = 10.0
+@export var total_days: int = 20
+
+@export_group("Energy")
+@export var starting_energy: int = 10
+@export var max_energy: int = 20
+@export var energy_regen_per_day: int = 3
+
+@export_group("Attention")
+@export var base_attention_pool: int = 10
+@export var habituation_thresholds: Array[int] = [5, 15, 30, 50]
+@export var habituation_costs: Array[float] = [1.0, 0.5, 0.25, 0.1, 0.0]
+
+@export_group("Wellbeing")
+@export var base_wellbeing: float = 35.0
+@export var positive_emotion_weight: float = 2.0
+@export var derived_resource_weight: float = 3.0
+@export var negative_emotion_weight: float = 1.5
+@export var unprocessed_negative_weight: float = 2.0
+@export var habit_building_weight: float = 1.0
+@export var adjacency_synergy_weight: float = 0.5
+@export var wellbeing_normalizer: float = 50.0
+@export var positive_emotions: Array[String] = ["joy", "calm", "wisdom"]
+@export var negative_emotions: Array[String] = ["grief", "anxiety"]
+
+@export_group("Wellbeing Display")
+@export var wellbeing_good_threshold: float = 70.0
+@export var wellbeing_warning_threshold: float = 40.0
+@export var wellbeing_good_color: Color = Color(0.3, 0.9, 0.3)
+@export var wellbeing_warning_color: Color = Color(0.9, 0.9, 0.3)
+@export var wellbeing_bad_color: Color = Color(0.9, 0.3, 0.3)
+
+@export_group("Endings")
+@export var flourishing_threshold: int = 80
+@export var growing_threshold: int = 50
+@export var surviving_threshold: int = 20
+
+@export_group("Grid")
+@export var grid_size: Vector2i = Vector2i(50, 50)
+@export var tile_size: int = 64
+
+@export_group("UI")
+@export var building_button_size: Vector2 = Vector2(80, 40)
+@export var speed_options: Array[float] = [1.0, 2.0, 3.0]
+
+@export_group("Clock Display")
+@export var day_hours: float = 16.0
+@export var night_hours: float = 8.0
+@export var day_start_hour: int = 6
+@export var night_start_hour: int = 22
+
 @onready var game_world = %GameWorld
 @onready var ui_layer: CanvasLayer = %UILayer
 @onready var game_state: Node = get_node("/root/GameState")
 @onready var event_bus: Node = get_node("/root/EventBus")
 @onready var config: Node = get_node("/root/Config")
+
+@onready var energy_label: Label = %EnergyLabel
+@onready var attention_label: Label = %AttentionLabel
+@onready var day_label: Label = %DayLabel
+@onready var wellbeing_label: Label = %WellbeingLabel
+@onready var instructions_label: Label = %Instructions
+@onready var phase_label: Label = %PhaseLabel
+@onready var time_label: Label = %TimeLabel
+@onready var end_night_btn: Button = %EndNightBtn
+@onready var building_toolbar: Container = %BuildingToolbar
 
 var resource_system: Node
 var building_system: Node
@@ -92,6 +155,8 @@ func _ready() -> void:
   event_bus.game_started.emit()
 
 func _setup_systems() -> void:
+  game_world.setup(grid_size, tile_size)
+
   resource_system = ResourceSystemScript.new()
   add_child(resource_system)
   resource_system.set_resources_layer(game_world.get_resources_layer())
@@ -102,42 +167,28 @@ func _setup_systems() -> void:
 
   worker_system = WorkerSystemScript.new()
   add_child(worker_system)
-  worker_system.setup(game_world.get_grid())
+  worker_system.setup(game_world.get_grid(), base_attention_pool, habituation_thresholds, habituation_costs)
 
   time_system = TimeSystemScript.new()
   add_child(time_system)
+  time_system.setup(day_duration_seconds, night_duration_seconds, total_days, energy_regen_per_day)
   time_system.phase_changed.connect(_on_phase_changed)
   time_system.day_started.connect(_on_day_started)
 
   event_bus.resource_overflow.connect(_on_resource_overflow)
 
+  get_node("/root/GameState").reset_to_defaults(starting_energy, max_energy, base_attention_pool, base_wellbeing, habituation_thresholds, habituation_costs)
+
 func _setup_ui() -> void:
-  _create_building_toolbar()
-  _create_info_panel()
-  _create_time_controls()
+  _populate_building_toolbar()
+  _connect_time_controls()
   _create_building_tooltip()
 
-func _create_building_toolbar() -> void:
-  var toolbar = HBoxContainer.new()
-  toolbar.name = "BuildingToolbar"
-  toolbar.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-  toolbar.offset_top = -(toolbar_height + toolbar_margin)
-  toolbar.offset_bottom = -toolbar_margin
-  toolbar.offset_left = toolbar_margin
-  toolbar.offset_right = -toolbar_margin
-
-  var bg = ColorRect.new()
-  bg.color = toolbar_bg_color
-  bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-  toolbar.add_child(bg)
-  bg.show_behind_parent = true
-
+func _populate_building_toolbar() -> void:
   var unlocked = building_system.get_unlocked_buildings()
   for building_id in unlocked:
     var btn = _create_building_button(building_id)
-    toolbar.add_child(btn)
-
-  ui_layer.add_child(toolbar)
+    building_toolbar.add_child(btn)
 
 func _create_building_button(building_id: String) -> Button:
   var BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
@@ -157,90 +208,11 @@ func _create_building_button(building_id: String) -> Button:
   btn.pressed.connect(_on_building_selected.bind(building_id))
   return btn
 
-func _create_info_panel() -> void:
-  var panel = PanelContainer.new()
-  panel.name = "InfoPanel"
-  panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
-  panel.offset_left = info_panel_margin
-  panel.offset_top = info_panel_margin
-  panel.offset_right = info_panel_margin + info_panel_size.x
-  panel.offset_bottom = info_panel_margin + info_panel_size.y
-
-  var vbox = VBoxContainer.new()
-  vbox.name = "VBoxContainer"
-  panel.add_child(vbox)
-
-  var goal_label = Label.new()
-  goal_label.name = "GoalLabel"
-  goal_label.text = "Goal: Maximize Wellbeing by Day 20"
-  goal_label.add_theme_font_size_override("font_size", instructions_font_size)
-  goal_label.add_theme_color_override("font_color", Color(0.9, 0.8, 0.4))
-  vbox.add_child(goal_label)
-
-  var separator = HSeparator.new()
-  vbox.add_child(separator)
-
-  var energy_label = Label.new()
-  energy_label.name = "EnergyLabel"
-  energy_label.text = "Energy: 10/20"
-  vbox.add_child(energy_label)
-
-  var attention_label = Label.new()
-  attention_label.name = "AttentionLabel"
-  attention_label.text = "Attention: 0/10"
-  vbox.add_child(attention_label)
-
-  var day_label = Label.new()
-  day_label.name = "DayLabel"
-  day_label.text = "Day 1"
-  vbox.add_child(day_label)
-
-  var wellbeing_label = Label.new()
-  wellbeing_label.name = "WellbeingLabel"
-  wellbeing_label.text = "Wellbeing: 35"
-  vbox.add_child(wellbeing_label)
-
-  var tier_label = Label.new()
-  tier_label.name = "TierLabel"
-  tier_label.text = "Baseline"
-  tier_label.add_theme_font_size_override("font_size", instructions_font_size)
-  vbox.add_child(tier_label)
-
-  var separator2 = HSeparator.new()
-  vbox.add_child(separator2)
-
-  var weather_label = Label.new()
-  weather_label.name = "WeatherLabel"
-  weather_label.text = "Weather: Neutral"
-  weather_label.add_theme_font_size_override("font_size", instructions_font_size)
-  vbox.add_child(weather_label)
-
-  var phase_label = Label.new()
-  phase_label.name = "PhaseLabel"
-  phase_label.text = "Phase: Day"
-  phase_label.add_theme_font_size_override("font_size", instructions_font_size)
-  vbox.add_child(phase_label)
-
-  var flow_label = Label.new()
-  flow_label.name = "FlowLabel"
-  flow_label.text = ""
-  flow_label.add_theme_font_size_override("font_size", instructions_font_size)
-  flow_label.add_theme_color_override("font_color", Color(0.4, 0.8, 1.0))
-  vbox.add_child(flow_label)
-
-  var beliefs_label = Label.new()
-  beliefs_label.name = "BeliefsLabel"
-  beliefs_label.text = "Beliefs: 0"
-  beliefs_label.add_theme_font_size_override("font_size", instructions_font_size)
-  vbox.add_child(beliefs_label)
-
-  var instructions = Label.new()
-  instructions.name = "InstructionsLabel"
-  instructions.text = "Click building to select\nClick grid to place\nRight-click to cancel"
-  instructions.add_theme_font_size_override("font_size", instructions_font_size)
-  vbox.add_child(instructions)
-
-  ui_layer.add_child(panel)
+func _connect_time_controls() -> void:
+  %Speed1xBtn.pressed.connect(func(): time_system.set_speed(speed_options[0]))
+  %Speed2xBtn.pressed.connect(func(): time_system.set_speed(speed_options[1]))
+  %Speed3xBtn.pressed.connect(func(): time_system.set_speed(speed_options[2]))
+  end_night_btn.pressed.connect(func(): time_system.end_night())
 
 func _on_building_selected(building_id: String) -> void:
   selected_building_id = building_id
@@ -443,25 +415,17 @@ func _update_transport_instructions() -> void:
   _update_instructions(base_text)
 
 func _update_instructions(text: String) -> void:
-  var panel = ui_layer.get_node_or_null("InfoPanel")
-  if panel:
-    var label = panel.get_node_or_null("VBoxContainer/InstructionsLabel")
-    if label:
-      label.text = text
+  instructions_label.text = text
 
 func _show_placement_failure(reason: String) -> void:
-  var panel = ui_layer.get_node_or_null("InfoPanel")
-  if panel:
-    var label = panel.get_node_or_null("VBoxContainer/InstructionsLabel")
-    if label:
-      label.text = reason
-      label.add_theme_color_override("font_color", Color(1, 0.3, 0.3))
-      var tween = create_tween()
-      tween.tween_interval(1.5)
-      tween.tween_callback(func():
-        label.remove_theme_color_override("font_color")
-        _update_instructions("Click building to select\nClick grid to place\nRight-click to cancel")
-      )
+  instructions_label.text = reason
+  instructions_label.add_theme_color_override("font_color", Color(1, 0.3, 0.3))
+  var tween = create_tween()
+  tween.tween_interval(1.5)
+  tween.tween_callback(func():
+    instructions_label.remove_theme_color_override("font_color")
+    _update_instructions("Click building to select\nClick grid to place\nRight-click to cancel")
+  )
 
 func _cancel_placement() -> void:
   is_placing = false
@@ -489,51 +453,13 @@ func _remove_selected_building() -> void:
   _update_instructions("Building removed (+%d energy)" % refund)
 
 func _update_energy_display() -> void:
-  var panel = ui_layer.get_node_or_null("InfoPanel")
-  if panel:
-    var label = panel.get_node_or_null("VBoxContainer/EnergyLabel")
-    if label:
-      label.text = "Energy: %d/%d" % [game_state.current_energy, game_state.max_energy]
-
-    var att_label = panel.get_node_or_null("VBoxContainer/AttentionLabel")
-    if att_label and worker_system:
-      att_label.text = "Attention: %d/%d" % [worker_system.attention_used, worker_system.attention_pool]
-
-    var wb_label = panel.get_node_or_null("VBoxContainer/WellbeingLabel")
-    if wb_label:
-      _calculate_wellbeing()
-      var wb_color = _get_wellbeing_color(game_state.wellbeing)
-      wb_label.text = "Wellbeing: %d" % int(game_state.wellbeing)
-      wb_label.add_theme_color_override("font_color", wb_color)
-
-    var tier_label = panel.get_node_or_null("VBoxContainer/TierLabel")
-    if tier_label:
-      var tier = game_state.get_wellbeing_tier()
-      var tier_info = _get_tier_display_info(tier)
-      tier_label.text = tier_info.name
-      tier_label.add_theme_color_override("font_color", tier_info.color)
-
-    var weather_label = panel.get_node_or_null("VBoxContainer/WeatherLabel")
-    if weather_label:
-      weather_label.text = _get_weather_description()
-
-    var phase_label = panel.get_node_or_null("VBoxContainer/PhaseLabel")
-    if phase_label and time_system:
-      var phase_text = "Day" if time_system.is_day() else "Night"
-      phase_label.text = "Phase: %s" % phase_text
-
-    var flow_label = panel.get_node_or_null("VBoxContainer/FlowLabel")
-    if flow_label:
-      if game_state.is_in_flow_state():
-        flow_label.text = "Flow State Active"
-        flow_label.visible = true
-      else:
-        flow_label.text = ""
-        flow_label.visible = false
-
-    var beliefs_label = panel.get_node_or_null("VBoxContainer/BeliefsLabel")
-    if beliefs_label:
-      beliefs_label.text = "Beliefs: %d" % game_state.active_beliefs.size()
+  energy_label.text = "Energy: %d/%d" % [game_state.current_energy, game_state.max_energy]
+  if worker_system:
+    attention_label.text = "Attention: %d/%d" % [worker_system.attention_used, worker_system.attention_pool]
+  _calculate_wellbeing()
+  var wb_color = _get_wellbeing_color(game_state.wellbeing)
+  wellbeing_label.text = "Wellbeing: %d" % int(game_state.wellbeing)
+  wellbeing_label.add_theme_color_override("font_color", wb_color)
 
 func _calculate_wellbeing() -> void:
   var positive_total = 0
@@ -542,9 +468,9 @@ func _calculate_wellbeing() -> void:
   for building in game_state.active_buildings:
     for res_id in building.storage:
       var amount = building.storage[res_id]
-      if res_id in ["joy", "calm", "wisdom"]:
+      if res_id in positive_emotions:
         positive_total += amount
-      elif res_id in ["grief", "anxiety"]:
+      elif res_id in negative_emotions:
         negative_total += amount
 
   var habit_count = 0
@@ -552,49 +478,48 @@ func _calculate_wellbeing() -> void:
     if building.has_behavior(BuildingDefs.Behavior.HABIT):
       habit_count += 1
 
-  var base = 35.0
-  var positive_bonus = positive_total * config.positive_emotion_weight
-  var negative_penalty = negative_total * config.negative_emotion_weight
-  var building_bonus = habit_count * config.habit_building_weight
+  var positive_bonus = positive_total * positive_emotion_weight
+  var negative_penalty = negative_total * negative_emotion_weight
+  var building_bonus = habit_count * habit_building_weight
 
-  var new_wellbeing = base + positive_bonus - negative_penalty + building_bonus
+  var new_wellbeing = base_wellbeing + positive_bonus - negative_penalty + building_bonus
   game_state.set_wellbeing(new_wellbeing)
 
 func _get_wellbeing_color(value: float) -> Color:
-  if value >= wellbeing_high_threshold:
-    return wellbeing_high_color
-  elif value >= wellbeing_medium_threshold:
-    return wellbeing_medium_color
+  if value >= wellbeing_good_threshold:
+    return wellbeing_good_color
+  elif value >= wellbeing_warning_threshold:
+    return wellbeing_warning_color
   else:
-    return wellbeing_low_color
+    return wellbeing_bad_color
 
 func _get_tier_display_info(tier: int) -> Dictionary:
-  var GameState = preload("res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd")
+  var GameStateScript = preload("res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd")
   match tier:
-    GameState.WellbeingTier.STRUGGLING:
+    GameStateScript.WellbeingTier.STRUGGLING:
       return {"name": "Struggling (<20)", "color": tier_struggling_color}
-    GameState.WellbeingTier.BASELINE:
+    GameStateScript.WellbeingTier.BASELINE:
       return {"name": "Baseline (20-39)", "color": Color(0.7, 0.7, 0.7)}
-    GameState.WellbeingTier.STABLE:
+    GameStateScript.WellbeingTier.STABLE:
       return {"name": "Stable (40-59)", "color": tier_surviving_color}
-    GameState.WellbeingTier.THRIVING:
+    GameStateScript.WellbeingTier.THRIVING:
       return {"name": "Thriving (60-79)", "color": tier_growing_color}
-    GameState.WellbeingTier.FLOURISHING:
+    GameStateScript.WellbeingTier.FLOURISHING:
       return {"name": "Flourishing (80+)", "color": tier_flourishing_color}
   return {"name": "Unknown", "color": Color.WHITE}
 
 func _get_weather_description() -> String:
-  var GameState = preload("res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd")
+  var GameStateScript = preload("res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd")
   match game_state.current_weather:
-    GameState.WeatherState.CLEAR_SKIES:
+    GameStateScript.WeatherState.CLEAR_SKIES:
       return "Clear Skies (+15% processing)"
-    GameState.WeatherState.STORM:
+    GameStateScript.WeatherState.STORM:
       return "Storm (-25% processing, +30% negative)"
-    GameState.WeatherState.OVERCAST:
+    GameStateScript.WeatherState.OVERCAST:
       return "Overcast (+15% grief generation)"
-    GameState.WeatherState.FOG:
+    GameStateScript.WeatherState.FOG:
       return "Fog (-10% processing)"
-    GameState.WeatherState.STILLNESS:
+    GameStateScript.WeatherState.STILLNESS:
       return "Stillness (+10% processing)"
     _:
       return "Neutral"
@@ -614,36 +539,6 @@ func spawn_worker_at(coord: Vector2i) -> Node:
   game_world.get_workers_layer().add_child(worker)
   return worker
 
-func _create_time_controls() -> void:
-  var panel = HBoxContainer.new()
-  panel.name = "TimeControls"
-  panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-  panel.offset_left = -250
-  panel.offset_top = info_panel_margin
-  panel.offset_right = -info_panel_margin
-  panel.offset_bottom = 50
-
-  var phase_label = Label.new()
-  phase_label.name = "PhaseLabel"
-  phase_label.text = "Day 1 - Day Phase"
-  phase_label.custom_minimum_size = Vector2(phase_label_min_width, 0)
-  panel.add_child(phase_label)
-
-  for speed_value in speed_options:
-    var speed_btn = Button.new()
-    speed_btn.text = "%dx" % int(speed_value)
-    speed_btn.pressed.connect(func(): time_system.set_speed(speed_value))
-    panel.add_child(speed_btn)
-
-  var end_night_btn = Button.new()
-  end_night_btn.name = "EndNightBtn"
-  end_night_btn.text = "End Night"
-  end_night_btn.visible = false
-  end_night_btn.pressed.connect(func(): time_system.end_night())
-  panel.add_child(end_night_btn)
-
-  ui_layer.add_child(panel)
-
 func _on_phase_changed(_is_day: bool) -> void:
   _update_time_display()
   _update_energy_display()
@@ -652,25 +547,25 @@ func _on_day_started(_day_number: int) -> void:
   resource_system.process_decay()
 
 func _update_time_display() -> void:
-  var controls = ui_layer.get_node_or_null("TimeControls")
-  if not controls:
-    return
+  var phase_text = "Day" if time_system.is_day() else "Night"
+  phase_label.text = "Day %d - %s Phase" % [time_system.current_day, phase_text]
+  end_night_btn.visible = time_system.is_night()
+  day_label.text = "Day %d" % time_system.current_day
+  time_label.text = _format_clock_time(time_system.get_phase_progress(), time_system.is_day())
 
-  var phase_label = controls.get_node_or_null("PhaseLabel")
-  var end_night_btn = controls.get_node_or_null("EndNightBtn")
-
-  if phase_label:
-    var phase_text = "Day" if time_system.is_day() else "Night"
-    phase_label.text = "Day %d - %s Phase" % [time_system.current_day, phase_text]
-
-  if end_night_btn:
-    end_night_btn.visible = time_system.is_night()
-
-  var panel = ui_layer.get_node_or_null("InfoPanel")
-  if panel:
-    var day_label = panel.get_node_or_null("VBoxContainer/DayLabel")
-    if day_label:
-      day_label.text = "Day %d" % time_system.current_day
+func _format_clock_time(progress: float, is_day: bool) -> String:
+  var total_hours = day_hours if is_day else night_hours
+  var start_hour = day_start_hour if is_day else night_start_hour
+  var elapsed_hours = progress * total_hours
+  var hour = start_hour + int(elapsed_hours)
+  if hour >= 24:
+    hour -= 24
+  var minute = int(fmod(elapsed_hours, 1.0) * 60.0)
+  var suffix = "AM" if hour < 12 else "PM"
+  var display_hour = hour % 12
+  if display_hour == 0:
+    display_hour = 12
+  return "%d:%02d %s" % [display_hour, minute, suffix]
 
 func _process(_delta: float) -> void:
   if time_system:

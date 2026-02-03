@@ -21,11 +21,15 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-Utils="*res://_common/utils.gd"
+GodotMCPInput="*uid://djeriu2380rj2"
 HTags="*uid://dfuf7asc72fs2"
-Config="*res://jan_28_2026-psychebuilder-ai/src/autoload/config.gd"
+Utils="*res://_common/utils.gd"
 EventBus="*res://jan_28_2026-psychebuilder-ai/src/autoload/event_bus.gd"
 GameState="*res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd"
+
+[debug]
+
+gdscript/warnings/unused_signal=0
 
 [display]
 
@@ -36,7 +40,12 @@ window/vsync/vsync_mode=0
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/daily_sketch/plugin.cfg", "res://addons/htags/plugin.cfg")
+enabled=PackedStringArray("res://addons/daily_sketch/plugin.cfg", "res://addons/gdUnit4/plugin.cfg", "res://addons/htags/plugin.cfg")
+
+[gdunit4]
+
+settings/test/test_discovery=true
+settings/test/test_lookup_folder="tests"
 
 [global_group]
 

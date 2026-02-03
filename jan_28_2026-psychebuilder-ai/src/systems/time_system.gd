@@ -16,15 +16,20 @@ var phase_time: float = 0.0
 var paused: bool = false
 var speed_multiplier: float = 1.0
 
-var day_duration: float = 45.0
-var night_duration: float = 10.0
-var total_days: int = 20
+var day_duration: float
+var night_duration: float
+var total_days: int
+var energy_regen_per_day: int
 
-func _ready() -> void:
-  if config:
-    day_duration = config.day_duration_seconds
-    night_duration = config.night_duration_seconds
-    total_days = config.total_days
+@export_group("Speed Limits")
+@export var min_speed: float = 0.5
+@export var max_speed: float = 3.0
+
+func setup(p_day_duration: float, p_night_duration: float, p_total_days: int, p_energy_regen: int) -> void:
+  day_duration = p_day_duration
+  night_duration = p_night_duration
+  total_days = p_total_days
+  energy_regen_per_day = p_energy_regen
 
 func _process(delta: float) -> void:
   if paused:
@@ -76,7 +81,7 @@ func _transition_to_day() -> void:
 func _trigger_day_start_effects() -> void:
   var gs = game_state
   if gs:
-    gs.on_day_start()
+    gs.on_day_start(energy_regen_per_day)
 
 func end_night() -> void:
   if current_phase == Phase.NIGHT:
@@ -87,7 +92,7 @@ func set_paused(p: bool) -> void:
   game_state.is_paused = p
 
 func set_speed(multiplier: float) -> void:
-  speed_multiplier = clampf(multiplier, 0.5, 3.0)
+  speed_multiplier = clampf(multiplier, min_speed, max_speed)
 
 func get_phase_progress() -> float:
   match current_phase:

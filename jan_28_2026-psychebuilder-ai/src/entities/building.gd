@@ -4,7 +4,6 @@ const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/buildi
 
 @onready var game_state: Node = get_node("/root/GameState")
 @onready var event_bus: Node = get_node("/root/EventBus")
-@onready var config: Node = get_node("/root/Config")
 
 enum Status {
   IDLE,
@@ -163,7 +162,9 @@ var is_legacy: bool = false
 var legacy_timer: float = 0.0
 var legacy_qualifying: bool = false
 
-# Visual
+@export_group("Visual")
+@export var disconnected_darken_factor: float = 0.4
+
 @onready var sprite: ColorRect = %ColorRect
 @onready var label: Label = %Label
 @onready var progress_bar: ProgressBar = %ProgressBar
@@ -192,8 +193,8 @@ func initialize(p_building_id: String, p_grid_coord: Vector2i, p_grid: RefCounte
     _update_visuals()
 
 func _update_visuals() -> void:
-  var tile_size = config.tile_size
-  var pixel_size = Vector2(size) * tile_size
+  var ts = grid.tile_size if grid else 64
+  var pixel_size = Vector2(size) * ts
 
   sprite.size = pixel_size
   _update_connection_visual()
@@ -631,7 +632,7 @@ func _output_resource(resource_id: String, amount: int, purity: float = -1.0) ->
     var transmuted = _try_overflow_transmutation(resource_id, overflow)
     var remaining_overflow = overflow - transmuted
     if remaining_overflow > 0:
-      var tile_size = config.tile_size
+      var tile_size = config.tile_size if config else (grid.tile_size if grid else 64)
       var spawn_pos = position + Vector2(size) * tile_size * 0.5 + Vector2(randf_range(-16, 16), randf_range(-16, 16))
       event_bus.resource_overflow.emit(resource_id, remaining_overflow, self, spawn_pos)
 

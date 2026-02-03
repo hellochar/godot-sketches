@@ -21,6 +21,15 @@ var carried_amount: int = 0
 
 @export_group("Movement")
 @export var move_speed: float = 100.0
+
+@export_group("Visual")
+@export var idle_color: Color = Color(1, 0.95, 0.7, 1)
+@export var carrying_color: Color = Color(1.2, 1.1, 0.8, 1)
+@export var mote_size: int = 24
+
+@export_group("Carry")
+@export var max_carry_amount: int = 5
+
 var target_position: Vector2
 
 var joy_boost_timer: float = 0.0
@@ -64,7 +73,7 @@ func _ready() -> void:
   if not mote_texture:
     mote_texture = _create_mote_texture_with_size(mote_texture_size)
   sprite.texture = mote_texture
-  modulate = base_modulate
+  modulate = idle_color
 
 func _create_mote_texture_with_size(tex_size: int) -> ImageTexture:
   var image = Image.create(tex_size, tex_size, false, Image.FORMAT_RGBA8)
@@ -252,10 +261,9 @@ func _process_pickup() -> void:
 
   var available = source_building.get_storage_amount(resource_type)
   if available > 0:
-    carried_amount = source_building.remove_from_storage(resource_type, mini(available, 5))
+    carried_amount = source_building.remove_from_storage(resource_type, mini(available, max_carry_amount))
     state = State.CARRYING
     _pathfind_to_building(dest_building)
-
     modulate = carrying_modulate
   else:
     pass
@@ -273,6 +281,7 @@ func _process_dropoff() -> void:
     _update_selection_visual()
     _update_focus_imprint()
     _gain_fatigue()
+    completions += 1
     job_cycle_completed.emit()
 
     # Loop back to pickup

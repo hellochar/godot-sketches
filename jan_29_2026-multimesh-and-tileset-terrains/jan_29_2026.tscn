@@ -663,5 +663,6 @@ texture = ExtResource("6_avqjf")
 [node name="MultiMeshInstance2D" type="MultiMeshInstance2D" parent="." unique_id=64956530]
 unique_name_in_owner = true
 material = ExtResource("7_r6y11")
+position = Vector2(9, 6)
 multimesh = SubResource("MultiMesh_ru80a")
 texture = ExtResource("6_avqjf")
