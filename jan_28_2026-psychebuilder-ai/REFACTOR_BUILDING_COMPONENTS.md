@@ -52,35 +52,35 @@ src/components/
 
 ---
 
-## Phase 2: Core Behaviors
-- [ ] Extract processor_component.gd
-- [ ] Extract coping_component.gd
-- [ ] Extract habit_component.gd
-- [ ] Extract infrastructure_component.gd
-- [ ] Replace is_road() with has_component("infrastructure")
-- [ ] Run game to verify Phase 2 works
+## Phase 2: Core Behaviors [COMPLETED]
+- [x] Extract processor_component.gd
+- [x] Extract coping_component.gd
+- [x] Extract habit_component.gd
+- [x] Extract infrastructure_component.gd
+- [x] Replace is_road() with has_component("infrastructure")
+- [x] Run game to verify Phase 2 works
 
 ---
 
-## Phase 3: Emotional Systems
-- [ ] Extract resonance_component.gd
-- [ ] Extract saturation_component.gd
-- [ ] Extract harmony_component.gd
-- [ ] Extract attunement_component.gd
-- [ ] Extract emotional_echo_component.gd
-- [ ] Run game to verify Phase 3 works
+## Phase 3: Emotional Systems [COMPLETED]
+- [x] Extract resonance_component.gd
+- [x] Extract saturation_component.gd
+- [x] Extract harmony_component.gd
+- [x] Extract attunement_component.gd
+- [x] Extract emotional_echo_component.gd
+- [x] Run game to verify Phase 3 works
 
 ---
 
-## Phase 4: Building State
-- [ ] Extract fatigue_component.gd
-- [ ] Extract fragility_component.gd
-- [ ] Extract mastery_component.gd
-- [ ] Extract velocity_component.gd
-- [ ] Extract momentum_component.gd
-- [ ] Extract legacy_component.gd
-- [ ] Extract awakening_component.gd
-- [ ] Run game to verify Phase 4 works
+## Phase 4: Building State [COMPLETED]
+- [x] Extract fatigue_component.gd
+- [x] Extract fragility_component.gd
+- [x] Extract mastery_component.gd
+- [x] Extract velocity_component.gd
+- [x] Extract momentum_component.gd
+- [x] Extract legacy_component.gd
+- [x] Extract awakening_component.gd
+- [x] Run game to verify Phase 4 works
 
 ---
 

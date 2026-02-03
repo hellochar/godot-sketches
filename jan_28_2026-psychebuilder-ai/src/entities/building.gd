@@ -252,6 +252,20 @@ func _setup_components() -> void:
     _add_component("attunement", attunement_comp)
     var echo_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/emotional_echo_component.gd").new()
     _add_component("emotional_echo", echo_comp)
+    var fatigue_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/fatigue_component.gd").new()
+    _add_component("fatigue", fatigue_comp)
+    var mastery_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/mastery_component.gd").new()
+    _add_component("mastery", mastery_comp)
+    var velocity_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/velocity_component.gd").new()
+    _add_component("velocity", velocity_comp)
+    var momentum_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/momentum_component.gd").new()
+    _add_component("momentum", momentum_comp)
+    var legacy_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/legacy_component.gd").new()
+    _add_component("legacy", legacy_comp)
+    var awakening_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/awakening_component.gd").new()
+    _add_component("awakening", awakening_comp)
+    var fragility_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/fragility_component.gd").new()
+    _add_component("fragility", fragility_comp)
 
   for component in _components.values():
     if component.has_method("_init_component"):
@@ -1599,6 +1613,9 @@ func _try_cascade_output(resource_id: String, amount: int) -> int:
   return remaining
 
 func _process_emotional_momentum(delta: float) -> void:
+  if has_component("momentum"):
+    return
+
   if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
     return
 
@@ -1755,6 +1772,9 @@ func _gain_fatigue() -> void:
   fatigue_level = minf(fatigue_level + config.fatigue_gain_per_process * gain_modifier, config.fatigue_max_level)
 
 func _process_fatigue(delta: float) -> void:
+  if has_component("fatigue"):
+    return
+
   if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
     return
 
@@ -2045,6 +2065,8 @@ func try_attunement_synergy() -> Dictionary:
   return result
 
 func _process_fragility(delta: float) -> void:
+  if has_component("fragility"):
+    return
   if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
     return
 
@@ -2076,6 +2098,8 @@ func _gain_fragility(inputs: Dictionary) -> void:
       event_bus.building_cracked.emit(self, fragility_level)
 
 func _process_fragility_leak(delta: float) -> void:
+  if has_component("fragility"):
+    return
   if not grid:
     return
 
@@ -2412,6 +2436,9 @@ func is_affected_by_suppression_field() -> bool:
   return false
 
 func _process_mastery(delta: float) -> void:
+  if has_component("mastery"):
+    return
+
   if mastery_processed.is_empty():
     return
 
@@ -2512,6 +2539,9 @@ func get_mastery_output_bonus() -> int:
   return 0
 
 func _process_velocity(delta: float) -> void:
+  if has_component("velocity"):
+    return
+
   if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
     return
 
@@ -2603,6 +2633,8 @@ func _is_in_any_sync_chain() -> bool:
   return false
 
 func _process_legacy(delta: float) -> void:
+  if has_component("legacy"):
+    return
   if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
     return
 
