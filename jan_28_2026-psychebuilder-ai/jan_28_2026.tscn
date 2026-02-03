@@ -342,11 +342,7 @@ theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 4
 
-[node name="ScrollContainer" type="ScrollContainer" parent="UILayer/BottomToolbar/MarginContainer" unique_id=1783622417]
-layout_mode = 2
-horizontal_scroll_mode = 0
-
-[node name="BuildingToolbar" type="FlowContainer" parent="UILayer/BottomToolbar/MarginContainer/ScrollContainer" unique_id=1437189348]
+[node name="BuildingToolbar" type="FlowContainer" parent="UILayer/BottomToolbar/MarginContainer" unique_id=1437189348]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
