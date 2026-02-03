@@ -23,3 +23,6 @@ Thumbs.db
 .mono/
 data_*/
 mono_crash.*.json
+
+# Claude
+nul
