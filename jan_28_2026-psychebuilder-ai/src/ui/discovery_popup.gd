@@ -39,6 +39,10 @@ func show_discovery(options: Array, p_time_system: Node = null) -> void:
     var option_panel = _create_option_panel(building_id, def, i)
     choices_container.add_child(option_panel)
 
+  if choices_container.get_child_count() == 0:
+    dismissed.emit()
+    return
+
   visible = true
 
   if time_system:
@@ -105,7 +109,7 @@ func _get_stats_text(def: Dictionary) -> String:
 
   return "\n".join(lines)
 
-func _create_option_panel(building_id: String, def: Dictionary, index: int) -> Control:
+func _create_option_panel(building_id: String, def: Dictionary, _index: int) -> Control:
   var panel = PanelContainer.new()
   panel.custom_minimum_size = Vector2(200, 260)
 
@@ -124,18 +128,16 @@ func _create_option_panel(building_id: String, def: Dictionary, index: int) -> C
     style.corner_radius_bottom_right = 4
     panel.add_theme_stylebox_override("panel", style)
 
-  var vbox = VBoxContainer.new()
-  vbox.add_theme_constant_override("separation", 8)
-  panel.add_child(vbox)
-
   var margin = MarginContainer.new()
   margin.add_theme_constant_override("margin_left", 10)
   margin.add_theme_constant_override("margin_right", 10)
   margin.add_theme_constant_override("margin_top", 10)
   margin.add_theme_constant_override("margin_bottom", 10)
+  panel.add_child(margin)
 
   var inner_vbox = VBoxContainer.new()
   inner_vbox.add_theme_constant_override("separation", 4)
+  margin.add_child(inner_vbox)
 
   if is_recommended:
     var rec_label = Label.new()
@@ -189,9 +191,6 @@ func _create_option_panel(building_id: String, def: Dictionary, index: int) -> C
   choose_btn.text = "Choose"
   choose_btn.pressed.connect(_on_choice_pressed.bind(building_id))
   inner_vbox.add_child(choose_btn)
-
-  margin.add_child(inner_vbox)
-  panel.add_child(margin)
 
   return panel
 

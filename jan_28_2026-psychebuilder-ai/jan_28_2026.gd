@@ -202,7 +202,7 @@ func _ready() -> void:
   _setup_systems()
   _setup_ui()
   event_bus.game_ended.connect(_on_game_ended)
-  _show_main_menu()
+  _on_start_game()  # Skip main menu for now
 
 func _setup_systems() -> void:
   game_world.setup(grid_size, tile_size)
@@ -240,6 +240,7 @@ func _setup_systems() -> void:
   game_flow_manager.setup(building_system, resource_system, game_world.get_grid())
   game_flow_manager.tutorial_hint_requested.connect(_on_tutorial_hint_requested)
   game_flow_manager.discovery_available.connect(_on_discovery_available)
+  game_flow_manager.starting_setup_complete.connect(_on_starting_setup_complete)
   event_bus.night_started.connect(_on_night_started)
   game_flow_manager.initialize_game()
 
@@ -257,9 +258,19 @@ func _setup_ui() -> void:
 
 func _populate_building_toolbar() -> void:
   var unlocked = building_system.get_unlocked_buildings()
-  for building_id in unlocked:
+  var sorted_buildings = _sort_buildings_by_cost(unlocked)
+  for building_id in sorted_buildings:
     var btn = _create_building_button(building_id)
     building_toolbar.add_child(btn)
+
+func _sort_buildings_by_cost(building_ids: Array) -> Array:
+  var with_costs: Array = []
+  for building_id in building_ids:
+    var def = BuildingDefs.get_definition(building_id)
+    var cost = def.get("build_cost", {}).get("energy", 0)
+    with_costs.append({"id": building_id, "cost": cost})
+  with_costs.sort_custom(func(a, b): return a.cost < b.cost)
+  return with_costs.map(func(item): return item.id)
 
 func _create_building_button(building_id: String) -> Button:
   var def = BuildingDefs.get_definition(building_id)
@@ -1015,7 +1026,14 @@ func _update_building_status_display(building: Node) -> void:
   var status_label = %BuildingStatusLabel
   status_label.text = "Status: %s" % _get_status_text(building)
 
+func _is_any_popup_active() -> bool:
+  return tutorial_hint_popup.visible or event_popup.visible or discovery_popup.visible
+
 func _on_tutorial_hint_requested(hint_text: String) -> void:
+  if hint_text.strip_edges() == "":
+    return
+  if _is_any_popup_active():
+    return
   var hint_label = tutorial_hint_popup.get_node("MarginContainer/VBoxContainer/HintLabel")
   hint_label.text = hint_text
   tutorial_hint_popup.visible = true
@@ -1026,6 +1044,8 @@ func _on_tutorial_hint_dismissed() -> void:
   time_system.set_paused(false)
 
 func _on_event_popup_requested(event_data: Dictionary) -> void:
+  if _is_any_popup_active():
+    return
   event_popup.show_event(event_data, time_system)
 
 func _on_event_choice_made(choice_index: int) -> void:
@@ -1035,6 +1055,8 @@ func _on_event_dismissed() -> void:
   event_system.dismiss_event()
 
 func _on_discovery_available(options: Array) -> void:
+  if _is_any_popup_active():
+    return
   discovery_popup.show_discovery(options, time_system)
 
 func _on_discovery_building_chosen(building_id: String) -> void:
@@ -1048,6 +1070,9 @@ func _on_discovery_dismissed() -> void:
 func _on_night_started(day_number: int) -> void:
   game_flow_manager.check_discovery(day_number)
 
+func _on_starting_setup_complete() -> void:
+  game_world.focus_on_buildings(game_state.active_buildings)
+
 func _on_building_unlocked(building_id: String) -> void:
   _add_building_to_toolbar(building_id)
 
@@ -1056,7 +1081,17 @@ func _add_building_to_toolbar(building_id: String) -> void:
     if child.name == building_id:
       return
   var btn = _create_building_button(building_id)
+  var new_cost = BuildingDefs.get_definition(building_id).get("build_cost", {}).get("energy", 0)
+  var insert_index = building_toolbar.get_child_count()
+  for i in range(building_toolbar.get_child_count()):
+    var child = building_toolbar.get_child(i)
+    var child_def = BuildingDefs.get_definition(child.name)
+    var child_cost = child_def.get("build_cost", {}).get("energy", 0)
+    if new_cost < child_cost:
+      insert_index = i
+      break
   building_toolbar.add_child(btn)
+  building_toolbar.move_child(btn, insert_index)
 
 func _update_building_tooltip() -> void:
   if is_placing:
@@ -1075,6 +1110,7 @@ func _update_building_tooltip() -> void:
   elif building and building == hovered_building:
     _populate_tooltip(building)
   elif not building and hovered_building:
+    hovered_building = null
     game_world.set_aura_building(null)
 
   if hovered_building:
@@ -1285,19 +1321,24 @@ func _on_game_ended(ending_tier: String) -> void:
 
 func _show_main_menu() -> void:
   game_world.visible = false
-  ui_layer.visible = false
+  ui_layer.visible = true
+  for child in ui_layer.get_children():
+    child.visible = false
   if main_menu:
     main_menu.queue_free()
   main_menu = MainMenuScene.instantiate()
   main_menu.start_game_pressed.connect(_on_start_game)
-  add_child(main_menu)
+  ui_layer.add_child(main_menu)
 
 func _on_start_game() -> void:
   if main_menu:
     main_menu.queue_free()
     main_menu = null
   game_world.visible = true
-  ui_layer.visible = true
+  for child in ui_layer.get_children():
+    if child == event_popup or child == discovery_popup or child == tutorial_hint_popup:
+      continue
+    child.visible = true
   game_started = true
   game_flow_manager.initialize_game()
   _update_energy_display()

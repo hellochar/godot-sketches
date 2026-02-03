@@ -132,6 +132,44 @@ func _center_camera() -> void:
   var center = grid.grid_to_world(grid.grid_size / 2)
   camera.position = center
 
+@export_group("Camera Focus")
+@export var building_focus_padding: float = 0.2
+
+func focus_on_buildings(buildings: Array) -> void:
+  if buildings.is_empty():
+    _center_camera()
+    return
+
+  var min_coord := Vector2(INF, INF)
+  var max_coord := Vector2(-INF, -INF)
+
+  for building in buildings:
+    var coord = Vector2(building.grid_coord)
+    var size = Vector2(building.size)
+    min_coord.x = minf(min_coord.x, coord.x)
+    min_coord.y = minf(min_coord.y, coord.y)
+    max_coord.x = maxf(max_coord.x, coord.x + size.x)
+    max_coord.y = maxf(max_coord.y, coord.y + size.y)
+
+  var padding_tiles = (max_coord - min_coord) * building_focus_padding
+  min_coord -= padding_tiles
+  max_coord += padding_tiles
+
+  var world_min = Vector2(min_coord) * grid.tile_size
+  var world_max = Vector2(max_coord) * grid.tile_size
+  var center = (world_min + world_max) * 0.5
+  var bbox_size = world_max - world_min
+
+  var viewport_size = get_viewport_rect().size
+  var zoom_x = viewport_size.x / bbox_size.x if bbox_size.x > 0 else 1.0
+  var zoom_y = viewport_size.y / bbox_size.y if bbox_size.y > 0 else 1.0
+  var target_zoom = minf(zoom_x, zoom_y)
+  target_zoom = clampf(target_zoom, min_zoom, max_zoom)
+
+  camera.zoom = Vector2(target_zoom, target_zoom)
+  camera.position = center
+  _clamp_camera()
+
 func _process(delta: float) -> void:
   _handle_camera_input(delta)
   _update_hover()
