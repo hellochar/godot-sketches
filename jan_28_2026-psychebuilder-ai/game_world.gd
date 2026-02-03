@@ -126,8 +126,14 @@ func _handle_camera_input(delta: float) -> void:
 func _clamp_camera() -> void:
   var world_size = Vector2(grid.grid_size) * grid.tile_size
   var half_view = get_viewport_rect().size / (2.0 * camera.zoom)
-  camera.position.x = clampf(camera.position.x, half_view.x, world_size.x - half_view.x)
-  camera.position.y = clampf(camera.position.y, half_view.y, world_size.y - half_view.y)
+  if half_view.x * 2 >= world_size.x:
+    camera.position.x = world_size.x / 2.0
+  else:
+    camera.position.x = clampf(camera.position.x, half_view.x, world_size.x - half_view.x)
+  if half_view.y * 2 >= world_size.y:
+    camera.position.y = world_size.y / 2.0
+  else:
+    camera.position.y = clampf(camera.position.y, half_view.y, world_size.y - half_view.y)
 
 func _unhandled_input(event: InputEvent) -> void:
   if event is InputEventMouseButton:
