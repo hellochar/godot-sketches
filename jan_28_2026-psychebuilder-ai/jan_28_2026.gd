@@ -1277,19 +1277,22 @@ func _on_game_ended(ending_tier: String) -> void:
 
 func _show_main_menu() -> void:
   game_world.visible = false
-  ui_layer.visible = false
+  ui_layer.visible = true
+  for child in ui_layer.get_children():
+    child.visible = false
   if main_menu:
     main_menu.queue_free()
   main_menu = MainMenuScene.instantiate()
   main_menu.start_game_pressed.connect(_on_start_game)
-  add_child(main_menu)
+  ui_layer.add_child(main_menu)
 
 func _on_start_game() -> void:
   if main_menu:
     main_menu.queue_free()
     main_menu = null
   game_world.visible = true
-  ui_layer.visible = true
+  for child in ui_layer.get_children():
+    child.visible = true
   game_started = true
   game_flow_manager.initialize_game()
   _update_energy_display()
