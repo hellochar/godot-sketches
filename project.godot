@@ -27,6 +27,7 @@ Utils="*res://_common/utils.gd"
 Config="*res://jan_28_2026-psychebuilder-ai/src/autoload/config.gd"
 EventBus="*res://jan_28_2026-psychebuilder-ai/src/autoload/event_bus.gd"
 GameState="*res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd"
+EventSystem="*res://jan_28_2026-psychebuilder-ai/src/systems/event_system.gd"
 
 [debug]
 

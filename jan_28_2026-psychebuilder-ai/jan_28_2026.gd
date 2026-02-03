@@ -5,6 +5,7 @@ const BuildingSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/sys
 const WorkerSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems/worker_system.gd")
 const TimeSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems/time_system.gd")
 const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
+const EventPopupScene = preload("res://jan_28_2026-psychebuilder-ai/src/ui/event_popup.tscn")
 
 @export_group("Time")
 @export var day_duration_seconds: float = 45.0
@@ -79,6 +80,9 @@ var resource_system: Node
 var building_system: Node
 var worker_system: Node
 var time_system: Node
+var event_system: Node
+var event_popup: PanelContainer
+var event_completion_timer: float = 0.0
 
 # Building placement state
 var selected_building_id: String = ""
@@ -173,6 +177,10 @@ func _setup_systems() -> void:
   time_system.phase_changed.connect(_on_phase_changed)
   time_system.day_started.connect(_on_day_started)
 
+  event_system = get_node("/root/EventSystem")
+  event_system.setup(resource_system, game_world.get_grid())
+  event_system.event_popup_requested.connect(_on_event_popup_requested)
+
   event_bus.resource_overflow.connect(_on_resource_overflow)
 
   get_node("/root/GameState").reset_to_defaults(starting_energy, max_energy, base_attention_pool, base_wellbeing, habituation_thresholds, habituation_costs)
@@ -181,6 +189,7 @@ func _setup_ui() -> void:
   _populate_building_toolbar()
   _connect_time_controls()
   _create_building_tooltip()
+  _create_event_popup()
 
 func _populate_building_toolbar() -> void:
   var unlocked = building_system.get_unlocked_buildings()
@@ -564,10 +573,17 @@ func _format_clock_time(progress: float, is_day: bool) -> String:
     display_hour = 12
   return "%d:%02d %s" % [display_hour, minute, suffix]
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
   if time_system:
     _update_time_display()
   _update_building_tooltip()
+  _update_event_completion_check(delta)
+
+func _update_event_completion_check(delta: float) -> void:
+  event_completion_timer += delta
+  if event_completion_timer >= config.event_completion_check_interval:
+    event_completion_timer = 0.0
+    event_system.check_completion_conditions()
 
 func _on_resource_overflow(resource_type: String, amount: int, _building: Node, world_position: Vector2) -> void:
   resource_system.spawn_resource(resource_type, world_position, amount)
@@ -625,6 +641,21 @@ func _create_building_tooltip() -> void:
   vbox.add_child(indicators_label)
 
   ui_layer.add_child(building_tooltip)
+
+func _create_event_popup() -> void:
+  event_popup = EventPopupScene.instantiate()
+  event_popup.choice_made.connect(_on_event_choice_made)
+  event_popup.dismissed.connect(_on_event_dismissed)
+  ui_layer.add_child(event_popup)
+
+func _on_event_popup_requested(event_data: Dictionary) -> void:
+  event_popup.show_event(event_data, time_system)
+
+func _on_event_choice_made(choice_index: int) -> void:
+  event_system.execute_choice(choice_index)
+
+func _on_event_dismissed() -> void:
+  event_system.dismiss_event()
 
 func _update_building_tooltip() -> void:
   if is_placing:
