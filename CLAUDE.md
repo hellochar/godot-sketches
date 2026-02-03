@@ -53,11 +53,11 @@
 - **Test location:** Place tests in `<sketch>/tests/` folder (e.g., `jan_28_2026-psychebuilder-ai/tests/test_game_state.gd`). gdUnit4 looks for folders named `tests/` by project setting.
 - **Run tests for a sketch:**
   ```bash
-  "/c/Users/hello/godot/Godot_v4.6-stable_win64.exe/Godot_v4.6-stable_win64_console.exe" --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -rc 1 --add res://<sketch>/tests
+  C:/Users/hello/godot/godot.exe --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -rc 1 --add res://<sketch>/tests
   ```
 - **Run all tests:**
   ```bash
-  "/c/Users/hello/godot/Godot_v4.6-stable_win64.exe/Godot_v4.6-stable_win64_console.exe" --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -rc 1 --add res://
+  C:/Users/hello/godot/godot.exe --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -rc 1 --add res://
   ```
 - **Exit codes:** 0 = all pass, non-zero = failures
 - **After implementing features:** Write tests, run them, fix failures before committing
