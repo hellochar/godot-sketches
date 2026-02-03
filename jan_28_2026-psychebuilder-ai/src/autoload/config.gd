@@ -466,8 +466,13 @@ extends Node
 @export_group("Tutorial Hints")
 @export var tutorial_enabled: bool = true
 @export var hint_day_1_roads: String = "Tip: Roads connect your buildings. Workers travel along roads to transport resources between buildings."
+@export var hint_day_1_phases: String = "During the Day, buildings work automatically. During the Night, time pauses - plan your next moves!"
 @export var hint_day_2_buildings: String = "Tip: Click a building in the toolbar at the bottom, then click on the grid to place it. Each building has different functions."
-@export var hint_day_3_workers: String = "Tip: Click on a building that produces resources, then click on a destination building to create a worker that transports resources."
+@export var hint_day_3_workers: String = "Tip: To assign a worker: (1) Click a building with resources, (2) Click 'Assign', (3) Click a destination building. Workers transport resources automatically."
+@export var hint_day_4_events: String = "Challenging events may arrive soon. Build some processing capacity to handle the emotions they bring."
+@export var hint_day_5_unlocks: String = "New buildings are now available! Check the toolbar for more options to build your emotional toolkit."
+@export var hint_wellbeing: String = "Click the Wellbeing display on the right to see a breakdown of what's affecting your score."
+@export var hint_resource_danger: String = "Warning: Some negative emotions have dangerous effects when they accumulate. Watch for red resource labels!"
 
 @export_group("Ending Text")
 @export var ending_flourishing_title: String = "Flourishing"

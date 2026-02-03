@@ -10,6 +10,10 @@ extends Resource
 @export var stack_size: int = 10
 @export var spawn_amount: int = 1
 
+@export_group("Danger Thresholds")
+@export var danger_threshold: int = 0  # 0 = no danger warning
+@export var danger_warning: String = ""
+
 func has_tag(tag: String) -> bool:
   return tags.has(tag)
 

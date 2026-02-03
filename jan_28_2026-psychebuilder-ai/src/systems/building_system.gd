@@ -11,8 +11,22 @@ var buildings_layer: Node2D
 var unlocked_buildings: Array = []
 
 func _ready() -> void:
-  unlocked_buildings = BuildingDefs.get_all_unlocked()
+  _update_day_based_unlocks(game_state.current_day)
   event_bus.event_completed.connect(_on_event_completed)
+  event_bus.day_started.connect(_on_day_started)
+
+func _on_day_started(day: int) -> void:
+  _update_day_based_unlocks(day)
+
+func _update_day_based_unlocks(day: int) -> void:
+  var newly_unlocked: Array = []
+  var day_buildings = BuildingDefs.get_unlocked_for_day(day)
+  for building_id in day_buildings:
+    if building_id not in unlocked_buildings:
+      unlocked_buildings.append(building_id)
+      newly_unlocked.append(building_id)
+  for building_id in newly_unlocked:
+    event_bus.building_unlocked.emit(building_id)
 
 func _on_event_completed(event_id: String) -> void:
   game_state.grant_event_reward(event_id)

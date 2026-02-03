@@ -12,3 +12,5 @@ tags = ["emotion.negative", "persistent"]
 decay_rate = 0.0
 stack_size = 15
 spawn_amount = 1
+danger_threshold = 5
+danger_warning = "Grief slows nearby buildings when it accumulates. Process it at a Mourning Chapel."
