@@ -39,7 +39,8 @@ func _process(delta: float) -> void:
 
   match current_phase:
     Phase.DAY:
-      game_state.update_weather_momentum(delta * speed_multiplier)
+      if current_day >= config.weather_enable_day:
+        game_state.update_weather_momentum(delta * speed_multiplier)
       game_state.update_breakthrough_timers(delta * speed_multiplier)
       game_state.update_flow_state(delta * speed_multiplier)
       game_state.update_flourishing_insight(delta * speed_multiplier)

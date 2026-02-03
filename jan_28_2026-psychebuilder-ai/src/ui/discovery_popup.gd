@@ -9,9 +9,11 @@ const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/buildi
 @onready var description_label: Label = %DescriptionLabel
 @onready var choices_container: HBoxContainer = %ChoicesContainer
 @onready var skip_button: Button = %SkipButton
+@onready var game_state: Node = get_node("/root/GameState")
 
 var time_system: Node
 var building_options: Array = []
+var recommended_building: String = ""
 
 func _ready() -> void:
   skip_button.pressed.connect(_on_skip_pressed)
@@ -20,6 +22,7 @@ func _ready() -> void:
 func show_discovery(options: Array, p_time_system: Node = null) -> void:
   time_system = p_time_system
   building_options = options
+  recommended_building = _determine_recommendation(options)
 
   title_label.text = "New Discovery"
   description_label.text = "You've gained new insight! Choose a building to unlock:"
@@ -45,9 +48,85 @@ func show_discovery(options: Array, p_time_system: Node = null) -> void:
   if time_system:
     time_system.set_paused(true)
 
+func _determine_recommendation(options: Array) -> String:
+  var negative_total = game_state.get_resource_total("grief") + game_state.get_resource_total("anxiety") + game_state.get_resource_total("worry")
+  var processor_count = 0
+  var habit_count = 0
+  var coping_count = 0
+
+  for building in game_state.active_buildings:
+    if building.has_behavior(BuildingDefs.Behavior.PROCESSOR):
+      processor_count += 1
+    if building.has_behavior(BuildingDefs.Behavior.HABIT):
+      habit_count += 1
+    if building.has_behavior(BuildingDefs.Behavior.COPING):
+      coping_count += 1
+
+  for building_id in options:
+    var def = BuildingDefs.get_definition(building_id)
+    var behaviors = def.get("behaviors", [])
+
+    if negative_total > 10 and behaviors.has(BuildingDefs.Behavior.PROCESSOR):
+      return building_id
+    if negative_total > 15 and behaviors.has(BuildingDefs.Behavior.COPING):
+      return building_id
+    if processor_count < 2 and behaviors.has(BuildingDefs.Behavior.PROCESSOR):
+      return building_id
+    if habit_count < 2 and behaviors.has(BuildingDefs.Behavior.HABIT):
+      return building_id
+
+  return ""
+
+func _get_recommendation_text(building_id: String, def: Dictionary) -> String:
+  var behaviors = def.get("behaviors", [])
+  var negative_total = game_state.get_resource_total("grief") + game_state.get_resource_total("anxiety") + game_state.get_resource_total("worry")
+
+  if behaviors.has(BuildingDefs.Behavior.PROCESSOR):
+    if negative_total > 10:
+      return "Good for processing negative emotions"
+    return "Converts resources into useful forms"
+  if behaviors.has(BuildingDefs.Behavior.GENERATOR):
+    return "Generates resources passively"
+  if behaviors.has(BuildingDefs.Behavior.HABIT):
+    return "Provides daily bonuses"
+  if behaviors.has(BuildingDefs.Behavior.COPING):
+    return "Activates during emotional crises"
+  return ""
+
+func _get_stats_text(def: Dictionary) -> String:
+  var lines: Array[String] = []
+
+  if def.has("generates"):
+    lines.append("Generates: %s" % def.get("generates", ""))
+  if def.has("input") and def.has("output"):
+    var inp = def.get("input", {})
+    var out = def.get("output", {})
+    lines.append("Converts: %s → %s" % [", ".join(inp.keys()), ", ".join(out.keys())])
+  if def.has("storage_capacity"):
+    var cap = def.get("storage_capacity", 0)
+    if cap > 0:
+      lines.append("Storage: %d" % cap)
+
+  return "\n".join(lines)
+
 func _create_option_panel(building_id: String, def: Dictionary, _index: int) -> Control:
   var panel = PanelContainer.new()
-  panel.custom_minimum_size = Vector2(180, 200)
+  panel.custom_minimum_size = Vector2(200, 260)
+
+  var is_recommended = building_id == recommended_building
+  if is_recommended:
+    var style = StyleBoxFlat.new()
+    style.bg_color = Color(0.15, 0.15, 0.2, 1)
+    style.border_color = Color(0.3, 0.9, 0.4, 0.8)
+    style.border_width_top = 2
+    style.border_width_bottom = 2
+    style.border_width_left = 2
+    style.border_width_right = 2
+    style.corner_radius_top_left = 4
+    style.corner_radius_top_right = 4
+    style.corner_radius_bottom_left = 4
+    style.corner_radius_bottom_right = 4
+    panel.add_theme_stylebox_override("panel", style)
 
   var margin = MarginContainer.new()
   margin.add_theme_constant_override("margin_left", 10)
@@ -57,8 +136,16 @@ func _create_option_panel(building_id: String, def: Dictionary, _index: int) -> 
   panel.add_child(margin)
 
   var inner_vbox = VBoxContainer.new()
-  inner_vbox.add_theme_constant_override("separation", 6)
+  inner_vbox.add_theme_constant_override("separation", 4)
   margin.add_child(inner_vbox)
+
+  if is_recommended:
+    var rec_label = Label.new()
+    rec_label.text = "★ Recommended"
+    rec_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    rec_label.add_theme_font_size_override("font_size", 10)
+    rec_label.add_theme_color_override("font_color", Color(0.3, 0.9, 0.4))
+    inner_vbox.add_child(rec_label)
 
   var color_rect = ColorRect.new()
   color_rect.custom_minimum_size = Vector2(40, 40)
@@ -76,8 +163,25 @@ func _create_option_panel(building_id: String, def: Dictionary, _index: int) -> 
   desc_label.text = def.get("description", "")
   desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
   desc_label.add_theme_font_size_override("font_size", 11)
-  desc_label.custom_minimum_size.y = 60
+  desc_label.custom_minimum_size.y = 40
   inner_vbox.add_child(desc_label)
+
+  var stats_text = _get_stats_text(def)
+  if stats_text != "":
+    var stats_label = Label.new()
+    stats_label.text = stats_text
+    stats_label.add_theme_font_size_override("font_size", 10)
+    stats_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.9))
+    inner_vbox.add_child(stats_label)
+
+  var hint_text = _get_recommendation_text(building_id, def)
+  if hint_text != "":
+    var hint_label = Label.new()
+    hint_label.text = hint_text
+    hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    hint_label.add_theme_font_size_override("font_size", 10)
+    hint_label.add_theme_color_override("font_color", Color(0.6, 0.8, 0.6))
+    inner_vbox.add_child(hint_label)
 
   var spacer = Control.new()
   spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL

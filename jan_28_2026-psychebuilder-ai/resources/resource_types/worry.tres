@@ -12,3 +12,5 @@ tags = ["emotion.negative", "persistent"]
 decay_rate = 0.0
 stack_size = 20
 spawn_amount = 1
+danger_threshold = 3
+danger_warning = "Worry compounds when above 3. Process it before it multiplies!"

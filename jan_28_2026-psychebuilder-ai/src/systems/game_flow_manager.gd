@@ -87,10 +87,19 @@ func check_tutorial_hint(day_number: int) -> void:
   match day_number:
     1:
       _show_hint_if_new("day_1_roads", config.hint_day_1_roads)
+      _show_hint_if_new("day_1_phases", config.hint_day_1_phases)
     2:
       _show_hint_if_new("day_2_buildings", config.hint_day_2_buildings)
+      _show_hint_if_new("day_2_speed", config.hint_day_2_speed)
+      _show_hint_if_new("hint_wellbeing", config.hint_wellbeing)
     3:
       _show_hint_if_new("day_3_workers", config.hint_day_3_workers)
+    4:
+      _show_hint_if_new("day_4_events", config.hint_day_4_events)
+    5:
+      _show_hint_if_new("day_5_unlocks", config.hint_day_5_unlocks)
+      _show_hint_if_new("day_5_weather", config.hint_day_5_weather)
+      _show_hint_if_new("hint_resource_danger", config.hint_resource_danger)
 
 func _show_hint_if_new(hint_id: String, hint_text: String) -> void:
   if game_state.has_hint_shown(hint_id):

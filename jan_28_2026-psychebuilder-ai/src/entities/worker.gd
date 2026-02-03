@@ -68,6 +68,16 @@ var is_fatigued: bool = false
 @onready var sprite: Sprite2D = %Sprite2D
 @onready var glow_sprite: Sprite2D = %GlowSprite
 @onready var carry_indicator: Sprite2D = %CarryIndicator
+@onready var mastery_bar: ProgressBar = %MasteryBar
+
+@export_group("Mastery Colors")
+@export var mastery_tier_colors: Array[Color] = [
+  Color(0.5, 0.5, 0.5, 1),  # Tier 0 - gray
+  Color(0.4, 0.6, 0.9, 1),  # Tier 1 - blue
+  Color(0.3, 0.8, 0.4, 1),  # Tier 2 - green
+  Color(0.9, 0.8, 0.3, 1),  # Tier 3 - gold
+  Color(0.7, 0.4, 0.9, 1),  # Tier 4 - purple
+]
 
 static var mote_texture: ImageTexture
 static var carry_texture: ImageTexture
@@ -202,6 +212,7 @@ func _process(delta: float) -> void:
   _update_joy_speed_boost(delta)
   _process_contamination(delta)
   _process_fatigue(delta)
+  _update_mastery_display()
 
   match state:
     State.IDLE:
@@ -576,3 +587,50 @@ func recover_fatigue_at_night() -> void:
 
 func get_fatigue_level() -> float:
   return fatigue_level
+
+func _update_mastery_display() -> void:
+  if job_id == "" or state == State.IDLE:
+    mastery_bar.visible = false
+    return
+
+  mastery_bar.visible = true
+  var current_completions = game_state.habituation_progress.get(job_id, 0)
+  var current_tier = game_state.get_habituation_level(job_id)
+  var thresholds = config.habituation_thresholds
+
+  var progress = 0.0
+  if current_tier >= thresholds.size():
+    progress = 1.0
+  elif current_tier == 0:
+    if thresholds.size() > 0:
+      progress = float(current_completions) / float(thresholds[0])
+  else:
+    var prev_threshold = thresholds[current_tier - 1]
+    var next_threshold = thresholds[current_tier] if current_tier < thresholds.size() else prev_threshold
+    var tier_progress = current_completions - prev_threshold
+    var tier_range = next_threshold - prev_threshold
+    if tier_range > 0:
+      progress = float(tier_progress) / float(tier_range)
+
+  mastery_bar.value = progress
+
+  var fill_style = mastery_bar.get_theme_stylebox("fill").duplicate()
+  var tier_idx = mini(current_tier, mastery_tier_colors.size() - 1)
+  fill_style.bg_color = mastery_tier_colors[tier_idx]
+  mastery_bar.add_theme_stylebox_override("fill", fill_style)
+
+func get_mastery_tooltip() -> String:
+  if job_id == "":
+    return "No job assigned"
+  var current_completions = game_state.habituation_progress.get(job_id, 0)
+  var current_tier = game_state.get_habituation_level(job_id)
+  var thresholds = config.habituation_thresholds
+  var cost = config.habituation_costs[current_tier] if current_tier < config.habituation_costs.size() else 0.0
+
+  var next_threshold = thresholds[current_tier] if current_tier < thresholds.size() else current_completions
+  var tier_names = ["Novice", "Practiced", "Skilled", "Expert", "Master"]
+  var tier_name = tier_names[current_tier] if current_tier < tier_names.size() else "Master"
+
+  return "Mastery: %s (Tier %d)\n%d/%d completions\nAttention cost: %.0f%%" % [
+    tier_name, current_tier, current_completions, next_threshold, cost * 100
+  ]

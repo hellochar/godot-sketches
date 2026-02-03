@@ -22,6 +22,7 @@ static var definitions: Dictionary = {
     "size": Vector2i(1, 1),
     "color": Color(0.55, 0.52, 0.62),
     "unlocked_by_default": true,
+    "ftue_unlock_day": 1,
   },
 
   "emotional_reservoir": {
@@ -34,6 +35,7 @@ static var definitions: Dictionary = {
     "color": Color(0.5, 0.6, 0.75),
     "storage_capacity": 20,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 1,
   },
 
   "memory_well": {
@@ -49,6 +51,7 @@ static var definitions: Dictionary = {
     "generation_amount": 1,
     "storage_capacity": 10,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 1,
   },
 
   "mourning_chapel": {
@@ -65,6 +68,7 @@ static var definitions: Dictionary = {
     "requires_worker": true,
     "storage_capacity": 12,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 1,
   },
 
   "morning_routine": {
@@ -79,6 +83,7 @@ static var definitions: Dictionary = {
     "habit_energy_bonus": 1,
     "storage_capacity": 10,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 3,
   },
 
   "comfort_hearth": {
@@ -94,6 +99,7 @@ static var definitions: Dictionary = {
     "generation_amount": 1,
     "storage_capacity": 5,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 3,
   },
 
   "anxiety_diffuser": {
@@ -110,6 +116,7 @@ static var definitions: Dictionary = {
     "requires_worker": false,
     "storage_capacity": 15,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 5,
   },
 
   "emergency_calm_center": {
@@ -157,6 +164,7 @@ static var definitions: Dictionary = {
     "habit_generates": {"calm": 1},
     "storage_capacity": 5,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 5,
   },
 
   "wound": {
@@ -172,6 +180,7 @@ static var definitions: Dictionary = {
     "generation_amount": 1,
     "storage_capacity": 6,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 7,
   },
 
   "worry_loop": {
@@ -187,6 +196,7 @@ static var definitions: Dictionary = {
     "generation_amount": 1,
     "storage_capacity": 6,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 7,
   },
 
   "memory_processor": {
@@ -207,6 +217,7 @@ static var definitions: Dictionary = {
     "requires_worker": false,
     "storage_capacity": 12,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 5,
   },
 
   "rumination_spiral": {
@@ -222,6 +233,7 @@ static var definitions: Dictionary = {
     "generation_amount": 1,
     "storage_capacity": 10,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 7,
   },
 
   "grounding_station": {
@@ -238,6 +250,7 @@ static var definitions: Dictionary = {
     "requires_worker": false,
     "storage_capacity": 10,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 5,
   },
 
   "inner_critic": {
@@ -253,6 +266,7 @@ static var definitions: Dictionary = {
     "generation_amount": 1,
     "storage_capacity": 8,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 7,
   },
 
   # === GENERATION BUILDINGS ===
@@ -315,6 +329,7 @@ static var definitions: Dictionary = {
     "generation_amount": 1,
     "storage_capacity": 10,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 5,
   },
 
   "excitement_generator": {
@@ -381,6 +396,7 @@ static var definitions: Dictionary = {
     "requires_worker": true,
     "storage_capacity": 12,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 7,
   },
 
   "fear_processing_plant": {
@@ -465,6 +481,7 @@ static var definitions: Dictionary = {
     "requires_worker": false,
     "storage_capacity": 12,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 5,
   },
 
   "rumination_recycler": {
@@ -513,6 +530,7 @@ static var definitions: Dictionary = {
     "color": Color(0.6, 0.55, 0.75),
     "storage_capacity": 30,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 5,
   },
 
   "thought_library": {
@@ -525,6 +543,7 @@ static var definitions: Dictionary = {
     "color": Color(0.5, 0.6, 0.75),
     "storage_capacity": 18,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 3,
   },
 
   "quick_cache": {
@@ -537,6 +556,7 @@ static var definitions: Dictionary = {
     "color": Color(0.7, 0.75, 0.8),
     "storage_capacity": 8,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 3,
   },
 
   "deep_storage": {
@@ -566,6 +586,7 @@ static var definitions: Dictionary = {
     "habit_reduces": {"anxiety": 2},
     "storage_capacity": 10,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 5,
   },
 
   "journaling_corner": {
@@ -580,6 +601,7 @@ static var definitions: Dictionary = {
     "habit_reduces": {"rumination": 2},
     "storage_capacity": 6,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 5,
   },
 
   "social_connection_hub": {
@@ -623,6 +645,7 @@ static var definitions: Dictionary = {
     "habit_energy_bonus": 2,
     "habit_reduces": {"fatigue": 4},
     "unlocked_by_default": true,
+    "ftue_unlock_day": 7,
   },
 
   "gratitude_practice": {
@@ -668,6 +691,7 @@ static var definitions: Dictionary = {
     "coping_cooldown": 20.0,
     "storage_capacity": 10,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 7,
   },
 
   "comfort_den": {
@@ -701,6 +725,7 @@ static var definitions: Dictionary = {
     "coping_cooldown": 15.0,
     "storage_capacity": 8,
     "unlocked_by_default": true,
+    "ftue_unlock_day": 7,
   },
 
   "support_hotline": {
@@ -748,6 +773,7 @@ static var definitions: Dictionary = {
     "size": Vector2i(1, 1),
     "color": Color(0.6, 0.55, 0.5),
     "unlocked_by_default": true,
+    "ftue_unlock_day": 3,
   },
 
   "highway": {
@@ -869,6 +895,16 @@ static func get_all_unlocked() -> Array:
   for id in definitions:
     if definitions[id].get("unlocked_by_default", false):
       result.append(id)
+  return result
+
+static func get_unlocked_for_day(day: int) -> Array:
+  var result = []
+  for id in definitions:
+    var def = definitions[id]
+    if def.get("unlocked_by_default", false):
+      var unlock_day = def.get("ftue_unlock_day", 1)
+      if day >= unlock_day:
+        result.append(id)
   return result
 
 static func get_all_ids() -> Array:

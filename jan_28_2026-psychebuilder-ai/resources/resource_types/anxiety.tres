@@ -12,3 +12,5 @@ tags = ["emotion.negative", "transient"]
 decay_rate = 0.0
 stack_size = 20
 spawn_amount = 1
+danger_threshold = 7
+danger_warning = "Anxiety spreads when high. Build processors to keep it under control."

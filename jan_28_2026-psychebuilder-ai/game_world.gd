@@ -3,6 +3,7 @@ extends Node2D
 const GridSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems/grid_system.gd")
 const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
 const BackgroundShader = preload("res://jan_28_2026-psychebuilder-ai/src/shaders/mindspace_background.gdshader")
+const AdjacencyRules = preload("res://jan_28_2026-psychebuilder-ai/src/data/adjacency_rules.gd")
 
 @onready var config: Node = get_node("/root/Config")
 
@@ -53,6 +54,11 @@ var aura_overlay: Node2D = null
 @export var aura_wisdom_color: Color = Color(0.7, 0.3, 1.0, 0.3)
 @export var aura_line_width: float = 2.0
 @export var aura_arc_points: int = 32
+@export var aura_pulse_speed: float = 2.0
+@export var aura_min_alpha: float = 0.15
+@export var aura_max_alpha: float = 0.5
+
+var aura_time: float = 0.0
 
 @export_group("Day/Night Visuals")
 @export var day_brightness: float = 1.0
@@ -167,6 +173,9 @@ func focus_on_buildings(buildings: Array) -> void:
 func _process(delta: float) -> void:
   _handle_camera_input(delta)
   _update_hover()
+  aura_time += delta
+  if aura_hovered_building:
+    queue_redraw()
 
 func _handle_camera_input(delta: float) -> void:
   var move_dir = Vector2.ZERO
@@ -229,6 +238,8 @@ func _update_hover() -> void:
   if new_coord != hover_coord:
     hover_coord = new_coord
     _update_hover_indicator()
+    if placement_mode:
+      queue_redraw()
 
 func _update_hover_indicator() -> void:
   if not grid or not grid.is_valid_coord(hover_coord) or not placement_mode:
@@ -305,6 +316,9 @@ func set_aura_building(building: Node) -> void:
     queue_redraw()
 
 func _draw() -> void:
+  if placement_mode and placement_building_id != "" and grid.is_valid_coord(hover_coord):
+    _draw_placement_adjacency_preview()
+
   if not aura_hovered_building or not is_instance_valid(aura_hovered_building):
     return
 
@@ -332,17 +346,21 @@ func _draw() -> void:
   if output.has("wisdom"):
     has_wisdom = true
 
+  var calm_amount = building.storage.get("calm", 0)
+  var tension_amount = building.storage.get("tension", 0)
+  var wisdom_amount = building.storage.get("wisdom", 0)
+
   if has_calm:
     var calm_radius = (config.calm_aura_radius + 0.5) * tile_size
-    _draw_aura_circle(building_center, calm_radius, aura_calm_color)
+    _draw_aura_circle(building_center, calm_radius, aura_calm_color, maxi(calm_amount, 1))
 
   if has_tension:
     var tension_radius = (config.tension_aura_radius + 0.5) * tile_size
-    _draw_aura_circle(building_center, tension_radius, aura_tension_color)
+    _draw_aura_circle(building_center, tension_radius, aura_tension_color, maxi(tension_amount, 1))
 
   if has_wisdom:
     var wisdom_radius = (config.wisdom_aura_radius + 0.5) * tile_size
-    _draw_aura_circle(building_center, wisdom_radius, aura_wisdom_color)
+    _draw_aura_circle(building_center, wisdom_radius, aura_wisdom_color, maxi(wisdom_amount, 1))
 
   _draw_adjacency_lines(building, building_center)
 
@@ -410,11 +428,17 @@ func _get_building_center(building: Node) -> Vector2:
   var top_left = grid.grid_to_world_top_left(building.grid_coord)
   return top_left + Vector2(size) * tile_size * 0.5
 
-func _draw_aura_circle(center: Vector2, radius: float, color: Color) -> void:
-  var fill_color = Color(color.r, color.g, color.b, color.a * 0.3)
+func _draw_aura_circle(center: Vector2, radius: float, color: Color, resource_amount: int = 1) -> void:
+  var pulse = 0.8 + 0.2 * sin(aura_time * aura_pulse_speed)
+  var amount_alpha = lerpf(aura_min_alpha, aura_max_alpha, clampf(float(resource_amount) / 10.0, 0.0, 1.0))
+  var final_alpha = color.a * pulse * amount_alpha / aura_max_alpha
+
+  var fill_color = Color(color.r, color.g, color.b, final_alpha * 0.5)
   draw_circle(center, radius, fill_color)
-  var outline_color = Color(color.r, color.g, color.b, color.a * 2.0)
+
+  var outline_color = Color(color.r, color.g, color.b, final_alpha * 2.0)
   outline_color.a = minf(outline_color.a, 0.8)
+
   var points = PackedVector2Array()
   for i in range(aura_arc_points + 1):
     var angle = float(i) / float(aura_arc_points) * TAU
@@ -438,3 +462,76 @@ func spawn_floating_text(world_pos: Vector2, text: String, color: Color = Color.
   tween.tween_property(label, "position:y", world_pos.y - 60, 2.0)
   tween.tween_property(label, "modulate:a", 0.0, 2.0).set_delay(0.5)
   tween.chain().tween_callback(label.queue_free)
+
+func _draw_placement_adjacency_preview() -> void:
+  var tile_size = config.tile_size
+  var placement_def = BuildingDefs.get_definition(placement_building_id)
+  var placement_center = grid.grid_to_world_top_left(hover_coord) + Vector2(placement_size) * tile_size * 0.5
+
+  var game_state = get_node("/root/GameState")
+  var adjacency_radius = AdjacencyRules.ADJACENCY_RADIUS
+
+  var net_efficiency = 1.0
+  var has_effects = false
+
+  for building in game_state.active_buildings:
+    if building.building_id == "road":
+      continue
+
+    var building_coord = building.grid_coord
+    var distance = max(
+      absi(hover_coord.x - building_coord.x),
+      absi(hover_coord.y - building_coord.y)
+    )
+
+    if distance > adjacency_radius + max(placement_size.x, placement_size.y):
+      continue
+
+    var neighbor_id = building.building_id
+    var effect = AdjacencyRules.get_adjacency_effect(placement_building_id, neighbor_id)
+    var reverse_effect = AdjacencyRules.get_adjacency_effect(neighbor_id, placement_building_id)
+
+    if effect.is_empty() and reverse_effect.is_empty():
+      continue
+
+    has_effects = true
+    var building_center = _get_building_center(building)
+
+    var combined_type = AdjacencyRules.EffectType.NEUTRAL
+    var combined_efficiency = 1.0
+
+    if not effect.is_empty():
+      combined_type = effect.get("type", AdjacencyRules.EffectType.NEUTRAL)
+      combined_efficiency *= effect.get("efficiency", 1.0)
+    if not reverse_effect.is_empty():
+      var rev_type = reverse_effect.get("type", AdjacencyRules.EffectType.NEUTRAL)
+      if rev_type == AdjacencyRules.EffectType.SYNERGY or combined_type == AdjacencyRules.EffectType.SYNERGY:
+        combined_type = AdjacencyRules.EffectType.SYNERGY
+      elif rev_type == AdjacencyRules.EffectType.CONFLICT:
+        combined_type = AdjacencyRules.EffectType.CONFLICT
+      combined_efficiency *= reverse_effect.get("efficiency", 1.0)
+
+    net_efficiency *= combined_efficiency
+
+    var line_color: Color
+    match combined_type:
+      AdjacencyRules.EffectType.SYNERGY:
+        line_color = config.adjacency_synergy_color
+      AdjacencyRules.EffectType.CONFLICT:
+        line_color = config.adjacency_conflict_color
+      _:
+        line_color = config.adjacency_neutral_color
+
+    draw_line(placement_center, building_center, line_color, config.adjacency_line_width)
+
+    var mid_point = (placement_center + building_center) * 0.5
+    if combined_type == AdjacencyRules.EffectType.SYNERGY:
+      _draw_synergy_icon(mid_point, line_color)
+    elif combined_type == AdjacencyRules.EffectType.CONFLICT:
+      _draw_conflict_icon(mid_point, line_color)
+
+  if has_effects and net_efficiency != 1.0:
+    var efficiency_text = "x%.2f" % net_efficiency
+    var text_pos = placement_center + Vector2(0, -tile_size - 10)
+    var text_color = Color(0.3, 0.9, 0.3) if net_efficiency > 1.0 else Color(0.9, 0.5, 0.3)
+    draw_string(ThemeDB.fallback_font, text_pos, efficiency_text, HORIZONTAL_ALIGNMENT_CENTER, -1, 14, text_color)

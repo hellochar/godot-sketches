@@ -300,6 +300,10 @@ func _on_building_selected(building_id: String) -> void:
   is_placing = true
   game_world.set_placement_mode(true, building_id, building_system)
 
+  if not game_state.has_hint_shown("first_building_placement"):
+    game_state.mark_hint_shown("first_building_placement")
+    _on_tutorial_hint_requested(config.hint_first_building_placement)
+
 func _unhandled_input(event: InputEvent) -> void:
   if event is InputEventMouseButton:
     var mb = event as InputEventMouseButton
@@ -869,6 +873,10 @@ func _start_transport_assignment(building: Node) -> void:
   if available_res.size() == 0:
     show_toast("No resources to transport", "warning")
     return
+
+  if not game_state.has_hint_shown("first_worker_assignment"):
+    game_state.mark_hint_shown("first_worker_assignment")
+    _on_tutorial_hint_requested(config.hint_first_worker_assignment)
 
   selected_source_building = building
   available_transport_resources = available_res
