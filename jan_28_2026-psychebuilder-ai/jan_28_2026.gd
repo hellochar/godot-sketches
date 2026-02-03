@@ -54,7 +54,7 @@ var building_tooltip: PanelContainer = null
 @export var building_button_size: Vector2 = Vector2(80, 40)
 
 @export_group("Info Panel")
-@export var info_panel_size: Vector2 = Vector2(190, 140)
+@export var info_panel_size: Vector2 = Vector2(220, 220)
 @export var info_panel_margin: float = 10.0
 @export var instructions_font_size: int = 12
 
@@ -170,6 +170,16 @@ func _create_info_panel() -> void:
   vbox.name = "VBoxContainer"
   panel.add_child(vbox)
 
+  var goal_label = Label.new()
+  goal_label.name = "GoalLabel"
+  goal_label.text = "Goal: Maximize Wellbeing by Day 20"
+  goal_label.add_theme_font_size_override("font_size", instructions_font_size)
+  goal_label.add_theme_color_override("font_color", Color(0.9, 0.8, 0.4))
+  vbox.add_child(goal_label)
+
+  var separator = HSeparator.new()
+  vbox.add_child(separator)
+
   var energy_label = Label.new()
   energy_label.name = "EnergyLabel"
   energy_label.text = "Energy: 10/20"
@@ -190,6 +200,40 @@ func _create_info_panel() -> void:
   wellbeing_label.text = "Wellbeing: 35"
   vbox.add_child(wellbeing_label)
 
+  var tier_label = Label.new()
+  tier_label.name = "TierLabel"
+  tier_label.text = "Baseline"
+  tier_label.add_theme_font_size_override("font_size", instructions_font_size)
+  vbox.add_child(tier_label)
+
+  var separator2 = HSeparator.new()
+  vbox.add_child(separator2)
+
+  var weather_label = Label.new()
+  weather_label.name = "WeatherLabel"
+  weather_label.text = "Weather: Neutral"
+  weather_label.add_theme_font_size_override("font_size", instructions_font_size)
+  vbox.add_child(weather_label)
+
+  var phase_label = Label.new()
+  phase_label.name = "PhaseLabel"
+  phase_label.text = "Phase: Day"
+  phase_label.add_theme_font_size_override("font_size", instructions_font_size)
+  vbox.add_child(phase_label)
+
+  var flow_label = Label.new()
+  flow_label.name = "FlowLabel"
+  flow_label.text = ""
+  flow_label.add_theme_font_size_override("font_size", instructions_font_size)
+  flow_label.add_theme_color_override("font_color", Color(0.4, 0.8, 1.0))
+  vbox.add_child(flow_label)
+
+  var beliefs_label = Label.new()
+  beliefs_label.name = "BeliefsLabel"
+  beliefs_label.text = "Beliefs: 0"
+  beliefs_label.add_theme_font_size_override("font_size", instructions_font_size)
+  vbox.add_child(beliefs_label)
+
   var instructions = Label.new()
   instructions.name = "InstructionsLabel"
   instructions.text = "Click building to select\nClick grid to place\nRight-click to cancel"
@@ -201,7 +245,7 @@ func _create_info_panel() -> void:
 func _on_building_selected(building_id: String) -> void:
   selected_building_id = building_id
   is_placing = true
-  game_world.set_placement_mode(true, building_id)
+  game_world.set_placement_mode(true, building_id, building_system)
 
 func _unhandled_input(event: InputEvent) -> void:
   if event is InputEventMouseButton:
@@ -462,6 +506,35 @@ func _update_energy_display() -> void:
       wb_label.text = "Wellbeing: %d" % int(game_state.wellbeing)
       wb_label.add_theme_color_override("font_color", wb_color)
 
+    var tier_label = panel.get_node_or_null("VBoxContainer/TierLabel")
+    if tier_label:
+      var tier = game_state.get_wellbeing_tier()
+      var tier_info = _get_tier_display_info(tier)
+      tier_label.text = tier_info.name
+      tier_label.add_theme_color_override("font_color", tier_info.color)
+
+    var weather_label = panel.get_node_or_null("VBoxContainer/WeatherLabel")
+    if weather_label:
+      weather_label.text = _get_weather_description()
+
+    var phase_label = panel.get_node_or_null("VBoxContainer/PhaseLabel")
+    if phase_label and time_system:
+      var phase_text = "Day" if time_system.is_day() else "Night"
+      phase_label.text = "Phase: %s" % phase_text
+
+    var flow_label = panel.get_node_or_null("VBoxContainer/FlowLabel")
+    if flow_label:
+      if game_state.is_in_flow_state():
+        flow_label.text = "Flow State Active"
+        flow_label.visible = true
+      else:
+        flow_label.text = ""
+        flow_label.visible = false
+
+    var beliefs_label = panel.get_node_or_null("VBoxContainer/BeliefsLabel")
+    if beliefs_label:
+      beliefs_label.text = "Beliefs: %d" % game_state.active_beliefs.size()
+
 func _calculate_wellbeing() -> void:
   var positive_total = 0
   var negative_total = 0
@@ -494,6 +567,37 @@ func _get_wellbeing_color(value: float) -> Color:
     return wellbeing_medium_color
   else:
     return wellbeing_low_color
+
+func _get_tier_display_info(tier: int) -> Dictionary:
+  var GameState = preload("res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd")
+  match tier:
+    GameState.WellbeingTier.STRUGGLING:
+      return {"name": "Struggling (<20)", "color": tier_struggling_color}
+    GameState.WellbeingTier.BASELINE:
+      return {"name": "Baseline (20-39)", "color": Color(0.7, 0.7, 0.7)}
+    GameState.WellbeingTier.STABLE:
+      return {"name": "Stable (40-59)", "color": tier_surviving_color}
+    GameState.WellbeingTier.THRIVING:
+      return {"name": "Thriving (60-79)", "color": tier_growing_color}
+    GameState.WellbeingTier.FLOURISHING:
+      return {"name": "Flourishing (80+)", "color": tier_flourishing_color}
+  return {"name": "Unknown", "color": Color.WHITE}
+
+func _get_weather_description() -> String:
+  var GameState = preload("res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd")
+  match game_state.current_weather:
+    GameState.WeatherState.CLEAR_SKIES:
+      return "Clear Skies (+15% processing)"
+    GameState.WeatherState.STORM:
+      return "Storm (-25% processing, +30% negative)"
+    GameState.WeatherState.OVERCAST:
+      return "Overcast (+15% grief generation)"
+    GameState.WeatherState.FOG:
+      return "Fog (-10% processing)"
+    GameState.WeatherState.STILLNESS:
+      return "Stillness (+10% processing)"
+    _:
+      return "Neutral"
 
 func get_resource_system() -> Node:
   return resource_system
@@ -622,12 +726,19 @@ func _create_building_tooltip() -> void:
   connection_label.add_theme_font_size_override("font_size", tooltip_desc_font_size)
   vbox.add_child(connection_label)
 
+  var indicators_label = Label.new()
+  indicators_label.name = "IndicatorsLabel"
+  indicators_label.add_theme_font_size_override("font_size", tooltip_desc_font_size)
+  indicators_label.add_theme_color_override("font_color", Color(0.6, 0.8, 0.9))
+  vbox.add_child(indicators_label)
+
   ui_layer.add_child(building_tooltip)
 
 func _update_building_tooltip() -> void:
   if is_placing:
     building_tooltip.visible = false
     hovered_building = null
+    game_world.set_aura_building(null)
     return
 
   var coord = game_world.hover_coord
@@ -636,8 +747,11 @@ func _update_building_tooltip() -> void:
   if building and building != hovered_building:
     hovered_building = building
     _populate_tooltip(building)
+    game_world.set_aura_building(building)
   elif building and building == hovered_building:
     _populate_tooltip(building)
+  elif not building and hovered_building:
+    game_world.set_aura_building(null)
 
   if hovered_building:
     building_tooltip.visible = true
@@ -655,6 +769,7 @@ func _update_building_tooltip() -> void:
   else:
     building_tooltip.visible = false
     hovered_building = null
+    game_world.set_aura_building(null)
 
 func _populate_tooltip(building: Node) -> void:
   var vbox = building_tooltip.get_node("VBox")
@@ -690,6 +805,45 @@ func _populate_tooltip(building: Node) -> void:
     connection_label.text = "Not connected to roads"
     connection_label.add_theme_color_override("font_color", Color(0.9, 0.4, 0.4))
     connection_label.visible = true
+
+  var indicators_label = vbox.get_node("IndicatorsLabel")
+  indicators_label.text = _get_indicator_explanations_text(building)
+  indicators_label.visible = indicators_label.text != ""
+
+func _get_indicator_explanations_text(building: Node) -> String:
+  var lines: Array[String] = []
+
+  if building.attuned_partners.size() > 0:
+    lines.append("[A] Attuned: bonded with nearby building")
+  if building.is_specialized:
+    lines.append("[M] Mastery: specialized in a resource")
+  if building.velocity_momentum >= 0.5:
+    lines.append("[V] Velocity: processing momentum active")
+  if building.is_legacy:
+    lines.append("[L] Legacy: imprinted by past worker")
+  if building._is_in_any_sync_chain():
+    lines.append("[S] Sync: emotionally synchronized")
+
+  var has_quality_indicators = false
+  for res_id in building.storage:
+    if building.storage[res_id] > 0:
+      var purity = building.storage_purity.get(res_id, config.purity_initial_level)
+      var mastery_level = building.get_mastery_level(res_id)
+      if purity >= config.purity_output_bonus_threshold or purity <= config.purity_min_level + 0.1:
+        has_quality_indicators = true
+      if mastery_level > 0:
+        has_quality_indicators = true
+
+  if has_quality_indicators:
+    if lines.size() > 0:
+      lines.append("")
+    lines.append("Resource symbols:")
+    lines.append("* = pure (>80% purity)")
+    lines.append("~ = diluted (<40% purity)")
+    lines.append("! = max mastery")
+    lines.append("+N = mastery level N")
+
+  return "\n".join(lines)
 
 func _get_status_text(building: Node) -> String:
   var Building = preload("res://jan_28_2026-psychebuilder-ai/src/entities/building.gd")
@@ -732,7 +886,18 @@ func _get_storage_text(building: Node) -> String:
   for res_id in building.storage:
     var amount = building.storage[res_id]
     if amount > 0:
-      items.append("%s: %d" % [res_id, amount])
+      var purity = building.storage_purity.get(res_id, config.purity_initial_level)
+      var mastery_level = building.get_mastery_level(res_id)
+      var indicator = ""
+      if purity >= config.purity_output_bonus_threshold:
+        indicator += "*"
+      elif purity <= config.purity_min_level + 0.1:
+        indicator += "~"
+      if mastery_level >= config.mastery_max_level:
+        indicator += "!"
+      elif mastery_level > 0:
+        indicator += "+" + str(mastery_level)
+      items.append("%s: %d%s" % [res_id, amount, indicator])
       total += amount
 
   if items.size() == 0:

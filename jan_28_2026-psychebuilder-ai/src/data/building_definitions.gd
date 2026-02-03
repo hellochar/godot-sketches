@@ -116,7 +116,7 @@ static var definitions: Dictionary = {
     "id": "emergency_calm_center",
     "name": "Emergency Calm Center",
     "description": "Activates when Anxiety spikes, rapidly converting it to Calm.",
-    "behaviors": [Behavior.COPING],
+    "behaviors": [Behavior.COPING, Behavior.STORAGE],
     "build_cost": {"energy": 6},
     "size": Vector2i(2, 2),
     "color": Color(0.3, 0.8, 0.7),
@@ -124,6 +124,7 @@ static var definitions: Dictionary = {
     "coping_input": {"anxiety": 5},
     "coping_output": {"calm": 3},
     "coping_cooldown": 30.0,
+    "storage_capacity": 15,
     "unlocked_by_default": false,
   },
 
@@ -131,7 +132,7 @@ static var definitions: Dictionary = {
     "id": "reflection_pool",
     "name": "Reflection Pool",
     "description": "Converts negative thoughts into Insight.",
-    "behaviors": [Behavior.PROCESSOR],
+    "behaviors": [Behavior.PROCESSOR, Behavior.STORAGE],
     "build_cost": {"energy": 5},
     "size": Vector2i(2, 2),
     "color": Color(0.5, 0.6, 0.9),
@@ -139,6 +140,7 @@ static var definitions: Dictionary = {
     "output": {"insight": 1},
     "process_time": 6.0,
     "requires_worker": true,
+    "storage_capacity": 10,
     "unlocked_by_default": false,
   },
 

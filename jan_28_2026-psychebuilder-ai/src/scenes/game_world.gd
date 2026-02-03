@@ -40,6 +40,18 @@ var drag_start_camera: Vector2
 var placement_mode: bool = false
 var placement_building_id: String = ""
 var placement_size: Vector2i = Vector2i(1, 1)
+var building_system: Node = null
+var placement_reason_label: Label = null
+
+var aura_hovered_building: Node = null
+var aura_overlay: Node2D = null
+
+@export_group("Aura Visualization")
+@export var aura_calm_color: Color = Color(0.3, 0.6, 1.0, 0.3)
+@export var aura_tension_color: Color = Color(1.0, 0.3, 0.3, 0.3)
+@export var aura_wisdom_color: Color = Color(0.7, 0.3, 1.0, 0.3)
+@export var aura_line_width: float = 2.0
+@export var aura_arc_points: int = 32
 
 func _ready() -> void:
   grid = GridSystemScript.new()
@@ -49,6 +61,19 @@ func _ready() -> void:
   _setup_background()
   _draw_grid_lines()
   _center_camera()
+  _create_placement_reason_label()
+  _create_aura_overlay()
+
+func _create_placement_reason_label() -> void:
+  placement_reason_label = Label.new()
+  placement_reason_label.name = "PlacementReasonLabel"
+  placement_reason_label.visible = false
+  placement_reason_label.add_theme_font_size_override("font_size", 12)
+  placement_reason_label.add_theme_color_override("font_color", Color(1, 0.4, 0.4))
+  placement_reason_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+  placement_reason_label.add_theme_constant_override("shadow_offset_x", 1)
+  placement_reason_label.add_theme_constant_override("shadow_offset_y", 1)
+  add_child(placement_reason_label)
 
 func _setup_background() -> void:
   var world_size = Vector2(grid.grid_size) * grid.tile_size
@@ -143,31 +168,53 @@ func _update_hover() -> void:
 func _update_hover_indicator() -> void:
   if not grid.is_valid_coord(hover_coord):
     hover_indicator.visible = false
+    _hide_placement_reason()
     return
 
   hover_indicator.visible = true
   hover_indicator.position = grid.grid_to_world_top_left(hover_coord)
 
-  # Resize for placement mode
   var tile_size = grid.tile_size
   hover_indicator.size = Vector2(placement_size) * tile_size
 
   if placement_mode:
-    var can_place = grid.is_area_free(hover_coord, placement_size)
-    if can_place:
+    var failure_reason = _get_placement_failure_reason()
+    if failure_reason == "":
       hover_indicator.color = hover_valid_color
+      _hide_placement_reason()
     else:
       hover_indicator.color = hover_invalid_color
+      _show_placement_reason(failure_reason)
   else:
+    _hide_placement_reason()
     hover_indicator.size = Vector2(tile_size, tile_size)
     if grid.is_occupied(hover_coord):
       hover_indicator.color = hover_selected_color
     else:
       hover_indicator.color = hover_valid_color
 
-func set_placement_mode(enabled: bool, building_id: String = "") -> void:
+func _get_placement_failure_reason() -> String:
+  if building_system and placement_building_id != "":
+    return building_system.get_placement_failure_reason(placement_building_id, hover_coord)
+  if not grid.is_area_free(hover_coord, placement_size):
+    return "Space is occupied"
+  return ""
+
+func _show_placement_reason(reason: String) -> void:
+  placement_reason_label.text = reason
+  placement_reason_label.visible = true
+  var indicator_pos = hover_indicator.position
+  var offset = Vector2(0, -20)
+  placement_reason_label.position = indicator_pos + offset
+
+func _hide_placement_reason() -> void:
+  placement_reason_label.visible = false
+
+func set_placement_mode(enabled: bool, building_id: String = "", p_building_system: Node = null) -> void:
   placement_mode = enabled
   placement_building_id = building_id
+  if p_building_system:
+    building_system = p_building_system
 
   if enabled and building_id != "":
     var def = BuildingDefs.get_definition(building_id)
@@ -188,3 +235,72 @@ func get_resources_layer() -> Node2D:
 
 func get_workers_layer() -> Node2D:
   return workers_layer
+
+func _create_aura_overlay() -> void:
+  aura_overlay = Node2D.new()
+  aura_overlay.name = "AuraOverlay"
+  aura_overlay.z_index = 10
+  add_child(aura_overlay)
+
+func set_aura_building(building: Node) -> void:
+  if aura_hovered_building != building:
+    aura_hovered_building = building
+    queue_redraw()
+
+func _draw() -> void:
+  if not aura_hovered_building or not is_instance_valid(aura_hovered_building):
+    return
+
+  var building = aura_hovered_building
+  var building_center = _get_building_center(building)
+  var tile_size = config.tile_size
+
+  var has_calm = building.storage.get("calm", 0) > 0
+  var has_tension = building.storage.get("tension", 0) > 0
+  var has_wisdom = building.storage.get("wisdom", 0) > 0
+
+  var generates = building.definition.get("generates", "")
+  if generates == "calm":
+    has_calm = true
+  elif generates == "tension":
+    has_tension = true
+  elif generates == "wisdom":
+    has_wisdom = true
+
+  var output = building.definition.get("output", {})
+  if output.has("calm"):
+    has_calm = true
+  if output.has("tension"):
+    has_tension = true
+  if output.has("wisdom"):
+    has_wisdom = true
+
+  if has_calm:
+    var calm_radius = (config.calm_aura_radius + 0.5) * tile_size
+    _draw_aura_circle(building_center, calm_radius, aura_calm_color)
+
+  if has_tension:
+    var tension_radius = (config.tension_aura_radius + 0.5) * tile_size
+    _draw_aura_circle(building_center, tension_radius, aura_tension_color)
+
+  if has_wisdom:
+    var wisdom_radius = (config.wisdom_aura_radius + 0.5) * tile_size
+    _draw_aura_circle(building_center, wisdom_radius, aura_wisdom_color)
+
+func _get_building_center(building: Node) -> Vector2:
+  var tile_size = config.tile_size
+  var size = building.size
+  var top_left = grid.grid_to_world_top_left(building.grid_coord)
+  return top_left + Vector2(size) * tile_size * 0.5
+
+func _draw_aura_circle(center: Vector2, radius: float, color: Color) -> void:
+  var fill_color = Color(color.r, color.g, color.b, color.a * 0.3)
+  draw_circle(center, radius, fill_color)
+  var outline_color = Color(color.r, color.g, color.b, color.a * 2.0)
+  outline_color.a = minf(outline_color.a, 0.8)
+  var points = PackedVector2Array()
+  for i in range(aura_arc_points + 1):
+    var angle = float(i) / float(aura_arc_points) * TAU
+    points.append(center + Vector2(cos(angle), sin(angle)) * radius)
+  for i in range(aura_arc_points):
+    draw_line(points[i], points[i + 1], outline_color, aura_line_width)

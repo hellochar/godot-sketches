@@ -47,6 +47,8 @@ func _process(delta: float) -> void:
 func _transition_to_night() -> void:
   current_phase = Phase.NIGHT
   phase_time = 0.0
+  game_state.current_phase = "night"
+  game_state.phase_time = 0.0
   game_state.on_day_end()
   _process_dream_recombinations()
   _recover_worker_fatigue()
@@ -58,6 +60,9 @@ func _transition_to_day() -> void:
   current_day += 1
   current_phase = Phase.DAY
   phase_time = 0.0
+  game_state.current_day = current_day
+  game_state.current_phase = "day"
+  game_state.phase_time = 0.0
 
   if current_day > total_days:
     _end_game()
@@ -79,6 +84,7 @@ func end_night() -> void:
 
 func set_paused(p: bool) -> void:
   paused = p
+  game_state.is_paused = p
 
 func set_speed(multiplier: float) -> void:
   speed_multiplier = clampf(multiplier, 0.5, 3.0)
@@ -117,9 +123,9 @@ func _process_dream_recombinations() -> void:
 
       if amount_a > 0 and amount_b > 0:
         var transform_amount = mini(amount_a, amount_b)
-        building.storage[resource_a] -= transform_amount
-        building.storage[resource_b] -= transform_amount
-        building.storage[output] = building.storage.get(output, 0) + transform_amount
+        building.remove_from_storage(resource_a, transform_amount)
+        building.remove_from_storage(resource_b, transform_amount)
+        building.add_to_storage(output, transform_amount)
         break
 
 func _recover_worker_fatigue() -> void:
@@ -129,6 +135,7 @@ func _recover_worker_fatigue() -> void:
 
 func _end_game() -> void:
   paused = true
+  game_state.is_paused = true
   var ending_tier = _calculate_ending_tier()
   event_bus.game_ended.emit(ending_tier)
 

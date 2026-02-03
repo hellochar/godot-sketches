@@ -27,14 +27,25 @@ func get_placement_failure_reason(building_id: String, coord: Vector2i) -> Strin
 
   var size = def.get("size", Vector2i(1, 1))
 
-  if not grid.is_area_free(coord, size):
-    return "Location is blocked"
+  var area_result = _check_area_placement(coord, size)
+  if area_result != "":
+    return area_result
 
   var cost = def.get("build_cost", {})
   var energy_cost = cost.get("energy", 0)
   if energy_cost > game_state.current_energy:
     return "Not enough energy (%d needed)" % energy_cost
 
+  return ""
+
+func _check_area_placement(coord: Vector2i, size: Vector2i) -> String:
+  for x in range(size.x):
+    for y in range(size.y):
+      var check_coord = coord + Vector2i(x, y)
+      if not grid.is_valid_coord(check_coord):
+        return "Out of bounds"
+      if grid.is_occupied(check_coord):
+        return "Space is occupied"
   return ""
 
 func place_building(building_id: String, coord: Vector2i) -> Node:
@@ -73,6 +84,10 @@ func remove_building(building: Node) -> void:
   var gs = game_state
   if building not in gs.active_buildings:
     return
+
+  for worker in gs.active_workers:
+    if worker.source_building == building or worker.dest_building == building:
+      worker.unassign()
 
   var coord = building.grid_coord
   var size = building.size

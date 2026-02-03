@@ -4,6 +4,7 @@ const WorkerScene = preload("res://jan_28_2026-psychebuilder-ai/src/entities/wor
 
 @onready var game_state: Node = get_node("/root/GameState")
 @onready var config: Node = get_node("/root/Config")
+@onready var event_bus: Node = get_node("/root/EventBus")
 
 var grid: RefCounted
 var workers: Array = []
@@ -15,6 +16,11 @@ func setup(p_grid: RefCounted) -> void:
   grid = p_grid
   attention_pool = config.base_attention_pool if config else 10
 
+func _sync_attention() -> void:
+  game_state.attention_used = float(attention_used)
+  game_state.attention_available = float(attention_pool)
+  event_bus.attention_changed.emit(float(attention_used), float(attention_pool))
+
 func get_available_attention() -> int:
   return attention_pool - attention_used
 
@@ -24,6 +30,7 @@ func spawn_worker(world_position: Vector2) -> Node:
   worker.setup(grid)
   worker.job_cycle_completed.connect(func(): update_habituation(worker))
   workers.append(worker)
+  game_state.active_workers.append(worker)
   return worker
 
 func remove_worker(worker: Node) -> void:
@@ -31,6 +38,7 @@ func remove_worker(worker: Node) -> void:
     _refund_attention(worker)
     worker.unassign()
     workers.erase(worker)
+    game_state.active_workers.erase(worker)
     worker.queue_free()
 
 func assign_transport_job(worker: Node, source: Node, dest: Node, resource_type: String) -> bool:
@@ -40,6 +48,7 @@ func assign_transport_job(worker: Node, source: Node, dest: Node, resource_type:
 
   if worker.assign_transport_job(source, dest, resource_type):
     attention_used += cost
+    _sync_attention()
     return true
   return false
 
@@ -50,6 +59,7 @@ func assign_operate_job(worker: Node, building: Node) -> bool:
 
   if worker.assign_operate_job(building):
     attention_used += cost
+    _sync_attention()
     return true
   return false
 
@@ -85,6 +95,7 @@ func _refund_attention(worker: Node) -> void:
 
   var cost = _calculate_attention_cost(worker, worker.job_type, worker.source_building if worker.source_building else worker.dest_building, worker.dest_building, worker.resource_type)
   attention_used = maxi(0, attention_used - cost)
+  _sync_attention()
 
 func update_habituation(worker: Node) -> void:
   var target_a = worker.source_building if worker.source_building else worker.dest_building
@@ -98,6 +109,7 @@ func update_habituation(worker: Node) -> void:
 
   if new_cost < old_cost:
     attention_used -= (old_cost - new_cost)
+    _sync_attention()
 
 func get_idle_workers() -> Array:
   var idle: Array = []

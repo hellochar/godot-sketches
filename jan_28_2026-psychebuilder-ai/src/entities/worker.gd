@@ -99,7 +99,10 @@ func assign_transport_job(p_source: Node, p_dest: Node, p_resource_type: String)
   state = State.MOVING_TO_PICKUP
   _pathfind_to_building(source_building)
 
-  return current_path.size() > 0
+  if current_path.size() > 0:
+    return true
+  state = State.PICKING_UP
+  return true
 
 func assign_operate_job(building: Node) -> bool:
   if not grid:

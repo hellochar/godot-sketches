@@ -44,7 +44,7 @@ var building_id: String
 var definition: Dictionary
 var grid_coord: Vector2i
 var size: Vector2i = Vector2i(1, 1)
-var grid: RefCounted
+var grid: Node
 
 # Connection
 var road_connected: bool = false
@@ -578,7 +578,9 @@ func _evaluate_trigger(trigger: String) -> bool:
   var operator = parts[1]
   var threshold = parts[2].to_int()
 
-  var current_value = game_state.get_resource_total(resource_id)
+  var current_value = 0
+  for building in game_state.active_buildings:
+    current_value += building.storage.get(resource_id, 0)
 
   match operator:
     ">":
@@ -1036,9 +1038,11 @@ func _process_nostalgia_crystallization(delta: float) -> void:
   var amount_to_crystallize = mini(crystallized_count, nostalgia_amount)
   remove_from_storage("nostalgia", amount_to_crystallize)
 
+  var removed_count = 0
   for batch_id in to_remove:
     nostalgia_age_tracker.erase(batch_id)
-    if to_remove.find(batch_id) >= amount_to_crystallize:
+    removed_count += 1
+    if removed_count >= amount_to_crystallize:
       break
 
   var nearby_calm = _count_nearby_resource("calm")
