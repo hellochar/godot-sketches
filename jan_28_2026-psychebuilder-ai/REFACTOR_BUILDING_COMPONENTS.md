@@ -96,11 +96,11 @@ src/components/
 
 ---
 
-## Phase 6: Validation
+## Phase 6: Validation [IN PROGRESS]
 - [ ] Write gdUnit4 tests for critical components
 - [ ] Run full test suite
-- [ ] Verify building.gd is under 500 lines
-- [ ] Final verification - run game end to end
+- [ ] Verify building.gd is under 500 lines (currently 2865 - old code retained as fallback)
+- [x] Final verification - run game end to end
 
 ---
 
@@ -109,6 +109,17 @@ src/components/
 ### 2026-02-02
 - Phase 1 completed. Created base infrastructure, storage component, generator component.
 - Game runs without errors.
+- Phases 2-5 completed. All 24 components extracted:
+  - Core: storage, generator, processor, coping, habit, infrastructure
+  - Emotional: resonance, saturation, harmony, attunement, emotional_echo
+  - Building state: fatigue, mastery, velocity, momentum, legacy, awakening, fragility
+  - Utility: purity, stagnation, adjacency, suppression, network
+
+### Architecture Notes
+- Components use lazy-loaded getters for autoloads (event_bus, config, game_state)
+- Skip checks in building.gd delegate to components when they exist
+- Old code retained as fallback - can be incrementally removed after testing
+- Building.gd still 2865 lines due to retained fallback code
 
 ---
 
