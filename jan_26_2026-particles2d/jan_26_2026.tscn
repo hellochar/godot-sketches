@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://bibkb3yu3x81g"]
+[gd_scene format=3 uid="uid://bibkb3yu3x81g"]
 
 [ext_resource type="Script" uid="uid://cal0yfbfnoj7o" path="res://jan_26_2026-particles2d/jan_26_2026.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://byx2jd0iwvlmq" path="res://jan_26_2026-particles2d/circular_streaks.tscn" id="2_50xqt"]
@@ -90,7 +90,7 @@ scale_min = 0.9
 scale_max = 1.1
 scale_curve = SubResource("CurveTexture_lay45")
 
-[node name="Control" type="Control"]
+[node name="Control" type="Control" unique_id=900357215]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -99,27 +99,25 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="_SmoothCamera" type="Camera2D" parent="."]
+[node name="_SmoothCamera" type="Camera2D" parent="." unique_id=674084932]
 visible = false
 script = ExtResource("2_uquox")
 metadata/_custom_type_script = "uid://cll2ewhxarmmd"
 
-[node name="circular-streaks" parent="." instance=ExtResource("2_50xqt")]
+[node name="circular-streaks" parent="." unique_id=847321519 instance=ExtResource("2_50xqt")]
 visible = false
 
-[node name="circular-streaks-wiggle" parent="." instance=ExtResource("3_50xqt")]
+[node name="circular-streaks-wiggle" parent="." unique_id=38639595 instance=ExtResource("3_50xqt")]
 visible = false
-position = Vector2(-182.37885, -238.19731)
+position = Vector2(-38.72148, -297.49057)
 process_material = SubResource("ParticleProcessMaterial_m0alm")
 
-[node name="thick-colorful-hair-in-wind" parent="." instance=ExtResource("5_50xqt")]
-visible = false
+[node name="thick-colorful-hair-in-wind" parent="." unique_id=960885601 instance=ExtResource("5_50xqt")]
 
-[node name="LightOccluder2D" type="LightOccluder2D" parent="thick-colorful-hair-in-wind"]
-visible = false
+[node name="LightOccluder2D" type="LightOccluder2D" parent="thick-colorful-hair-in-wind" unique_id=891746437]
 occluder = SubResource("OccluderPolygon2D_50xqt")
 
-[node name="falling-xiaohan-portrait" type="GPUParticles2D" parent="."]
+[node name="falling-xiaohan-portrait" type="GPUParticles2D" parent="." unique_id=1283031697]
 visible = false
 material = SubResource("CanvasItemMaterial_47aty")
 amount = 400
@@ -130,7 +128,7 @@ explosiveness = 0.5
 draw_order = 0
 process_material = SubResource("ParticleProcessMaterial_lay45")
 
-[node name="oneshot-emojis-all-over-the-screen" type="GPUParticles2D" parent="."]
+[node name="oneshot-emojis-all-over-the-screen" type="GPUParticles2D" parent="." unique_id=1823148713]
 material = SubResource("CanvasItemMaterial_q0ufj")
 emitting = false
 amount = 125
