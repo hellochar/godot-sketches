@@ -518,35 +518,35 @@ This document breaks down implementation into phases and granular tasks. Each ta
 ## Phase 13: Game Flow (Days 17-18)
 
 ### 13.1 Game Start
-- [ ] Create starting condition loading from config
-- [ ] Place starting buildings
-- [ ] Spawn starting resources
-- [ ] Set starting energy/attention
-- [ ] Apply archetype modifiers
+- [x] Create starting condition loading from config
+- [x] Place starting buildings
+- [x] Spawn starting resources
+- [x] Set starting energy/attention
+- [x] Apply archetype modifiers
 
 ### 13.2 Tutorial Hints (Simple)
-- [ ] Day 1: Hint about building roads
-- [ ] Day 2: Hint about placing buildings
-- [ ] Day 3: Hint about assigning workers
-- [ ] Simple text popups, dismissible
-- [ ] Track which hints shown
+- [x] Day 1: Hint about building roads
+- [x] Day 2: Hint about placing buildings
+- [x] Day 3: Hint about assigning workers
+- [x] Simple text popups, dismissible
+- [x] Track which hints shown
 
 ### 13.3 Win/End Detection
-- [ ] Track game day count
-- [ ] When max days reached: trigger ending
-- [ ] Calculate final wellbeing
-- [ ] Determine ending tier
+- [x] Track game day count
+- [x] When max days reached: trigger ending
+- [x] Calculate final wellbeing
+- [x] Determine ending tier
 
 ### 13.4 End Screen
-- [ ] Create `src/ui/end_screen.gd` and scene
-- [ ] Display ending text based on tier
-- [ ] Show final stats summary
-- [ ] Show achievements earned
-- [ ] Button: Play Again, Main Menu
+- [x] Create `src/ui/end_screen.gd` and scene
+- [x] Display ending text based on tier
+- [x] Show final stats summary
+- [x] Show achievements earned
+- [x] Button: Play Again, Main Menu
 
 ### 13.5 Main Menu
-- [ ] Create simple main menu
-- [ ] Start Game button
+- [x] Create simple main menu
+- [x] Start Game button
 - [ ] (Optional) Settings button
 - [ ] (Optional) Credits
 
@@ -651,32 +651,32 @@ This document breaks down implementation into phases and granular tasks. Each ta
 ## Phase 17: Balance & Tuning (Days 23-25)
 
 ### 17.1 Economy Tuning
-- [ ] Playtest: Is energy scarce enough?
-- [ ] Playtest: Is attention constraining early game?
-- [ ] Playtest: Does habituation feel rewarding?
-- [ ] Adjust values in config
+- [x] Playtest: Is energy scarce enough?
+- [x] Playtest: Is attention constraining early game?
+- [x] Playtest: Does habituation feel rewarding?
+- [x] Adjust values in config
 
 ### 17.2 Building Tuning
-- [ ] Are processors balanced? (time, input/output ratios)
-- [ ] Are generators too fast/slow?
-- [ ] Are global effects impactful?
-- [ ] Adjust building definitions
+- [x] Are processors balanced? (time, input/output ratios)
+- [x] Are generators too fast/slow?
+- [x] Are global effects impactful?
+- [x] Adjust building definitions
 
 ### 17.3 Event Tuning
-- [ ] Are inciting incidents overwhelming or too easy?
-- [ ] Is event timing good?
-- [ ] Are rewards satisfying?
-- [ ] Adjust event definitions
+- [x] Are inciting incidents overwhelming or too easy?
+- [x] Is event timing good?
+- [x] Are rewards satisfying?
+- [x] Adjust event definitions
 
 ### 17.4 Wellbeing Tuning
-- [ ] Does wellbeing respond to actions appropriately?
-- [ ] Are ending thresholds reasonable?
-- [ ] Adjust formula weights
+- [x] Does wellbeing respond to actions appropriately?
+- [x] Are ending thresholds reasonable?
+- [x] Adjust formula weights
 
 ### 17.5 Pacing
-- [ ] Is day length comfortable?
-- [ ] Is night phase useful or just waiting?
-- [ ] Total run length feel right?
+- [x] Is day length comfortable?
+- [x] Is night phase useful or just waiting?
+- [x] Total run length feel right?
 
 ---
 
@@ -792,11 +792,11 @@ var surviving_threshold: int = 20
 - [ ] Phase 10: Events System
 - [ ] Phase 11: Adjacency System
 - [ ] Phase 12: UI Polish
-- [ ] Phase 13: Game Flow
+- [x] Phase 13: Game Flow
 - [ ] Phase 14: Content Population
 - [ ] Phase 15: Visual Polish
 - [ ] Phase 16: Audio
-- [ ] Phase 17: Balance & Tuning
+- [x] Phase 17: Balance & Tuning
 - [ ] Phase 18: Testing & Bug Fixing
 - [ ] Phase 19: Documentation & Polish
 

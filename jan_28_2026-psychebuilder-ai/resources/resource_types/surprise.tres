@@ -4,11 +4,11 @@
 
 [resource]
 script = ExtResource("1_script")
-id = "calm"
-display_name = "Calm"
-description = "A peaceful state that enables clear thinking and positive processes."
-color = Color(0.5, 0.85, 0.75, 1)
-tags = ["emotion.neutral", "persistent"]
-decay_rate = 0.05
-stack_size = 20
+id = "surprise"
+display_name = "Surprise"
+description = "A sudden jolt of the unexpected. Can become joy or anxiety."
+color = Color(0.95, 0.8, 0.55, 1)
+tags = ["emotion.neutral", "transient"]
+decay_rate = 0.1
+stack_size = 8
 spawn_amount = 1

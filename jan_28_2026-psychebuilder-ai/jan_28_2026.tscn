@@ -3,6 +3,37 @@
 [ext_resource type="Script" uid="uid://yka2ynw1ww7e" path="res://jan_28_2026-psychebuilder-ai/jan_28_2026.gd" id="1_script"]
 [ext_resource type="Script" uid="uid://cbhf3jd20hhij" path="res://jan_28_2026-psychebuilder-ai/game_world.gd" id="2_c28ry"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.12, 0.1, 0.18, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.25, 0.4, 0.5)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wellbeing_bg"]
+bg_color = Color(0.15, 0.12, 0.22, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.2, 0.35, 0.6)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wellbeing_fill"]
+bg_color = Color(0.45, 0.85, 0.55, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
 [node name="PsycheBuilder" type="Control" unique_id=173724855]
 layout_mode = 3
 anchors_preset = 15
@@ -21,7 +52,7 @@ script = ExtResource("2_c28ry")
 offset_right = 3200.0
 offset_bottom = 3200.0
 mouse_filter = 2
-color = Color(0.15, 0.12, 0.18, 1)
+color = Color(0.14, 0.11, 0.2, 1)
 
 [node name="GridOverlay" type="Node2D" parent="GameWorld" unique_id=633751731]
 unique_name_in_owner = true
@@ -51,91 +82,249 @@ zoom = Vector2(0.5, 0.5)
 unique_name_in_owner = true
 layer = 10
 
-[node name="InfoPanel" type="PanelContainer" parent="UILayer" unique_id=1915629706]
-unique_name_in_owner = true
-offset_left = 10.0
-offset_top = 10.0
-offset_right = 200.0
-offset_bottom = 150.0
+[node name="TopBar" type="HBoxContainer" parent="UILayer"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 50.0
+grow_horizontal = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UILayer/InfoPanel" unique_id=152532775]
+[node name="LeftSpacer" type="Control" parent="UILayer/TopBar"]
 layout_mode = 2
+size_flags_horizontal = 3
 
-[node name="EnergyLabel" type="Label" parent="UILayer/InfoPanel/VBoxContainer" unique_id=251109357]
-unique_name_in_owner = true
+[node name="TimeControlsPanel" type="PanelContainer" parent="UILayer/TopBar"]
 layout_mode = 2
-text = "Energy: 10/20"
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="AttentionLabel" type="Label" parent="UILayer/InfoPanel/VBoxContainer" unique_id=750683920]
-unique_name_in_owner = true
+[node name="TimeControls" type="HBoxContainer" parent="UILayer/TopBar/TimeControlsPanel"]
 layout_mode = 2
-text = "Attention: 0/10"
+theme_override_constants/separation = 8
 
-[node name="DayLabel" type="Label" parent="UILayer/InfoPanel/VBoxContainer" unique_id=370669622]
+[node name="DayLabel" type="Label" parent="UILayer/TopBar/TimeControlsPanel/TimeControls"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Day 1"
+horizontal_alignment = 1
 
-[node name="WellbeingLabel" type="Label" parent="UILayer/InfoPanel/VBoxContainer" unique_id=323671591]
-unique_name_in_owner = true
+[node name="VSeparator" type="VSeparator" parent="UILayer/TopBar/TimeControlsPanel/TimeControls"]
 layout_mode = 2
-text = "Wellbeing: 35"
 
-[node name="Instructions" type="Label" parent="UILayer/InfoPanel/VBoxContainer" unique_id=1118386645]
+[node name="PhaseLabel" type="Label" parent="UILayer/TopBar/TimeControlsPanel/TimeControls"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "Click building to select
-Click grid to place
-Right-click to cancel"
+text = "Day Phase"
+horizontal_alignment = 1
 
-[node name="TimeControls" type="HBoxContainer" parent="UILayer" unique_id=1232977541]
+[node name="TimeLabel" type="Label" parent="UILayer/TopBar/TimeControlsPanel/TimeControls"]
 unique_name_in_owner = true
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -120.0
-offset_right = 120.0
-offset_bottom = 40.0
-grow_horizontal = 2
-scale = Vector2(1.25, 1.25)
-
-[node name="PhaseLabel" type="Label" parent="UILayer/TimeControls" unique_id=2015298302]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 0)
-layout_mode = 2
-text = "Day 1 - Day Phase"
-
-[node name="TimeLabel" type="Label" parent="UILayer/TimeControls" unique_id=1337836467]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(70, 0)
+custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "6:00 AM"
 horizontal_alignment = 1
 
-[node name="Speed1xBtn" type="Button" parent="UILayer/TimeControls" unique_id=1341145926]
+[node name="VSeparator2" type="VSeparator" parent="UILayer/TopBar/TimeControlsPanel/TimeControls"]
+layout_mode = 2
+
+[node name="Speed1xBtn" type="Button" parent="UILayer/TopBar/TimeControlsPanel/TimeControls"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "1x"
 
-[node name="Speed2xBtn" type="Button" parent="UILayer/TimeControls" unique_id=1880252205]
+[node name="Speed2xBtn" type="Button" parent="UILayer/TopBar/TimeControlsPanel/TimeControls"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "2x"
 
-[node name="Speed3xBtn" type="Button" parent="UILayer/TimeControls" unique_id=2078874847]
+[node name="Speed3xBtn" type="Button" parent="UILayer/TopBar/TimeControlsPanel/TimeControls"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "3x"
 
-[node name="EndNightBtn" type="Button" parent="UILayer/TimeControls" unique_id=1696295681]
+[node name="EndNightBtn" type="Button" parent="UILayer/TopBar/TimeControlsPanel/TimeControls"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 text = "End Night"
 
-[node name="BuildingToolbar" type="FlowContainer" parent="UILayer" unique_id=1292038311]
+[node name="RightSpacer" type="Control" parent="UILayer/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LeftPanel" type="PanelContainer" parent="UILayer"]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 60.0
+offset_right = 190.0
+offset_bottom = -70.0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="UILayer/LeftPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UILayer/LeftPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="EnergyLabel" type="Label" parent="UILayer/LeftPanel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
+layout_mode = 2
+text = "Energy: 10/20"
+
+[node name="AttentionLabel" type="Label" parent="UILayer/LeftPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Attention: 0/10"
+
+[node name="WellbeingLabel" type="Label" parent="UILayer/LeftPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Wellbeing: 35"
+
+[node name="HSeparator" type="HSeparator" parent="UILayer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ResourcesHeader" type="Label" parent="UILayer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Resources"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="UILayer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ResourceList" type="VBoxContainer" parent="UILayer/LeftPanel/MarginContainer/VBoxContainer/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="HSeparator2" type="HSeparator" parent="UILayer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Instructions" type="Label" parent="UILayer/LeftPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Click building to select
+Click grid to place
+Right-click to cancel"
+autowrap_mode = 2
+
+[node name="RightPanel" type="PanelContainer" parent="UILayer"]
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -210.0
+offset_top = 60.0
+offset_right = -10.0
+offset_bottom = -70.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="UILayer/RightPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UILayer/RightPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="WellbeingHeader" type="Label" parent="UILayer/RightPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Wellbeing"
+horizontal_alignment = 1
+
+[node name="WellbeingValue" type="Label" parent="UILayer/RightPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "35"
+horizontal_alignment = 1
+
+[node name="WellbeingBar" type="ProgressBar" parent="UILayer/RightPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_wellbeing_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_wellbeing_fill")
+max_value = 100.0
+value = 35.0
+show_percentage = false
+
+[node name="HSeparator" type="HSeparator" parent="UILayer/RightPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="BuildingInfoPanel" type="VBoxContainer" parent="UILayer/RightPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="BuildingNameLabel" type="Label" parent="UILayer/RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Building Name"
+
+[node name="BuildingDescLabel" type="Label" parent="UILayer/RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Building description goes here"
+autowrap_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="UILayer/RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
+layout_mode = 2
+
+[node name="BuildingStatusLabel" type="Label" parent="UILayer/RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Status: Idle"
+
+[node name="StorageContainer" type="VBoxContainer" parent="UILayer/RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="WorkersContainer" type="VBoxContainer" parent="UILayer/RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="UILayer/RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AssignWorkerBtn" type="Button" parent="UILayer/RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel/ButtonsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Assign"
+
+[node name="RemoveBuildingBtn" type="Button" parent="UILayer/RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel/ButtonsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Remove"
+
+[node name="BottomToolbar" type="PanelContainer" parent="UILayer"]
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
@@ -145,10 +334,48 @@ offset_top = -60.0
 offset_right = -10.0
 offset_bottom = -10.0
 grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="Background" type="ColorRect" parent="UILayer/BuildingToolbar" unique_id=932989299]
-show_behind_parent = true
+[node name="MarginContainer" type="MarginContainer" parent="UILayer/BottomToolbar"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="ScrollContainer" type="ScrollContainer" parent="UILayer/BottomToolbar/MarginContainer"]
+layout_mode = 2
+vertical_scroll_mode = 0
+
+[node name="BuildingToolbar" type="HBoxContainer" parent="UILayer/BottomToolbar/MarginContainer/ScrollContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ToastContainer" type="VBoxContainer" parent="UILayer"]
+unique_name_in_owner = true
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = 60.0
+offset_right = 150.0
+offset_bottom = 200.0
+grow_horizontal = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="WellbeingEffectsLayer" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
+layer = 5
+
+[node name="EffectsRect" type="ColorRect" parent="WellbeingEffectsLayer"]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
-color = Color(0.1, 0.1, 0.15, 0.9)
+color = Color(1, 1, 1, 0)

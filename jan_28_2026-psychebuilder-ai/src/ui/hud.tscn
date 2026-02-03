@@ -1,0 +1,308 @@
+[gd_scene format=3 uid="uid://d4hud7scene001"]
+
+[ext_resource type="Script" uid="uid://hud7script001" path="res://jan_28_2026-psychebuilder-ai/src/ui/hud.gd" id="1_hud"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.1, 0.1, 0.15, 0.9)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wellbeing_bg"]
+bg_color = Color(0.15, 0.15, 0.2, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wellbeing_fill"]
+bg_color = Color(0.3, 0.9, 0.3, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="HUD" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_hud")
+
+[node name="TopBar" type="HBoxContainer" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 50.0
+grow_horizontal = 2
+
+[node name="LeftSpacer" type="Control" parent="TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TimeControlsPanel" type="PanelContainer" parent="TopBar"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="TimeControls" type="HBoxContainer" parent="TopBar/TimeControlsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DayLabel" type="Label" parent="TopBar/TimeControlsPanel/TimeControls"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Day 1"
+horizontal_alignment = 1
+
+[node name="VSeparator" type="VSeparator" parent="TopBar/TimeControlsPanel/TimeControls"]
+layout_mode = 2
+
+[node name="PhaseLabel" type="Label" parent="TopBar/TimeControlsPanel/TimeControls"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Day Phase"
+horizontal_alignment = 1
+
+[node name="TimeLabel" type="Label" parent="TopBar/TimeControlsPanel/TimeControls"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "6:00 AM"
+horizontal_alignment = 1
+
+[node name="VSeparator2" type="VSeparator" parent="TopBar/TimeControlsPanel/TimeControls"]
+layout_mode = 2
+
+[node name="Speed1xBtn" type="Button" parent="TopBar/TimeControlsPanel/TimeControls"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "1x"
+
+[node name="Speed2xBtn" type="Button" parent="TopBar/TimeControlsPanel/TimeControls"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "2x"
+
+[node name="Speed3xBtn" type="Button" parent="TopBar/TimeControlsPanel/TimeControls"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "3x"
+
+[node name="EndNightBtn" type="Button" parent="TopBar/TimeControlsPanel/TimeControls"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "End Night"
+
+[node name="RightSpacer" type="Control" parent="TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LeftPanel" type="PanelContainer" parent="."]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 60.0
+offset_right = 190.0
+offset_bottom = -70.0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="LeftPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LeftPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="EnergyLabel" type="Label" parent="LeftPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Energy: 10/20"
+
+[node name="AttentionLabel" type="Label" parent="LeftPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Attention: 0/10"
+
+[node name="HSeparator" type="HSeparator" parent="LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ResourcesHeader" type="Label" parent="LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Resources"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ResourceList" type="VBoxContainer" parent="LeftPanel/MarginContainer/VBoxContainer/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="HSeparator2" type="HSeparator" parent="LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="InstructionsLabel" type="Label" parent="LeftPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Click building to select
+Click grid to place
+Right-click to cancel"
+autowrap_mode = 2
+
+[node name="RightPanel" type="PanelContainer" parent="."]
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -210.0
+offset_top = 60.0
+offset_right = -10.0
+offset_bottom = -70.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="RightPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="RightPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="WellbeingHeader" type="Label" parent="RightPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Wellbeing"
+horizontal_alignment = 1
+
+[node name="WellbeingValue" type="Label" parent="RightPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "35"
+horizontal_alignment = 1
+
+[node name="WellbeingBar" type="ProgressBar" parent="RightPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_wellbeing_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_wellbeing_fill")
+max_value = 100.0
+value = 35.0
+show_percentage = false
+
+[node name="HSeparator" type="HSeparator" parent="RightPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="BuildingInfoPanel" type="VBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="BuildingNameLabel" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Building Name"
+
+[node name="BuildingDescLabel" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Building description goes here"
+autowrap_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
+layout_mode = 2
+
+[node name="BuildingStatusLabel" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Status: Idle"
+
+[node name="StorageContainer" type="VBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="WorkersContainer" type="VBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AssignWorkerBtn" type="Button" parent="RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel/ButtonsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Assign"
+
+[node name="RemoveBuildingBtn" type="Button" parent="RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel/ButtonsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Remove"
+
+[node name="BottomToolbar" type="PanelContainer" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -60.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="BottomToolbar"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="ScrollContainer" type="ScrollContainer" parent="BottomToolbar/MarginContainer"]
+layout_mode = 2
+vertical_scroll_mode = 0
+
+[node name="BuildingToolbar" type="HBoxContainer" parent="BottomToolbar/MarginContainer/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ToastContainer" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = 60.0
+offset_right = 150.0
+offset_bottom = 200.0
+grow_horizontal = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[connection signal="pressed" from="RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel/ButtonsContainer/AssignWorkerBtn" to="." method="_on_assign_worker_pressed"]
+[connection signal="pressed" from="RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel/ButtonsContainer/RemoveBuildingBtn" to="." method="_on_remove_building_pressed"]

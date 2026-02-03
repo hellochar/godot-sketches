@@ -12,6 +12,8 @@ signal building_placed(building: Node, coord: Vector2i)
 signal building_removed(building: Node, coord: Vector2i)
 signal building_activated(building: Node)
 signal building_deactivated(building: Node)
+signal building_unlocked(building_id: String)
+signal building_discovered(building_id: String)
 
 # Worker signals
 signal worker_assigned(worker: Node, job_type: String, target: Node)
@@ -117,3 +119,7 @@ signal sync_chain_triggered(emotion_type: String, buildings: Array, bonus_level:
 signal sync_chain_insight(emotion_type: String, amount: int)
 signal legacy_status_achieved(building: Node)
 signal legacy_bonus_applied(building: Node, bonus_type: String)
+
+signal adjacency_synergy_formed(building: Node, neighbor: Node, effect: Dictionary)
+signal adjacency_conflict_formed(building: Node, neighbor: Node, effect: Dictionary)
+signal adjacency_changed(building: Node)

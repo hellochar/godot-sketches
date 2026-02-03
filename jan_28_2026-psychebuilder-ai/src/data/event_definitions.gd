@@ -21,8 +21,8 @@ static var definitions: Dictionary = {
     "type": EventType.MINOR_POSITIVE,
     "description": "Sometimes the sun just shines a little brighter. A burst of good feeling washes over you.",
     "spawns": [
-      {"resource": "joy", "amount": 3, "location": "random"},
-      {"resource": "calm", "amount": 2, "location": "random"}
+      {"resource": "joy", "amount": 4, "location": "random"},
+      {"resource": "calm", "amount": 3, "location": "random"}
     ],
     "choices": [],
     "completion_condition": "",
@@ -60,24 +60,24 @@ static var definitions: Dictionary = {
     "type": EventType.INCITING_INCIDENT,
     "description": "Something you cared about deeply has ended. A relationship, a job, a dream. The loss hits hard.",
     "spawns": [
-      {"resource": "grief", "amount": 15, "location": "center"},
-      {"resource": "shame", "amount": 8, "location": "center"},
-      {"resource": "anger", "amount": 5, "location": "random"}
+      {"resource": "grief", "amount": 12, "location": "center"},
+      {"resource": "shame", "amount": 6, "location": "center"},
+      {"resource": "anger", "amount": 4, "location": "random"}
     ],
     "choices": [
       {
         "text": "Sit with the feelings",
-        "effect": {"spawns": [{"resource": "calm", "amount": 3, "location": "center"}]}
+        "effect": {"spawns": [{"resource": "calm", "amount": 4, "location": "center"}]}
       },
       {
         "text": "Push through",
-        "effect": {"energy_cost": 5, "spawns": [{"resource": "tension", "amount": 5, "location": "random"}]}
+        "effect": {"energy_cost": 4, "spawns": [{"resource": "tension", "amount": 4, "location": "random"}]}
       }
     ],
-    "completion_condition": "grief < 3 and shame < 2",
+    "completion_condition": "grief < 5 and shame < 3",
     "completion_reward": {
       "unlock_building": "resilience_monument",
-      "spawn": {"resource": "wisdom", "amount": 5, "location": "center"}
+      "spawn": {"resource": "wisdom", "amount": 7, "location": "center"}
     }
   },
 
@@ -88,23 +88,23 @@ static var definitions: Dictionary = {
     "type": EventType.INCITING_INCIDENT,
     "description": "Someone or something precious is gone. The weight of absence settles in.",
     "spawns": [
-      {"resource": "grief", "amount": 20, "location": "center"},
-      {"resource": "loneliness", "amount": 10, "location": "center"},
-      {"resource": "nostalgia", "amount": 8, "location": "random"}
+      {"resource": "grief", "amount": 15, "location": "center"},
+      {"resource": "loneliness", "amount": 8, "location": "center"},
+      {"resource": "nostalgia", "amount": 6, "location": "random"}
     ],
     "choices": [
       {
         "text": "Honor what was",
-        "effect": {"spawns": [{"resource": "wisdom", "amount": 2, "location": "center"}]}
+        "effect": {"spawns": [{"resource": "wisdom", "amount": 3, "location": "center"}]}
       },
       {
         "text": "Distract yourself",
-        "effect": {"energy_cost": 3, "spawns": [{"resource": "anxiety", "amount": 4, "location": "random"}]}
+        "effect": {"energy_cost": 3, "spawns": [{"resource": "anxiety", "amount": 3, "location": "random"}]}
       }
     ],
-    "completion_condition": "grief < 5 and loneliness < 3",
+    "completion_condition": "grief < 6 and loneliness < 4",
     "completion_reward": {
-      "spawn": {"resource": "wisdom", "amount": 8, "location": "center"}
+      "spawn": {"resource": "wisdom", "amount": 10, "location": "center"}
     }
   },
 
@@ -115,23 +115,23 @@ static var definitions: Dictionary = {
     "type": EventType.INCITING_INCIDENT,
     "description": "You tried your best and it wasn't enough. Self-doubt creeps in.",
     "spawns": [
-      {"resource": "shame", "amount": 12, "location": "center"},
-      {"resource": "doubt", "amount": 10, "location": "center"},
-      {"resource": "fear", "amount": 6, "location": "random"}
+      {"resource": "shame", "amount": 10, "location": "center"},
+      {"resource": "doubt", "amount": 8, "location": "center"},
+      {"resource": "fear", "amount": 5, "location": "random"}
     ],
     "choices": [
       {
         "text": "Learn from this",
-        "effect": {"spawns": [{"resource": "insight", "amount": 2, "location": "center"}]}
+        "effect": {"spawns": [{"resource": "insight", "amount": 3, "location": "center"}]}
       },
       {
         "text": "Blame circumstances",
-        "effect": {"spawns": [{"resource": "anger", "amount": 3, "location": "random"}]}
+        "effect": {"spawns": [{"resource": "anger", "amount": 2, "location": "random"}]}
       }
     ],
-    "completion_condition": "shame < 3 and doubt < 3",
+    "completion_condition": "shame < 4 and doubt < 4",
     "completion_reward": {
-      "spawn": {"resource": "confidence", "amount": 5, "location": "center"}
+      "spawn": {"resource": "confidence", "amount": 6, "location": "center"}
     }
   },
 
@@ -142,23 +142,23 @@ static var definitions: Dictionary = {
     "type": EventType.INCITING_INCIDENT,
     "description": "Everything is too much. The demands pile up faster than you can manage.",
     "spawns": [
-      {"resource": "anxiety", "amount": 15, "location": "center"},
-      {"resource": "tension", "amount": 12, "location": "center"},
-      {"resource": "fatigue", "amount": 8, "location": "random"}
+      {"resource": "anxiety", "amount": 12, "location": "center"},
+      {"resource": "tension", "amount": 10, "location": "center"},
+      {"resource": "fatigue", "amount": 6, "location": "random"}
     ],
     "choices": [
       {
         "text": "Take a breath",
-        "effect": {"spawns": [{"resource": "calm", "amount": 4, "location": "center"}]}
+        "effect": {"spawns": [{"resource": "calm", "amount": 5, "location": "center"}]}
       },
       {
         "text": "Power through",
-        "effect": {"energy_cost": 4, "spawns": [{"resource": "tension", "amount": 6, "location": "random"}]}
+        "effect": {"energy_cost": 3, "spawns": [{"resource": "tension", "amount": 5, "location": "random"}]}
       }
     ],
-    "completion_condition": "anxiety < 5 and tension < 4",
+    "completion_condition": "anxiety < 6 and tension < 5",
     "completion_reward": {
-      "spawn": {"resource": "calm", "amount": 8, "location": "center"}
+      "spawn": {"resource": "calm", "amount": 10, "location": "center"}
     }
   },
 
@@ -169,23 +169,23 @@ static var definitions: Dictionary = {
     "type": EventType.INCITING_INCIDENT,
     "description": "Trust has been broken. Someone you relied on has let you down deeply.",
     "spawns": [
-      {"resource": "anger", "amount": 12, "location": "center"},
-      {"resource": "grief", "amount": 8, "location": "center"},
-      {"resource": "doubt", "amount": 6, "location": "random"}
+      {"resource": "anger", "amount": 10, "location": "center"},
+      {"resource": "grief", "amount": 6, "location": "center"},
+      {"resource": "doubt", "amount": 5, "location": "random"}
     ],
     "choices": [
       {
         "text": "Feel the anger fully",
-        "effect": {"spawns": [{"resource": "tension", "amount": 3, "location": "center"}]}
+        "effect": {"spawns": [{"resource": "tension", "amount": 2, "location": "center"}]}
       },
       {
         "text": "Seek understanding",
-        "effect": {"spawns": [{"resource": "insight", "amount": 2, "location": "center"}]}
+        "effect": {"spawns": [{"resource": "insight", "amount": 3, "location": "center"}]}
       }
     ],
-    "completion_condition": "anger < 4 and grief < 3",
+    "completion_condition": "anger < 5 and grief < 4",
     "completion_reward": {
-      "spawn": {"resource": "wisdom", "amount": 6, "location": "center"}
+      "spawn": {"resource": "wisdom", "amount": 8, "location": "center"}
     }
   },
 
@@ -196,23 +196,23 @@ static var definitions: Dictionary = {
     "type": EventType.INCITING_INCIDENT,
     "description": "Something new is beginning. It's exciting and terrifying in equal measure.",
     "spawns": [
-      {"resource": "excitement", "amount": 10, "location": "center"},
-      {"resource": "fear", "amount": 8, "location": "center"},
-      {"resource": "hope", "amount": 6, "location": "random"}
+      {"resource": "excitement", "amount": 8, "location": "center"},
+      {"resource": "fear", "amount": 6, "location": "center"},
+      {"resource": "hope", "amount": 5, "location": "random"}
     ],
     "choices": [
       {
         "text": "Embrace the unknown",
-        "effect": {"spawns": [{"resource": "courage", "amount": 3, "location": "center"}]}
+        "effect": {"spawns": [{"resource": "courage", "amount": 4, "location": "center"}]}
       },
       {
         "text": "Hold onto the familiar",
-        "effect": {"spawns": [{"resource": "nostalgia", "amount": 4, "location": "random"}]}
+        "effect": {"spawns": [{"resource": "nostalgia", "amount": 3, "location": "random"}]}
       }
     ],
-    "completion_condition": "fear < 3",
+    "completion_condition": "fear < 4",
     "completion_reward": {
-      "spawn": {"resource": "joy", "amount": 6, "location": "center"}
+      "spawn": {"resource": "joy", "amount": 8, "location": "center"}
     }
   },
 
@@ -239,7 +239,7 @@ static var definitions: Dictionary = {
     "type": EventType.MINOR_POSITIVE,
     "description": "A small delight catches you by surprise. A favorite song, a kind word, a beautiful moment.",
     "spawns": [
-      {"resource": "joy", "amount": 5, "location": "random"}
+      {"resource": "joy", "amount": 6, "location": "random"}
     ],
     "choices": [],
     "completion_condition": "",
@@ -321,6 +321,99 @@ static var definitions: Dictionary = {
         "effect": {"spawns": [{"resource": "tension", "amount": 2, "location": "random"}]}
       }
     ],
+    "completion_condition": "",
+    "completion_reward": {}
+  },
+
+  "quiet_moment": {
+    "id": "quiet_moment",
+    "name": "Quiet Moment",
+    "phase": EventPhase.ANY,
+    "type": EventType.MINOR_POSITIVE,
+    "description": "A brief pause in the chaos. The world feels still.",
+    "spawns": [
+      {"resource": "calm", "amount": 4, "location": "center"},
+      {"resource": "contentment", "amount": 2, "location": "random"}
+    ],
+    "choices": [],
+    "completion_condition": "",
+    "completion_reward": {}
+  },
+
+  "self_criticism": {
+    "id": "self_criticism",
+    "name": "Self-Criticism",
+    "phase": EventPhase.ANY,
+    "type": EventType.MINOR_NEGATIVE,
+    "description": "The inner critic speaks up, finding fault where none exists.",
+    "spawns": [
+      {"resource": "doubt", "amount": 4, "location": "center"},
+      {"resource": "shame", "amount": 2, "location": "random"}
+    ],
+    "choices": [
+      {
+        "text": "Challenge the thoughts",
+        "effect": {"spawns": [{"resource": "insight", "amount": 1, "location": "center"}], "energy_cost": 2}
+      },
+      {
+        "text": "Accept the criticism",
+        "effect": {"spawns": [{"resource": "tension", "amount": 2, "location": "random"}]}
+      }
+    ],
+    "completion_condition": "",
+    "completion_reward": {}
+  },
+
+  "moment_of_gratitude": {
+    "id": "moment_of_gratitude",
+    "name": "Moment of Gratitude",
+    "phase": EventPhase.ANY,
+    "type": EventType.MINOR_POSITIVE,
+    "description": "Something reminds you of all you have to be thankful for.",
+    "spawns": [
+      {"resource": "gratitude", "amount": 3, "location": "center"},
+      {"resource": "joy", "amount": 2, "location": "random"}
+    ],
+    "choices": [],
+    "completion_condition": "",
+    "completion_reward": {}
+  },
+
+  "restless_night": {
+    "id": "restless_night",
+    "name": "Restless Night",
+    "phase": EventPhase.ANY,
+    "type": EventType.MINOR_NEGATIVE,
+    "description": "Sleep wouldn't come. The mind raced with thoughts.",
+    "spawns": [
+      {"resource": "fatigue", "amount": 3, "location": "center"},
+      {"resource": "restlessness", "amount": 3, "location": "random"}
+    ],
+    "choices": [
+      {
+        "text": "Use the time to reflect",
+        "effect": {"spawns": [{"resource": "insight", "amount": 1, "location": "center"}]}
+      },
+      {
+        "text": "Just push through",
+        "effect": {"spawns": [{"resource": "tension", "amount": 2, "location": "random"}]}
+      }
+    ],
+    "completion_condition": "",
+    "completion_reward": {}
+  },
+
+  "small_victory": {
+    "id": "small_victory",
+    "name": "Small Victory",
+    "phase": EventPhase.ANY,
+    "type": EventType.MINOR_POSITIVE,
+    "description": "Something went right today. A task completed, a problem solved.",
+    "spawns": [
+      {"resource": "pride", "amount": 3, "location": "center"},
+      {"resource": "confidence", "amount": 2, "location": "random"}
+    ],
+    "choices": [],
     "completion_condition": "",
     "completion_reward": {}
   }

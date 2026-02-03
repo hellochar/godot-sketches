@@ -2,6 +2,7 @@ extends Node2D
 
 const GridSystemScript = preload("res://jan_28_2026-psychebuilder-ai/src/systems/grid_system.gd")
 const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
+const BackgroundShader = preload("res://jan_28_2026-psychebuilder-ai/src/shaders/mindspace_background.gdshader")
 
 @onready var config: Node = get_node("/root/Config")
 
@@ -16,13 +17,13 @@ var hover_coord: Vector2i = Vector2i(-1, -1)
 
 @export_group("Grid Overlay")
 @export var show_grid_lines: bool = true
-@export var grid_line_color: Color = Color(0.25, 0.22, 0.3, 0.5)
+@export var grid_line_color: Color = Color(0.3, 0.25, 0.4, 0.35)
 @export var grid_line_width: float = 1.0
 
 @export_group("Hover Indicator")
-@export var hover_valid_color: Color = Color(0.3, 1, 0.3, 0.4)
-@export var hover_invalid_color: Color = Color(1, 0.3, 0.3, 0.4)
-@export var hover_selected_color: Color = Color(0.5, 0.5, 1, 0.4)
+@export var hover_valid_color: Color = Color(0.4, 0.9, 0.5, 0.4)
+@export var hover_invalid_color: Color = Color(0.9, 0.35, 0.35, 0.4)
+@export var hover_selected_color: Color = Color(0.6, 0.5, 0.9, 0.4)
 
 @onready var camera: Camera2D = %Camera
 @onready var grid_overlay: Node2D = %GridOverlay
@@ -53,6 +54,15 @@ var aura_overlay: Node2D = null
 @export var aura_line_width: float = 2.0
 @export var aura_arc_points: int = 32
 
+@export_group("Day/Night Visuals")
+@export var day_brightness: float = 1.0
+@export var night_brightness: float = 0.6
+@export var background_top_color: Color = Color(0.12, 0.1, 0.18, 1.0)
+@export var background_bottom_color: Color = Color(0.18, 0.15, 0.25, 1.0)
+@export var background_accent_color: Color = Color(0.25, 0.2, 0.35, 1.0)
+
+var background_material: ShaderMaterial
+
 func setup(p_grid_size: Vector2i, p_tile_size: int) -> void:
   grid = GridSystemScript.new()
   grid.setup(p_grid_size, p_tile_size)
@@ -76,6 +86,19 @@ func _create_placement_reason_label() -> void:
 func _setup_background() -> void:
   var world_size = Vector2(grid.grid_size) * grid.tile_size
   background.size = world_size
+  background_material = ShaderMaterial.new()
+  background_material.shader = BackgroundShader
+  background_material.set_shader_parameter("top_color", background_top_color)
+  background_material.set_shader_parameter("bottom_color", background_bottom_color)
+  background_material.set_shader_parameter("accent_color", background_accent_color)
+  background_material.set_shader_parameter("day_brightness", day_brightness)
+  background_material.set_shader_parameter("night_brightness", night_brightness)
+  background_material.set_shader_parameter("time_of_day", 1.0)
+  background.material = background_material
+
+func set_time_of_day(progress: float) -> void:
+  if background_material:
+    background_material.set_shader_parameter("time_of_day", progress)
 
 func _draw_grid_lines() -> void:
   if not show_grid_lines:
@@ -290,6 +313,66 @@ func _draw() -> void:
   if has_wisdom:
     var wisdom_radius = (config.wisdom_aura_radius + 0.5) * tile_size
     _draw_aura_circle(building_center, wisdom_radius, aura_wisdom_color)
+
+  _draw_adjacency_lines(building, building_center)
+
+func _draw_adjacency_lines(building: Node, building_center: Vector2) -> void:
+  if not building.has_method("get_adjacency_descriptions"):
+    return
+
+  var adjacency_descriptions = building.get_adjacency_descriptions()
+  if adjacency_descriptions.is_empty():
+    return
+
+  var adjacent_neighbors = building.adjacent_neighbors if "adjacent_neighbors" in building else []
+
+  for neighbor in adjacent_neighbors:
+    if not is_instance_valid(neighbor):
+      continue
+
+    var neighbor_id = neighbor.building_id if "building_id" in neighbor else ""
+    if neighbor_id == "":
+      continue
+
+    var neighbor_center = _get_building_center(neighbor)
+    var effect_type = -1
+    var description = ""
+
+    for desc in adjacency_descriptions:
+      if desc["neighbor"] == neighbor_id:
+        effect_type = desc["type"]
+        description = desc["description"]
+        break
+
+    if effect_type == -1:
+      continue
+
+    var line_color: Color
+    match effect_type:
+      0:
+        line_color = config.adjacency_synergy_color
+      1:
+        line_color = config.adjacency_conflict_color
+      _:
+        line_color = config.adjacency_neutral_color
+
+    draw_line(building_center, neighbor_center, line_color, config.adjacency_line_width)
+
+    var mid_point = (building_center + neighbor_center) * 0.5
+    if effect_type == 0:
+      _draw_synergy_icon(mid_point, line_color)
+    elif effect_type == 1:
+      _draw_conflict_icon(mid_point, line_color)
+
+func _draw_synergy_icon(pos: Vector2, color: Color) -> void:
+  var icon_size = 8.0
+  draw_line(pos + Vector2(-icon_size, 0), pos + Vector2(icon_size, 0), color, 2.0)
+  draw_line(pos + Vector2(0, -icon_size), pos + Vector2(0, icon_size), color, 2.0)
+
+func _draw_conflict_icon(pos: Vector2, color: Color) -> void:
+  var icon_size = 6.0
+  draw_line(pos + Vector2(-icon_size, -icon_size), pos + Vector2(icon_size, icon_size), color, 2.0)
+  draw_line(pos + Vector2(-icon_size, icon_size), pos + Vector2(icon_size, -icon_size), color, 2.0)
 
 func _get_building_center(building: Node) -> Vector2:
   var tile_size = config.tile_size

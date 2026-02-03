@@ -1,37 +1,62 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" uid="uid://go4lsvwmtafh" path="res://jan_28_2026-psychebuilder-ai/src/entities/building.gd" id="1_script"]
+[ext_resource type="Shader" path="res://jan_28_2026-psychebuilder-ai/src/shaders/building_visual.gdshader" id="2_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_building"]
+shader = ExtResource("2_shader")
+shader_parameter/corner_radius = 0.08
+shader_parameter/glow_size = 0.06
+shader_parameter/glow_intensity = 0.25
+shader_parameter/base_color = Color(0.5, 0.5, 0.6, 1)
+shader_parameter/pulse_speed = 2.0
+shader_parameter/pulse_intensity = 0.15
+shader_parameter/is_processing = 0.0
 
 [node name="Building" type="Node2D"]
 script = ExtResource("1_script")
 
+[node name="GlowRect" type="ColorRect" parent="."]
+unique_name_in_owner = true
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 68.0
+offset_bottom = 68.0
+mouse_filter = 2
+color = Color(1, 1, 1, 0.15)
+
 [node name="ColorRect" type="ColorRect" parent="."]
 unique_name_in_owner = true
+material = SubResource("ShaderMaterial_building")
 offset_right = 64.0
 offset_bottom = 64.0
+mouse_filter = 2
 color = Color(0.5, 0.5, 0.5, 1)
 
 [node name="Label" type="Label" parent="."]
 unique_name_in_owner = true
 offset_right = 64.0
 offset_bottom = 64.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="ProgressBar" type="ProgressBar" parent="."]
 unique_name_in_owner = true
-offset_top = -8.0
+offset_top = -10.0
 offset_right = 64.0
-offset_bottom = 0.0
+offset_bottom = -2.0
 value = 50.0
 show_percentage = false
 
 [node name="StatusIndicator" type="ColorRect" parent="."]
 unique_name_in_owner = true
-offset_left = -4.0
-offset_top = -4.0
-offset_right = 8.0
-offset_bottom = 8.0
+offset_left = -6.0
+offset_top = -6.0
+offset_right = 10.0
+offset_bottom = 10.0
 color = Color(0.5, 0.5, 0.5, 1)
 
 [node name="DisconnectedWarning" type="Label" parent="."]
@@ -41,8 +66,8 @@ offset_left = -2.0
 offset_top = -2.0
 offset_right = 18.0
 offset_bottom = 18.0
-theme_override_colors/font_color = Color(1, 0.2, 0.2, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.05, 0.1, 1)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 16
 text = "!"

@@ -1,6 +1,7 @@
 extends Node2D
 
 const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
+const AdjacencyRules = preload("res://jan_28_2026-psychebuilder-ai/src/data/adjacency_rules.gd")
 
 @onready var game_state: Node = get_node("/root/GameState")
 @onready var event_bus: Node = get_node("/root/EventBus")
@@ -163,10 +164,17 @@ var is_legacy: bool = false
 var legacy_timer: float = 0.0
 var legacy_qualifying: bool = false
 
+var adjacency_effects: Dictionary = {}
+var adjacency_efficiency_multiplier: float = 1.0
+var adjacency_output_bonus: int = 0
+var adjacency_transport_bonus: float = 0.0
+var adjacent_neighbors: Array[Node] = []
+
 @export_group("Visual")
 @export var disconnected_darken_factor: float = 0.4
 
 @onready var sprite: ColorRect = %ColorRect
+@onready var glow_rect: ColorRect = %GlowRect
 @onready var label: Label = %Label
 @onready var progress_bar: ProgressBar = %ProgressBar
 @onready var status_indicator: ColorRect = %StatusIndicator
@@ -175,6 +183,14 @@ var legacy_qualifying: bool = false
 func _ready() -> void:
   if definition:
     _update_visuals()
+  event_bus.building_placed.connect(_on_building_placed)
+  event_bus.building_removed.connect(_on_building_removed)
+
+func _exit_tree() -> void:
+  if event_bus.building_placed.is_connected(_on_building_placed):
+    event_bus.building_placed.disconnect(_on_building_placed)
+  if event_bus.building_removed.is_connected(_on_building_removed):
+    event_bus.building_removed.disconnect(_on_building_removed)
 
 func initialize(p_building_id: String, p_grid_coord: Vector2i, p_grid: Node = null) -> void:
   building_id = p_building_id
@@ -199,6 +215,13 @@ func _update_visuals() -> void:
 
   sprite.size = pixel_size
   _update_connection_visual()
+  _update_shader_material()
+
+  if glow_rect:
+    glow_rect.position = Vector2(-4, -4)
+    glow_rect.size = pixel_size + Vector2(8, 8)
+    var base_color = definition.get("color", Color.WHITE)
+    glow_rect.color = Color(base_color.r, base_color.g, base_color.b, 0.12)
 
   label.size = pixel_size
   label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -209,6 +232,14 @@ func _update_visuals() -> void:
   progress_bar.visible = false
 
   _update_status_visual()
+
+func _update_shader_material() -> void:
+  if not sprite.material:
+    return
+  var base_color = definition.get("color", Color.WHITE)
+  sprite.material.set_shader_parameter("base_color", base_color)
+  var is_proc = current_status == Status.PROCESSING or current_status == Status.GENERATING
+  sprite.material.set_shader_parameter("is_processing", 1.0 if is_proc else 0.0)
 
 func _update_connection() -> void:
   if not grid:
@@ -344,7 +375,8 @@ func _process_generation(delta: float) -> void:
   var harmony_multiplier = _get_harmony_speed_multiplier()
   var flow_multiplier = game_state.get_flow_state_multiplier()
   var wellbeing_modifier = game_state.get_wellbeing_generation_modifier(is_positive)
-  var effective_delta = delta * grief_multiplier * cascade_multiplier * weather_modifier * belief_modifier * awakening_multiplier * harmony_multiplier * flow_multiplier * wellbeing_modifier
+  var adjacency_multiplier = get_adjacency_efficiency_multiplier()
+  var effective_delta = delta * grief_multiplier * cascade_multiplier * weather_modifier * belief_modifier * awakening_multiplier * harmony_multiplier * flow_multiplier * wellbeing_modifier * adjacency_multiplier
 
   if resource_id == "anxiety":
     var suppression = _get_calm_aura_suppression()
@@ -394,7 +426,8 @@ func _process_processing(delta: float) -> void:
   var wellbeing_modifier = game_state.get_wellbeing_processing_modifier()
   var sync_chain_multiplier = _get_sync_chain_speed_multiplier()
   var legacy_multiplier = get_legacy_speed_multiplier()
-  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier * fatigue_multiplier * echo_multiplier * harmony_multiplier * flow_multiplier * purity_multiplier * attunement_multiplier * fragility_multiplier * stagnation_multiplier * mastery_multiplier * velocity_multiplier * wellbeing_modifier * sync_chain_multiplier * legacy_multiplier
+  var adjacency_multiplier = get_adjacency_efficiency_multiplier()
+  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier * fatigue_multiplier * echo_multiplier * harmony_multiplier * flow_multiplier * purity_multiplier * attunement_multiplier * fragility_multiplier * stagnation_multiplier * mastery_multiplier * velocity_multiplier * wellbeing_modifier * sync_chain_multiplier * legacy_multiplier * adjacency_multiplier
   if process_timer <= 0:
     _complete_processing()
 
@@ -461,7 +494,12 @@ func _complete_processing() -> void:
   var attunement_bonus = get_attunement_output_bonus()
   var mastery_bonus = get_mastery_output_bonus()
   var legacy_bonus = get_legacy_output_bonus()
-  var total_bonus = awakening_bonus + harmony_bonus + purity_bonus + attunement_bonus + mastery_bonus + legacy_bonus
+  var adjacency_bonus = get_adjacency_output_bonus()
+  var total_bonus = awakening_bonus + harmony_bonus + purity_bonus + attunement_bonus + mastery_bonus + legacy_bonus + adjacency_bonus
+
+  var spillover = get_adjacency_spillover()
+  for spillover_resource in spillover:
+    _output_resource(spillover_resource, spillover[spillover_resource])
 
   var synergy = try_attunement_synergy()
   if synergy.get("triggered", false):
@@ -680,6 +718,11 @@ func get_storage_purity(resource_id: String) -> float:
 
 func get_storage_amount(resource_id: String) -> int:
   return storage.get(resource_id, 0)
+
+func has_space_for(resource_id: String, amount: int) -> bool:
+  var effective_capacity = get_effective_storage_capacity()
+  var space = effective_capacity - _get_total_stored()
+  return space >= amount
 
 func assign_worker(worker: Node) -> void:
   assigned_worker = worker
@@ -2414,3 +2457,157 @@ func get_legacy_timer_progress() -> float:
   if not legacy_qualifying:
     return 0.0
   return legacy_timer / config.legacy_time_required
+
+func _on_building_placed(building: Node, _coord: Vector2i) -> void:
+  if building == self:
+    recalculate_adjacency()
+  elif _is_within_adjacency_radius(building):
+    recalculate_adjacency()
+
+func _on_building_removed(building: Node, _coord: Vector2i) -> void:
+  if building == self:
+    return
+  if building in adjacent_neighbors:
+    recalculate_adjacency()
+
+func _is_within_adjacency_radius(other: Node) -> bool:
+  if not other or not is_instance_valid(other):
+    return false
+  if not other.has_method("get_storage_amount"):
+    return false
+  var other_coord = other.grid_coord if other.has_method("get_storage_amount") else Vector2i(-999, -999)
+  var other_size = other.size if "size" in other else Vector2i(1, 1)
+  for x in range(size.x):
+    for y in range(size.y):
+      var my_cell = grid_coord + Vector2i(x, y)
+      for ox in range(other_size.x):
+        for oy in range(other_size.y):
+          var other_cell = other_coord + Vector2i(ox, oy)
+          var dist = absi(my_cell.x - other_cell.x) + absi(my_cell.y - other_cell.y)
+          if dist <= AdjacencyRules.ADJACENCY_RADIUS:
+            return true
+  return false
+
+func get_buildings_in_adjacency_radius() -> Array[Node]:
+  var result: Array[Node] = []
+  if not grid:
+    return result
+  var checked_buildings: Dictionary = {}
+  for x in range(-AdjacencyRules.ADJACENCY_RADIUS, size.x + AdjacencyRules.ADJACENCY_RADIUS):
+    for y in range(-AdjacencyRules.ADJACENCY_RADIUS, size.y + AdjacencyRules.ADJACENCY_RADIUS):
+      if x >= 0 and x < size.x and y >= 0 and y < size.y:
+        continue
+      var check = grid_coord + Vector2i(x, y)
+      if not grid.is_valid_coord(check):
+        continue
+      var occupant = grid.get_occupant(check)
+      if not occupant or occupant == self:
+        continue
+      if not occupant.has_method("get_storage_amount"):
+        continue
+      var occupant_id = occupant.get_instance_id()
+      if checked_buildings.has(occupant_id):
+        continue
+      if _is_within_adjacency_radius(occupant):
+        checked_buildings[occupant_id] = true
+        result.append(occupant)
+  return result
+
+func recalculate_adjacency() -> void:
+  adjacency_effects.clear()
+  adjacency_efficiency_multiplier = 1.0
+  adjacency_output_bonus = 0
+  adjacency_transport_bonus = 0.0
+  adjacent_neighbors = get_buildings_in_adjacency_radius()
+
+  var same_type_count = 0
+
+  for neighbor in adjacent_neighbors:
+    var neighbor_id = neighbor.building_id if "building_id" in neighbor else ""
+    if neighbor_id == "":
+      continue
+
+    if neighbor_id == building_id and has_behavior(BuildingDefs.Behavior.GENERATOR):
+      same_type_count += 1
+
+    var effect = AdjacencyRules.get_adjacency_effect(building_id, neighbor_id)
+    if effect.is_empty():
+      continue
+
+    adjacency_effects[neighbor_id] = effect
+
+    if effect.has("efficiency"):
+      adjacency_efficiency_multiplier *= effect["efficiency"]
+
+    if effect.has("output_bonus"):
+      adjacency_output_bonus += effect["output_bonus"]
+
+    if effect.has("output_penalty"):
+      adjacency_output_bonus += effect["output_penalty"]
+
+    if effect.has("transport_bonus"):
+      adjacency_transport_bonus += effect["transport_bonus"]
+
+    var effect_type = effect.get("type", -1)
+    if effect_type == AdjacencyRules.EffectType.SYNERGY:
+      event_bus.adjacency_synergy_formed.emit(self, neighbor, effect)
+    elif effect_type == AdjacencyRules.EffectType.CONFLICT:
+      event_bus.adjacency_conflict_formed.emit(self, neighbor, effect)
+
+  if same_type_count > 0 and has_behavior(BuildingDefs.Behavior.GENERATOR):
+    var stacking_mult = AdjacencyRules.get_stacking_multiplier(building_id, same_type_count + 1)
+    adjacency_efficiency_multiplier *= stacking_mult
+
+  event_bus.adjacency_changed.emit(self)
+
+func get_adjacency_efficiency_multiplier() -> float:
+  return adjacency_efficiency_multiplier
+
+func get_adjacency_output_bonus() -> int:
+  return adjacency_output_bonus
+
+func get_adjacency_transport_bonus() -> float:
+  return adjacency_transport_bonus
+
+func get_adjacency_spillover() -> Dictionary:
+  var spillover: Dictionary = {}
+  for neighbor_id in adjacency_effects:
+    var effect = adjacency_effects[neighbor_id]
+    if effect.has("spillover"):
+      for resource_id in effect["spillover"]:
+        spillover[resource_id] = spillover.get(resource_id, 0) + effect["spillover"][resource_id]
+  return spillover
+
+func get_adjacent_building_ids() -> Array[String]:
+  var result: Array[String] = []
+  for neighbor in adjacent_neighbors:
+    if "building_id" in neighbor:
+      result.append(neighbor.building_id)
+  return result
+
+func has_adjacency_synergy() -> bool:
+  for neighbor_id in adjacency_effects:
+    var effect = adjacency_effects[neighbor_id]
+    if effect.get("type", -1) == AdjacencyRules.EffectType.SYNERGY:
+      return true
+  return false
+
+func has_adjacency_conflict() -> bool:
+  for neighbor_id in adjacency_effects:
+    var effect = adjacency_effects[neighbor_id]
+    if effect.get("type", -1) == AdjacencyRules.EffectType.CONFLICT:
+      return true
+  return false
+
+func get_adjacency_descriptions() -> Array[Dictionary]:
+  var result: Array[Dictionary] = []
+  for neighbor_id in adjacency_effects:
+    var effect = adjacency_effects[neighbor_id]
+    result.append({
+      "neighbor": neighbor_id,
+      "type": effect.get("type", AdjacencyRules.EffectType.NEUTRAL),
+      "description": effect.get("description", ""),
+      "efficiency": effect.get("efficiency", 1.0),
+      "output_bonus": effect.get("output_bonus", 0)
+    })
+  return result

@@ -98,12 +98,19 @@ func _refund_attention(worker: Node) -> void:
   if worker.job_type == "":
     return
 
-  var cost = _calculate_attention_cost(worker, worker.job_type, worker.source_building if worker.source_building else worker.dest_building, worker.dest_building, worker.resource_type)
+  var target_a = worker.source_building if worker.source_building else worker.dest_building
+  if not target_a:
+    return
+
+  var cost = _calculate_attention_cost(worker, worker.job_type, target_a, worker.dest_building, worker.resource_type)
   attention_used = maxi(0, attention_used - cost)
   _sync_attention()
 
 func update_habituation(worker: Node) -> void:
   var target_a = worker.source_building if worker.source_building else worker.dest_building
+  if not target_a:
+    return
+
   var old_cost = _calculate_attention_cost(worker, worker.job_type, target_a, worker.dest_building, worker.resource_type)
 
   var job_id = _make_job_id(worker.job_type, target_a, worker.dest_building, worker.resource_type)
