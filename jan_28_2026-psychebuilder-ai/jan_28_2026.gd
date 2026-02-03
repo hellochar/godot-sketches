@@ -202,7 +202,7 @@ func _ready() -> void:
   _setup_systems()
   _setup_ui()
   event_bus.game_ended.connect(_on_game_ended)
-  _show_main_menu()
+  _on_start_game()  # Skip main menu for now
 
 func _setup_systems() -> void:
   game_world.setup(grid_size, tile_size)
