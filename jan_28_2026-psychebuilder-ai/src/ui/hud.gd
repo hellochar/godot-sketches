@@ -93,6 +93,20 @@ func _create_building_button(building_id: String) -> Button:
   name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
   vbox.add_child(name_label)
 
+  var behaviors = def.get("behaviors", [])
+  if behaviors.size() > 0:
+    var behavior_hbox = HBoxContainer.new()
+    behavior_hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    behavior_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+    for behavior in behaviors:
+      var icon_label = Label.new()
+      icon_label.add_theme_font_size_override("font_size", 10)
+      icon_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+      icon_label.text = _get_behavior_icon(behavior)
+      icon_label.add_theme_color_override("font_color", _get_behavior_color(behavior))
+      behavior_hbox.add_child(icon_label)
+    vbox.add_child(behavior_hbox)
+
   var cost = def.get("build_cost", {})
   var energy = cost.get("energy", 0)
   if energy > 0:
@@ -108,6 +122,40 @@ func _create_building_button(building_id: String) -> Button:
   btn.tooltip_text = _get_building_tooltip(def)
   btn.pressed.connect(func(): building_selected.emit(building_id))
   return btn
+
+func _get_behavior_icon(behavior: int) -> String:
+  match behavior:
+    BuildingDefs.Behavior.GENERATOR:
+      return "⚡"
+    BuildingDefs.Behavior.PROCESSOR:
+      return "⚙"
+    BuildingDefs.Behavior.STORAGE:
+      return "📦"
+    BuildingDefs.Behavior.HABIT:
+      return "🔄"
+    BuildingDefs.Behavior.COPING:
+      return "🛡"
+    BuildingDefs.Behavior.INFRASTRUCTURE:
+      return "🛤"
+    _:
+      return "•"
+
+func _get_behavior_color(behavior: int) -> Color:
+  match behavior:
+    BuildingDefs.Behavior.GENERATOR:
+      return Color(0.9, 0.8, 0.3)
+    BuildingDefs.Behavior.PROCESSOR:
+      return Color(0.5, 0.7, 0.9)
+    BuildingDefs.Behavior.STORAGE:
+      return Color(0.6, 0.6, 0.6)
+    BuildingDefs.Behavior.HABIT:
+      return Color(0.3, 0.9, 0.5)
+    BuildingDefs.Behavior.COPING:
+      return Color(0.9, 0.5, 0.3)
+    BuildingDefs.Behavior.INFRASTRUCTURE:
+      return Color(0.7, 0.7, 0.5)
+    _:
+      return Color(0.7, 0.7, 0.7)
 
 func _get_building_tooltip(def: Dictionary) -> String:
   var lines: Array[String] = []
@@ -369,6 +417,7 @@ func show_building_info(building: Node) -> void:
   _update_building_storage_display(building)
   _update_building_workers_display(building)
   _update_building_status_display(building)
+  _update_building_adjacency_display(building)
 
 func _update_building_storage_display(building: Node) -> void:
   var storage_container = %StorageContainer
@@ -466,6 +515,74 @@ func _update_building_status_display(building: Node) -> void:
       status_label.text = "Status: Generating"
     _:
       status_label.text = "Status: Unknown"
+
+func _update_building_adjacency_display(building: Node) -> void:
+  var container = %AdjacencyContainer
+  for child in container.get_children():
+    child.queue_free()
+
+  if not building.has_method("get_adjacency_descriptions"):
+    return
+
+  var descriptions = building.get_adjacency_descriptions()
+  if descriptions.is_empty():
+    return
+
+  var header = Label.new()
+  header.text = "Adjacency Effects:"
+  header.add_theme_font_size_override("font_size", 12)
+  container.add_child(header)
+
+  var net_efficiency = 1.0
+  var net_output_bonus = 0
+
+  for desc in descriptions:
+    var neighbor_id = desc.get("neighbor", "")
+    var effect_type = desc.get("type", 0)
+    var efficiency = desc.get("efficiency", 1.0)
+    var output_bonus = desc.get("output_bonus", 0)
+    var description_text = desc.get("description", "")
+
+    net_efficiency *= efficiency
+    net_output_bonus += output_bonus
+
+    var neighbor_def = BuildingDefs.get_definition(neighbor_id)
+    var neighbor_name = neighbor_def.get("name", neighbor_id) if not neighbor_def.is_empty() else neighbor_id
+
+    var effect_label = Label.new()
+    effect_label.add_theme_font_size_override("font_size", 10)
+
+    var effect_str = ""
+    if efficiency != 1.0:
+      var pct = int((efficiency - 1.0) * 100)
+      effect_str = "%+d%% speed" % pct
+    if output_bonus != 0:
+      if effect_str != "":
+        effect_str += ", "
+      effect_str += "%+d output" % output_bonus
+
+    var type_str = ""
+    match effect_type:
+      0:  # SYNERGY
+        type_str = "(Synergy)"
+        effect_label.add_theme_color_override("font_color", Color(0.4, 0.9, 0.4))
+      1:  # CONFLICT
+        type_str = "(Conflict)"
+        effect_label.add_theme_color_override("font_color", Color(0.9, 0.4, 0.4))
+      _:
+        effect_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+
+    effect_label.text = "  %s: %s %s" % [neighbor_name, effect_str, type_str]
+    container.add_child(effect_label)
+
+  if descriptions.size() > 1:
+    var total_label = Label.new()
+    total_label.add_theme_font_size_override("font_size", 10)
+    total_label.add_theme_color_override("font_color", Color(0.9, 0.9, 0.6))
+    total_label.text = "  Net: x%.2f efficiency" % net_efficiency
+    if net_output_bonus != 0:
+      total_label.text += ", %+d output" % net_output_bonus
+    container.add_child(total_label)
 
 func hide_building_info() -> void:
   selected_building_node = null
