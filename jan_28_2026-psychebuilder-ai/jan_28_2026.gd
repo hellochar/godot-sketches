@@ -240,6 +240,7 @@ func _setup_systems() -> void:
   game_flow_manager.setup(building_system, resource_system, game_world.get_grid())
   game_flow_manager.tutorial_hint_requested.connect(_on_tutorial_hint_requested)
   game_flow_manager.discovery_available.connect(_on_discovery_available)
+  game_flow_manager.starting_setup_complete.connect(_on_starting_setup_complete)
   event_bus.night_started.connect(_on_night_started)
   game_flow_manager.initialize_game()
 
@@ -1060,6 +1061,9 @@ func _on_discovery_dismissed() -> void:
 
 func _on_night_started(day_number: int) -> void:
   game_flow_manager.check_discovery(day_number)
+
+func _on_starting_setup_complete() -> void:
+  game_world.focus_on_buildings(game_state.active_buildings)
 
 func _on_building_unlocked(building_id: String) -> void:
   _add_building_to_toolbar(building_id)
