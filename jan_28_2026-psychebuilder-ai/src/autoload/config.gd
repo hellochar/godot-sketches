@@ -294,6 +294,7 @@ extends Node
 }
 
 @export_group("Emotional Weather")
+@export var weather_enable_day: int = 5
 @export var weather_resource_scale: float = 20.0
 @export var weather_momentum_lerp: float = 0.5
 @export var weather_storm_threshold: float = 1.5
@@ -445,8 +446,7 @@ extends Node
 @export var starting_buildings: Array[Dictionary] = [
   {"id": "memory_well", "coord": Vector2i(10, 10)},
   {"id": "emotional_reservoir", "coord": Vector2i(14, 10)},
-  {"id": "morning_routine", "coord": Vector2i(10, 14)},
-  {"id": "exercise_yard", "coord": Vector2i(14, 14)},
+  {"id": "mourning_chapel", "coord": Vector2i(10, 14)},
   {"id": "road", "coord": Vector2i(12, 10)},
   {"id": "road", "coord": Vector2i(12, 11)},
   {"id": "road", "coord": Vector2i(12, 12)},
@@ -468,11 +468,15 @@ extends Node
 @export var hint_day_1_roads: String = "Tip: Roads connect your buildings. Workers travel along roads to transport resources between buildings."
 @export var hint_day_1_phases: String = "During the Day, buildings work automatically. During the Night, time pauses - plan your next moves!"
 @export var hint_day_2_buildings: String = "Tip: Click a building in the toolbar at the bottom, then click on the grid to place it. Each building has different functions."
+@export var hint_day_2_speed: String = "Use the 1x/2x/3x buttons to control game speed. Slow down when things get overwhelming!"
 @export var hint_day_3_workers: String = "Tip: To assign a worker: (1) Click a building with resources, (2) Click 'Assign', (3) Click a destination building. Workers transport resources automatically."
 @export var hint_day_4_events: String = "Challenging events may arrive soon. Build some processing capacity to handle the emotions they bring."
 @export var hint_day_5_unlocks: String = "New buildings are now available! Check the toolbar for more options to build your emotional toolkit."
+@export var hint_day_5_weather: String = "Weather patterns now affect your buildings. Joy brings Clear Skies (bonuses), while Anxiety can cause Storms (penalties)."
 @export var hint_wellbeing: String = "Click the Wellbeing display on the right to see a breakdown of what's affecting your score."
 @export var hint_resource_danger: String = "Warning: Some negative emotions have dangerous effects when they accumulate. Watch for red resource labels!"
+@export var hint_first_worker_assignment: String = "Worker Assignment Tutorial:\n1. You clicked 'Assign' on a building with resources\n2. Use scroll wheel to select which resource to transport\n3. Click a destination building to complete the assignment\n4. The worker will automatically move resources between buildings"
+@export var hint_first_building_placement: String = "Building Placement Tutorial:\n1. You selected a building from the toolbar\n2. Green tiles are valid placement locations\n3. Click to place, or right-click to cancel\n4. Buildings need road connections to function properly"
 
 @export_group("Ending Text")
 @export var ending_flourishing_title: String = "Flourishing"
