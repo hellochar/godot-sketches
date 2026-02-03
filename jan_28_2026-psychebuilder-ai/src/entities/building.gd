@@ -28,7 +28,17 @@ enum SaturationState {
 }
 
 @export_group("Status Display")
-@export var status_colors: Dictionary = {
+@export var status_icons: Dictionary = {
+  Status.IDLE: "...",
+  Status.PROCESSING: "⚙",
+  Status.WAITING_INPUT: "📥",
+  Status.WAITING_WORKER: "👤",
+  Status.STORAGE_FULL: "📦",
+  Status.GENERATING: "✨",
+  Status.COPING_READY: "💡",
+  Status.COPING_COOLDOWN: "⏳",
+}
+var status_colors: Dictionary = {
   Status.IDLE: Color(0.5, 0.5, 0.5),
   Status.PROCESSING: Color(0.2, 0.8, 0.2),
   Status.WAITING_INPUT: Color(0.9, 0.6, 0.2),
@@ -172,15 +182,24 @@ var adjacent_neighbors: Array[Node] = []
 
 var _components: Dictionary = {}
 
+var is_selected: bool = false
+var _selection_tween: Tween = null
+
 @export_group("Visual")
 @export var disconnected_darken_factor: float = 0.4
+@export var selection_glow_color: Color = Color(1.0, 0.9, 0.4, 0.6)
+@export var selection_pulse_min: float = 0.4
+@export var selection_pulse_max: float = 0.8
 
 @onready var sprite: ColorRect = %ColorRect
 @onready var glow_rect: ColorRect = %GlowRect
 @onready var label: Label = %Label
 @onready var progress_bar: ProgressBar = %ProgressBar
-@onready var status_indicator: ColorRect = %StatusIndicator
+@onready var status_indicator: Label = %StatusIndicator
 @onready var disconnected_warning: Label = %DisconnectedWarning
+@onready var worker_hint: Label = %WorkerHint
+
+var has_ever_had_worker: bool = false
 
 func _ready() -> void:
   if definition:
@@ -316,8 +335,9 @@ func _update_visuals() -> void:
   if glow_rect:
     glow_rect.position = Vector2(-4, -4)
     glow_rect.size = pixel_size + Vector2(8, 8)
-    var base_color = definition.get("color", Color.WHITE)
-    glow_rect.color = Color(base_color.r, base_color.g, base_color.b, 0.12)
+    if not is_selected:
+      var base_color = definition.get("color", Color.WHITE)
+      glow_rect.color = Color(base_color.r, base_color.g, base_color.b, 0.12)
 
   label.size = pixel_size
   label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -328,6 +348,24 @@ func _update_visuals() -> void:
   progress_bar.visible = false
 
   _update_status_visual()
+
+func set_selected(selected: bool) -> void:
+  if is_selected == selected:
+    return
+  is_selected = selected
+
+  if _selection_tween:
+    _selection_tween.kill()
+    _selection_tween = null
+
+  if selected:
+    glow_rect.color = selection_glow_color
+    _selection_tween = create_tween().set_loops()
+    _selection_tween.tween_property(glow_rect, "color:a", selection_pulse_max, 0.5)
+    _selection_tween.tween_property(glow_rect, "color:a", selection_pulse_min, 0.5)
+  else:
+    var base_color = definition.get("color", Color.WHITE)
+    glow_rect.color = Color(base_color.r, base_color.g, base_color.b, 0.12)
 
 func _update_shader_material() -> void:
   if not sprite.material:
@@ -917,6 +955,7 @@ func has_space_for(resource_id: String, amount: int) -> bool:
 
 func assign_worker(worker: Node) -> void:
   assigned_worker = worker
+  has_ever_had_worker = true
 
 func unassign_worker() -> void:
   assigned_worker = null
@@ -1007,7 +1046,8 @@ func _update_status() -> void:
   current_status = Status.IDLE
 
 func _update_status_visual() -> void:
-  status_indicator.color = status_colors.get(current_status, Color.GRAY)
+  status_indicator.text = status_icons.get(current_status, "...")
+  worker_hint.visible = current_status == Status.WAITING_WORKER and not has_ever_had_worker
 
   var is_processor = has_behavior(BuildingDefs.Behavior.PROCESSOR)
   var is_coping = has_behavior(BuildingDefs.Behavior.COPING)

@@ -321,7 +321,6 @@ func _unhandled_input(event: InputEvent) -> void:
     var key = event as InputEventKey
     if key.pressed and key.keycode == KEY_ESCAPE:
       if selected_building:
-        selected_building = null
         _cancel_placement()
       elif selected_worker:
         _deselect_worker()
@@ -349,6 +348,8 @@ func _try_place_building() -> void:
     _update_energy_display()
     var def = BuildingDefs.get_definition(selected_building_id)
     show_toast("Placed %s" % def.get("name", selected_building_id), "success")
+    if selected_building_id != "road":
+      _cancel_placement()
   else:
     show_toast(failure_reason, "error")
     _show_placement_failure(failure_reason)
@@ -376,7 +377,11 @@ func _handle_click() -> void:
     _select_building(building)
 
 func _select_building(building: Node) -> void:
+  if selected_building and is_instance_valid(selected_building):
+    selected_building.set_selected(false)
   selected_building = building
+  if selected_building:
+    selected_building.set_selected(true)
   _show_building_info(building)
 
   var def = building.definition
@@ -516,6 +521,8 @@ func _show_placement_failure(reason: String) -> void:
 func _cancel_placement() -> void:
   is_placing = false
   selected_building_id = ""
+  if selected_building and is_instance_valid(selected_building):
+    selected_building.set_selected(false)
   selected_building = null
   game_world.set_placement_mode(false, "")
   _cancel_transport_assignment()
@@ -529,6 +536,7 @@ func _remove_selected_building() -> void:
   var energy_cost = cost.get("energy", 0)
   var refund = int(energy_cost * removal_refund_percent)
 
+  building.set_selected(false)
   building_system.remove_building(building)
 
   if refund > 0:
@@ -696,7 +704,7 @@ func _update_event_completion_check(delta: float) -> void:
 
 func _on_resource_overflow(resource_type: String, amount: int, _building: Node, world_position: Vector2) -> void:
   resource_system.spawn_resource(resource_type, world_position, amount)
-  show_toast("Storage full: %s overflow" % resource_type, "warning")
+  game_world.spawn_floating_text(world_position, "Storage full: %s" % resource_type, Color.ORANGE)
 
 func _create_building_tooltip() -> void:
   building_tooltip = PanelContainer.new()
@@ -1131,36 +1139,24 @@ func _populate_tooltip(building: Node) -> void:
   name_label.text = def.get("name", building.building_id)
 
   var desc_label = vbox.get_node("DescLabel")
-  desc_label.text = def.get("description", "")
+  desc_label.visible = false
 
   var status_label = vbox.get_node("StatusLabel")
   status_label.text = _get_status_text(building)
   status_label.add_theme_color_override("font_color", _get_status_color(building))
 
   var storage_label = vbox.get_node("StorageLabel")
-  storage_label.text = _get_storage_text(building)
+  storage_label.text = _get_compact_storage_text(building)
   storage_label.visible = storage_label.text != ""
 
   var production_label = vbox.get_node("ProductionLabel")
-  production_label.text = _get_production_text(building)
-  production_label.visible = production_label.text != ""
+  production_label.visible = false
 
   var connection_label = vbox.get_node("ConnectionLabel")
-  if building.is_road():
-    connection_label.text = ""
-    connection_label.visible = false
-  elif building.road_connected:
-    connection_label.text = "Connected to roads"
-    connection_label.add_theme_color_override("font_color", Color(0.5, 0.8, 0.5))
-    connection_label.visible = true
-  else:
-    connection_label.text = "Not connected to roads"
-    connection_label.add_theme_color_override("font_color", Color(0.9, 0.4, 0.4))
-    connection_label.visible = true
+  connection_label.visible = false
 
   var indicators_label = vbox.get_node("IndicatorsLabel")
-  indicators_label.text = _get_indicator_explanations_text(building)
-  indicators_label.visible = indicators_label.text != ""
+  indicators_label.visible = false
 
 func _get_indicator_explanations_text(building: Node) -> String:
   var lines: Array[String] = []
@@ -1228,6 +1224,21 @@ func _get_status_text(building: Node) -> String:
 
 func _get_status_color(building: Node) -> Color:
   return building.status_colors.get(building.current_status, Color.GRAY)
+
+func _get_compact_storage_text(building: Node) -> String:
+  if building.storage_capacity <= 0:
+    return ""
+
+  var items = []
+  for res_id in building.storage:
+    var amount = building.storage[res_id]
+    if amount > 0:
+      items.append("%d %s" % [amount, res_id])
+
+  if items.size() == 0:
+    return ""
+
+  return ", ".join(items)
 
 func _get_storage_text(building: Node) -> String:
   if building.storage_capacity <= 0:

@@ -51,13 +51,19 @@ offset_bottom = -2.0
 value = 50.0
 show_percentage = false
 
-[node name="StatusIndicator" type="ColorRect" parent="."]
+[node name="StatusIndicator" type="Label" parent="."]
 unique_name_in_owner = true
-offset_left = -6.0
-offset_top = -6.0
-offset_right = 10.0
-offset_bottom = 10.0
-color = Color(0.5, 0.5, 0.5, 1)
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 16.0
+offset_bottom = 16.0
+theme_override_colors/font_color = Color(1, 1, 1, 0.9)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 14
+text = "..."
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="DisconnectedWarning" type="Label" parent="."]
 unique_name_in_owner = true
@@ -71,5 +77,19 @@ theme_override_colors/font_outline_color = Color(0.1, 0.05, 0.1, 1)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 16
 text = "!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="WorkerHint" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+offset_top = -28.0
+offset_right = 64.0
+offset_bottom = -12.0
+theme_override_colors/font_color = Color(1, 0.9, 0.4, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 9
+text = "Needs worker - click Assign"
 horizontal_alignment = 1
 vertical_alignment = 1

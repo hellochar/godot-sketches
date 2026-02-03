@@ -231,7 +231,7 @@ func _update_hover() -> void:
     _update_hover_indicator()
 
 func _update_hover_indicator() -> void:
-  if not grid or not grid.is_valid_coord(hover_coord):
+  if not grid or not grid.is_valid_coord(hover_coord) or not placement_mode:
     hover_indicator.visible = false
     _hide_placement_reason()
     return
@@ -242,21 +242,13 @@ func _update_hover_indicator() -> void:
   var tile_size = grid.tile_size
   hover_indicator.size = Vector2(placement_size) * tile_size
 
-  if placement_mode:
-    var failure_reason = _get_placement_failure_reason()
-    if failure_reason == "":
-      hover_indicator.color = hover_valid_color
-      _hide_placement_reason()
-    else:
-      hover_indicator.color = hover_invalid_color
-      _show_placement_reason(failure_reason)
-  else:
+  var failure_reason = _get_placement_failure_reason()
+  if failure_reason == "":
+    hover_indicator.color = hover_valid_color
     _hide_placement_reason()
-    hover_indicator.size = Vector2(tile_size, tile_size)
-    if grid.is_occupied(hover_coord):
-      hover_indicator.color = hover_selected_color
-    else:
-      hover_indicator.color = hover_valid_color
+  else:
+    hover_indicator.color = hover_invalid_color
+    _show_placement_reason(failure_reason)
 
 func _get_placement_failure_reason() -> String:
   if building_system and placement_building_id != "":
@@ -429,3 +421,20 @@ func _draw_aura_circle(center: Vector2, radius: float, color: Color) -> void:
     points.append(center + Vector2(cos(angle), sin(angle)) * radius)
   for i in range(aura_arc_points):
     draw_line(points[i], points[i + 1], outline_color, aura_line_width)
+
+func spawn_floating_text(world_pos: Vector2, text: String, color: Color = Color.WHITE) -> void:
+  var label = Label.new()
+  label.text = text
+  label.position = world_pos - Vector2(50, 10)
+  label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+  label.add_theme_font_size_override("font_size", 12)
+  label.add_theme_color_override("font_color", color)
+  label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
+  label.add_theme_constant_override("outline_size", 2)
+  add_child(label)
+
+  var tween = create_tween()
+  tween.set_parallel(true)
+  tween.tween_property(label, "position:y", world_pos.y - 60, 2.0)
+  tween.tween_property(label, "modulate:a", 0.0, 2.0).set_delay(0.5)
+  tween.chain().tween_callback(label.queue_free)

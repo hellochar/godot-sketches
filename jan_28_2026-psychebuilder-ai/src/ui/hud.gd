@@ -33,7 +33,7 @@ var building_system: Node
 var worker_system: Node
 var time_system: Node
 
-var resource_labels: Dictionary = {}
+var resource_labels: Dictionary = {}  # resource_id -> {label: Label, container: HBoxContainer}
 var building_buttons: Dictionary = {}
 var selected_building_node: Node = null
 var toast_queue: Array = []
@@ -147,7 +147,9 @@ func _update_all_resource_labels() -> void:
 
   var resource_types = resource_system.get_all_resource_types()
   for res_type in resource_types:
+    var amount = game_state.get_resource_total(res_type.id)
     var hbox = HBoxContainer.new()
+    hbox.visible = amount > 0
 
     var color_rect = ColorRect.new()
     color_rect.custom_minimum_size = Vector2(12, 12)
@@ -155,7 +157,7 @@ func _update_all_resource_labels() -> void:
     hbox.add_child(color_rect)
 
     var label = Label.new()
-    label.text = "%s: %d" % [res_type.display_name, game_state.get_resource_total(res_type.id)]
+    label.text = "%s: %d" % [res_type.display_name, amount]
     label.add_theme_font_size_override("font_size", 12)
     label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
@@ -169,13 +171,15 @@ func _update_all_resource_labels() -> void:
     hbox.add_child(label)
     hbox.tooltip_text = res_type.description
     container.add_child(hbox)
-    resource_labels[res_type.id] = label
+    resource_labels[res_type.id] = {label = label, container = hbox}
 
 func _on_resource_total_changed(resource_type: String, new_total: int) -> void:
   if resource_labels.has(resource_type):
     var res_type = resource_system.get_resource_type(resource_type)
     if res_type:
-      resource_labels[resource_type].text = "%s: %d" % [res_type.display_name, new_total]
+      var entry = resource_labels[resource_type]
+      entry.label.text = "%s: %d" % [res_type.display_name, new_total]
+      entry.container.visible = new_total > 0
 
 func _update_energy_display() -> void:
   var energy_label = %EnergyLabel
