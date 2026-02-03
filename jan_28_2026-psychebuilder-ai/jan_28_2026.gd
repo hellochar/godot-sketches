@@ -70,24 +70,9 @@ const WellbeingShader = preload("res://jan_28_2026-psychebuilder-ai/src/shaders/
 @onready var game_state: Node = get_node("/root/GameState")
 @onready var event_bus: Node = get_node("/root/EventBus")
 @onready var config: Node = get_node("/root/Config")
-
-@onready var energy_label: Label = %EnergyLabel
-@onready var attention_label: Label = %AttentionLabel
-@onready var day_label: Label = %DayLabel
-@onready var wellbeing_label: Label = %WellbeingLabel
-@onready var instructions_label: Label = %Instructions
-@onready var phase_label: Label = %PhaseLabel
-@onready var time_label: Label = %TimeLabel
-@onready var end_night_btn: Button = %EndNightBtn
-@onready var building_toolbar: Container = %BuildingToolbar
-@onready var resource_list: VBoxContainer = %ResourceList
-@onready var toast_container: VBoxContainer = %ToastContainer
-@onready var building_info_panel: VBoxContainer = %BuildingInfoPanel
-@onready var wellbeing_value_label: Label = %WellbeingValue
-@onready var wellbeing_bar: ProgressBar = %WellbeingBar
-@onready var assign_worker_btn: Button = %AssignWorkerBtn
-@onready var remove_building_btn: Button = %RemoveBuildingBtn
 @onready var effects_rect: ColorRect = %EffectsRect
+
+var hud: Node  # Reference to hud.gd script on UILayer
 
 var wellbeing_material: ShaderMaterial
 var resource_system: Node
@@ -199,6 +184,7 @@ var active_toasts: Array = []
 @export var tier_struggling_color: Color = Color(0.9, 0.3, 0.3)
 
 func _ready() -> void:
+  hud = ui_layer  # hud.gd is attached to UILayer
   _setup_systems()
   _setup_ui()
   event_bus.game_ended.connect(_on_game_ended)
@@ -245,55 +231,14 @@ func _setup_systems() -> void:
   game_flow_manager.initialize_game()
 
 func _setup_ui() -> void:
-  _populate_building_toolbar()
-  _connect_time_controls()
+  hud.setup(resource_system, building_system, worker_system, time_system)
+  hud.building_selected.connect(_on_building_selected)
+  hud.building_action_pressed.connect(_on_hud_building_action)
+  hud.connect_time_controls(time_system)
   _create_building_tooltip()
   _create_event_popup()
   _create_discovery_popup()
   _create_tutorial_hint_popup()
-  _populate_resource_list()
-  _connect_building_info_buttons()
-  event_bus.resource_total_changed.connect(_on_resource_total_changed)
-  event_bus.building_unlocked.connect(_on_building_unlocked)
-
-func _populate_building_toolbar() -> void:
-  var unlocked = building_system.get_unlocked_buildings()
-  var sorted_buildings = _sort_buildings_by_cost(unlocked)
-  for building_id in sorted_buildings:
-    var btn = _create_building_button(building_id)
-    building_toolbar.add_child(btn)
-
-func _sort_buildings_by_cost(building_ids: Array) -> Array:
-  var with_costs: Array = []
-  for building_id in building_ids:
-    var def = BuildingDefs.get_definition(building_id)
-    var cost = def.get("build_cost", {}).get("energy", 0)
-    with_costs.append({"id": building_id, "cost": cost})
-  with_costs.sort_custom(func(a, b): return a.cost < b.cost)
-  return with_costs.map(func(item): return item.id)
-
-func _create_building_button(building_id: String) -> Button:
-  var def = BuildingDefs.get_definition(building_id)
-
-  var btn = Button.new()
-  btn.name = building_id
-  btn.text = def.get("name", building_id)
-  btn.custom_minimum_size = building_button_size
-  btn.tooltip_text = def.get("description", "")
-
-  var cost = def.get("build_cost", {})
-  var energy = cost.get("energy", 0)
-  if energy > 0:
-    btn.text += "\n(" + str(energy) + "E)"
-
-  btn.pressed.connect(_on_building_selected.bind(building_id))
-  return btn
-
-func _connect_time_controls() -> void:
-  %Speed1xBtn.pressed.connect(func(): time_system.set_speed(speed_options[0]))
-  %Speed2xBtn.pressed.connect(func(): time_system.set_speed(speed_options[1]))
-  %Speed3xBtn.pressed.connect(func(): time_system.set_speed(speed_options[2]))
-  end_night_btn.pressed.connect(func(): time_system.end_night())
 
 func _on_building_selected(building_id: String) -> void:
   selected_building_id = building_id
@@ -510,15 +455,13 @@ func _update_transport_instructions() -> void:
   _update_instructions(base_text)
 
 func _update_instructions(text: String) -> void:
-  instructions_label.text = text
+  hud.update_instructions(text)
 
 func _show_placement_failure(reason: String) -> void:
-  instructions_label.text = reason
-  instructions_label.add_theme_color_override("font_color", Color(1, 0.3, 0.3))
+  hud.update_instructions(reason)
   var tween = create_tween()
   tween.tween_interval(1.5)
   tween.tween_callback(func():
-    instructions_label.remove_theme_color_override("font_color")
     _update_instructions("Click building to select\nClick grid to place\nRight-click to cancel")
   )
 
@@ -553,35 +496,8 @@ func _remove_selected_building() -> void:
   _update_instructions("Click building to select\nClick grid to place")
 
 func _update_energy_display() -> void:
-  energy_label.text = "Energy: %d/%d" % [game_state.current_energy, game_state.max_energy]
-  var energy_ratio = float(game_state.current_energy) / float(game_state.max_energy) if game_state.max_energy > 0 else 0.0
-  var energy_color = energy_normal_color
-  if energy_ratio <= energy_critical_threshold:
-    energy_color = energy_critical_color
-  elif energy_ratio <= energy_low_threshold:
-    energy_color = energy_low_color
-  energy_label.add_theme_color_override("font_color", energy_color)
-
-  if worker_system:
-    attention_label.text = "Attention: %d/%d" % [worker_system.attention_used, worker_system.attention_pool]
-    var attention_ratio = float(worker_system.attention_used) / float(worker_system.attention_pool) if worker_system.attention_pool > 0 else 0.0
-    var attention_color = attention_normal_color
-    if attention_ratio >= attention_full_threshold:
-      attention_color = attention_full_color
-    elif attention_ratio >= attention_high_threshold:
-      attention_color = attention_high_color
-    attention_label.add_theme_color_override("font_color", attention_color)
-
   _calculate_wellbeing()
-  var wb_color = _get_wellbeing_color(game_state.wellbeing)
-  wellbeing_label.text = "Wellbeing: %d" % int(game_state.wellbeing)
-  wellbeing_label.add_theme_color_override("font_color", wb_color)
-  wellbeing_value_label.text = "%d" % int(game_state.wellbeing)
-  wellbeing_value_label.add_theme_color_override("font_color", wb_color)
-  wellbeing_bar.value = game_state.wellbeing
-  var fill_style = wellbeing_bar.get_theme_stylebox("fill").duplicate()
-  fill_style.bg_color = wb_color
-  wellbeing_bar.add_theme_stylebox_override("fill", fill_style)
+  # HUD handles display updates via event_bus signals
 
 func _calculate_wellbeing() -> void:
   var positive_total = 0
@@ -663,7 +579,6 @@ func spawn_worker_at(coord: Vector2i) -> Node:
   return worker
 
 func _on_phase_changed(_is_day: bool) -> void:
-  _update_time_display()
   _update_energy_display()
   _update_visual_effects()
 
@@ -672,30 +587,8 @@ func _on_day_started(day_number: int) -> void:
   show_toast("Day %d begins" % day_number, "info")
   game_flow_manager.check_tutorial_hint(day_number)
 
-func _update_time_display() -> void:
-  var phase_text = "Day" if time_system.is_day() else "Night"
-  phase_label.text = "Day %d - %s Phase" % [time_system.current_day, phase_text]
-  end_night_btn.visible = time_system.is_night()
-  day_label.text = "Day %d" % time_system.current_day
-  time_label.text = _format_clock_time(time_system.get_phase_progress(), time_system.is_day())
-
-func _format_clock_time(progress: float, is_day: bool) -> String:
-  var total_hours = day_hours if is_day else night_hours
-  var start_hour = day_start_hour if is_day else night_start_hour
-  var elapsed_hours = progress * total_hours
-  var hour = start_hour + int(elapsed_hours)
-  if hour >= 24:
-    hour -= 24
-  var minute = int(fmod(elapsed_hours, 1.0) * 60.0)
-  var suffix = "AM" if hour < 12 else "PM"
-  var display_hour = hour % 12
-  if display_hour == 0:
-    display_hour = 12
-  return "%d:%02d %s" % [display_hour, minute, suffix]
-
 func _process(delta: float) -> void:
   if time_system:
-    _update_time_display()
     _update_visual_effects()
   _update_building_tooltip()
   _update_event_completion_check(delta)
@@ -811,49 +704,13 @@ func _create_tutorial_hint_popup() -> void:
 
   ui_layer.add_child(tutorial_hint_popup)
 
-func _populate_resource_list() -> void:
-  for child in resource_list.get_children():
-    child.queue_free()
-  resource_labels.clear()
-
-  var resource_types = resource_system.get_all_resource_types()
-  for res_type in resource_types:
-    var hbox = HBoxContainer.new()
-
-    var color_rect = ColorRect.new()
-    color_rect.custom_minimum_size = Vector2(12, 12)
-    color_rect.color = res_type.color
-    hbox.add_child(color_rect)
-
-    var label = Label.new()
-    label.text = "%s: %d" % [res_type.display_name, game_state.get_resource_total(res_type.id)]
-    label.add_theme_font_size_override("font_size", 12)
-    label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-
-    if res_type.is_positive_emotion():
-      label.add_theme_color_override("font_color", positive_resource_color)
-    elif res_type.is_negative_emotion():
-      label.add_theme_color_override("font_color", negative_resource_color)
-    else:
-      label.add_theme_color_override("font_color", neutral_resource_color)
-
-    hbox.add_child(label)
-    hbox.tooltip_text = res_type.description
-    resource_list.add_child(hbox)
-    resource_labels[res_type.id] = label
-
-func _connect_building_info_buttons() -> void:
-  assign_worker_btn.pressed.connect(_on_assign_worker_pressed)
-  remove_building_btn.pressed.connect(_on_remove_building_pressed)
-
-func _on_assign_worker_pressed() -> void:
-  if selected_building:
-    _start_transport_assignment(selected_building)
-
-func _on_remove_building_pressed() -> void:
-  if selected_building:
-    _remove_selected_building()
-    _hide_building_info()
+func _on_hud_building_action(action: String, building: Node) -> void:
+  match action:
+    "assign_worker":
+      _start_transport_assignment(building)
+    "remove_building":
+      _remove_selected_building()
+      hud.hide_building_info()
 
 func _start_transport_assignment(building: Node) -> void:
   var def = building.definition
@@ -885,154 +742,14 @@ func _start_transport_assignment(building: Node) -> void:
   is_assigning_transport = true
   _update_transport_instructions()
 
-func _on_resource_total_changed(resource_type: String, new_total: int) -> void:
-  if resource_labels.has(resource_type):
-    var res_type = resource_system.get_resource_type(resource_type)
-    if res_type:
-      resource_labels[resource_type].text = "%s: %d" % [res_type.display_name, new_total]
-
 func show_toast(message: String, toast_type: String = "info") -> void:
-  toast_queue.append({"message": message, "type": toast_type})
-  _process_toast_queue()
-
-func _process_toast_queue() -> void:
-  while toast_queue.size() > 0 and active_toasts.size() < toast_max_visible:
-    var toast_data = toast_queue.pop_front()
-    _create_toast(toast_data.message, toast_data.type)
-
-func _create_toast(message: String, toast_type: String) -> void:
-  var panel = PanelContainer.new()
-  panel.modulate.a = 0.0
-
-  var margin_cont = MarginContainer.new()
-  margin_cont.add_theme_constant_override("margin_left", 10)
-  margin_cont.add_theme_constant_override("margin_right", 10)
-  margin_cont.add_theme_constant_override("margin_top", 5)
-  margin_cont.add_theme_constant_override("margin_bottom", 5)
-  panel.add_child(margin_cont)
-
-  var label = Label.new()
-  label.text = message
-  label.add_theme_font_size_override("font_size", 12)
-
-  match toast_type:
-    "success":
-      label.add_theme_color_override("font_color", toast_success_color)
-    "warning":
-      label.add_theme_color_override("font_color", toast_warning_color)
-    "error":
-      label.add_theme_color_override("font_color", toast_error_color)
-    _:
-      label.add_theme_color_override("font_color", toast_info_color)
-
-  margin_cont.add_child(label)
-  toast_container.add_child(panel)
-  active_toasts.append(panel)
-
-  var tween = create_tween()
-  tween.tween_property(panel, "modulate:a", 1.0, 0.2)
-  tween.tween_interval(toast_duration)
-  tween.tween_property(panel, "modulate:a", 0.0, 0.3)
-  tween.tween_callback(func():
-    active_toasts.erase(panel)
-    panel.queue_free()
-    _process_toast_queue()
-  )
+  hud.show_toast(message, toast_type)
 
 func _show_building_info(building: Node) -> void:
-  building_info_panel.visible = true
-
-  var def = building.definition
-  %BuildingNameLabel.text = def.get("name", building.building_id)
-  %BuildingDescLabel.text = def.get("description", "")
-
-  _update_building_storage_display(building)
-  _update_building_workers_display(building)
-  _update_building_status_display(building)
+  hud.show_building_info(building)
 
 func _hide_building_info() -> void:
-  building_info_panel.visible = false
-
-func _update_building_storage_display(building: Node) -> void:
-  var storage_container = %StorageContainer
-  for child in storage_container.get_children():
-    child.queue_free()
-
-  if building.storage_capacity <= 0:
-    var label = Label.new()
-    label.text = "No storage"
-    label.add_theme_font_size_override("font_size", 11)
-    storage_container.add_child(label)
-    return
-
-  var total = 0
-  for res_id in building.storage:
-    total += building.storage[res_id]
-
-  var header = Label.new()
-  header.text = "Storage (%d/%d):" % [total, building.storage_capacity]
-  header.add_theme_font_size_override("font_size", 12)
-  storage_container.add_child(header)
-
-  if building.storage.is_empty() or total == 0:
-    var empty_label = Label.new()
-    empty_label.text = "  Empty"
-    empty_label.add_theme_font_size_override("font_size", 11)
-    empty_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
-    storage_container.add_child(empty_label)
-  else:
-    for res_id in building.storage:
-      var amount = building.storage[res_id]
-      if amount > 0:
-        var item_label = Label.new()
-        item_label.text = "  %s: %d" % [res_id.capitalize(), amount]
-        item_label.add_theme_font_size_override("font_size", 11)
-        storage_container.add_child(item_label)
-
-func _update_building_workers_display(building: Node) -> void:
-  var workers_container = %WorkersContainer
-  for child in workers_container.get_children():
-    child.queue_free()
-
-  var assigned_workers: Array = []
-  for worker in game_state.active_workers:
-    if worker.source_building == building or worker.dest_building == building:
-      assigned_workers.append(worker)
-
-  var header = Label.new()
-  header.text = "Workers (%d):" % assigned_workers.size()
-  header.add_theme_font_size_override("font_size", 12)
-  workers_container.add_child(header)
-
-  if assigned_workers.is_empty():
-    var none_label = Label.new()
-    none_label.text = "  None assigned"
-    none_label.add_theme_font_size_override("font_size", 11)
-    none_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
-    workers_container.add_child(none_label)
-  else:
-    for worker in assigned_workers:
-      var worker_label = Label.new()
-      var desc = _get_worker_short_description(worker, building)
-      worker_label.text = "  " + desc
-      worker_label.add_theme_font_size_override("font_size", 11)
-      workers_container.add_child(worker_label)
-
-func _get_worker_short_description(worker: Node, context_building: Node) -> String:
-  if worker.job_type == "transport":
-    if worker.source_building == context_building:
-      var dest = worker.dest_building.building_id if worker.dest_building else "?"
-      return "Sending %s to %s" % [worker.resource_type, dest]
-    else:
-      var src = worker.source_building.building_id if worker.source_building else "?"
-      return "Bringing %s from %s" % [worker.resource_type, src]
-  elif worker.job_type == "operate":
-    return "Operating"
-  return "Idle"
-
-func _update_building_status_display(building: Node) -> void:
-  var status_label = %BuildingStatusLabel
-  status_label.text = "Status: %s" % _get_status_text(building)
+  hud.hide_building_info()
 
 func _is_any_popup_active() -> bool:
   return tutorial_hint_popup.visible or event_popup.visible or discovery_popup.visible
@@ -1069,8 +786,7 @@ func _on_discovery_available(options: Array) -> void:
 
 func _on_discovery_building_chosen(building_id: String) -> void:
   game_flow_manager.apply_discovery(building_id)
-  _add_building_to_toolbar(building_id)
-  show_toast("Unlocked: %s" % BuildingDefs.get_definition(building_id).get("name", building_id), "success")
+  hud.show_toast("Unlocked: %s" % BuildingDefs.get_definition(building_id).get("name", building_id), "success")
 
 func _on_discovery_dismissed() -> void:
   pass
@@ -1080,26 +796,6 @@ func _on_night_started(day_number: int) -> void:
 
 func _on_starting_setup_complete() -> void:
   game_world.focus_on_buildings(game_state.active_buildings)
-
-func _on_building_unlocked(building_id: String) -> void:
-  _add_building_to_toolbar(building_id)
-
-func _add_building_to_toolbar(building_id: String) -> void:
-  for child in building_toolbar.get_children():
-    if child.name == building_id:
-      return
-  var btn = _create_building_button(building_id)
-  var new_cost = BuildingDefs.get_definition(building_id).get("build_cost", {}).get("energy", 0)
-  var insert_index = building_toolbar.get_child_count()
-  for i in range(building_toolbar.get_child_count()):
-    var child = building_toolbar.get_child(i)
-    var child_def = BuildingDefs.get_definition(child.name)
-    var child_cost = child_def.get("build_cost", {}).get("energy", 0)
-    if new_cost < child_cost:
-      insert_index = i
-      break
-  building_toolbar.add_child(btn)
-  building_toolbar.move_child(btn, insert_index)
 
 func _update_building_tooltip() -> void:
   if is_placing:

@@ -198,9 +198,8 @@ func _update_all_resource_labels() -> void:
 
   var resource_types = resource_system.get_all_resource_types()
   for res_type in resource_types:
-    var amount = game_state.get_resource_total(res_type.id)
+    var amount = int(game_state.get_resource_total(res_type.id))
     var hbox = HBoxContainer.new()
-    hbox.visible = amount > 0
 
     var color_rect = ColorRect.new()
     color_rect.custom_minimum_size = Vector2(12, 12)
@@ -223,6 +222,7 @@ func _update_all_resource_labels() -> void:
     hbox.tooltip_text = res_type.description
     container.add_child(hbox)
     resource_labels[res_type.id] = {label = label, container = hbox}
+    hbox.visible = amount > 0
 
 func _on_resource_total_changed(resource_type: String, new_total: int) -> void:
   if resource_labels.has(resource_type):
@@ -392,20 +392,22 @@ func _check_danger_threshold(res_type: Resource, total: int) -> void:
   if threshold <= 0:
     return
   var res_id = res_type.id
-  var label = resource_labels.get(res_id)
+  var entry = resource_labels.get(res_id)
+  if not entry:
+    return
+  var label = entry.label
   if total >= threshold:
-    if label:
-      label.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4))
+    label.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4))
     if not danger_warnings_shown.get(res_id, false):
       danger_warnings_shown[res_id] = true
       var warning = res_type.get("danger_warning") if res_type.get("danger_warning") else "%s is at dangerous levels!" % res_type.display_name
       show_toast(warning, "warning")
   else:
-    if label and res_type.is_negative_emotion():
+    if res_type.is_negative_emotion():
       label.add_theme_color_override("font_color", negative_resource_color)
-    elif label and res_type.is_positive_emotion():
+    elif res_type.is_positive_emotion():
       label.add_theme_color_override("font_color", positive_resource_color)
-    elif label:
+    else:
       label.add_theme_color_override("font_color", neutral_resource_color)
     danger_warnings_shown[res_id] = false
 
