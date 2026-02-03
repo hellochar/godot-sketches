@@ -239,6 +239,20 @@ func _setup_components() -> void:
     var infra_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/infrastructure_component.gd").new()
     _add_component("infrastructure", infra_comp)
 
+  if definition.get("storage_capacity", 0) > 0:
+    var resonance_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/resonance_component.gd").new()
+    _add_component("resonance", resonance_comp)
+    var saturation_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/saturation_component.gd").new()
+    _add_component("saturation", saturation_comp)
+
+  if BuildingDefs.Behavior.PROCESSOR in behaviors:
+    var harmony_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/harmony_component.gd").new()
+    _add_component("harmony", harmony_comp)
+    var attunement_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/attunement_component.gd").new()
+    _add_component("attunement", attunement_comp)
+    var echo_comp = preload("res://jan_28_2026-psychebuilder-ai/src/components/emotional_echo_component.gd").new()
+    _add_component("emotional_echo", echo_comp)
+
   for component in _components.values():
     if component.has_method("_init_component"):
       component._init_component(self)
@@ -1280,6 +1294,9 @@ func _count_nearby_resource(resource_id: String) -> int:
   return total
 
 func _process_resonance(delta: float) -> void:
+  if has_component("resonance"):
+    return
+
   if storage_capacity <= 0:
     return
 
@@ -1333,6 +1350,9 @@ func _get_resonance_speed_multiplier() -> float:
   return 1.0
 
 func _process_saturation(delta: float) -> void:
+  if has_component("saturation"):
+    return
+
   var effective_capacity = get_effective_storage_capacity()
   if effective_capacity <= 0:
     saturation_state = SaturationState.NONE
@@ -1377,6 +1397,9 @@ func _process_saturation(delta: float) -> void:
     saturation_state = SaturationState.NONE
 
 func _process_saturation_effects(delta: float) -> void:
+  if has_component("saturation"):
+    return
+
   match saturation_state:
     SaturationState.JOY_SATURATED:
       _process_joy_saturation(delta)
@@ -1777,6 +1800,9 @@ func _build_emotional_echo(inputs: Dictionary) -> void:
   _update_dominant_echo()
 
 func _process_emotional_echo_decay(delta: float) -> void:
+  if has_component("emotional_echo"):
+    return
+
   if emotional_echo.is_empty():
     return
 
@@ -1821,6 +1847,9 @@ func _get_emotional_echo_multiplier() -> float:
     return 1.0 - (echo_strength * config.echo_different_type_penalty)
 
 func _process_harmony() -> void:
+  if has_component("harmony"):
+    return
+
   var was_in_harmony = is_in_harmony
   var was_attuned_count = attuned_partners.size()
   harmony_partners.clear()
@@ -1925,6 +1954,9 @@ func get_purity_output_bonus() -> int:
   return 0
 
 func _process_attunement(delta: float) -> void:
+  if has_component("attunement"):
+    return
+
   var old_attuned = attuned_partners.duplicate()
 
   if not is_in_harmony:
