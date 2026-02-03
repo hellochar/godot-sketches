@@ -1,24 +1,28 @@
 extends Node
 
 @export_group("Time")
-@export var day_duration_seconds: float = 45.0
-@export var night_duration_seconds: float = 10.0
+@export var day_duration_seconds: float = 50.0
+@export var night_duration_seconds: float = 8.0
 @export var total_days: int = 20
 
 @export_group("Energy")
-@export var starting_energy: int = 10
+@export var starting_energy: int = 8
 @export var max_energy: int = 20
-@export var energy_regen_per_day: int = 3
+@export var energy_regen_per_day: int = 4
 
 @export_group("Attention")
 @export var base_attention_pool: int = 10
-@export var habituation_thresholds: Array[int] = [5, 15, 30, 50]
+@export var habituation_thresholds: Array[int] = [3, 10, 25, 45]
 @export var habituation_costs: Array[float] = [1.0, 0.5, 0.25, 0.1, 0.0]
 
-@export_group("Wellbeing")
+@export_group("Wellbeing Formula")
 @export var positive_emotion_weight: float = 2.0
 @export var negative_emotion_weight: float = 1.5
+@export var derived_resource_weight: float = 3.0
+@export var unprocessed_negative_weight: float = 2.0
 @export var habit_building_weight: float = 1.0
+@export var adjacency_synergy_weight: float = 0.5
+@export var wellbeing_normalizer: float = 50.0
 
 @export_group("Endings")
 @export var flourishing_threshold: int = 80
@@ -431,3 +435,52 @@ extends Node
 @export var inciting_incident_day: int = 5
 @export var allow_repeat_events: bool = true
 @export var event_completion_check_interval: float = 5.0
+
+@export_group("Discovery System")
+@export var discovery_chance: float = 0.4
+@export var discovery_options_count: int = 3
+@export var discovery_min_day: int = 2
+
+@export_group("Starting Conditions - Striver Archetype")
+@export var starting_buildings: Array[Dictionary] = [
+  {"id": "memory_well", "coord": Vector2i(10, 10)},
+  {"id": "emotional_reservoir", "coord": Vector2i(14, 10)},
+  {"id": "morning_routine", "coord": Vector2i(10, 14)},
+  {"id": "exercise_yard", "coord": Vector2i(14, 14)},
+  {"id": "road", "coord": Vector2i(12, 10)},
+  {"id": "road", "coord": Vector2i(12, 11)},
+  {"id": "road", "coord": Vector2i(12, 12)},
+  {"id": "road", "coord": Vector2i(12, 13)},
+  {"id": "road", "coord": Vector2i(12, 14)},
+]
+@export var starting_resources: Dictionary = {
+  "calm": 5,
+  "tension": 3,
+  "worry": 2,
+}
+@export var archetype_productivity_bonus: float = 0.1
+@export var archetype_rest_penalty: float = 0.1
+@export var archetype_worry_generation_interval: float = 30.0
+@export var archetype_worry_generation_amount: int = 1
+
+@export_group("Tutorial Hints")
+@export var tutorial_enabled: bool = true
+@export var hint_day_1_roads: String = "Tip: Roads connect your buildings. Workers travel along roads to transport resources between buildings."
+@export var hint_day_2_buildings: String = "Tip: Click a building in the toolbar at the bottom, then click on the grid to place it. Each building has different functions."
+@export var hint_day_3_workers: String = "Tip: Click on a building that produces resources, then click on a destination building to create a worker that transports resources."
+
+@export_group("Ending Text")
+@export var ending_flourishing_title: String = "Flourishing"
+@export var ending_flourishing_text: String = "Through careful attention to your inner world, you've built something beautiful. Your habits sustain you, your emotions flow freely, and wisdom guides your path. This is what growth looks like."
+@export var ending_growing_title: String = "Growing"
+@export var ending_growing_text: String = "The mind weathered the storm and emerged stronger. While challenges remain, you've laid foundations that will serve you well. Keep building."
+@export var ending_surviving_title: String = "Surviving"
+@export var ending_surviving_text: String = "It was hard. Really hard. But you made it through. Sometimes that's enough. Tomorrow is another chance to build something better."
+@export var ending_struggling_title: String = "Struggling"
+@export var ending_struggling_text: String = "Sometimes the weight is too much to bear alone. The path forward isn't always clear, but every small step matters. Be gentle with yourself."
+
+@export_group("Adjacency Visualization")
+@export var adjacency_synergy_color: Color = Color(0.3, 0.9, 0.3, 0.6)
+@export var adjacency_conflict_color: Color = Color(0.9, 0.3, 0.3, 0.6)
+@export var adjacency_neutral_color: Color = Color(0.7, 0.7, 0.3, 0.4)
+@export var adjacency_line_width: float = 3.0

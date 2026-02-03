@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://b4x7y9m2k3n5p"]
+
+[ext_resource type="Script" path="res://jan_28_2026-psychebuilder-ai/src/ui/end_screen.gd" id="1_script"]
+
+[node name="EndScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")

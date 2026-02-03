@@ -66,13 +66,20 @@ var is_fatigued: bool = false
 
 # Visual
 @onready var sprite: Sprite2D = %Sprite2D
+@onready var glow_sprite: Sprite2D = %GlowSprite
+@onready var carry_indicator: Sprite2D = %CarryIndicator
 
 static var mote_texture: ImageTexture
+static var carry_texture: ImageTexture
 
 func _ready() -> void:
   if not mote_texture:
     mote_texture = _create_mote_texture_with_size(mote_texture_size)
+  if not carry_texture:
+    carry_texture = _create_carry_texture(16)
   sprite.texture = mote_texture
+  glow_sprite.texture = mote_texture
+  carry_indicator.texture = carry_texture
   modulate = idle_color
 
 func _create_mote_texture_with_size(tex_size: int) -> ImageTexture:
@@ -84,9 +91,33 @@ func _create_mote_texture_with_size(tex_size: int) -> ImageTexture:
     for y in range(tex_size):
       var dist = Vector2(x, y).distance_to(center)
       if dist <= radius:
-        var alpha = 1.0 - (dist / radius) * 0.5
-        var brightness = 1.0 - (dist / radius) * 0.3
-        image.set_pixel(x, y, Color(brightness, brightness, brightness, alpha))
+        var t = dist / radius
+        var alpha = 1.0 - t * t * 0.6
+        var brightness = 1.0 - t * 0.2
+        var inner_glow = 1.0 + 0.3 * (1.0 - t)
+        image.set_pixel(x, y, Color(brightness * inner_glow, brightness * inner_glow, brightness, alpha))
+      else:
+        var fade = (dist - radius) / 4.0
+        if fade < 1.0:
+          var alpha = (1.0 - fade) * 0.2
+          image.set_pixel(x, y, Color(0.9, 0.9, 0.85, alpha))
+        else:
+          image.set_pixel(x, y, Color(0, 0, 0, 0))
+
+  return ImageTexture.create_from_image(image)
+
+func _create_carry_texture(tex_size: int) -> ImageTexture:
+  var image = Image.create(tex_size, tex_size, false, Image.FORMAT_RGBA8)
+  var center = Vector2(tex_size / 2.0, tex_size / 2.0)
+  var radius = tex_size / 2.0 - 2
+
+  for x in range(tex_size):
+    for y in range(tex_size):
+      var dist = Vector2(x, y).distance_to(center)
+      if dist <= radius:
+        var t = dist / radius
+        var alpha = 1.0 - t * t
+        image.set_pixel(x, y, Color(1, 1, 1, alpha))
       else:
         image.set_pixel(x, y, Color(0, 0, 0, 0))
 
@@ -265,6 +296,7 @@ func _process_pickup() -> void:
     state = State.CARRYING
     _pathfind_to_building(dest_building)
     modulate = carrying_modulate
+    _show_carry_indicator(true)
   else:
     pass
 
@@ -318,6 +350,12 @@ func _return_resources_to_source() -> void:
 func unassign() -> void:
   if dest_building and job_type == "operate":
     dest_building.unassign_worker()
+
+  if carried_amount > 0 and resource_type != "":
+    var event_bus = get_node("/root/EventBus")
+    var spawn_pos = position + Vector2(randf_range(-16, 16), randf_range(-16, 16))
+    event_bus.resource_overflow.emit(resource_type, carried_amount, null, spawn_pos)
+
   job_type = ""
   source_building = null
   dest_building = null
@@ -343,6 +381,22 @@ func _update_selection_visual() -> void:
   else:
     modulate = _get_contamination_modulate()
     scale = Vector2(1.0, 1.0)
+  _show_carry_indicator(carried_amount > 0)
+
+func _show_carry_indicator(show: bool) -> void:
+  if not carry_indicator:
+    return
+  carry_indicator.visible = show
+  if show and resource_type != "":
+    var res_system = get_node_or_null("/root/PsycheBuilder")
+    if res_system and res_system.has_method("get_resource_system"):
+      var rs = res_system.get_resource_system()
+      if rs:
+        var res_def = rs.get_resource_type(resource_type)
+        if res_def:
+          carry_indicator.modulate = res_def.color
+          return
+    carry_indicator.modulate = Color(1, 0.9, 0.7)
 
 func _get_contamination_speed_modifier() -> float:
   var negative_total = emotional_residue.get("anxiety", 0.0) + emotional_residue.get("grief", 0.0)

@@ -12,6 +12,11 @@ var unlocked_buildings: Array = []
 
 func _ready() -> void:
   unlocked_buildings = BuildingDefs.get_all_unlocked()
+  event_bus.event_completed.connect(_on_event_completed)
+
+func _on_event_completed(event_id: String) -> void:
+  game_state.grant_event_reward(event_id)
+  _check_all_unlock_conditions()
 
 func setup(p_grid: Node, p_buildings_layer: Node2D) -> void:
   grid = p_grid
@@ -134,9 +139,63 @@ func is_unlocked(building_id: String) -> bool:
 func unlock_building(building_id: String) -> void:
   if building_id not in unlocked_buildings:
     unlocked_buildings.append(building_id)
+    event_bus.building_unlocked.emit(building_id)
 
 func get_unlocked_buildings() -> Array:
   return unlocked_buildings
+
+func check_unlock_condition(building_id: String) -> bool:
+  var def = BuildingDefs.get_definition(building_id)
+  if def.is_empty():
+    return false
+  if def.get("unlocked_by_default", false):
+    return true
+  if game_state.has_discovered_building(building_id):
+    return true
+
+  var condition = def.get("unlock_condition", {})
+  if condition.is_empty():
+    return false
+
+  if condition.has("insight"):
+    var required = condition["insight"]
+    if game_state.get_resource_total("insight") >= required:
+      return true
+
+  if condition.has("event_reward"):
+    var event_id = condition["event_reward"]
+    if game_state.has_event_reward(event_id):
+      return true
+
+  return false
+
+func _check_all_unlock_conditions() -> void:
+  var all_ids = BuildingDefs.get_all_ids()
+  for building_id in all_ids:
+    if building_id not in unlocked_buildings:
+      if check_unlock_condition(building_id):
+        unlock_building(building_id)
+        event_bus.building_activated.emit(null)
+
+func get_lockable_buildings() -> Array:
+  var result = []
+  var all_ids = BuildingDefs.get_all_ids()
+  for building_id in all_ids:
+    var def = BuildingDefs.get_definition(building_id)
+    if not def.get("unlocked_by_default", false):
+      if building_id not in unlocked_buildings:
+        result.append(building_id)
+  return result
+
+func get_discoverable_buildings() -> Array:
+  var result = []
+  var lockable = get_lockable_buildings()
+  for building_id in lockable:
+    var def = BuildingDefs.get_definition(building_id)
+    var condition = def.get("unlock_condition", {})
+    if not condition.has("event_reward"):
+      result.append(building_id)
+  return result
 
 func trigger_all_habits() -> void:
   for building in game_state.active_buildings:

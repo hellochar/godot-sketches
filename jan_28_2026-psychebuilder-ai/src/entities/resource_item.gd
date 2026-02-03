@@ -14,6 +14,7 @@ var carried_by: Node = null
 @export var texture_size: int = 32
 
 @onready var sprite: Sprite2D = %Sprite2D
+@onready var glow_sprite: Sprite2D = %GlowSprite
 @onready var label: Label = %Label
 
 static var circle_texture: ImageTexture
@@ -22,6 +23,8 @@ func _ready() -> void:
   if not circle_texture:
     circle_texture = _create_circle_texture_with_size(texture_size)
   sprite.texture = circle_texture
+  if glow_sprite:
+    glow_sprite.texture = circle_texture
   if resource_type:
     _update_visuals()
 

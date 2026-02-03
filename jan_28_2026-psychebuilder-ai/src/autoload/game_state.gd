@@ -84,6 +84,17 @@ var sync_chain_events: Dictionary = {}
 var active_sync_chains: Dictionary = {}
 var sync_chain_bonus_timers: Dictionary = {}
 
+# Tutorial hint tracking
+var hints_shown: Dictionary = {}
+
+# Building unlock tracking
+var event_rewards_granted: Array[String] = []
+var discovered_buildings: Array[String] = []
+
+# Archetype modifiers
+var archetype_productivity_bonus: float = 0.0
+var archetype_rest_penalty: float = 0.0
+
 # Wellbeing tier tracking
 enum WellbeingTier { STRUGGLING, BASELINE, STABLE, THRIVING, FLOURISHING }
 var current_wellbeing_tier: WellbeingTier = WellbeingTier.BASELINE
@@ -143,6 +154,12 @@ func reset_to_defaults(p_starting_energy: int, p_max_energy: int, p_base_attenti
 
   current_wellbeing_tier = WellbeingTier.BASELINE
   flourishing_insight_timer = 0.0
+
+  hints_shown.clear()
+  archetype_productivity_bonus = 0.0
+  archetype_rest_penalty = 0.0
+  event_rewards_granted.clear()
+  discovered_buildings.clear()
 
 func spend_energy(amount: int) -> bool:
   if current_energy < amount:
@@ -608,3 +625,33 @@ func is_in_sync_chain(building: Node, emotion_type: String) -> bool:
   if not active_sync_chains.has(emotion_type):
     return false
   return building in active_sync_chains[emotion_type]["buildings"]
+
+func get_archetype_processing_modifier() -> float:
+  return 1.0 + archetype_productivity_bonus
+
+func get_archetype_rest_modifier() -> float:
+  return 1.0 - archetype_rest_penalty
+
+func apply_archetype_modifiers(productivity: float, rest_penalty: float) -> void:
+  archetype_productivity_bonus = productivity
+  archetype_rest_penalty = rest_penalty
+
+func has_hint_shown(hint_id: String) -> bool:
+  return hints_shown.get(hint_id, false)
+
+func mark_hint_shown(hint_id: String) -> void:
+  hints_shown[hint_id] = true
+
+func grant_event_reward(event_id: String) -> void:
+  if event_id not in event_rewards_granted:
+    event_rewards_granted.append(event_id)
+
+func has_event_reward(event_id: String) -> bool:
+  return event_id in event_rewards_granted
+
+func add_discovered_building(building_id: String) -> void:
+  if building_id not in discovered_buildings:
+    discovered_buildings.append(building_id)
+
+func has_discovered_building(building_id: String) -> bool:
+  return building_id in discovered_buildings
