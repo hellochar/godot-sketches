@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://6cvx51xujnlh"]
 
-[ext_resource type="Script" uid="uid://c63jhh3y7dj5q" path="res://feb_4_2026/feb_4_2026.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://cryktbdip53cs" path="res://feb_4_2026/greenlake.png" id="2_nc0db"]
+[ext_resource type="Script" uid="uid://c63jhh3y7dj5q" path="res://feb_4_2026-greenlake-walker/feb_4_2026.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cryktbdip53cs" path="res://feb_4_2026-greenlake-walker/greenlake.png" id="2_nc0db"]
 [ext_resource type="Material" uid="uid://dci3vssaaaqb6" path="res://_materials/water/water.material" id="3_lt0sr"]
-[ext_resource type="Script" uid="uid://bpthmx2l4g2dt" path="res://feb_4_2026/character_body_3d.gd" id="5_q8beh"]
+[ext_resource type="Script" uid="uid://bpthmx2l4g2dt" path="res://feb_4_2026-greenlake-walker/character_body_3d.gd" id="5_q8beh"]
 [ext_resource type="PackedScene" path="res://_common/third_person_camera/third_person_camera.tscn" id="6_camera"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_q8beh"]
