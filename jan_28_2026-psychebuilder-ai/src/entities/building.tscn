@@ -93,3 +93,31 @@ theme_override_font_sizes/font_size = 9
 text = "Needs worker - click Assign"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="CrackOverlay" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+offset_right = 64.0
+offset_bottom = 64.0
+theme_override_colors/font_color = Color(0.8, 0.3, 0.3, 0.8)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.4)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 32
+text = "⚡"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AwakenedBadge" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+offset_left = 48.0
+offset_top = -8.0
+offset_right = 72.0
+offset_bottom = 16.0
+theme_override_colors/font_color = Color(1, 0.9, 0.4, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 14
+text = "✨"
+horizontal_alignment = 1
+vertical_alignment = 1

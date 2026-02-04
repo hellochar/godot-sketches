@@ -47,6 +47,9 @@ func _ready() -> void:
   event_bus.building_placed.connect(_on_building_placed)
   event_bus.building_removed.connect(_on_building_removed)
   event_bus.building_unlocked.connect(_on_building_unlocked)
+  event_bus.weather_changed.connect(_on_weather_changed)
+  event_bus.flow_state_entered.connect(_on_flow_state_entered)
+  event_bus.flow_state_exited.connect(_on_flow_state_exited)
   %WellbeingToggle.pressed.connect(_on_wellbeing_toggle_pressed)
 
 func setup(p_resource_system: Node, p_building_system: Node, p_worker_system: Node, p_time_system: Node) -> void:
@@ -63,6 +66,13 @@ func _process(_delta: float) -> void:
   if time_system:
     _update_time_display()
   _update_building_button_affordability()
+  _update_weather_display()
+  _update_flow_state_display()
+  if selected_building_node and is_instance_valid(selected_building_node):
+    _update_building_status_display(selected_building_node)
+    _update_building_speed_breakdown(selected_building_node)
+    _update_building_awakening_display(selected_building_node)
+    _update_building_mastery_display(selected_building_node)
 
 func _populate_building_toolbar() -> void:
   var toolbar = %BuildingToolbar
@@ -219,10 +229,32 @@ func _update_all_resource_labels() -> void:
       label.add_theme_color_override("font_color", neutral_resource_color)
 
     hbox.add_child(label)
-    hbox.tooltip_text = res_type.description
+    hbox.tooltip_text = _get_enhanced_resource_tooltip(res_type)
     container.add_child(hbox)
     resource_labels[res_type.id] = {label = label, container = hbox}
     hbox.visible = amount > 0
+
+func _get_enhanced_resource_tooltip(res_type: Resource) -> String:
+  var lines: Array[String] = [res_type.display_name, res_type.description, ""]
+
+  var processors: Array[String] = []
+  for building_id in BuildingDefs.get_all_ids():
+    var def = BuildingDefs.get_definition(building_id)
+    var inputs = def.get("input", {})
+    if inputs.has(res_type.id):
+      processors.append(def.get("name", building_id))
+
+  if processors.size() > 0:
+    lines.append("Processed by: %s" % ", ".join(processors))
+
+  var threshold = res_type.get("danger_threshold") if res_type.get("danger_threshold") else 0
+  if threshold > 0:
+    var warning = res_type.get("danger_warning") if res_type.get("danger_warning") else "Dangerous at high levels"
+    lines.append("")
+    lines.append("Danger threshold: %d" % threshold)
+    lines.append(warning)
+
+  return "\n".join(lines)
 
 func _on_resource_total_changed(resource_type: String, new_total: int) -> void:
   if resource_labels.has(resource_type):
@@ -424,6 +456,9 @@ func show_building_info(building: Node) -> void:
   _update_building_workers_display(building)
   _update_building_status_display(building)
   _update_building_adjacency_display(building)
+  _update_building_speed_breakdown(building)
+  _update_building_awakening_display(building)
+  _update_building_mastery_display(building)
 
 func _update_building_storage_display(building: Node) -> void:
   var storage_container = %StorageContainer
@@ -489,6 +524,19 @@ func _update_building_workers_display(building: Node) -> void:
       worker_label.text = "  " + desc
       worker_label.add_theme_font_size_override("font_size", 11)
       workers_container.add_child(worker_label)
+
+      var job_id = worker.get_job_id() if worker.has_method("get_job_id") else ""
+      if job_id != "":
+        var hab_level = game_state.get_habituation_level(job_id)
+        var cost = game_state.get_attention_cost(job_id)
+        var completions = game_state.habituation_progress.get(job_id, 0)
+        var next_threshold = config.habituation_thresholds[hab_level] if hab_level < config.habituation_thresholds.size() else completions
+
+        var hab_label = Label.new()
+        hab_label.text = "    Habituation Lv%d (%d/%d) Cost: %.1f" % [hab_level, completions, next_threshold, cost]
+        hab_label.add_theme_font_size_override("font_size", 9)
+        hab_label.add_theme_color_override("font_color", Color(0.6, 0.7, 0.8))
+        workers_container.add_child(hab_label)
 
 func _get_worker_short_description(worker: Node, context_building: Node) -> String:
   if worker.job_type == "transport":
@@ -662,3 +710,217 @@ func _on_remove_building_pressed() -> void:
   if selected_building_node:
     building_action_pressed.emit("remove_building", selected_building_node)
     hide_building_info()
+
+func _get_weather_icon(weather: int) -> String:
+  var GameState = preload("res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd")
+  match weather:
+    GameState.WeatherState.CLEAR_SKIES:
+      return "☀"
+    GameState.WeatherState.OVERCAST:
+      return "☁"
+    GameState.WeatherState.FOG:
+      return "🌫"
+    GameState.WeatherState.STORM:
+      return "⛈"
+    GameState.WeatherState.STILLNESS:
+      return "🌙"
+    _:
+      return "—"
+
+func _get_weather_name(weather: int) -> String:
+  var GameState = preload("res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd")
+  match weather:
+    GameState.WeatherState.CLEAR_SKIES:
+      return "Clear Skies"
+    GameState.WeatherState.OVERCAST:
+      return "Overcast"
+    GameState.WeatherState.FOG:
+      return "Fog"
+    GameState.WeatherState.STORM:
+      return "Storm"
+    GameState.WeatherState.STILLNESS:
+      return "Stillness"
+    _:
+      return "Neutral"
+
+func _get_weather_tooltip(weather: int) -> String:
+  var GameState = preload("res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd")
+  match weather:
+    GameState.WeatherState.CLEAR_SKIES:
+      return "Clear Skies\n+%d%% processing speed\n+%d%% joy generation\n+%d%% habit effectiveness" % [int(config.weather_clear_processing_bonus * 100), int(config.weather_clear_joy_gen_bonus * 100), int(config.weather_clear_habit_bonus * 100)]
+    GameState.WeatherState.OVERCAST:
+      return "Overcast\n+%d%% grief generation" % int(config.weather_overcast_grief_gen_bonus * 100)
+    GameState.WeatherState.FOG:
+      return "Fog\n-%d%% processing speed\nReduced clarity" % int(config.weather_fog_processing_penalty * 100)
+    GameState.WeatherState.STORM:
+      return "Storm\n-%d%% processing speed\n+%d%% negative generation\n-%d%% habit effectiveness" % [int(config.weather_storm_processing_penalty * 100), int(config.weather_storm_negative_gen_bonus * 100), int(config.weather_storm_habit_penalty * 100)]
+    GameState.WeatherState.STILLNESS:
+      return "Stillness\n+%d%% processing speed\n+%d%% habit effectiveness\nPeaceful atmosphere" % [int(config.weather_stillness_processing_bonus * 100), int(config.weather_stillness_habit_bonus * 100)]
+    _:
+      return "Neutral weather\nNo special effects\nWeather changes based on emotional balance"
+
+func _update_weather_display() -> void:
+  %WeatherIcon.text = _get_weather_icon(game_state.current_weather)
+  %WeatherLabel.text = _get_weather_name(game_state.current_weather)
+  %WeatherIcon.get_parent().get_parent().tooltip_text = _get_weather_tooltip(game_state.current_weather)
+
+func _on_weather_changed(_old: int, _new: int) -> void:
+  _update_weather_display()
+  var name = _get_weather_name(_new)
+  if _new != 0:
+    show_toast("Weather changed: %s" % name, "info")
+
+func _update_flow_state_display() -> void:
+  var flow_panel = %FlowStatePanel
+  var flow_bar = %FlowBar
+  var flow_status = %FlowStatus
+
+  var level = game_state.flow_state_level
+  var is_active = game_state.is_in_flow_state()
+
+  flow_panel.visible = level > 0 or is_active
+  flow_bar.value = level
+
+  if is_active:
+    flow_status.text = "✨ FLOW ACTIVE"
+    flow_status.add_theme_color_override("font_color", Color(0.4, 0.9, 0.4))
+  else:
+    flow_status.text = "Building..."
+    flow_status.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+
+  var flow_ratio = level / config.flow_max_level
+  var speed_bonus = flow_ratio * config.flow_speed_bonus_at_max
+  flow_panel.tooltip_text = "Flow State\nLevel: %.0f%%\nSpeed Bonus: +%.0f%%\n\nConditions:\n- Attention used ≤ %.0f%%\n- %d+ buildings processing\n\nGenerate insight while in flow!" % [level * 100, speed_bonus * 100, config.flow_attention_threshold * 100, config.flow_active_buildings_required]
+
+func _on_flow_state_entered(_level: float) -> void:
+  show_toast("Entered flow state!", "success")
+
+func _on_flow_state_exited() -> void:
+  pass
+
+func _update_building_speed_breakdown(building: Node) -> void:
+  var container = %SpeedBreakdownContainer
+  for child in container.get_children():
+    child.queue_free()
+
+  if not building.has_method("get_speed_multiplier_breakdown"):
+    return
+
+  var breakdown = building.get_speed_multiplier_breakdown()
+  if breakdown.is_empty():
+    return
+
+  var total = breakdown.get("total", 1.0)
+  if absf(total - 1.0) < 0.01:
+    return
+
+  var header = Label.new()
+  header.text = "Speed: x%.2f" % total
+  header.add_theme_font_size_override("font_size", 12)
+  if total > 1.0:
+    header.add_theme_color_override("font_color", Color(0.4, 0.9, 0.4))
+  elif total < 1.0:
+    header.add_theme_color_override("font_color", Color(0.9, 0.6, 0.4))
+  container.add_child(header)
+
+  var categories = breakdown.get("categories", {})
+  for category_name in categories:
+    var modifiers = categories[category_name]
+    var has_non_default = false
+    for mod_name in modifiers:
+      if absf(modifiers[mod_name] - 1.0) >= 0.01:
+        has_non_default = true
+        break
+
+    if not has_non_default:
+      continue
+
+    for mod_name in modifiers:
+      var value = modifiers[mod_name]
+      if absf(value - 1.0) < 0.01:
+        continue
+
+      var label = Label.new()
+      var pct = int((value - 1.0) * 100)
+      label.text = "  %s: %+d%%" % [mod_name.capitalize(), pct]
+      label.add_theme_font_size_override("font_size", 10)
+      if value > 1.0:
+        label.add_theme_color_override("font_color", Color(0.5, 0.8, 0.5))
+      else:
+        label.add_theme_color_override("font_color", Color(0.8, 0.5, 0.5))
+      container.add_child(label)
+
+func _update_building_awakening_display(building: Node) -> void:
+  var container = %AwakeningContainer
+  for child in container.get_children():
+    child.queue_free()
+
+  if not building.has_method("has_behavior"):
+    return
+
+  if not building.has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    return
+
+  if building.is_awakened:
+    var badge = Label.new()
+    badge.text = "✨ Awakened"
+    badge.add_theme_font_size_override("font_size", 11)
+    badge.add_theme_color_override("font_color", Color(1.0, 0.9, 0.4))
+    badge.tooltip_text = "This building has awakened!\n+%.0f%% speed\n+%d output per cycle\n+%d storage capacity" % [config.awakening_speed_bonus * 100, config.awakening_output_bonus, config.awakening_storage_bonus]
+    container.add_child(badge)
+  else:
+    var header = Label.new()
+    header.text = "Awakening: %d/%d" % [building.awakening_experience, config.awakening_threshold]
+    header.add_theme_font_size_override("font_size", 11)
+    container.add_child(header)
+
+    var bar = ProgressBar.new()
+    bar.custom_minimum_size = Vector2(0, 8)
+    bar.max_value = config.awakening_threshold
+    bar.value = building.awakening_experience
+    bar.show_percentage = false
+    container.add_child(bar)
+
+func _update_building_mastery_display(building: Node) -> void:
+  var container = %MasteryContainer
+  for child in container.get_children():
+    child.queue_free()
+
+  if not building.has_method("has_behavior"):
+    return
+
+  if not building.has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    return
+
+  var mastery_data = building.mastery_processed
+  if mastery_data.is_empty():
+    return
+
+  var header = Label.new()
+  header.text = "Mastery:"
+  header.add_theme_font_size_override("font_size", 11)
+  container.add_child(header)
+
+  for res_type in mastery_data:
+    var processed = mastery_data[res_type]
+    var level = building.mastery_levels.get(res_type, 0)
+
+    var stars = ""
+    for i in range(config.mastery_max_level):
+      if i < level:
+        stars += "★"
+      else:
+        stars += "☆"
+
+    var next_threshold = 0
+    if level < config.mastery_thresholds.size():
+      next_threshold = config.mastery_thresholds[level]
+    else:
+      next_threshold = processed
+
+    var label = Label.new()
+    label.text = "  %s: %s (%d/%d)" % [res_type.capitalize(), stars, processed, next_threshold]
+    label.add_theme_font_size_override("font_size", 10)
+    if level >= config.mastery_max_level:
+      label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.4))
+    container.add_child(label)

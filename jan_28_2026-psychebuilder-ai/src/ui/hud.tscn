@@ -23,6 +23,13 @@ corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_flow_fill"]
+bg_color = Color(0.4, 0.7, 0.9, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
 [node name="HUD" type="CanvasLayer"]
 layer = 10
 script = ExtResource("1_hud")
@@ -36,6 +43,28 @@ grow_horizontal = 2
 [node name="LeftSpacer" type="Control" parent="TopBar"]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="WeatherPanel" type="PanelContainer" parent="TopBar"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="WeatherContent" type="HBoxContainer" parent="TopBar/WeatherPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="WeatherIcon" type="Label" parent="TopBar/WeatherPanel/WeatherContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "—"
+horizontal_alignment = 1
+
+[node name="WeatherLabel" type="Label" parent="TopBar/WeatherPanel/WeatherContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Neutral"
+vertical_alignment = 1
 
 [node name="TimeControlsPanel" type="PanelContainer" parent="TopBar"]
 layout_mode = 2
@@ -228,6 +257,36 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 1
 
+[node name="FlowStatePanel" type="VBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="FlowHeader" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/FlowStatePanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Flow State"
+horizontal_alignment = 1
+
+[node name="FlowBar" type="ProgressBar" parent="RightPanel/MarginContainer/VBoxContainer/FlowStatePanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_wellbeing_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_flow_fill")
+max_value = 1.0
+value = 0.0
+show_percentage = false
+
+[node name="FlowStatus" type="Label" parent="RightPanel/MarginContainer/VBoxContainer/FlowStatePanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+text = "Building..."
+horizontal_alignment = 1
+
 [node name="HSeparator" type="HSeparator" parent="RightPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
@@ -272,6 +331,21 @@ layout_mode = 2
 theme_override_constants/separation = 2
 
 [node name="AdjacencyContainer" type="VBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="SpeedBreakdownContainer" type="VBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="AwakeningContainer" type="VBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="MasteryContainer" type="VBoxContainer" parent="RightPanel/MarginContainer/VBoxContainer/BuildingInfoPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 2
