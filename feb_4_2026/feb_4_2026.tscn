@@ -94,3 +94,6 @@ unique_name_in_owner = true
 target_path = NodePath("../CharacterBody3D")
 framing_style = 1
 vertical_offset = 0.0
+auto_recenter_enabled = true
+
+[editable path="ThirdPersonCamera"]
