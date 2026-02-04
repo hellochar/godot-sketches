@@ -199,6 +199,8 @@ func _on_choice_pressed(building_id: String) -> void:
   _close_popup()
 
 func _on_skip_pressed() -> void:
+  game_state.update_resource_total("insight", 1)
+  game_state.track_insight_generated(1)
   dismissed.emit()
   _close_popup()
 

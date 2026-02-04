@@ -98,6 +98,7 @@ var archetype_rest_penalty: float = 0.0
 # Wellbeing tier tracking
 enum WellbeingTier { STRUGGLING, BASELINE, STABLE, THRIVING, FLOURISHING }
 var current_wellbeing_tier: WellbeingTier = WellbeingTier.BASELINE
+var highest_wellbeing_tier_reached: WellbeingTier = WellbeingTier.BASELINE
 var flourishing_insight_timer: float = 0.0
 
 func reset_to_defaults(p_starting_energy: int, p_max_energy: int, p_base_attention: float, p_base_wellbeing: float, p_habituation_thresholds: Array[int] = [], p_habituation_costs: Array[float] = []) -> void:
@@ -153,6 +154,7 @@ func reset_to_defaults(p_starting_energy: int, p_max_energy: int, p_base_attenti
   sync_chain_bonus_timers.clear()
 
   current_wellbeing_tier = WellbeingTier.BASELINE
+  highest_wellbeing_tier_reached = WellbeingTier.BASELINE
   flourishing_insight_timer = 0.0
 
   hints_shown.clear()
@@ -217,6 +219,9 @@ func _update_wellbeing_tier() -> void:
     current_wellbeing_tier = WellbeingTier.BASELINE
   else:
     current_wellbeing_tier = WellbeingTier.STRUGGLING
+
+  if current_wellbeing_tier > highest_wellbeing_tier_reached:
+    highest_wellbeing_tier_reached = current_wellbeing_tier
 
   if old_tier != current_wellbeing_tier:
     event_bus.wellbeing_tier_changed.emit(old_tier, current_wellbeing_tier)

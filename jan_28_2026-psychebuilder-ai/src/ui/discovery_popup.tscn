@@ -57,4 +57,4 @@ layout_mode = 2
 [node name="SkipButton" type="Button" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Skip Discovery"
+text = "Skip Discovery (+1 Insight)"
