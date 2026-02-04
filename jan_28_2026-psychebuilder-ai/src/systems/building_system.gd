@@ -181,6 +181,32 @@ func check_unlock_condition(building_id: String) -> bool:
     if game_state.has_event_reward(event_id):
       return true
 
+  if condition.has("wellbeing_tier"):
+    var required_tier_name = condition["wellbeing_tier"]
+    var tier_map = {
+      "struggling": game_state.WellbeingTier.STRUGGLING,
+      "baseline": game_state.WellbeingTier.BASELINE,
+      "stable": game_state.WellbeingTier.STABLE,
+      "thriving": game_state.WellbeingTier.THRIVING,
+      "flourishing": game_state.WellbeingTier.FLOURISHING,
+    }
+    var required_tier = tier_map.get(required_tier_name, game_state.WellbeingTier.BASELINE)
+    if game_state.highest_wellbeing_tier_reached >= required_tier:
+      return true
+
+  if condition.has("belief"):
+    var required_belief_name = condition["belief"]
+    var belief_map = {
+      "handle_difficulty": game_state.Belief.HANDLE_DIFFICULTY,
+      "joy_resilient": game_state.Belief.JOY_RESILIENT,
+      "calm_foundation": game_state.Belief.CALM_FOUNDATION,
+      "growth_adversity": game_state.Belief.GROWTH_ADVERSITY,
+      "mindful_awareness": game_state.Belief.MINDFUL_AWARENESS,
+    }
+    var required_belief = belief_map.get(required_belief_name, null)
+    if required_belief != null and game_state.has_belief(required_belief):
+      return true
+
   return false
 
 func _check_all_unlock_conditions() -> void:

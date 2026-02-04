@@ -138,6 +138,7 @@ static var definitions: Dictionary = {
     "coping_cooldown": 30.0,
     "storage_capacity": 15,
     "unlocked_by_default": false,
+    "unlock_condition": {"belief": "calm_foundation"},
   },
 
   "reflection_pool": {
@@ -460,7 +461,7 @@ static var definitions: Dictionary = {
     "requires_worker": false,
     "storage_capacity": 10,
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 2},
+    "unlock_condition": {"wellbeing_tier": "stable"},
   },
 
   "integration_temple": {
@@ -646,7 +647,7 @@ static var definitions: Dictionary = {
     "habit_reduces": {"restlessness": 2, "boredom": 2},
     "storage_capacity": 8,
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 2},
+    "unlock_condition": {"wellbeing_tier": "stable"},
   },
 
   "sleep_chamber": {
@@ -687,7 +688,7 @@ static var definitions: Dictionary = {
     "color": Color(0.6, 0.55, 0.5),
     "habit_reduces": {"anxiety": 1, "shame": 1, "doubt": 1},
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 3},
+    "unlock_condition": {"belief": "handle_difficulty"},
   },
 
   # === COPING BUILDINGS ===
@@ -757,7 +758,7 @@ static var definitions: Dictionary = {
     "coping_cooldown": 30.0,
     "storage_capacity": 6,
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 2},
+    "unlock_condition": {"wellbeing_tier": "thriving"},
   },
 
   "grounding_chamber": {
