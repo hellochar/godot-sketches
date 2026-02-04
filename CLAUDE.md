@@ -48,6 +48,16 @@
 4. Update [autoload] paths in project.godot
 5. Check for load() calls with hardcoded paths
 
+### Git worktrees for isolated work
+
+When creating a worktree, copy .godot/ so headless Godot can validate scripts:
+```bash
+git worktree add ../sketches-<name> <branch-name> -b <branch-name>
+cp -r .godot ../sketches-<name>/
+```
+
+After adding the worktree, run `/add-dir ../sketches-<name>/` to allow edits without repeated permission prompts.
+
 ## Testing with gdUnit4
 - **When to write tests:** Write tests for logic-heavy code (state machines, calculations, game rules, utilities). Skip tests for UI-only or scene-setup code.
 - **Test location:** Place tests in `<sketch>/tests/` folder (e.g., `jan_28_2026-psychebuilder-ai/tests/test_game_state.gd`). gdUnit4 looks for folders named `tests/` by project setting.
