@@ -9,6 +9,10 @@
 - Do not invent abbreviations or acronyms for user facing text. Reuse terminology already established in the codebase and presented to the player. Optimize for understandability over brevity.
 
 # Godot
+## Input Actions
+- WASD is mapped to `camera_left`, `camera_right`, `camera_up`, `camera_down` (NOT `ui_left/right/up/down`)
+- Use `camera_*` actions for player movement
+
 ## Overall guidance
 - ALWAYS use two spaces for indentation, never tabs
 - Do not ever delete the .godot folder unless I explicitly ask.
