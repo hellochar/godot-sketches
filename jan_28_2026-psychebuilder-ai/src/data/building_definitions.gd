@@ -310,7 +310,7 @@ static var definitions: Dictionary = {
     "generation_amount": 1,
     "storage_capacity": 12,
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 2},
+    "unlock_condition": {"insight": 1},
   },
 
   "hope_beacon": {
@@ -326,7 +326,7 @@ static var definitions: Dictionary = {
     "generation_amount": 1,
     "storage_capacity": 8,
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 2},
+    "unlock_condition": {"insight": 1},
   },
 
   "curiosity_garden": {
@@ -390,7 +390,7 @@ static var definitions: Dictionary = {
     "generation_amount": 1,
     "storage_capacity": 8,
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 2},
+    "unlock_condition": {"insight": 1},
   },
 
   # === PROCESSING BUILDINGS ===
@@ -426,7 +426,7 @@ static var definitions: Dictionary = {
     "requires_worker": true,
     "storage_capacity": 10,
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 2},
+    "unlock_condition": {"insight": 1},
   },
 
   "shame_sanctuary": {
@@ -511,7 +511,7 @@ static var definitions: Dictionary = {
     "requires_worker": true,
     "storage_capacity": 12,
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 2},
+    "unlock_condition": {"insight": 1},
   },
 
   "despair_alchemist": {
