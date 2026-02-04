@@ -4,6 +4,9 @@
       "Bash",
       "Skill",
       "mcp__godot-mcp__*"
+    ],
+    "additionalDirectories": [
+      "../"
     ]
   },
   "enableAllProjectMcpServers": true,
