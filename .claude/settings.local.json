@@ -3,10 +3,11 @@
     "allow": [
       "Bash",
       "Skill",
-      "mcp__godot-mcp__*"
+      "mcp__godot-mcp__*",
+      "WebSearch"
     ],
     "additionalDirectories": [
-      "../"
+      "..\\"
     ]
   },
   "enableAllProjectMcpServers": true,
