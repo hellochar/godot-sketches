@@ -1,12 +1,13 @@
 extends Camera3D
 @export var speed := 5.0
+@export var sensitivity := 0.002
 
 func _process(delta):
 	var direction := Vector3.ZERO
 	if Input.is_action_pressed("camera_up"):
-		direction -= Vector3.FORWARD
-	if Input.is_action_pressed("camera_down"):
 		direction += Vector3.FORWARD
+	if Input.is_action_pressed("camera_down"):
+		direction -= Vector3.FORWARD
 	if Input.is_action_pressed("camera_left"):
 		direction -= Vector3.RIGHT
 	if Input.is_action_pressed("camera_right"):
@@ -18,14 +19,15 @@ func _process(delta):
 
 	if direction != Vector3.ZERO:
 		direction = direction.normalized()
-		direction = global_transform.basis * direction
-		translate(direction * speed * delta)
+		translate_object_local(direction * speed * delta)
 
-	# if Input.is_action_pressed("mouse_right"):
-	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-	var mouse_motion = Input.get_last_mouse_velocity()
-	var sensitivity := 0.00005
-	rotate_y(-mouse_motion.x * sensitivity)
-	rotate_z(mouse_motion.y * sensitivity)
-	# else:
-	#     Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+		rotation.y -= event.relative.x * sensitivity
+		rotation.x -= event.relative.y * sensitivity
+		rotation.x = clamp(rotation.x, -PI / 2, PI / 2)
+	elif event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+		elif event.button_index == MOUSE_BUTTON_RIGHT and not event.pressed:
+			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
