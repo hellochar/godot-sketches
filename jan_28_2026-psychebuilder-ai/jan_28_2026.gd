@@ -1052,6 +1052,10 @@ func _on_start_game() -> void:
   event_bus.game_started.emit()
 
 func _show_end_screen(ending_tier: String) -> void:
+  var meta = get_node_or_null("/root/MetaProgression")
+  if meta:
+    meta.record_run_end(game_state, ending_tier)
+
   if end_screen:
     end_screen.queue_free()
   end_screen = EndScreenScene.instantiate()
