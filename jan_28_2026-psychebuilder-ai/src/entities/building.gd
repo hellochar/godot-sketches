@@ -198,6 +198,8 @@ var _selection_tween: Tween = null
 @onready var status_indicator: Label = %StatusIndicator
 @onready var disconnected_warning: Label = %DisconnectedWarning
 @onready var worker_hint: Label = %WorkerHint
+@onready var crack_overlay: Label = %CrackOverlay
+@onready var awakened_badge: Label = %AwakenedBadge
 
 var has_ever_had_worker: bool = false
 
@@ -436,6 +438,8 @@ func _update_storage_display() -> void:
       if storage[res_id] > 0:
         var purity = storage_purity.get(res_id, config.purity_initial_level)
         var mastery_level = get_mastery_level(res_id)
+        var stagnation_data = resource_age_data.get(res_id, {})
+        var stagnation_level = stagnation_data.get("stagnation", 0.0)
         var indicator = ""
         if purity >= config.purity_output_bonus_threshold:
           indicator += "*"
@@ -445,6 +449,8 @@ func _update_storage_display() -> void:
           indicator += "!"
         elif mastery_level > 0:
           indicator += "+" + str(mastery_level)
+        if stagnation_level >= 0.5:
+          indicator += " (stale)"
         storage_text += "\n%s: %d%s" % [res_id, storage[res_id], indicator]
     if storage_text == "":
       storage_text = "\n(empty)"
@@ -1064,6 +1070,16 @@ func _update_status_visual() -> void:
     progress_bar.value = progress * 100.0
   else:
     progress_bar.visible = false
+
+  if crack_overlay:
+    var show_cracks = fragility_level >= config.fragility_crack_threshold
+    crack_overlay.visible = show_cracks
+    if show_cracks:
+      var crack_alpha = lerpf(0.4, 1.0, (fragility_level - config.fragility_crack_threshold) / (1.0 - config.fragility_crack_threshold))
+      crack_overlay.modulate.a = crack_alpha
+
+  if awakened_badge:
+    awakened_badge.visible = is_awakened
 
 func _is_storage_full() -> bool:
   var effective_capacity = get_effective_storage_capacity()
@@ -2601,6 +2617,57 @@ func get_mastery_output_bonus() -> int:
       return config.mastery_output_bonus_at_max
 
   return 0
+
+func get_speed_multiplier_breakdown() -> Dictionary:
+  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
+    return {}
+
+  var categories: Dictionary = {}
+
+  categories["building_state"] = {
+    "awakened": get_awakening_speed_multiplier(),
+    "fatigue": _get_fatigue_speed_multiplier(),
+    "fragility": _get_fragility_speed_multiplier(),
+  }
+
+  categories["environment"] = {
+    "weather": game_state.get_weather_processing_modifier(),
+    "wellbeing": game_state.get_wellbeing_processing_modifier(),
+    "breakthrough": game_state.get_breakthrough_speed_modifier(),
+    "grief": _get_grief_speed_multiplier(),
+    "tension": _get_tension_speed_multiplier(),
+  }
+
+  categories["synergy"] = {
+    "harmony": _get_harmony_speed_multiplier(),
+    "resonance": _get_resonance_speed_multiplier(),
+    "attunement": get_attunement_speed_multiplier(),
+    "adjacency": get_adjacency_efficiency_multiplier(),
+    "sync_chain": _get_sync_chain_speed_multiplier(),
+  }
+
+  categories["resource"] = {
+    "purity": _get_purity_speed_multiplier(),
+    "stagnation": _get_stagnation_speed_multiplier(),
+    "wisdom": _get_wisdom_efficiency_multiplier(),
+    "echo": _get_emotional_echo_multiplier(),
+  }
+
+  categories["momentum"] = {
+    "flow": game_state.get_flow_state_multiplier(),
+    "momentum": _get_momentum_speed_multiplier(),
+    "velocity": get_velocity_speed_multiplier(),
+    "mastery": get_mastery_speed_multiplier(),
+    "legacy": get_legacy_speed_multiplier(),
+    "support": _get_support_network_efficiency_multiplier(),
+  }
+
+  var total = 1.0
+  for category in categories:
+    for mod_name in categories[category]:
+      total *= categories[category][mod_name]
+
+  return {"total": total, "categories": categories}
 
 func _process_velocity(delta: float) -> void:
   if has_component("velocity"):
