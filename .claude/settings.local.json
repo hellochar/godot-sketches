@@ -13,6 +13,6 @@
   },
   "enableAllProjectMcpServers": true,
   "enabledPlugins": {
-    "ralph-loop@claude-plugins-official": true
+    "ralph-loop@claude-plugins-official": false
   }
 }
