@@ -2,8 +2,6 @@ extends Node
 
 const ResourceItemScene = preload("res://jan_28_2026-psychebuilder-ai/src/entities/resource_item.tscn")
 
-@onready var game_state: Node = get_node("/root/GameState")
-@onready var event_bus: Node = get_node("/root/EventBus")
 
 var resource_types: Dictionary = {}  # id -> ResourceType
 var resources_layer: Node2D
@@ -44,15 +42,15 @@ func spawn_resource(type_id: String, world_position: Vector2, amount: int = 1) -
   else:
     add_child(item)
 
-  var gs = game_state
+  var gs = GameState.instance
   gs.active_resources.append(item)
   gs.update_resource_total(type_id, amount)
-  event_bus.resource_spawned.emit(type_id, world_position, amount)
+  EventBus.instance.resource_spawned.emit(type_id, world_position, amount)
 
   return item
 
 func remove_resource(item: Node) -> void:
-  var gs = game_state
+  var gs = GameState.instance
   if item in gs.active_resources:
     var type_id = item.get_resource_id()
     var amount = item.amount
@@ -61,7 +59,7 @@ func remove_resource(item: Node) -> void:
     gs.update_resource_total(type_id, -amount)
 
 func process_decay() -> void:
-  var gs = game_state
+  var gs = GameState.instance
   var to_remove: Array[Node] = []
 
   for item in gs.active_resources:
@@ -70,7 +68,7 @@ func process_decay() -> void:
 
     var decayed = item.decay()
     if decayed > 0:
-      event_bus.resource_decayed.emit(item.get_resource_id(), decayed)
+      EventBus.instance.resource_decayed.emit(item.get_resource_id(), decayed)
       gs.update_resource_total(item.get_resource_id(), -decayed)
 
     if item.is_depleted():
@@ -80,14 +78,14 @@ func process_decay() -> void:
     remove_resource(item)
 
 func get_total(type_id: String) -> int:
-  return game_state.get_resource_total(type_id)
+  return GameState.instance.get_resource_total(type_id)
 
 func get_all_resource_types() -> Array:
   return resource_types.values()
 
 func get_resources_at(world_position: Vector2, radius: float = 32.0) -> Array[Node]:
   var result: Array[Node] = []
-  for item in game_state.active_resources:
+  for item in GameState.instance.active_resources:
     if item.position.distance_to(world_position) <= radius:
       result.append(item)
   return result
@@ -96,7 +94,7 @@ func get_nearest_resource(world_position: Vector2, type_id: String = "") -> Node
   var nearest: Node = null
   var nearest_dist = INF
 
-  for item in game_state.active_resources:
+  for item in GameState.instance.active_resources:
     if type_id != "" and item.get_resource_id() != type_id:
       continue
     if item.is_carried():

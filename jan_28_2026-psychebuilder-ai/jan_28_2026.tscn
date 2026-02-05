@@ -3,6 +3,13 @@
 [ext_resource type="Script" uid="uid://yka2ynw1ww7e" path="res://jan_28_2026-psychebuilder-ai/jan_28_2026.gd" id="1_script"]
 [ext_resource type="Script" uid="uid://cbhf3jd20hhij" path="res://jan_28_2026-psychebuilder-ai/game_world.gd" id="2_c28ry"]
 [ext_resource type="PackedScene" uid="uid://dxenqwy20p40s" path="res://jan_28_2026-psychebuilder-ai/src/ui/hud.tscn" id="3_hud"]
+[ext_resource type="AudioStream" path="res://jan_28_2026-psychebuilder-ai/assets/audio/background_music.wav" id="4_bgm"]
+[ext_resource type="Script" path="res://jan_28_2026-psychebuilder-ai/src/autoload/config.gd" id="5_config"]
+[ext_resource type="Script" path="res://jan_28_2026-psychebuilder-ai/src/autoload/event_bus.gd" id="6_event_bus"]
+[ext_resource type="Script" path="res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd" id="7_game_state"]
+[ext_resource type="Script" path="res://jan_28_2026-psychebuilder-ai/src/autoload/meta_progression.gd" id="8_meta_progression"]
+[ext_resource type="Script" path="res://jan_28_2026-psychebuilder-ai/src/systems/event_system.gd" id="9_event_system"]
+[ext_resource type="Script" path="res://jan_28_2026-psychebuilder-ai/src/autoload/audio_feedback.gd" id="10_audio_feedback"]
 
 [node name="PsycheBuilder" type="Control" unique_id=173724855]
 layout_mode = 3
@@ -13,6 +20,24 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_script")
+
+[node name="Config" type="Node" parent="."]
+script = ExtResource("5_config")
+
+[node name="EventBus" type="Node" parent="."]
+script = ExtResource("6_event_bus")
+
+[node name="GameState" type="Node" parent="."]
+script = ExtResource("7_game_state")
+
+[node name="MetaProgression" type="Node" parent="."]
+script = ExtResource("8_meta_progression")
+
+[node name="EventSystem" type="Node" parent="."]
+script = ExtResource("9_event_system")
+
+[node name="AudioFeedback" type="Node" parent="."]
+script = ExtResource("10_audio_feedback")
 
 [node name="GameWorld" type="Node2D" parent="." unique_id=931979143]
 unique_name_in_owner = true
@@ -65,3 +90,11 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(1, 1, 1, 0)
+
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("4_bgm")
+volume_db = -6.0
+autoplay = true
+
+[connection signal="finished" from="BackgroundMusic" to="BackgroundMusic" method="play"]

@@ -9,7 +9,6 @@ const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/buildi
 @onready var description_label: Label = %DescriptionLabel
 @onready var choices_container: HBoxContainer = %ChoicesContainer
 @onready var skip_button: Button = %SkipButton
-@onready var game_state: Node = get_node("/root/GameState")
 
 var time_system: Node
 var building_options: Array = []
@@ -49,12 +48,12 @@ func show_discovery(options: Array, p_time_system: Node = null) -> void:
     time_system.set_paused(true)
 
 func _determine_recommendation(options: Array) -> String:
-  var negative_total = game_state.get_resource_total("grief") + game_state.get_resource_total("anxiety") + game_state.get_resource_total("worry")
+  var negative_total = GameState.instance.get_resource_total("grief") + GameState.instance.get_resource_total("anxiety") + GameState.instance.get_resource_total("worry")
   var processor_count = 0
   var habit_count = 0
   var coping_count = 0
 
-  for building in game_state.active_buildings:
+  for building in GameState.instance.active_buildings:
     if building.has_behavior(BuildingDefs.Behavior.PROCESSOR):
       processor_count += 1
     if building.has_behavior(BuildingDefs.Behavior.HABIT):
@@ -79,7 +78,7 @@ func _determine_recommendation(options: Array) -> String:
 
 func _get_recommendation_text(building_id: String, def: Dictionary) -> String:
   var behaviors = def.get("behaviors", [])
-  var negative_total = game_state.get_resource_total("grief") + game_state.get_resource_total("anxiety") + game_state.get_resource_total("worry")
+  var negative_total = GameState.instance.get_resource_total("grief") + GameState.instance.get_resource_total("anxiety") + GameState.instance.get_resource_total("worry")
 
   if behaviors.has(BuildingDefs.Behavior.PROCESSOR):
     if negative_total > 10:
@@ -199,6 +198,8 @@ func _on_choice_pressed(building_id: String) -> void:
   _close_popup()
 
 func _on_skip_pressed() -> void:
+  GameState.instance.update_resource_total("insight", 1)
+  GameState.instance.track_insight_generated(1)
   dismissed.emit()
   _close_popup()
 

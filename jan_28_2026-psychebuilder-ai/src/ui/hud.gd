@@ -24,9 +24,6 @@ signal building_action_pressed(action: String, building: Node)
 @export var negative_resource_color: Color = Color(0.9, 0.5, 0.5)
 @export var neutral_resource_color: Color = Color(0.8, 0.8, 0.8)
 
-@onready var game_state: Node = get_node("/root/GameState")
-@onready var event_bus: Node = get_node("/root/EventBus")
-@onready var config: Node = get_node("/root/Config")
 
 var resource_system: Node
 var building_system: Node
@@ -41,15 +38,18 @@ var active_toasts: Array = []
 var danger_warnings_shown: Dictionary = {}  # resource_id -> bool (to avoid spam)
 
 func _ready() -> void:
-  event_bus.resource_total_changed.connect(_on_resource_total_changed)
-  event_bus.energy_changed.connect(_on_energy_changed)
-  event_bus.wellbeing_changed.connect(_on_wellbeing_changed)
-  event_bus.building_placed.connect(_on_building_placed)
-  event_bus.building_removed.connect(_on_building_removed)
-  event_bus.building_unlocked.connect(_on_building_unlocked)
-  event_bus.weather_changed.connect(_on_weather_changed)
-  event_bus.flow_state_entered.connect(_on_flow_state_entered)
-  event_bus.flow_state_exited.connect(_on_flow_state_exited)
+  EventBus.instance.resource_total_changed.connect(_on_resource_total_changed)
+  EventBus.instance.energy_changed.connect(_on_energy_changed)
+  EventBus.instance.wellbeing_changed.connect(_on_wellbeing_changed)
+  EventBus.instance.building_placed.connect(_on_building_placed)
+  EventBus.instance.building_removed.connect(_on_building_removed)
+  EventBus.instance.building_unlocked.connect(_on_building_unlocked)
+  EventBus.instance.weather_changed.connect(_on_weather_changed)
+  EventBus.instance.flow_state_entered.connect(_on_flow_state_entered)
+  EventBus.instance.flow_state_exited.connect(_on_flow_state_exited)
+  EventBus.instance.wellbeing_tier_changed.connect(_on_wellbeing_tier_changed)
+  EventBus.instance.belief_unlocked.connect(_on_belief_unlocked)
+  EventBus.instance.breakthrough_triggered.connect(_on_breakthrough_triggered)
   %WellbeingToggle.pressed.connect(_on_wellbeing_toggle_pressed)
 
 func setup(p_resource_system: Node, p_building_system: Node, p_worker_system: Node, p_time_system: Node) -> void:
@@ -130,7 +130,10 @@ func _create_building_button(building_id: String) -> Button:
 
   btn.add_child(vbox)
   btn.tooltip_text = _get_building_tooltip(def)
-  btn.pressed.connect(func(): building_selected.emit(building_id))
+  btn.pressed.connect(func():
+    AudioFeedback.instance.play_sfx("ui_click")
+    building_selected.emit(building_id)
+  )
   return btn
 
 func _get_behavior_icon(behavior: int) -> String:
@@ -196,7 +199,7 @@ func _update_building_button_affordability() -> void:
     var def = BuildingDefs.get_definition(building_id)
     var cost = def.get("build_cost", {})
     var energy = cost.get("energy", 0)
-    var can_afford = game_state.current_energy >= energy
+    var can_afford = GameState.instance.current_energy >= energy
     btn.disabled = not can_afford
     btn.modulate = affordable_color if can_afford else unaffordable_color
 
@@ -208,7 +211,7 @@ func _update_all_resource_labels() -> void:
 
   var resource_types = resource_system.get_all_resource_types()
   for res_type in resource_types:
-    var amount = int(game_state.get_resource_total(res_type.id))
+    var amount = int(GameState.instance.get_resource_total(res_type.id))
     var hbox = HBoxContainer.new()
 
     var color_rect = ColorRect.new()
@@ -267,7 +270,7 @@ func _on_resource_total_changed(resource_type: String, new_total: int) -> void:
 
 func _update_energy_display() -> void:
   var energy_label = %EnergyLabel
-  energy_label.text = "Energy: %d/%d" % [game_state.current_energy, game_state.max_energy]
+  energy_label.text = "Energy: %d/%d" % [GameState.instance.current_energy, GameState.instance.max_energy]
 
   var attention_label = %AttentionLabel
   if worker_system:
@@ -279,7 +282,7 @@ func _on_energy_changed(_old: int, _new: int) -> void:
 func _update_wellbeing_display() -> void:
   var wellbeing_value = %WellbeingValue
   var wellbeing_bar = %WellbeingBar
-  var value = game_state.wellbeing
+  var value = GameState.instance.wellbeing
 
   wellbeing_value.text = "%d" % int(value)
   wellbeing_bar.value = value
@@ -320,7 +323,7 @@ func _update_wellbeing_breakdown() -> void:
   var positive_details: Dictionary = {}
   var negative_details: Dictionary = {}
 
-  for building in game_state.active_buildings:
+  for building in GameState.instance.active_buildings:
     for res_id in building.storage:
       var amount = building.storage[res_id]
       if amount <= 0:
@@ -335,7 +338,7 @@ func _update_wellbeing_breakdown() -> void:
 
   var habit_count = 0
   var habit_building_names: Array = []
-  for building in game_state.active_buildings:
+  for building in GameState.instance.active_buildings:
     if building.has_behavior(BuildingDefs.get_definition(building.building_id).get("behaviors", [])[0] if BuildingDefs.get_definition(building.building_id).get("behaviors", []).size() > 0 else -1):
       pass
     var def = BuildingDefs.get_definition(building.building_id)
@@ -502,7 +505,7 @@ func _update_building_workers_display(building: Node) -> void:
     child.queue_free()
 
   var assigned_workers: Array = []
-  for worker in game_state.active_workers:
+  for worker in GameState.instance.active_workers:
     if worker.source_building == building or worker.dest_building == building:
       assigned_workers.append(worker)
 
@@ -527,10 +530,10 @@ func _update_building_workers_display(building: Node) -> void:
 
       var job_id = worker.get_job_id() if worker.has_method("get_job_id") else ""
       if job_id != "":
-        var hab_level = game_state.get_habituation_level(job_id)
-        var cost = game_state.get_attention_cost(job_id)
-        var completions = game_state.habituation_progress.get(job_id, 0)
-        var next_threshold = config.habituation_thresholds[hab_level] if hab_level < config.habituation_thresholds.size() else completions
+        var hab_level = GameState.instance.get_habituation_level(job_id)
+        var cost = GameState.instance.get_attention_cost(job_id)
+        var completions = GameState.instance.habituation_progress.get(job_id, 0)
+        var next_threshold = Config.instance.habituation_thresholds[hab_level] if hab_level < Config.instance.habituation_thresholds.size() else completions
 
         var hab_label = Label.new()
         hab_label.text = "    Habituation Lv%d (%d/%d) Cost: %.1f" % [hab_level, completions, next_threshold, cost]
@@ -747,22 +750,22 @@ func _get_weather_tooltip(weather: int) -> String:
   var GameState = preload("res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd")
   match weather:
     GameState.WeatherState.CLEAR_SKIES:
-      return "Clear Skies\n+%d%% processing speed\n+%d%% joy generation\n+%d%% habit effectiveness" % [int(config.weather_clear_processing_bonus * 100), int(config.weather_clear_joy_gen_bonus * 100), int(config.weather_clear_habit_bonus * 100)]
+      return "Clear Skies\n+%d%% processing speed\n+%d%% joy generation\n+%d%% habit effectiveness" % [int(Config.instance.weather_clear_processing_bonus * 100), int(Config.instance.weather_clear_joy_gen_bonus * 100), int(Config.instance.weather_clear_habit_bonus * 100)]
     GameState.WeatherState.OVERCAST:
-      return "Overcast\n+%d%% grief generation" % int(config.weather_overcast_grief_gen_bonus * 100)
+      return "Overcast\n+%d%% grief generation" % int(Config.instance.weather_overcast_grief_gen_bonus * 100)
     GameState.WeatherState.FOG:
-      return "Fog\n-%d%% processing speed\nReduced clarity" % int(config.weather_fog_processing_penalty * 100)
+      return "Fog\n-%d%% processing speed\nReduced clarity" % int(Config.instance.weather_fog_processing_penalty * 100)
     GameState.WeatherState.STORM:
-      return "Storm\n-%d%% processing speed\n+%d%% negative generation\n-%d%% habit effectiveness" % [int(config.weather_storm_processing_penalty * 100), int(config.weather_storm_negative_gen_bonus * 100), int(config.weather_storm_habit_penalty * 100)]
+      return "Storm\n-%d%% processing speed\n+%d%% negative generation\n-%d%% habit effectiveness" % [int(Config.instance.weather_storm_processing_penalty * 100), int(Config.instance.weather_storm_negative_gen_bonus * 100), int(Config.instance.weather_storm_habit_penalty * 100)]
     GameState.WeatherState.STILLNESS:
-      return "Stillness\n+%d%% processing speed\n+%d%% habit effectiveness\nPeaceful atmosphere" % [int(config.weather_stillness_processing_bonus * 100), int(config.weather_stillness_habit_bonus * 100)]
+      return "Stillness\n+%d%% processing speed\n+%d%% habit effectiveness\nPeaceful atmosphere" % [int(Config.instance.weather_stillness_processing_bonus * 100), int(Config.instance.weather_stillness_habit_bonus * 100)]
     _:
       return "Neutral weather\nNo special effects\nWeather changes based on emotional balance"
 
 func _update_weather_display() -> void:
-  %WeatherIcon.text = _get_weather_icon(game_state.current_weather)
-  %WeatherLabel.text = _get_weather_name(game_state.current_weather)
-  %WeatherIcon.get_parent().get_parent().tooltip_text = _get_weather_tooltip(game_state.current_weather)
+  %WeatherIcon.text = _get_weather_icon(GameState.instance.current_weather)
+  %WeatherLabel.text = _get_weather_name(GameState.instance.current_weather)
+  %WeatherIcon.get_parent().get_parent().tooltip_text = _get_weather_tooltip(GameState.instance.current_weather)
 
 func _on_weather_changed(_old: int, _new: int) -> void:
   _update_weather_display()
@@ -775,8 +778,8 @@ func _update_flow_state_display() -> void:
   var flow_bar = %FlowBar
   var flow_status = %FlowStatus
 
-  var level = game_state.flow_state_level
-  var is_active = game_state.is_in_flow_state()
+  var level = GameState.instance.flow_state_level
+  var is_active = GameState.instance.is_in_flow_state()
 
   flow_panel.visible = level > 0 or is_active
   flow_bar.value = level
@@ -788,9 +791,9 @@ func _update_flow_state_display() -> void:
     flow_status.text = "Building..."
     flow_status.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
 
-  var flow_ratio = level / config.flow_max_level
-  var speed_bonus = flow_ratio * config.flow_speed_bonus_at_max
-  flow_panel.tooltip_text = "Flow State\nLevel: %.0f%%\nSpeed Bonus: +%.0f%%\n\nConditions:\n- Attention used ≤ %.0f%%\n- %d+ buildings processing\n\nGenerate insight while in flow!" % [level * 100, speed_bonus * 100, config.flow_attention_threshold * 100, config.flow_active_buildings_required]
+  var flow_ratio = level / Config.instance.flow_max_level
+  var speed_bonus = flow_ratio * Config.instance.flow_speed_bonus_at_max
+  flow_panel.tooltip_text = "Flow State\nLevel: %.0f%%\nSpeed Bonus: +%.0f%%\n\nConditions:\n- Attention used ≤ %.0f%%\n- %d+ buildings processing\n\nGenerate insight while in flow!" % [level * 100, speed_bonus * 100, Config.instance.flow_attention_threshold * 100, Config.instance.flow_active_buildings_required]
 
 func _on_flow_state_entered(_level: float) -> void:
   show_toast("Entered flow state!", "success")
@@ -866,17 +869,17 @@ func _update_building_awakening_display(building: Node) -> void:
     badge.text = "✨ Awakened"
     badge.add_theme_font_size_override("font_size", 11)
     badge.add_theme_color_override("font_color", Color(1.0, 0.9, 0.4))
-    badge.tooltip_text = "This building has awakened!\n+%.0f%% speed\n+%d output per cycle\n+%d storage capacity" % [config.awakening_speed_bonus * 100, config.awakening_output_bonus, config.awakening_storage_bonus]
+    badge.tooltip_text = "This building has awakened!\n+%.0f%% speed\n+%d output per cycle\n+%d storage capacity" % [Config.instance.awakening_speed_bonus * 100, Config.instance.awakening_output_bonus, Config.instance.awakening_storage_bonus]
     container.add_child(badge)
   else:
     var header = Label.new()
-    header.text = "Awakening: %d/%d" % [building.awakening_experience, config.awakening_threshold]
+    header.text = "Awakening: %d/%d" % [building.awakening_experience, Config.instance.awakening_threshold]
     header.add_theme_font_size_override("font_size", 11)
     container.add_child(header)
 
     var bar = ProgressBar.new()
     bar.custom_minimum_size = Vector2(0, 8)
-    bar.max_value = config.awakening_threshold
+    bar.max_value = Config.instance.awakening_threshold
     bar.value = building.awakening_experience
     bar.show_percentage = false
     container.add_child(bar)
@@ -906,21 +909,78 @@ func _update_building_mastery_display(building: Node) -> void:
     var level = building.mastery_levels.get(res_type, 0)
 
     var stars = ""
-    for i in range(config.mastery_max_level):
+    for i in range(Config.instance.mastery_max_level):
       if i < level:
         stars += "★"
       else:
         stars += "☆"
 
     var next_threshold = 0
-    if level < config.mastery_thresholds.size():
-      next_threshold = config.mastery_thresholds[level]
+    if level < Config.instance.mastery_thresholds.size():
+      next_threshold = Config.instance.mastery_thresholds[level]
     else:
       next_threshold = processed
 
     var label = Label.new()
     label.text = "  %s: %s (%d/%d)" % [res_type.capitalize(), stars, processed, next_threshold]
     label.add_theme_font_size_override("font_size", 10)
-    if level >= config.mastery_max_level:
+    if level >= Config.instance.mastery_max_level:
       label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.4))
     container.add_child(label)
+
+func _get_tier_name(tier: int) -> String:
+  var GS := preload("res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd")
+  match tier:
+    GS.WellbeingTier.STRUGGLING: return "Struggling"
+    GS.WellbeingTier.BASELINE: return "Baseline"
+    GS.WellbeingTier.STABLE: return "Stable"
+    GS.WellbeingTier.THRIVING: return "Thriving"
+    GS.WellbeingTier.FLOURISHING: return "Flourishing"
+  return "Unknown"
+
+func _get_tier_feedback_color(tier: int) -> Color:
+  var GS := preload("res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd")
+  match tier:
+    GS.WellbeingTier.STRUGGLING: return Color(0.9, 0.3, 0.3)
+    GS.WellbeingTier.BASELINE: return Color(0.7, 0.7, 0.7)
+    GS.WellbeingTier.STABLE: return Color(0.9, 0.9, 0.3)
+    GS.WellbeingTier.THRIVING: return Color(0.5, 0.8, 0.3)
+    GS.WellbeingTier.FLOURISHING: return Color(0.2, 0.9, 0.4)
+  return Color.WHITE
+
+func _on_wellbeing_tier_changed(old_tier: int, new_tier: int) -> void:
+  var improving := new_tier > old_tier
+  var tier_name := _get_tier_name(new_tier)
+  var direction := "improved" if improving else "declined"
+  var toast_type := "success" if improving else "warning"
+  show_toast("Wellbeing %s: %s" % [direction, tier_name], toast_type)
+
+  var wellbeing_value := %WellbeingValue
+  var tier_color := _get_tier_feedback_color(new_tier)
+  var tween := create_tween()
+  tween.tween_property(wellbeing_value, "scale", Vector2(1.3, 1.3), 0.15)
+  tween.parallel().tween_property(wellbeing_value, "modulate", tier_color, 0.15)
+  tween.tween_property(wellbeing_value, "scale", Vector2.ONE, 0.25).set_ease(Tween.EASE_OUT)
+  tween.parallel().tween_property(wellbeing_value, "modulate", Color.WHITE, 0.4)
+
+func _get_belief_info(belief: int) -> Dictionary:
+  var GS := preload("res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd")
+  match belief:
+    GS.Belief.HANDLE_DIFFICULTY:
+      return {"name": "I Can Handle Difficulty", "effect": "+20% processing speed for grief/anxiety"}
+    GS.Belief.JOY_RESILIENT:
+      return {"name": "Joy is Resilient", "effect": "+15% positive emotion generation"}
+    GS.Belief.CALM_FOUNDATION:
+      return {"name": "Calm is My Foundation", "effect": "+15% processing speed"}
+    GS.Belief.GROWTH_ADVERSITY:
+      return {"name": "Growth Through Adversity", "effect": "+20% habit effectiveness"}
+    GS.Belief.MINDFUL_AWARENESS:
+      return {"name": "Mindful Awareness", "effect": "+10% habit effectiveness"}
+  return {"name": "Unknown Belief", "effect": ""}
+
+func _on_belief_unlocked(belief: int) -> void:
+  var info := _get_belief_info(belief)
+  show_toast("Belief unlocked: %s\n%s" % [info["name"], info["effect"]], "success")
+
+func _on_breakthrough_triggered(insight_reward: int, wisdom_reward: int) -> void:
+  show_toast("Breakthrough! +%d Insight, +%d Wisdom" % [insight_reward, wisdom_reward], "success")

@@ -1,4 +1,8 @@
+class_name GameState
 extends Node
+
+static var instance: GameState
+func _init(): instance = self
 
 # Time state
 var current_day: int = 1
@@ -98,6 +102,7 @@ var archetype_rest_penalty: float = 0.0
 # Wellbeing tier tracking
 enum WellbeingTier { STRUGGLING, BASELINE, STABLE, THRIVING, FLOURISHING }
 var current_wellbeing_tier: WellbeingTier = WellbeingTier.BASELINE
+var highest_wellbeing_tier_reached: WellbeingTier = WellbeingTier.BASELINE
 var flourishing_insight_timer: float = 0.0
 
 func reset_to_defaults(p_starting_energy: int, p_max_energy: int, p_base_attention: float, p_base_wellbeing: float, p_habituation_thresholds: Array[int] = [], p_habituation_costs: Array[float] = []) -> void:
@@ -153,6 +158,7 @@ func reset_to_defaults(p_starting_energy: int, p_max_energy: int, p_base_attenti
   sync_chain_bonus_timers.clear()
 
   current_wellbeing_tier = WellbeingTier.BASELINE
+  highest_wellbeing_tier_reached = WellbeingTier.BASELINE
   flourishing_insight_timer = 0.0
 
   hints_shown.clear()
@@ -166,31 +172,31 @@ func spend_energy(amount: int) -> bool:
     return false
   var old = current_energy
   current_energy -= amount
-  get_node("/root/EventBus").energy_changed.emit(old, current_energy)
+  EventBus.instance.energy_changed.emit(old, current_energy)
   return true
 
 func add_energy(amount: int) -> void:
   var old = current_energy
   current_energy = mini(current_energy + amount, max_energy)
   if old != current_energy:
-    get_node("/root/EventBus").energy_changed.emit(old, current_energy)
+    EventBus.instance.energy_changed.emit(old, current_energy)
 
 func use_attention(amount: float) -> bool:
   if attention_used + amount > attention_available:
     return false
   attention_used += amount
-  get_node("/root/EventBus").attention_changed.emit(attention_used, attention_available)
+  EventBus.instance.attention_changed.emit(attention_used, attention_available)
   return true
 
 func free_attention(amount: float) -> void:
   attention_used = maxf(0.0, attention_used - amount)
-  get_node("/root/EventBus").attention_changed.emit(attention_used, attention_available)
+  EventBus.instance.attention_changed.emit(attention_used, attention_available)
 
 func update_resource_total(resource_type: String, delta: int) -> void:
   if not resource_totals.has(resource_type):
     resource_totals[resource_type] = 0
   resource_totals[resource_type] += delta
-  get_node("/root/EventBus").resource_total_changed.emit(resource_type, resource_totals[resource_type])
+  EventBus.instance.resource_total_changed.emit(resource_type, resource_totals[resource_type])
 
 func get_resource_total(resource_type: String) -> int:
   return resource_totals.get(resource_type, 0)
@@ -199,12 +205,12 @@ func set_wellbeing(value: float) -> void:
   var old = wellbeing
   wellbeing = clampf(value, 0.0, 100.0)
   if old != wellbeing:
-    get_node("/root/EventBus").wellbeing_changed.emit(old, wellbeing)
+    EventBus.instance.wellbeing_changed.emit(old, wellbeing)
     _update_wellbeing_tier()
 
 func _update_wellbeing_tier() -> void:
-  var cfg = get_node("/root/Config")
-  var event_bus = get_node("/root/EventBus")
+  var cfg = Config.instance
+  var event_bus = EventBus.instance
   var old_tier = current_wellbeing_tier
 
   if wellbeing >= cfg.wellbeing_flourishing_threshold:
@@ -218,6 +224,9 @@ func _update_wellbeing_tier() -> void:
   else:
     current_wellbeing_tier = WellbeingTier.STRUGGLING
 
+  if current_wellbeing_tier > highest_wellbeing_tier_reached:
+    highest_wellbeing_tier_reached = current_wellbeing_tier
+
   if old_tier != current_wellbeing_tier:
     event_bus.wellbeing_tier_changed.emit(old_tier, current_wellbeing_tier)
 
@@ -225,7 +234,7 @@ func get_wellbeing_tier() -> WellbeingTier:
   return current_wellbeing_tier
 
 func get_wellbeing_processing_modifier() -> float:
-  var cfg = get_node("/root/Config")
+  var cfg = Config.instance
   match current_wellbeing_tier:
     WellbeingTier.STRUGGLING:
       return 1.0 - cfg.wellbeing_struggling_processing_penalty
@@ -240,7 +249,7 @@ func get_wellbeing_processing_modifier() -> float:
       return 1.0
 
 func get_wellbeing_generation_modifier(is_positive: bool) -> float:
-  var cfg = get_node("/root/Config")
+  var cfg = Config.instance
   match current_wellbeing_tier:
     WellbeingTier.STRUGGLING:
       if not is_positive:
@@ -257,7 +266,7 @@ func get_wellbeing_generation_modifier(is_positive: bool) -> float:
       return 1.0
 
 func get_wellbeing_energy_bonus() -> int:
-  var cfg = get_node("/root/Config")
+  var cfg = Config.instance
   match current_wellbeing_tier:
     WellbeingTier.THRIVING, WellbeingTier.FLOURISHING:
       return cfg.wellbeing_thriving_energy_regen_bonus
@@ -269,8 +278,8 @@ func update_flourishing_insight(delta: float) -> void:
     flourishing_insight_timer = 0.0
     return
 
-  var cfg = get_node("/root/Config")
-  var event_bus = get_node("/root/EventBus")
+  var cfg = Config.instance
+  var event_bus = EventBus.instance
 
   flourishing_insight_timer += delta
   if flourishing_insight_timer >= 1.0:
@@ -304,8 +313,8 @@ func on_day_start(energy_regen: int) -> void:
       building.trigger_habit()
 
 func on_day_end() -> void:
-  var cfg = get_node("/root/Config")
-  var event_bus = get_node("/root/EventBus")
+  var cfg = Config.instance
+  var event_bus = EventBus.instance
 
   if get_resource_total("joy") >= cfg.belief_joy_threshold:
     days_with_joy_above_threshold += 1
@@ -341,7 +350,7 @@ func track_insight_generated(amount: int) -> void:
   total_insight_generated += amount
 
 func update_weather_momentum(delta: float) -> void:
-  var cfg = get_node("/root/Config")
+  var cfg = Config.instance
 
   for emotion in weather_momentum:
     var target = float(get_resource_total(emotion)) / cfg.weather_resource_scale
@@ -351,8 +360,8 @@ func update_weather_momentum(delta: float) -> void:
   _determine_weather()
 
 func _determine_weather() -> void:
-  var cfg = get_node("/root/Config")
-  var event_bus = get_node("/root/EventBus")
+  var cfg = Config.instance
+  var event_bus = EventBus.instance
   var old_weather = current_weather
 
   var joy_mom = weather_momentum.get("joy", 0.0)
@@ -381,7 +390,7 @@ func _determine_weather() -> void:
     event_bus.weather_changed.emit(old_weather, current_weather)
 
 func get_weather_processing_modifier() -> float:
-  var cfg = get_node("/root/Config")
+  var cfg = Config.instance
   match current_weather:
     WeatherState.CLEAR_SKIES:
       return 1.0 + cfg.weather_clear_processing_bonus
@@ -395,7 +404,7 @@ func get_weather_processing_modifier() -> float:
       return 1.0
 
 func get_weather_generation_modifier() -> float:
-  var cfg = get_node("/root/Config")
+  var cfg = Config.instance
   match current_weather:
     WeatherState.STORM:
       return 1.0 + cfg.weather_storm_negative_gen_bonus
@@ -407,7 +416,7 @@ func get_weather_generation_modifier() -> float:
       return 1.0
 
 func get_weather_habit_modifier() -> float:
-  var cfg = get_node("/root/Config")
+  var cfg = Config.instance
   match current_weather:
     WeatherState.CLEAR_SKIES:
       return 1.0 + cfg.weather_clear_habit_bonus
@@ -419,7 +428,7 @@ func get_weather_habit_modifier() -> float:
       return 1.0
 
 func get_belief_processing_modifier() -> float:
-  var cfg = get_node("/root/Config")
+  var cfg = Config.instance
   var modifier = 1.0
   if has_belief(Belief.HANDLE_DIFFICULTY):
     modifier *= 1.0 + cfg.belief_handle_difficulty_bonus
@@ -428,14 +437,14 @@ func get_belief_processing_modifier() -> float:
   return modifier
 
 func get_belief_generation_modifier() -> float:
-  var cfg = get_node("/root/Config")
+  var cfg = Config.instance
   var modifier = 1.0
   if has_belief(Belief.JOY_RESILIENT):
     modifier *= 1.0 + cfg.belief_joy_resilient_bonus
   return modifier
 
 func get_belief_habit_modifier() -> float:
-  var cfg = get_node("/root/Config")
+  var cfg = Config.instance
   var modifier = 1.0
   if has_belief(Belief.GROWTH_ADVERSITY):
     modifier *= 1.0 + cfg.belief_growth_adversity_bonus
@@ -444,7 +453,7 @@ func get_belief_habit_modifier() -> float:
   return modifier
 
 func record_negative_processed(negative_type: String, amount: int) -> void:
-  var cfg = get_node("/root/Config")
+  var cfg = Config.instance
 
   if breakthrough_cooldown_timer > 0:
     return
@@ -459,7 +468,7 @@ func record_negative_processed(negative_type: String, amount: int) -> void:
   check_breakthrough()
 
 func check_breakthrough() -> void:
-  var cfg = get_node("/root/Config")
+  var cfg = Config.instance
 
   var qualifying_types = 0
   for neg_type in breakthrough_types_processed:
@@ -470,8 +479,8 @@ func check_breakthrough() -> void:
     trigger_breakthrough()
 
 func trigger_breakthrough() -> void:
-  var cfg = get_node("/root/Config")
-  var event_bus = get_node("/root/EventBus")
+  var cfg = Config.instance
+  var event_bus = EventBus.instance
 
   var total_negative = 0
   for neg_type in breakthrough_types_processed:
@@ -507,14 +516,14 @@ func update_breakthrough_timers(delta: float) -> void:
       breakthrough_types_processed.clear()
 
 func get_breakthrough_speed_modifier() -> float:
-  var cfg = get_node("/root/Config")
+  var cfg = Config.instance
   if breakthrough_speed_buff_timer > 0:
     return 1.0 + cfg.breakthrough_speed_buff_amount
   return 1.0
 
 func update_flow_state(delta: float) -> void:
-  var cfg = get_node("/root/Config")
-  var event_bus = get_node("/root/EventBus")
+  var cfg = Config.instance
+  var event_bus = EventBus.instance
 
   var attention_ratio = attention_used / attention_available if attention_available > 0 else 1.0
   var active_processing_count = 0
@@ -546,7 +555,7 @@ func update_flow_state(delta: float) -> void:
     flow_insight_timer = 0.0
 
 func get_flow_state_multiplier() -> float:
-  var cfg = get_node("/root/Config")
+  var cfg = Config.instance
   var flow_ratio = flow_state_level / cfg.flow_max_level
   return 1.0 + (flow_ratio * cfg.flow_speed_bonus_at_max)
 
@@ -554,8 +563,8 @@ func is_in_flow_state() -> bool:
   return flow_state_level >= 0.5
 
 func record_processing_event(building: Node, emotion_type: String) -> void:
-  var cfg = get_node("/root/Config")
-  var event_bus = get_node("/root/EventBus")
+  var cfg = Config.instance
+  var event_bus = EventBus.instance
   var current_time = Time.get_ticks_msec() / 1000.0
 
   if not sync_chain_events.has(emotion_type):
@@ -580,8 +589,8 @@ func record_processing_event(building: Node, emotion_type: String) -> void:
     _trigger_sync_chain(emotion_type, unique_buildings)
 
 func _trigger_sync_chain(emotion_type: String, buildings: Array[Node]) -> void:
-  var cfg = get_node("/root/Config")
-  var event_bus = get_node("/root/EventBus")
+  var cfg = Config.instance
+  var event_bus = EventBus.instance
 
   var bonus_level = minf(
     (buildings.size() - cfg.sync_chain_min_buildings + 1) * cfg.sync_chain_bonus_per_building,

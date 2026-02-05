@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://crvvymwwqk84f"
+path="res://.godot/imported/Primitive_Wall_Slope.obj-50326c2bbe961a2e7f233cfbba46b71b.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Primitive_Wall_Slope.obj-50326c2bbe961a2e7f233cfbba46b71b.mesh"]
+
+source_file="res://assets/kaykit_prototype_bits/Assets/obj/Primitive_Wall_Slope.obj"
+dest_files=["res://.godot/imported/Primitive_Wall_Slope.obj-50326c2bbe961a2e7f233cfbba46b71b.mesh", "res://.godot/imported/Primitive_Wall_Slope.obj-50326c2bbe961a2e7f233cfbba46b71b.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

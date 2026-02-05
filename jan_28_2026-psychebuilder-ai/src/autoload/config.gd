@@ -1,4 +1,8 @@
+class_name Config
 extends Node
+
+static var instance: Config
+func _init(): instance = self
 
 @export_group("Time")
 @export var day_duration_seconds: float = 50.0

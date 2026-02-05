@@ -4,27 +4,18 @@ extends Node
 var building: Node
 var definition: Dictionary
 var grid: Node
-var _game_state: Node
-var _event_bus: Node
-var _config: Node
 
 var game_state: Node:
   get:
-    if not _game_state:
-      _game_state = building.game_state
-    return _game_state
+    return GameState.instance
 
 var event_bus: Node:
   get:
-    if not _event_bus:
-      _event_bus = building.event_bus
-    return _event_bus
+    return EventBus.instance
 
 var config: Node:
   get:
-    if not _config:
-      _config = building.config
-    return _config
+    return Config.instance
 
 func _init_component(p_building: Node) -> void:
   building = p_building

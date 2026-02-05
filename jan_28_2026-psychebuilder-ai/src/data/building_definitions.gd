@@ -52,6 +52,7 @@ static var definitions: Dictionary = {
     "storage_capacity": 10,
     "unlocked_by_default": true,
     "ftue_unlock_day": 1,
+    "synergy_hints": ["memory_processor", "mourning_chapel"],
   },
 
   "mourning_chapel": {
@@ -69,6 +70,7 @@ static var definitions: Dictionary = {
     "storage_capacity": 12,
     "unlocked_by_default": true,
     "ftue_unlock_day": 3,
+    "synergy_hints": ["memory_well", "wound"],
   },
 
   "morning_routine": {
@@ -84,6 +86,7 @@ static var definitions: Dictionary = {
     "storage_capacity": 10,
     "unlocked_by_default": true,
     "ftue_unlock_day": 2,
+    "synergy_hints": ["exercise_yard", "comfort_hearth"],
   },
 
   "comfort_hearth": {
@@ -100,6 +103,7 @@ static var definitions: Dictionary = {
     "storage_capacity": 5,
     "unlocked_by_default": true,
     "ftue_unlock_day": 3,
+    "synergy_hints": ["morning_routine", "exercise_yard"],
   },
 
   "anxiety_diffuser": {
@@ -117,6 +121,7 @@ static var definitions: Dictionary = {
     "storage_capacity": 15,
     "unlocked_by_default": true,
     "ftue_unlock_day": 5,
+    "synergy_hints": ["worry_loop"],
   },
 
   "emergency_calm_center": {
@@ -133,6 +138,7 @@ static var definitions: Dictionary = {
     "coping_cooldown": 30.0,
     "storage_capacity": 15,
     "unlocked_by_default": false,
+    "unlock_condition": {"belief": "calm_foundation"},
   },
 
   "reflection_pool": {
@@ -149,6 +155,7 @@ static var definitions: Dictionary = {
     "requires_worker": true,
     "storage_capacity": 12,
     "unlocked_by_default": false,
+    "synergy_hints": ["rumination_spiral", "inner_critic"],
   },
 
   "exercise_yard": {
@@ -165,6 +172,7 @@ static var definitions: Dictionary = {
     "storage_capacity": 5,
     "unlocked_by_default": true,
     "ftue_unlock_day": 3,
+    "synergy_hints": ["morning_routine", "comfort_hearth"],
   },
 
   "wound": {
@@ -181,6 +189,7 @@ static var definitions: Dictionary = {
     "storage_capacity": 6,
     "unlocked_by_default": true,
     "ftue_unlock_day": 5,
+    "synergy_hints": ["mourning_chapel"],
   },
 
   "worry_loop": {
@@ -197,6 +206,7 @@ static var definitions: Dictionary = {
     "storage_capacity": 6,
     "unlocked_by_default": true,
     "ftue_unlock_day": 5,
+    "synergy_hints": ["anxiety_diffuser", "grounding_station"],
   },
 
   "memory_processor": {
@@ -218,6 +228,7 @@ static var definitions: Dictionary = {
     "storage_capacity": 12,
     "unlocked_by_default": true,
     "ftue_unlock_day": 7,
+    "synergy_hints": ["memory_well"],
   },
 
   "rumination_spiral": {
@@ -234,6 +245,7 @@ static var definitions: Dictionary = {
     "storage_capacity": 10,
     "unlocked_by_default": true,
     "ftue_unlock_day": 7,
+    "synergy_hints": ["reflection_pool", "grounding_station"],
   },
 
   "grounding_station": {
@@ -251,6 +263,7 @@ static var definitions: Dictionary = {
     "storage_capacity": 10,
     "unlocked_by_default": true,
     "ftue_unlock_day": 7,
+    "synergy_hints": ["worry_loop", "rumination_spiral"],
   },
 
   "inner_critic": {
@@ -267,6 +280,7 @@ static var definitions: Dictionary = {
     "storage_capacity": 8,
     "unlocked_by_default": true,
     "ftue_unlock_day": 9,
+    "synergy_hints": ["reflection_pool"],
   },
 
   # === GENERATION BUILDINGS ===
@@ -297,7 +311,7 @@ static var definitions: Dictionary = {
     "generation_amount": 1,
     "storage_capacity": 12,
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 2},
+    "unlock_condition": {"insight": 1},
   },
 
   "hope_beacon": {
@@ -315,7 +329,7 @@ static var definitions: Dictionary = {
     "generation_bonus_multiplier": 2.0,
     "storage_capacity": 8,
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 2},
+    "unlock_condition": {"insight": 1},
   },
 
   "curiosity_garden": {
@@ -382,7 +396,7 @@ static var definitions: Dictionary = {
     "generation_amount": 1,
     "storage_capacity": 8,
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 2},
+    "unlock_condition": {"insight": 1},
   },
 
   # === PROCESSING BUILDINGS ===
@@ -418,7 +432,7 @@ static var definitions: Dictionary = {
     "requires_worker": true,
     "storage_capacity": 10,
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 2},
+    "unlock_condition": {"insight": 1},
   },
 
   "shame_sanctuary": {
@@ -452,7 +466,7 @@ static var definitions: Dictionary = {
     "requires_worker": false,
     "storage_capacity": 10,
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 2},
+    "unlock_condition": {"wellbeing_tier": "stable"},
   },
 
   "integration_temple": {
@@ -503,7 +517,7 @@ static var definitions: Dictionary = {
     "requires_worker": true,
     "storage_capacity": 12,
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 2},
+    "unlock_condition": {"insight": 1},
   },
 
   "despair_alchemist": {
@@ -596,6 +610,7 @@ static var definitions: Dictionary = {
     "storage_capacity": 10,
     "unlocked_by_default": true,
     "ftue_unlock_day": 5,
+    "synergy_hints": ["grounding_station", "journaling_corner"],
   },
 
   "journaling_corner": {
@@ -611,6 +626,7 @@ static var definitions: Dictionary = {
     "storage_capacity": 6,
     "unlocked_by_default": true,
     "ftue_unlock_day": 5,
+    "synergy_hints": ["meditation_garden", "reflection_pool"],
   },
 
   "social_connection_hub": {
@@ -640,7 +656,7 @@ static var definitions: Dictionary = {
     "habit_reduces": {"restlessness": 2, "boredom": 2},
     "storage_capacity": 8,
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 2},
+    "unlock_condition": {"wellbeing_tier": "stable"},
   },
 
   "sleep_chamber": {
@@ -681,7 +697,7 @@ static var definitions: Dictionary = {
     "color": Color(0.6, 0.55, 0.5),
     "habit_reduces": {"anxiety": 1, "shame": 1, "doubt": 1},
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 3},
+    "unlock_condition": {"belief": "handle_difficulty"},
   },
 
   # === COPING BUILDINGS ===
@@ -751,7 +767,7 @@ static var definitions: Dictionary = {
     "coping_cooldown": 30.0,
     "storage_capacity": 6,
     "unlocked_by_default": false,
-    "unlock_condition": {"insight": 2},
+    "unlock_condition": {"wellbeing_tier": "thriving"},
   },
 
   "grounding_chamber": {

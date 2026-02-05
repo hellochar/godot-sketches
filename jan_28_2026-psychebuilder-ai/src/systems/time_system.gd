@@ -6,9 +6,6 @@ signal phase_changed(is_day: bool)
 
 enum Phase { DAY, NIGHT }
 
-@onready var game_state: Node = get_node("/root/GameState")
-@onready var event_bus: Node = get_node("/root/EventBus")
-@onready var config: Node = get_node("/root/Config")
 
 var current_day: int = 1
 var current_phase: Phase = Phase.DAY
@@ -39,12 +36,12 @@ func _process(delta: float) -> void:
 
   match current_phase:
     Phase.DAY:
-      if current_day >= config.weather_enable_day:
-        game_state.update_weather_momentum(delta * speed_multiplier)
-      game_state.update_breakthrough_timers(delta * speed_multiplier)
-      game_state.update_flow_state(delta * speed_multiplier)
-      game_state.update_flourishing_insight(delta * speed_multiplier)
-      game_state.update_sync_chain_timers(delta * speed_multiplier)
+      if current_day >= Config.instance.weather_enable_day:
+        GameState.instance.update_weather_momentum(delta * speed_multiplier)
+      GameState.instance.update_breakthrough_timers(delta * speed_multiplier)
+      GameState.instance.update_flow_state(delta * speed_multiplier)
+      GameState.instance.update_flourishing_insight(delta * speed_multiplier)
+      GameState.instance.update_sync_chain_timers(delta * speed_multiplier)
       if phase_time >= day_duration:
         _transition_to_night()
     Phase.NIGHT:
@@ -53,22 +50,22 @@ func _process(delta: float) -> void:
 func _transition_to_night() -> void:
   current_phase = Phase.NIGHT
   phase_time = 0.0
-  game_state.current_phase = "night"
-  game_state.phase_time = 0.0
-  game_state.on_day_end()
+  GameState.instance.current_phase = "night"
+  GameState.instance.phase_time = 0.0
+  GameState.instance.on_day_end()
   _process_dream_recombinations()
   _recover_worker_fatigue()
   night_started.emit(current_day)
   phase_changed.emit(false)
-  event_bus.night_started.emit(current_day)
+  EventBus.instance.night_started.emit(current_day)
 
 func _transition_to_day() -> void:
   current_day += 1
   current_phase = Phase.DAY
   phase_time = 0.0
-  game_state.current_day = current_day
-  game_state.current_phase = "day"
-  game_state.phase_time = 0.0
+  GameState.instance.current_day = current_day
+  GameState.instance.current_phase = "day"
+  GameState.instance.phase_time = 0.0
 
   if current_day > total_days:
     _end_game()
@@ -76,11 +73,11 @@ func _transition_to_day() -> void:
 
   day_started.emit(current_day)
   phase_changed.emit(true)
-  event_bus.day_started.emit(current_day)
+  EventBus.instance.day_started.emit(current_day)
   _trigger_day_start_effects()
 
 func _trigger_day_start_effects() -> void:
-  var gs = game_state
+  var gs = GameState.instance
   if gs:
     gs.on_day_start(energy_regen_per_day)
 
@@ -90,7 +87,7 @@ func end_night() -> void:
 
 func set_paused(p: bool) -> void:
   paused = p
-  game_state.is_paused = p
+  GameState.instance.is_paused = p
 
 func set_speed(multiplier: float) -> void:
   speed_multiplier = clampf(multiplier, min_speed, max_speed)
@@ -110,13 +107,13 @@ func is_night() -> bool:
   return current_phase == Phase.NIGHT
 
 func _process_dream_recombinations() -> void:
-  var recipes = config.dream_recipes
-  for building in game_state.active_buildings:
+  var recipes = Config.instance.dream_recipes
+  for building in GameState.instance.active_buildings:
     if building.storage_capacity <= 0:
       continue
 
     for recipe_key in recipes:
-      if randf() > config.dream_recombination_chance:
+      if randf() > Config.instance.dream_recombination_chance:
         continue
 
       var parts = recipe_key.split("+")
@@ -135,23 +132,23 @@ func _process_dream_recombinations() -> void:
         break
 
 func _recover_worker_fatigue() -> void:
-  for worker in game_state.active_workers:
+  for worker in GameState.instance.active_workers:
     if worker.has_method("recover_fatigue_at_night"):
       worker.recover_fatigue_at_night()
 
 func _end_game() -> void:
   paused = true
-  game_state.is_paused = true
+  GameState.instance.is_paused = true
   var ending_tier = _calculate_ending_tier()
-  event_bus.game_ended.emit(ending_tier)
+  EventBus.instance.game_ended.emit(ending_tier)
 
 func _calculate_ending_tier() -> String:
-  var wb = game_state.wellbeing
-  if wb >= config.flourishing_threshold:
+  var wb = GameState.instance.wellbeing
+  if wb >= Config.instance.flourishing_threshold:
     return "flourishing"
-  elif wb >= config.growing_threshold:
+  elif wb >= Config.instance.growing_threshold:
     return "growing"
-  elif wb >= config.surviving_threshold:
+  elif wb >= Config.instance.surviving_threshold:
     return "surviving"
   else:
     return "struggling"

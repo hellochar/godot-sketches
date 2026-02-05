@@ -2,9 +2,6 @@ extends Node
 
 const WorkerScene = preload("res://jan_28_2026-psychebuilder-ai/src/entities/worker.tscn")
 
-@onready var game_state: Node = get_node("/root/GameState")
-@onready var config: Node = get_node("/root/Config")
-@onready var event_bus: Node = get_node("/root/EventBus")
 
 var grid: Node
 var workers: Array = []
@@ -22,13 +19,13 @@ func setup(p_grid: Node, p_attention_pool: int, p_thresholds: Array, p_costs: Ar
   habituation_costs = p_costs
 
 func _sync_attention() -> void:
-  game_state.attention_used = float(attention_used)
-  var total_pool = attention_pool + game_state.get_global_attention_bonus()
-  game_state.attention_available = float(total_pool)
-  event_bus.attention_changed.emit(float(attention_used), float(total_pool))
+  GameState.instance.attention_used = float(attention_used)
+  var total_pool := attention_pool + GameState.instance.get_global_attention_bonus()
+  GameState.instance.attention_available = float(total_pool)
+  EventBus.instance.attention_changed.emit(float(attention_used), float(total_pool))
 
 func get_available_attention() -> int:
-  var total_pool = attention_pool + game_state.get_global_attention_bonus()
+  var total_pool := attention_pool + GameState.instance.get_global_attention_bonus()
   return total_pool - attention_used
 
 func spawn_worker(world_position: Vector2) -> Node:
@@ -37,7 +34,7 @@ func spawn_worker(world_position: Vector2) -> Node:
   worker.setup(grid)
   worker.job_cycle_completed.connect(func(): update_habituation(worker))
   workers.append(worker)
-  game_state.active_workers.append(worker)
+  GameState.instance.active_workers.append(worker)
   return worker
 
 func remove_worker(worker: Node) -> void:
@@ -45,7 +42,7 @@ func remove_worker(worker: Node) -> void:
     _refund_attention(worker)
     worker.unassign()
     workers.erase(worker)
-    game_state.active_workers.erase(worker)
+    GameState.instance.active_workers.erase(worker)
     worker.queue_free()
 
 func assign_transport_job(worker: Node, source: Node, dest: Node, resource_type: String) -> bool:
@@ -75,13 +72,13 @@ func unassign_worker(worker: Node) -> void:
   worker.unassign()
 
 func _calculate_attention_cost(worker: Node, job_type: String, target_a: Node, target_b: Node, resource_type: String) -> int:
-  if game_state.is_habituation_disabled():
-    return ceili(config.habituation_costs[0])
+  if GameState.instance.is_habituation_disabled():
+    return ceili(Config.instance.habituation_costs[0])
   var job_id = _make_job_id(job_type, target_a, target_b, resource_type)
-  var gs = game_state
+  var gs = GameState.instance
   var completions = gs.habituation_progress.get(job_id, 0)
   var tier = _get_habituation_tier(completions)
-  var cost_multiplier = config.habituation_costs[tier]
+  var cost_multiplier = Config.instance.habituation_costs[tier]
   return ceili(cost_multiplier)
 
 func _make_job_id(job_type: String, target_a: Node, target_b: Node, resource_type: String) -> String:
@@ -92,7 +89,7 @@ func _make_job_id(job_type: String, target_a: Node, target_b: Node, resource_typ
   return ""
 
 func _get_habituation_tier(completions: int) -> int:
-  var thresholds = config.habituation_thresholds
+  var thresholds = Config.instance.habituation_thresholds
   for i in range(thresholds.size()):
     if completions < thresholds[i]:
       return i
@@ -118,7 +115,7 @@ func update_habituation(worker: Node) -> void:
   var old_cost = _calculate_attention_cost(worker, worker.job_type, target_a, worker.dest_building, worker.resource_type)
 
   var job_id = _make_job_id(worker.job_type, target_a, worker.dest_building, worker.resource_type)
-  var gs = game_state
+  var gs = GameState.instance
   gs.increment_habituation(job_id)
 
   var new_cost = _calculate_attention_cost(worker, worker.job_type, target_a, worker.dest_building, worker.resource_type)
