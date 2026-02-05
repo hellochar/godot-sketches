@@ -327,6 +327,58 @@ static var rules: Dictionary = {
       "efficiency": 1.2,
       "description": "Fast storage accelerates processing"
     }
+  },
+
+  "meaning_radiator": {
+    "integration_temple": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.25,
+      "description": "Meaning cycles back through integration"
+    },
+    "meditation_garden": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Stillness amplifies meaning"
+    }
+  },
+
+  "self_belief_forge": {
+    "resilience_monument": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Resilience reinforces self-belief"
+    },
+    "anger_forge": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Courage forges strength"
+    }
+  },
+
+  "excitement_channeler": {
+    "curiosity_garden": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Excitement fuels curiosity"
+    },
+    "creative_studio": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Creative energy flows"
+    }
+  },
+
+  "contentment_garden": {
+    "gratitude_practice": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Gratitude grows from contentment"
+    },
+    "comfort_hearth": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Comfort nurtures contentment"
+    }
   }
 }
 

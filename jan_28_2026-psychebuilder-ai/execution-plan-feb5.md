@@ -417,45 +417,41 @@ Icons to add:
 
 ## Execution Order
 
-### Session 1 (Now)
+### Session 1 (Completed)
 1. ✅ Task 1.1: Fix negative generator stacking
 2. ✅ Task 1.2: Add unique flag to globals
 3. ✅ Task 1.3: Implement uniqueness check
-4. Run tests
+4. ✅ Task 2.1: Restructure FTUE unlock days
+5. ✅ Task 3.1: Add Integration Temple adjacency
+6. ✅ Task 3.2: Add cross-archetype bridges
 
-### Session 2
-5. Task 2.1: Restructure FTUE unlock days
-6. Task 3.1: Add Integration Temple adjacency
-7. Task 3.2: Add cross-archetype bridges
-8. Run tests
+### Session 2 (Completed)
+7. ✅ Task 2.2: Add conditions to global effects
+8. ✅ Task 2.3: Implement activation conditions (game_state.gd, worker_system.gd)
+9. ✅ Task 3.3: Add lenticular depth to flat buildings
 
-### Session 3
-9. Task 2.2: Add conditions to global effects
-10. Task 2.3: Implement activation conditions
-11. Run tests
+### Session 3 (Completed)
+10. ✅ Task 4.2: Add processing chains for orphans (4 new buildings)
+11. ✅ Add quick_cache adjacency rules for processors
+12. ✅ Add adjacency rules for new buildings
+13. ✅ Add tests for new functionality
 
-### Session 4
-12. Task 3.3: Add lenticular depth to flat buildings
-13. Task 4.1: Merge redundant resources
-14. Task 4.2: Add processing chains for orphans
-15. Run tests
-
-### Session 5
-16. Task 5.1: Add efficiency breakdown UI
-17. Task 5.2: Add keyword status icons
-18. Final testing and polish
+### Remaining (Phase 5 - UI)
+14. Task 5.1: Add efficiency breakdown UI
+15. Task 5.2: Add keyword status icons
+16. Final testing and polish
 
 ---
 
 ## Success Criteria
 
 After all phases:
-- [ ] No negative generator compounds (all use diminishing returns)
-- [ ] Global effect buildings are unique
-- [ ] No Layer 2+ buildings unlocked before Day 3
-- [ ] Integration Temple has 5+ adjacency synergies
-- [ ] All archetypes have bridges to at least 2 other archetypes
-- [ ] No resources without processing chains (except derived end-goals)
-- [ ] All "always correct" buildings have conditions or trade-offs
-- [ ] Players can see efficiency breakdown on hover
-- [ ] Tests pass
+- [x] No negative generator compounds (all use diminishing returns)
+- [x] Global effect buildings are unique
+- [x] No Layer 2+ buildings unlocked before Day 3
+- [x] Integration Temple has 5+ adjacency synergies
+- [x] All archetypes have bridges to at least 2 other archetypes
+- [x] No resources without processing chains (except derived end-goals)
+- [x] All "always correct" buildings have conditions or trade-offs
+- [ ] Players can see efficiency breakdown on hover (UI work remaining)
+- [ ] Tests pass (need Godot to run)

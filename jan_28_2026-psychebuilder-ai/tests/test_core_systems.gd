@@ -191,13 +191,52 @@ func test_adjacency_no_effect() -> void:
   assert_bool(effect.is_empty()).is_true()
 
 
-func test_adjacency_stacking_multiplier() -> void:
+func test_adjacency_stacking_multiplier_diminishes() -> void:
   var mult_single = AdjacencyRules.get_stacking_multiplier("worry_loop", 1)
   assert_float(mult_single).is_equal(1.0)
 
   var mult_double = AdjacencyRules.get_stacking_multiplier("worry_loop", 2)
-  assert_float(mult_double).is_greater(1.0)
+  assert_float(mult_double).is_less(1.0)
+
+  var mult_triple = AdjacencyRules.get_stacking_multiplier("worry_loop", 3)
+  assert_float(mult_triple).is_less(mult_double)
 
 
 func test_adjacency_radius_constant() -> void:
   assert_int(AdjacencyRules.ADJACENCY_RADIUS).is_equal(2)
+
+
+func test_global_effect_buildings_are_unique() -> void:
+  var all_defs = BuildingDefs.get_all_definitions()
+  var global_effect_ids = ["optimism_lens", "stoic_foundation", "creative_core",
+    "compassion_center", "acceptance_shrine", "attention_amplifier"]
+  for building_id in global_effect_ids:
+    var def = all_defs.get(building_id, {})
+    if not def.is_empty():
+      assert_bool(def.get("unique", false)).is_true()
+
+
+func test_new_orphan_resource_buildings_exist() -> void:
+  var all_defs = BuildingDefs.get_all_definitions()
+  var new_buildings = ["self_belief_forge", "meaning_radiator",
+    "excitement_channeler", "contentment_garden"]
+  for building_id in new_buildings:
+    assert_bool(all_defs.has(building_id)).is_true()
+
+
+func test_quick_cache_has_processor_adjacencies() -> void:
+  var processors = ["mourning_chapel", "anxiety_diffuser", "memory_processor",
+    "grounding_station", "reflection_pool", "anger_forge", "tension_release"]
+  for processor_id in processors:
+    var effect = AdjacencyRules.get_adjacency_effect("quick_cache", processor_id)
+    assert_bool(effect.is_empty()).is_false()
+    assert_int(effect["type"]).is_equal(AdjacencyRules.EffectType.SYNERGY)
+
+
+func test_integration_temple_has_adjacencies() -> void:
+  var synergy_buildings = ["mourning_chapel", "reflection_pool", "gratitude_practice",
+    "meditation_garden", "journaling_corner"]
+  for building_id in synergy_buildings:
+    var effect = AdjacencyRules.get_adjacency_effect("integration_temple", building_id)
+    assert_bool(effect.is_empty()).is_false()
+    assert_int(effect["type"]).is_equal(AdjacencyRules.EffectType.SYNERGY)
