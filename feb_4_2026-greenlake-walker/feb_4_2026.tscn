@@ -5,6 +5,7 @@
 [ext_resource type="Material" uid="uid://dci3vssaaaqb6" path="res://_materials/water/water.material" id="3_lt0sr"]
 [ext_resource type="Script" uid="uid://bpthmx2l4g2dt" path="res://feb_4_2026-greenlake-walker/character_body_3d.gd" id="5_q8beh"]
 [ext_resource type="PackedScene" path="res://_common/third_person_camera/third_person_camera.tscn" id="6_camera"]
+[ext_resource type="AudioStream" path="res://feb_4_2026-greenlake-walker/assets/audio/background_music.wav" id="7_bgm"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_q8beh"]
 size = Vector3(100, 1, 100)
@@ -95,5 +96,13 @@ target_path = NodePath("../CharacterBody3D")
 framing_style = 1
 vertical_offset = 0.0
 auto_recenter_enabled = true
+
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("7_bgm")
+volume_db = -6.0
+autoplay = true
+
+[connection signal="finished" from="BackgroundMusic" to="BackgroundMusic" method="play"]
 
 [editable path="ThirdPersonCamera"]
