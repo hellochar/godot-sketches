@@ -5,7 +5,6 @@ const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/buildi
 const BackgroundShader = preload("res://jan_28_2026-psychebuilder-ai/src/shaders/mindspace_background.gdshader")
 const AdjacencyRules = preload("res://jan_28_2026-psychebuilder-ai/src/data/adjacency_rules.gd")
 
-@onready var config: Node = get_node("/root/Config")
 
 var grid: Node  # GridSystem
 var hover_coord: Vector2i = Vector2i(-1, -1)
@@ -324,7 +323,7 @@ func _draw() -> void:
 
   var building = aura_hovered_building
   var building_center = _get_building_center(building)
-  var tile_size = config.tile_size
+  var tile_size = Config.instance.tile_size
 
   var has_calm = building.storage.get("calm", 0) > 0
   var has_tension = building.storage.get("tension", 0) > 0
@@ -351,15 +350,15 @@ func _draw() -> void:
   var wisdom_amount = building.storage.get("wisdom", 0)
 
   if has_calm:
-    var calm_radius = (config.calm_aura_radius + 0.5) * tile_size
+    var calm_radius = (Config.instance.calm_aura_radius + 0.5) * tile_size
     _draw_aura_circle(building_center, calm_radius, aura_calm_color, maxi(calm_amount, 1))
 
   if has_tension:
-    var tension_radius = (config.tension_aura_radius + 0.5) * tile_size
+    var tension_radius = (Config.instance.tension_aura_radius + 0.5) * tile_size
     _draw_aura_circle(building_center, tension_radius, aura_tension_color, maxi(tension_amount, 1))
 
   if has_wisdom:
-    var wisdom_radius = (config.wisdom_aura_radius + 0.5) * tile_size
+    var wisdom_radius = (Config.instance.wisdom_aura_radius + 0.5) * tile_size
     _draw_aura_circle(building_center, wisdom_radius, aura_wisdom_color, maxi(wisdom_amount, 1))
 
   _draw_adjacency_lines(building, building_center)
@@ -398,13 +397,13 @@ func _draw_adjacency_lines(building: Node, building_center: Vector2) -> void:
     var line_color: Color
     match effect_type:
       0:
-        line_color = config.adjacency_synergy_color
+        line_color = Config.instance.adjacency_synergy_color
       1:
-        line_color = config.adjacency_conflict_color
+        line_color = Config.instance.adjacency_conflict_color
       _:
-        line_color = config.adjacency_neutral_color
+        line_color = Config.instance.adjacency_neutral_color
 
-    draw_line(building_center, neighbor_center, line_color, config.adjacency_line_width)
+    draw_line(building_center, neighbor_center, line_color, Config.instance.adjacency_line_width)
 
     var mid_point = (building_center + neighbor_center) * 0.5
     if effect_type == 0:
@@ -423,7 +422,7 @@ func _draw_conflict_icon(pos: Vector2, color: Color) -> void:
   draw_line(pos + Vector2(-icon_size, icon_size), pos + Vector2(icon_size, -icon_size), color, 2.0)
 
 func _get_building_center(building: Node) -> Vector2:
-  var tile_size = config.tile_size
+  var tile_size = Config.instance.tile_size
   var size = building.size
   var top_left = grid.grid_to_world_top_left(building.grid_coord)
   return top_left + Vector2(size) * tile_size * 0.5
@@ -464,11 +463,11 @@ func spawn_floating_text(world_pos: Vector2, text: String, color: Color = Color.
   tween.chain().tween_callback(label.queue_free)
 
 func _draw_placement_adjacency_preview() -> void:
-  var tile_size = config.tile_size
+  var tile_size = Config.instance.tile_size
   var placement_def = BuildingDefs.get_definition(placement_building_id)
   var placement_center = grid.grid_to_world_top_left(hover_coord) + Vector2(placement_size) * tile_size * 0.5
 
-  var game_state = get_node("/root/GameState")
+  var game_state = GameState.instance
   var adjacency_radius = AdjacencyRules.ADJACENCY_RADIUS
 
   var net_efficiency = 1.0
@@ -516,13 +515,13 @@ func _draw_placement_adjacency_preview() -> void:
     var line_color: Color
     match combined_type:
       AdjacencyRules.EffectType.SYNERGY:
-        line_color = config.adjacency_synergy_color
+        line_color = Config.instance.adjacency_synergy_color
       AdjacencyRules.EffectType.CONFLICT:
-        line_color = config.adjacency_conflict_color
+        line_color = Config.instance.adjacency_conflict_color
       _:
-        line_color = config.adjacency_neutral_color
+        line_color = Config.instance.adjacency_neutral_color
 
-    draw_line(placement_center, building_center, line_color, config.adjacency_line_width)
+    draw_line(placement_center, building_center, line_color, Config.instance.adjacency_line_width)
 
     var mid_point = (placement_center + building_center) * 0.5
     if combined_type == AdjacencyRules.EffectType.SYNERGY:

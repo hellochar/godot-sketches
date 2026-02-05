@@ -3,17 +3,15 @@ extends Node
 const BuildingScene = preload("res://jan_28_2026-psychebuilder-ai/src/entities/building.tscn")
 const BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
 
-@onready var game_state: Node = get_node("/root/GameState")
-@onready var event_bus: Node = get_node("/root/EventBus")
 
 var grid: Node  # GridSystem
 var buildings_layer: Node2D
 var unlocked_buildings: Array = []
 
 func _ready() -> void:
-  _update_day_based_unlocks(game_state.current_day)
-  event_bus.event_completed.connect(_on_event_completed)
-  event_bus.day_started.connect(_on_day_started)
+  _update_day_based_unlocks(GameState.instance.current_day)
+  EventBus.instance.event_completed.connect(_on_event_completed)
+  EventBus.instance.day_started.connect(_on_day_started)
 
 func _on_day_started(day: int) -> void:
   _update_day_based_unlocks(day)
@@ -26,10 +24,10 @@ func _update_day_based_unlocks(day: int) -> void:
       unlocked_buildings.append(building_id)
       newly_unlocked.append(building_id)
   for building_id in newly_unlocked:
-    event_bus.building_unlocked.emit(building_id)
+    EventBus.instance.building_unlocked.emit(building_id)
 
 func _on_event_completed(event_id: String) -> void:
-  game_state.grant_event_reward(event_id)
+  GameState.instance.grant_event_reward(event_id)
   _check_all_unlock_conditions()
 
 func setup(p_grid: Node, p_buildings_layer: Node2D) -> void:
@@ -52,7 +50,7 @@ func get_placement_failure_reason(building_id: String, coord: Vector2i) -> Strin
 
   var cost = def.get("build_cost", {})
   var energy_cost = cost.get("energy", 0)
-  if energy_cost > game_state.current_energy:
+  if energy_cost > GameState.instance.current_energy:
     return "Not enough energy (%d needed)" % energy_cost
 
   return ""
@@ -78,7 +76,7 @@ func place_building(building_id: String, coord: Vector2i) -> Node:
   var cost = def.get("build_cost", {})
   var energy_cost = cost.get("energy", 0)
   if energy_cost > 0:
-    game_state.spend_energy(energy_cost)
+    GameState.instance.spend_energy(energy_cost)
 
   # Create building
   var building = BuildingScene.instantiate()
@@ -87,7 +85,7 @@ func place_building(building_id: String, coord: Vector2i) -> Node:
 
   # Add to scene
   buildings_layer.add_child(building)
-  game_state.active_buildings.append(building)
+  GameState.instance.active_buildings.append(building)
 
   # Mark grid as occupied
   grid.occupy_area(coord, size, building)
@@ -95,12 +93,12 @@ func place_building(building_id: String, coord: Vector2i) -> Node:
   # Update connections for nearby buildings
   _update_nearby_connections(coord, size)
 
-  event_bus.building_placed.emit(building, coord)
+  EventBus.instance.building_placed.emit(building, coord)
 
   return building
 
 func remove_building(building: Node) -> void:
-  var gs = game_state
+  var gs = GameState.instance
   if building not in gs.active_buildings:
     return
 
@@ -117,7 +115,7 @@ func remove_building(building: Node) -> void:
   # Remove from tracking
   gs.active_buildings.erase(building)
 
-  event_bus.building_removed.emit(building, coord)
+  EventBus.instance.building_removed.emit(building, coord)
 
   building.queue_free()
 
@@ -126,23 +124,23 @@ func remove_building(building: Node) -> void:
 
 func get_building_at(coord: Vector2i) -> Node:
   var occupant = grid.get_occupant(coord)
-  if occupant and occupant in game_state.active_buildings:
+  if occupant and occupant in GameState.instance.active_buildings:
     return occupant
   return null
 
 func get_all_buildings() -> Array[Node]:
-  return game_state.active_buildings
+  return GameState.instance.active_buildings
 
 func get_buildings_by_type(building_id: String) -> Array[Node]:
   var result: Array[Node] = []
-  for building in game_state.active_buildings:
+  for building in GameState.instance.active_buildings:
     if building.building_id == building_id:
       result.append(building)
   return result
 
 func get_roads() -> Array[Node]:
   var result: Array[Node] = []
-  for building in game_state.active_buildings:
+  for building in GameState.instance.active_buildings:
     if building.is_road():
       result.append(building)
   return result
@@ -153,7 +151,7 @@ func is_unlocked(building_id: String) -> bool:
 func unlock_building(building_id: String) -> void:
   if building_id not in unlocked_buildings:
     unlocked_buildings.append(building_id)
-    event_bus.building_unlocked.emit(building_id)
+    EventBus.instance.building_unlocked.emit(building_id)
 
 func get_unlocked_buildings() -> Array:
   return unlocked_buildings
@@ -164,7 +162,7 @@ func check_unlock_condition(building_id: String) -> bool:
     return false
   if def.get("unlocked_by_default", false):
     return true
-  if game_state.has_discovered_building(building_id):
+  if GameState.instance.has_discovered_building(building_id):
     return true
 
   var condition = def.get("unlock_condition", {})
@@ -173,38 +171,38 @@ func check_unlock_condition(building_id: String) -> bool:
 
   if condition.has("insight"):
     var required = condition["insight"]
-    if game_state.get_resource_total("insight") >= required:
+    if GameState.instance.get_resource_total("insight") >= required:
       return true
 
   if condition.has("event_reward"):
     var event_id = condition["event_reward"]
-    if game_state.has_event_reward(event_id):
+    if GameState.instance.has_event_reward(event_id):
       return true
 
   if condition.has("wellbeing_tier"):
     var required_tier_name = condition["wellbeing_tier"]
     var tier_map = {
-      "struggling": game_state.WellbeingTier.STRUGGLING,
-      "baseline": game_state.WellbeingTier.BASELINE,
-      "stable": game_state.WellbeingTier.STABLE,
-      "thriving": game_state.WellbeingTier.THRIVING,
-      "flourishing": game_state.WellbeingTier.FLOURISHING,
+      "struggling": GameState.instance.WellbeingTier.STRUGGLING,
+      "baseline": GameState.instance.WellbeingTier.BASELINE,
+      "stable": GameState.instance.WellbeingTier.STABLE,
+      "thriving": GameState.instance.WellbeingTier.THRIVING,
+      "flourishing": GameState.instance.WellbeingTier.FLOURISHING,
     }
-    var required_tier = tier_map.get(required_tier_name, game_state.WellbeingTier.BASELINE)
-    if game_state.highest_wellbeing_tier_reached >= required_tier:
+    var required_tier = tier_map.get(required_tier_name, GameState.instance.WellbeingTier.BASELINE)
+    if GameState.instance.highest_wellbeing_tier_reached >= required_tier:
       return true
 
   if condition.has("belief"):
     var required_belief_name = condition["belief"]
     var belief_map = {
-      "handle_difficulty": game_state.Belief.HANDLE_DIFFICULTY,
-      "joy_resilient": game_state.Belief.JOY_RESILIENT,
-      "calm_foundation": game_state.Belief.CALM_FOUNDATION,
-      "growth_adversity": game_state.Belief.GROWTH_ADVERSITY,
-      "mindful_awareness": game_state.Belief.MINDFUL_AWARENESS,
+      "handle_difficulty": GameState.instance.Belief.HANDLE_DIFFICULTY,
+      "joy_resilient": GameState.instance.Belief.JOY_RESILIENT,
+      "calm_foundation": GameState.instance.Belief.CALM_FOUNDATION,
+      "growth_adversity": GameState.instance.Belief.GROWTH_ADVERSITY,
+      "mindful_awareness": GameState.instance.Belief.MINDFUL_AWARENESS,
     }
     var required_belief = belief_map.get(required_belief_name, null)
-    if required_belief != null and game_state.has_belief(required_belief):
+    if required_belief != null and GameState.instance.has_belief(required_belief):
       return true
 
   return false
@@ -215,7 +213,7 @@ func _check_all_unlock_conditions() -> void:
     if building_id not in unlocked_buildings:
       if check_unlock_condition(building_id):
         unlock_building(building_id)
-        event_bus.building_activated.emit(null)
+        EventBus.instance.building_activated.emit(null)
 
 func get_lockable_buildings() -> Array:
   var result = []
@@ -238,7 +236,7 @@ func get_discoverable_buildings() -> Array:
   return result
 
 func trigger_all_habits() -> void:
-  for building in game_state.active_buildings:
+  for building in GameState.instance.active_buildings:
     building.trigger_habit()
 
 func is_connected_to_road(coord: Vector2i) -> bool:

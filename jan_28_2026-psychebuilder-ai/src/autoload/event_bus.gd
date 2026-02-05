@@ -1,4 +1,8 @@
+class_name EventBus
 extends Node
+
+static var instance: EventBus
+func _init(): instance = self
 
 # Resource signals
 signal resource_spawned(resource_type: String, location: Vector2, amount: int)

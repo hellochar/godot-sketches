@@ -2,8 +2,6 @@ extends Node2D
 
 signal job_cycle_completed
 
-@onready var config: Node = get_node("/root/Config")
-@onready var game_state: Node = get_node("/root/GameState")
 
 enum State { IDLE, MOVING_TO_PICKUP, PICKING_UP, CARRYING, MOVING_TO_DROPOFF, DROPPING_OFF }
 
@@ -257,21 +255,21 @@ func _update_joy_speed_boost(delta: float) -> void:
   var carrying_joy = state == State.CARRYING and resource_type == "joy" and carried_amount > 0
 
   if carrying_joy:
-    current_speed_multiplier = 1.0 + config.joy_carry_speed_bonus
-    joy_boost_timer = config.joy_boost_duration
+    current_speed_multiplier = 1.0 + Config.instance.joy_carry_speed_bonus
+    joy_boost_timer = Config.instance.joy_boost_duration
     return
 
   var near_joy_building = false
-  for building in game_state.active_buildings:
+  for building in GameState.instance.active_buildings:
     if building.storage.get("joy", 0) > 0:
       var dist = position.distance_to(building.position)
-      if dist <= config.joy_proximity_radius:
+      if dist <= Config.instance.joy_proximity_radius:
         near_joy_building = true
         break
 
   if near_joy_building:
-    joy_boost_timer = config.joy_boost_duration
-    current_speed_multiplier = 1.0 + config.joy_proximity_speed_bonus
+    joy_boost_timer = Config.instance.joy_boost_duration
+    current_speed_multiplier = 1.0 + Config.instance.joy_proximity_speed_bonus
     return
 
   if joy_boost_timer > 0:
@@ -363,7 +361,7 @@ func unassign() -> void:
     dest_building.unassign_worker()
 
   if carried_amount > 0 and resource_type != "":
-    var event_bus = get_node("/root/EventBus")
+    var event_bus = EventBus.instance
     var spawn_pos = position + Vector2(randf_range(-16, 16), randf_range(-16, 16))
     event_bus.resource_overflow.emit(resource_type, carried_amount, null, spawn_pos)
 
@@ -413,30 +411,30 @@ func _get_contamination_speed_modifier() -> float:
   var negative_total = emotional_residue.get("anxiety", 0.0) + emotional_residue.get("grief", 0.0)
   var positive_total = emotional_residue.get("joy", 0.0) + emotional_residue.get("calm", 0.0)
 
-  var negative_factor = minf(negative_total / config.contamination_max_level, 1.0)
-  var positive_factor = minf(positive_total / config.contamination_max_level, 1.0)
+  var negative_factor = minf(negative_total / Config.instance.contamination_max_level, 1.0)
+  var positive_factor = minf(positive_total / Config.instance.contamination_max_level, 1.0)
 
-  var slowdown = negative_factor * config.contamination_speed_negative
-  var speedup = positive_factor * config.contamination_speed_positive
+  var slowdown = negative_factor * Config.instance.contamination_speed_negative
+  var speedup = positive_factor * Config.instance.contamination_speed_positive
 
   return 1.0 - slowdown + speedup
 
 func _absorb_emotion(emotion: String, amount: float) -> void:
-  var absorbed = amount * config.contamination_absorb_rate
+  var absorbed = amount * Config.instance.contamination_absorb_rate
   var current = emotional_residue.get(emotion, 0.0)
-  emotional_residue[emotion] = minf(current + absorbed, config.contamination_max_level)
+  emotional_residue[emotion] = minf(current + absorbed, Config.instance.contamination_max_level)
 
 func _decay_emotions(delta: float) -> void:
-  var decay = config.contamination_decay_rate * delta
+  var decay = Config.instance.contamination_decay_rate * delta
   for emotion in emotional_residue.keys():
     emotional_residue[emotion] = maxf(0.0, emotional_residue[emotion] - decay)
 
 func _process_contamination(delta: float) -> void:
   _decay_emotions(delta)
 
-  for building in game_state.active_buildings:
+  for building in GameState.instance.active_buildings:
     var dist = position.distance_to(building.position)
-    if dist <= config.joy_proximity_radius:
+    if dist <= Config.instance.joy_proximity_radius:
       for emotion in ["anxiety", "grief", "joy", "calm"]:
         var amount = building.storage.get(emotion, 0)
         if amount > 0:
@@ -449,8 +447,8 @@ func _get_contamination_modulate() -> Color:
   var negative_total = emotional_residue.get("anxiety", 0.0) + emotional_residue.get("grief", 0.0)
   var positive_total = emotional_residue.get("joy", 0.0) + emotional_residue.get("calm", 0.0)
 
-  var negative_factor = minf(negative_total / config.contamination_max_level, 1.0)
-  var positive_factor = minf(positive_total / config.contamination_max_level, 1.0)
+  var negative_factor = minf(negative_total / Config.instance.contamination_max_level, 1.0)
+  var positive_factor = minf(positive_total / Config.instance.contamination_max_level, 1.0)
 
   var result = base_modulate
   if negative_factor > positive_factor:
@@ -459,7 +457,7 @@ func _get_contamination_modulate() -> Color:
     result = base_modulate.lerp(positive_contamination_color, positive_factor * positive_color_blend)
 
   if is_fatigued:
-    var fatigue_ratio = (fatigue_level - config.worker_fatigue_onset_threshold) / (config.worker_fatigue_max_level - config.worker_fatigue_onset_threshold)
+    var fatigue_ratio = (fatigue_level - Config.instance.worker_fatigue_onset_threshold) / (Config.instance.worker_fatigue_max_level - Config.instance.worker_fatigue_onset_threshold)
     result = result.lerp(fatigued_modulate, fatigue_ratio * fatigued_color_blend)
 
   return result
@@ -469,12 +467,12 @@ func _update_focus_imprint() -> void:
     return
 
   var current_level = focus_imprints.get(job_id, 0.0)
-  var new_level = minf(current_level + config.focus_imprint_gain_per_cycle, config.focus_imprint_max_level)
+  var new_level = minf(current_level + Config.instance.focus_imprint_gain_per_cycle, Config.instance.focus_imprint_max_level)
   focus_imprints[job_id] = new_level
 
   for other_job in focus_imprints:
     if other_job != job_id:
-      focus_imprints[other_job] = maxf(0.0, focus_imprints[other_job] - config.focus_decay_rate)
+      focus_imprints[other_job] = maxf(0.0, focus_imprints[other_job] - Config.instance.focus_decay_rate)
 
   var max_focus = 0.0
   for fj in focus_imprints:
@@ -487,14 +485,14 @@ func get_focus_speed_multiplier() -> float:
     return 1.0
 
   var current_focus = focus_imprints.get(job_id, 0.0)
-  var focus_ratio = current_focus / config.focus_imprint_max_level
+  var focus_ratio = current_focus / Config.instance.focus_imprint_max_level
 
   if dominant_focus != "" and dominant_focus != job_id:
     var dominant_level = focus_imprints.get(dominant_focus, 0.0)
-    if dominant_level > float(config.focus_transfer_threshold) * config.focus_imprint_gain_per_cycle:
-      return 1.0 - config.focus_unfamiliar_penalty * (1.0 - focus_ratio)
+    if dominant_level > float(Config.instance.focus_transfer_threshold) * Config.instance.focus_imprint_gain_per_cycle:
+      return 1.0 - Config.instance.focus_unfamiliar_penalty * (1.0 - focus_ratio)
 
-  return 1.0 + config.focus_efficiency_bonus_at_max * focus_ratio
+  return 1.0 + Config.instance.focus_efficiency_bonus_at_max * focus_ratio
 
 func _get_road_speed_modifier() -> float:
   var my_coord = grid.world_to_grid(position)
@@ -526,13 +524,13 @@ func _recover_fatigue_from_proximity(delta: float) -> void:
   var joy_recovery = 0.0
   var calm_recovery = 0.0
 
-  for building in game_state.active_buildings:
+  for building in GameState.instance.active_buildings:
     var dist = position.distance_to(building.position)
-    if dist <= config.joy_proximity_radius:
+    if dist <= Config.instance.joy_proximity_radius:
       if building.storage.get("joy", 0) > 0:
-        joy_recovery += config.worker_fatigue_joy_recovery_bonus
+        joy_recovery += Config.instance.worker_fatigue_joy_recovery_bonus
       if building.storage.get("calm", 0) > 0:
-        calm_recovery += config.worker_fatigue_calm_recovery_bonus
+        calm_recovery += Config.instance.worker_fatigue_calm_recovery_bonus
 
   var total_recovery = (joy_recovery + calm_recovery) * delta
   if total_recovery > 0:
@@ -540,48 +538,48 @@ func _recover_fatigue_from_proximity(delta: float) -> void:
 
 func _update_fatigue_state() -> void:
   var was_fatigued = is_fatigued
-  is_fatigued = fatigue_level >= config.worker_fatigue_onset_threshold
+  is_fatigued = fatigue_level >= Config.instance.worker_fatigue_onset_threshold
 
   if is_fatigued and not was_fatigued:
-    get_node("/root/EventBus").worker_fatigued.emit(self, fatigue_level)
+    EventBus.instance.worker_fatigued.emit(self, fatigue_level)
   elif not is_fatigued and was_fatigued:
-    get_node("/root/EventBus").worker_rested.emit(self)
+    EventBus.instance.worker_rested.emit(self)
 
 func _gain_fatigue() -> void:
   var old_level = fatigue_level
-  fatigue_level = minf(fatigue_level + config.worker_fatigue_gain_per_cycle, config.worker_fatigue_max_level)
+  fatigue_level = minf(fatigue_level + Config.instance.worker_fatigue_gain_per_cycle, Config.instance.worker_fatigue_max_level)
   if fatigue_level > old_level:
     _update_fatigue_state()
 
 func _get_fatigue_speed_modifier() -> float:
-  if fatigue_level < config.worker_fatigue_onset_threshold:
+  if fatigue_level < Config.instance.worker_fatigue_onset_threshold:
     return 1.0
 
-  var fatigue_ratio = (fatigue_level - config.worker_fatigue_onset_threshold) / (config.worker_fatigue_max_level - config.worker_fatigue_onset_threshold)
-  return 1.0 - (fatigue_ratio * config.worker_fatigue_speed_penalty_at_max)
+  var fatigue_ratio = (fatigue_level - Config.instance.worker_fatigue_onset_threshold) / (Config.instance.worker_fatigue_max_level - Config.instance.worker_fatigue_onset_threshold)
+  return 1.0 - (fatigue_ratio * Config.instance.worker_fatigue_speed_penalty_at_max)
 
 func _check_fatigue_drop(delta: float) -> void:
-  if fatigue_level < config.worker_fatigue_drop_chance_threshold:
+  if fatigue_level < Config.instance.worker_fatigue_drop_chance_threshold:
     return
 
   if carried_amount <= 0:
     return
 
-  var drop_chance = config.worker_fatigue_drop_chance_per_tick * delta
-  var fatigue_factor = (fatigue_level - config.worker_fatigue_drop_chance_threshold) / (config.worker_fatigue_max_level - config.worker_fatigue_drop_chance_threshold)
+  var drop_chance = Config.instance.worker_fatigue_drop_chance_per_tick * delta
+  var fatigue_factor = (fatigue_level - Config.instance.worker_fatigue_drop_chance_threshold) / (Config.instance.worker_fatigue_max_level - Config.instance.worker_fatigue_drop_chance_threshold)
   drop_chance *= fatigue_factor
 
   if randf() < drop_chance:
     var drop_amount = mini(carried_amount, 1)
     carried_amount -= drop_amount
-    var event_bus = get_node("/root/EventBus")
+    var event_bus = EventBus.instance
     event_bus.worker_dropped_resource.emit(self, resource_type, drop_amount)
     var spawn_pos = position + Vector2(randf_range(-16, 16), randf_range(-16, 16))
     event_bus.resource_overflow.emit(resource_type, drop_amount, null, spawn_pos)
 
 func recover_fatigue_at_night() -> void:
   var old_level = fatigue_level
-  fatigue_level = maxf(0.0, fatigue_level - config.worker_fatigue_night_recovery_rate)
+  fatigue_level = maxf(0.0, fatigue_level - Config.instance.worker_fatigue_night_recovery_rate)
   if old_level != fatigue_level:
     _update_fatigue_state()
 
@@ -594,9 +592,9 @@ func _update_mastery_display() -> void:
     return
 
   mastery_bar.visible = true
-  var current_completions = game_state.habituation_progress.get(job_id, 0)
-  var current_tier = game_state.get_habituation_level(job_id)
-  var thresholds = config.habituation_thresholds
+  var current_completions = GameState.instance.habituation_progress.get(job_id, 0)
+  var current_tier = GameState.instance.get_habituation_level(job_id)
+  var thresholds = Config.instance.habituation_thresholds
 
   var progress = 0.0
   if current_tier >= thresholds.size():
@@ -622,10 +620,10 @@ func _update_mastery_display() -> void:
 func get_mastery_tooltip() -> String:
   if job_id == "":
     return "No job assigned"
-  var current_completions = game_state.habituation_progress.get(job_id, 0)
-  var current_tier = game_state.get_habituation_level(job_id)
-  var thresholds = config.habituation_thresholds
-  var cost = config.habituation_costs[current_tier] if current_tier < config.habituation_costs.size() else 0.0
+  var current_completions = GameState.instance.habituation_progress.get(job_id, 0)
+  var current_tier = GameState.instance.get_habituation_level(job_id)
+  var thresholds = Config.instance.habituation_thresholds
+  var cost = Config.instance.habituation_costs[current_tier] if current_tier < Config.instance.habituation_costs.size() else 0.0
 
   var next_threshold = thresholds[current_tier] if current_tier < thresholds.size() else current_completions
   var tier_names = ["Novice", "Practiced", "Skilled", "Expert", "Master"]

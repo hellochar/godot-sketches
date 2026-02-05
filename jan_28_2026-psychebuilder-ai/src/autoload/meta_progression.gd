@@ -1,4 +1,8 @@
+class_name MetaProgression
 extends Node
+
+static var instance: MetaProgression
+func _init(): instance = self
 
 const SAVE_PATH = "user://meta_progression.save"
 
@@ -17,7 +21,7 @@ var endings_achieved: Array[String] = []
 
 func _ready() -> void:
   load_progress()
-  var event_bus = get_node_or_null("/root/EventBus")
+  var event_bus = EventBus.instance
   if event_bus:
     event_bus.building_placed.connect(_on_building_placed)
 
@@ -84,7 +88,7 @@ func load_progress() -> void:
 func record_run_end(game_state: Node, ending_type: String) -> void:
   total_runs += 1
 
-  if game_state.wellbeing >= game_state.get_node("/root/Config").flourishing_threshold:
+  if game_state.wellbeing >= Config.instance.flourishing_threshold:
     runs_won += 1
 
   if game_state.wellbeing > best_wellbeing:
@@ -114,7 +118,7 @@ func record_run_end(game_state: Node, ending_type: String) -> void:
   save_progress()
 
 func _belief_to_string(belief: int) -> String:
-  var game_state = get_node("/root/GameState")
+  var game_state = GameState.instance
   match belief:
     game_state.Belief.HANDLE_DIFFICULTY:
       return "handle_difficulty"

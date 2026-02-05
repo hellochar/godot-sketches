@@ -67,9 +67,6 @@ const WellbeingShader = preload("res://jan_28_2026-psychebuilder-ai/src/shaders/
 
 @onready var game_world = %GameWorld
 @onready var ui_layer: CanvasLayer = %UILayer
-@onready var game_state: Node = get_node("/root/GameState")
-@onready var event_bus: Node = get_node("/root/EventBus")
-@onready var config: Node = get_node("/root/Config")
 @onready var effects_rect: ColorRect = %EffectsRect
 
 var hud: Node  # Reference to hud.gd script on UILayer
@@ -187,7 +184,7 @@ func _ready() -> void:
   hud = ui_layer  # hud.gd is attached to UILayer
   _setup_systems()
   _setup_ui()
-  event_bus.game_ended.connect(_on_game_ended)
+  EventBus.instance.game_ended.connect(_on_game_ended)
   _on_start_game()  # Skip main menu for now
 
 func _setup_systems() -> void:
@@ -211,13 +208,13 @@ func _setup_systems() -> void:
   time_system.phase_changed.connect(_on_phase_changed)
   time_system.day_started.connect(_on_day_started)
 
-  event_system = get_node("/root/EventSystem")
+  event_system = EventSystem.instance
   event_system.setup(resource_system, game_world.get_grid(), building_system)
   event_system.event_popup_requested.connect(_on_event_popup_requested)
 
-  event_bus.resource_overflow.connect(_on_resource_overflow)
+  EventBus.instance.resource_overflow.connect(_on_resource_overflow)
 
-  get_node("/root/GameState").reset_to_defaults(starting_energy, max_energy, base_attention_pool, base_wellbeing, habituation_thresholds, habituation_costs)
+  GameState.instance.reset_to_defaults(starting_energy, max_energy, base_attention_pool, base_wellbeing, habituation_thresholds, habituation_costs)
 
   game_flow_manager = GameFlowManagerScript.new()
   add_child(game_flow_manager)
@@ -227,7 +224,7 @@ func _setup_systems() -> void:
   game_flow_manager.tutorial_hint_requested.connect(_on_tutorial_hint_requested)
   game_flow_manager.discovery_available.connect(_on_discovery_available)
   game_flow_manager.starting_setup_complete.connect(_on_starting_setup_complete)
-  event_bus.night_started.connect(_on_night_started)
+  EventBus.instance.night_started.connect(_on_night_started)
   game_flow_manager.initialize_game()
 
 func _setup_ui() -> void:
@@ -245,9 +242,9 @@ func _on_building_selected(building_id: String) -> void:
   is_placing = true
   game_world.set_placement_mode(true, building_id, building_system)
 
-  if not game_state.has_hint_shown("first_building_placement"):
-    game_state.mark_hint_shown("first_building_placement")
-    _on_tutorial_hint_requested(config.hint_first_building_placement)
+  if not GameState.instance.has_hint_shown("first_building_placement"):
+    GameState.instance.mark_hint_shown("first_building_placement")
+    _on_tutorial_hint_requested(Config.instance.hint_first_building_placement)
 
 func _unhandled_input(event: InputEvent) -> void:
   if event is InputEventMouseButton:
@@ -487,7 +484,7 @@ func _remove_selected_building() -> void:
   building_system.remove_building(building)
 
   if refund > 0:
-    game_state.add_energy(refund)
+    GameState.instance.add_energy(refund)
 
   selected_building = null
   _cancel_transport_assignment()
@@ -503,7 +500,7 @@ func _calculate_wellbeing() -> void:
   var positive_total = 0
   var negative_total = 0
 
-  for building in game_state.active_buildings:
+  for building in GameState.instance.active_buildings:
     for res_id in building.storage:
       var amount = building.storage[res_id]
       if res_id in positive_emotions:
@@ -512,7 +509,7 @@ func _calculate_wellbeing() -> void:
         negative_total += amount
 
   var habit_count = 0
-  for building in game_state.active_buildings:
+  for building in GameState.instance.active_buildings:
     if building.has_behavior(BuildingDefs.Behavior.HABIT):
       habit_count += 1
 
@@ -521,7 +518,7 @@ func _calculate_wellbeing() -> void:
   var building_bonus = habit_count * habit_building_weight
 
   var new_wellbeing = base_wellbeing + positive_bonus - negative_penalty + building_bonus
-  game_state.set_wellbeing(new_wellbeing)
+  GameState.instance.set_wellbeing(new_wellbeing)
   _update_wellbeing_visual_effects()
 
 func _get_wellbeing_color(value: float) -> Color:
@@ -549,7 +546,7 @@ func _get_tier_display_info(tier: int) -> Dictionary:
 
 func _get_weather_description() -> String:
   var GameStateScript = preload("res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd")
-  match game_state.current_weather:
+  match GameState.instance.current_weather:
     GameStateScript.WeatherState.CLEAR_SKIES:
       return "Clear Skies (+15% processing)"
     GameStateScript.WeatherState.STORM:
@@ -595,7 +592,7 @@ func _process(delta: float) -> void:
 
 func _update_event_completion_check(delta: float) -> void:
   event_completion_timer += delta
-  if event_completion_timer >= config.event_completion_check_interval:
+  if event_completion_timer >= Config.instance.event_completion_check_interval:
     event_completion_timer = 0.0
     event_system.check_completion_conditions()
 
@@ -731,9 +728,9 @@ func _start_transport_assignment(building: Node) -> void:
     show_toast("No resources to transport", "warning")
     return
 
-  if not game_state.has_hint_shown("first_worker_assignment"):
-    game_state.mark_hint_shown("first_worker_assignment")
-    _on_tutorial_hint_requested(config.hint_first_worker_assignment)
+  if not GameState.instance.has_hint_shown("first_worker_assignment"):
+    GameState.instance.mark_hint_shown("first_worker_assignment")
+    _on_tutorial_hint_requested(Config.instance.hint_first_worker_assignment)
 
   selected_source_building = building
   available_transport_resources = available_res
@@ -795,7 +792,7 @@ func _on_night_started(day_number: int) -> void:
   game_flow_manager.check_discovery(day_number)
 
 func _on_starting_setup_complete() -> void:
-  game_world.focus_on_buildings(game_state.active_buildings)
+  game_world.focus_on_buildings(GameState.instance.active_buildings)
 
 func _update_building_tooltip() -> void:
   if is_placing:
@@ -879,9 +876,9 @@ func _get_indicator_explanations_text(building: Node) -> String:
   var has_quality_indicators = false
   for res_id in building.storage:
     if building.storage[res_id] > 0:
-      var purity = building.storage_purity.get(res_id, config.purity_initial_level)
+      var purity = building.storage_purity.get(res_id, Config.instance.purity_initial_level)
       var mastery_level = building.get_mastery_level(res_id)
-      if purity >= config.purity_output_bonus_threshold or purity <= config.purity_min_level + 0.1:
+      if purity >= Config.instance.purity_output_bonus_threshold or purity <= Config.instance.purity_min_level + 0.1:
         has_quality_indicators = true
       if mastery_level > 0:
         has_quality_indicators = true
@@ -953,14 +950,14 @@ func _get_storage_text(building: Node) -> String:
   for res_id in building.storage:
     var amount = building.storage[res_id]
     if amount > 0:
-      var purity = building.storage_purity.get(res_id, config.purity_initial_level)
+      var purity = building.storage_purity.get(res_id, Config.instance.purity_initial_level)
       var mastery_level = building.get_mastery_level(res_id)
       var indicator = ""
-      if purity >= config.purity_output_bonus_threshold:
+      if purity >= Config.instance.purity_output_bonus_threshold:
         indicator += "*"
-      elif purity <= config.purity_min_level + 0.1:
+      elif purity <= Config.instance.purity_min_level + 0.1:
         indicator += "~"
-      if mastery_level >= config.mastery_max_level:
+      if mastery_level >= Config.instance.mastery_max_level:
         indicator += "!"
       elif mastery_level > 0:
         indicator += "+" + str(mastery_level)
@@ -1049,27 +1046,27 @@ func _on_start_game() -> void:
   game_started = true
   game_flow_manager.initialize_game()
   _update_energy_display()
-  event_bus.game_started.emit()
+  EventBus.instance.game_started.emit()
 
 func _show_end_screen(ending_tier: String) -> void:
-  var meta = get_node_or_null("/root/MetaProgression")
+  var meta = MetaProgression.instance
   if meta:
-    meta.record_run_end(game_state, ending_tier)
+    meta.record_run_end(GameState.instance, ending_tier)
 
   if end_screen:
     end_screen.queue_free()
   end_screen = EndScreenScene.instantiate()
-  end_screen.setup(game_flow_manager, game_state)
+  end_screen.setup(game_flow_manager, GameState.instance)
   end_screen.play_again_pressed.connect(_on_play_again)
   end_screen.main_menu_pressed.connect(_on_return_to_menu)
   var stats = _gather_end_stats()
-  end_screen.show_ending(ending_tier, game_state.wellbeing, stats)
+  end_screen.show_ending(ending_tier, GameState.instance.wellbeing, stats)
   ui_layer.add_child(end_screen)
 
 func _gather_end_stats() -> Dictionary:
   var total_positive = 0
   var total_negative = 0
-  for building in game_state.active_buildings:
+  for building in GameState.instance.active_buildings:
     for res_id in building.storage:
       var amount = building.storage[res_id]
       if res_id in positive_emotions:
@@ -1078,11 +1075,11 @@ func _gather_end_stats() -> Dictionary:
         total_negative += amount
   return {
     "days": time_system.current_day,
-    "buildings": game_state.active_buildings.size(),
-    "workers": game_state.active_workers.size(),
+    "buildings": GameState.instance.active_buildings.size(),
+    "workers": GameState.instance.active_workers.size(),
     "positive_resources": total_positive,
     "negative_resources": total_negative,
-    "beliefs": game_state.active_beliefs,
+    "beliefs": GameState.instance.active_beliefs,
   }
 
 func _on_return_to_menu() -> void:
@@ -1106,12 +1103,12 @@ func _get_ending_description(tier: String) -> String:
   return game_flow_manager.get_ending_text(tier)
 
 func _gather_summary_stats() -> String:
-  var building_count = game_state.active_buildings.size()
-  var worker_count = game_state.active_workers.size()
+  var building_count = GameState.instance.active_buildings.size()
+  var worker_count = GameState.instance.active_workers.size()
 
   var total_positive = 0
   var total_negative = 0
-  for building in game_state.active_buildings:
+  for building in GameState.instance.active_buildings:
     for res_id in building.storage:
       var amount = building.storage[res_id]
       if res_id in ["joy", "calm", "wisdom"]:
@@ -1142,7 +1139,7 @@ func _setup_wellbeing_effects() -> void:
 func _update_wellbeing_visual_effects() -> void:
   if not wellbeing_material:
     return
-  var wb = game_state.wellbeing
+  var wb = GameState.instance.wellbeing
   wellbeing_material.set_shader_parameter("wellbeing", wb)
 
 func _update_visual_effects() -> void:

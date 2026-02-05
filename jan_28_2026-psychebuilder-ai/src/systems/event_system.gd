@@ -1,12 +1,13 @@
+class_name EventSystem
 extends Node
+
+static var instance: EventSystem
+func _init(): instance = self
 
 const EventDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/event_definitions.gd")
 
 signal event_popup_requested(event_data: Dictionary)
 
-@onready var game_state: Node = get_node("/root/GameState")
-@onready var event_bus: Node = get_node("/root/EventBus")
-@onready var config: Node = get_node("/root/Config")
 
 var event_history: Array[String] = []
 var current_event: Dictionary = {}
@@ -24,7 +25,7 @@ func setup(p_resource_system: Node, p_grid_system: Node, p_building_system: Node
   building_system = p_building_system
 
 func _ready() -> void:
-  event_bus.day_started.connect(_on_day_started)
+  EventBus.instance.day_started.connect(_on_day_started)
 
 func _on_day_started(day_number: int) -> void:
   energy_regen_modifier = 0
@@ -36,7 +37,7 @@ func _check_inciting_incident(day_number: int) -> void:
   if inciting_incident_triggered:
     return
 
-  if day_number >= config.inciting_incident_day:
+  if day_number >= Config.instance.inciting_incident_day:
     var incidents = EventDefs.get_inciting_incidents()
     if incidents.size() > 0:
       var incident_id = incidents[randi() % incidents.size()]
@@ -44,14 +45,14 @@ func _check_inciting_incident(day_number: int) -> void:
       inciting_incident_triggered = true
 
 func _check_random_event() -> void:
-  if randf() > config.random_event_chance:
+  if randf() > Config.instance.random_event_chance:
     return
 
   if current_event.size() > 0:
     return
 
   var minor_events = EventDefs.get_minor_events()
-  var available = minor_events.filter(func(id): return id not in event_history or config.allow_repeat_events)
+  var available = minor_events.filter(func(id): return id not in event_history or Config.instance.allow_repeat_events)
 
   if available.size() == 0:
     available = minor_events
@@ -83,7 +84,7 @@ func _trigger_event(event_id: String) -> void:
   if choices.size() > 0:
     event_popup_requested.emit(event_data)
   else:
-    event_bus.event_triggered.emit(event_id)
+    EventBus.instance.event_triggered.emit(event_id)
     _check_completion_tracking(event_data)
     current_event = {}
 
@@ -101,8 +102,8 @@ func _spawn_event_resources(spawns: Array) -> void:
       resource_system.spawn_resource(resource_type, world_pos, amount)
 
 func _get_spawn_position(location: String, spawn_data: Dictionary) -> Vector2:
-  var grid_size = config.grid_size
-  var tile_size = config.tile_size
+  var grid_size = Config.instance.grid_size
+  var tile_size = Config.instance.tile_size
 
   match location:
     "center":
@@ -125,7 +126,7 @@ func _get_spawn_position(location: String, spawn_data: Dictionary) -> Vector2:
       return _get_spawn_position("random", {})
 
 func _find_building_by_id(building_id: String) -> Node:
-  for building in game_state.active_buildings:
+  for building in GameState.instance.active_buildings:
     if building.building_id == building_id:
       return building
   return null
@@ -143,17 +144,17 @@ func execute_choice(choice_index: int) -> void:
 
   var energy_cost = effect.get("energy_cost", 0)
   if energy_cost > 0:
-    game_state.spend_energy(energy_cost)
+    GameState.instance.spend_energy(energy_cost)
 
   var energy_gain = effect.get("energy_gain", 0)
   if energy_gain > 0:
-    game_state.add_energy(energy_gain)
+    GameState.instance.add_energy(energy_gain)
 
   _spawn_event_resources(effect.get("spawns", []))
 
   var event_id = current_event.get("id", "")
-  event_bus.event_triggered.emit(event_id)
-  event_bus.event_choice_made.emit(event_id, choice_index)
+  EventBus.instance.event_triggered.emit(event_id)
+  EventBus.instance.event_choice_made.emit(event_id, choice_index)
 
   _check_completion_tracking(current_event)
   current_event = {}
@@ -201,7 +202,7 @@ func _evaluate_single_condition(condition: String) -> bool:
   var op = result.get_string(2)
   var value = int(result.get_string(3))
 
-  var current_total = game_state.get_resource_total(resource_type)
+  var current_total = GameState.instance.get_resource_total(resource_type)
 
   match op:
     "<":
@@ -226,17 +227,17 @@ func _grant_completion_reward(event: Dictionary) -> void:
   var unlock_building = reward.get("unlock_building", "")
   if unlock_building != "" and building_system:
     building_system.unlock_building(unlock_building)
-    game_state.grant_event_reward(event_id)
+    GameState.instance.grant_event_reward(event_id)
 
   var spawn = reward.get("spawn", {})
   if spawn.size() > 0:
     _spawn_event_resources([spawn])
 
-  event_bus.event_completed.emit(event_id)
+  EventBus.instance.event_completed.emit(event_id)
 
 func _apply_energy_modifier() -> void:
-  if energy_regen_modifier != 0 and game_state:
-    game_state.add_energy(energy_regen_modifier)
+  if energy_regen_modifier != 0 and GameState.instance:
+    GameState.instance.add_energy(energy_regen_modifier)
 
 func get_active_event() -> Dictionary:
   return current_event
@@ -256,6 +257,6 @@ func get_pending_completion_count() -> int:
 func dismiss_event() -> void:
   if current_event.size() > 0:
     var event_id = current_event.get("id", "")
-    event_bus.event_triggered.emit(event_id)
+    EventBus.instance.event_triggered.emit(event_id)
     _check_completion_tracking(current_event)
     current_event = {}
