@@ -38,6 +38,9 @@ func get_speed_multiplier() -> float:
     bonus += (harmony_partners.size() - 1) * config.harmony_mutual_bonus
   return 1.0 + bonus
 
+func get_generation_multiplier() -> float:
+  return get_speed_multiplier()
+
 func get_output_bonus() -> int:
   if is_in_harmony:
     return config.harmony_output_bonus

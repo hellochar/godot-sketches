@@ -24,21 +24,22 @@ func on_process(delta: float) -> void:
       output_resource(resource_id, amount)
 
 func _get_effective_multiplier(resource_id: String) -> float:
-  var is_positive = resource_id in config.resonance_positive_resources
-  var mult = 1.0
+  var is_positive := resource_id in config.resonance_positive_resources
+  var mult := 1.0
 
   mult *= building._get_grief_speed_multiplier()
   mult *= 1.0 + (config.cascade_generator_boost_amount if building.cascade_boost_active else 0.0)
   mult *= game_state.get_weather_generation_modifier()
   mult *= game_state.get_belief_generation_modifier()
-  mult *= building.get_awakening_generator_rate_multiplier()
-  mult *= building._get_harmony_speed_multiplier()
   mult *= game_state.get_flow_state_multiplier()
   mult *= game_state.get_wellbeing_generation_modifier(is_positive)
+  for component in building.get_components():
+    if component != self:
+      mult *= component.get_generation_multiplier()
   mult *= building.get_adjacency_efficiency_multiplier()
 
   if resource_id == "anxiety":
-    var suppression = building._get_calm_aura_suppression()
+    var suppression := building._get_calm_aura_suppression()
     mult *= (1.0 - suppression)
 
   return mult

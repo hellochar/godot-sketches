@@ -15,15 +15,6 @@ enum Status {
   COPING_COOLDOWN,
 }
 
-enum SaturationState {
-  NONE,
-  JOY_SATURATED,
-  CALM_SATURATED,
-  GRIEF_SATURATED,
-  ANXIETY_SATURATED,
-  WISDOM_SATURATED,
-}
-
 @export_group("Status Display")
 @export var status_icons: Dictionary = {
   Status.IDLE: "...",
@@ -61,16 +52,24 @@ var road_connected: bool = false
 var storage: Dictionary = {}  # resource_id -> amount
 var storage_capacity: int = 0
 
-# Processing state
-var processing_active: bool = false
-var process_timer: float = 0.0
+# Processing state (delegated to ProcessorComponent)
+var processing_active: bool:
+  get:
+    var comp := get_component("processor") as ProcessorComponent
+    return comp.processing_active if comp else false
+
+var process_timer: float:
+  get:
+    var comp := get_component("processor") as ProcessorComponent
+    return comp.process_timer if comp else 0.0
+
 var assigned_worker: Node = null
 
-# Generation state
-var generation_timer: float = 0.0
-
-# Coping state
-var coping_cooldown_timer: float = 0.0
+# Coping state (delegated to CopingComponent)
+var coping_cooldown_timer: float:
+  get:
+    var comp := get_component("coping") as CopingComponent
+    return comp.coping_cooldown_timer if comp else 0.0
 
 # Anxiety spreading state
 var anxiety_spread_timer: float = 0.0
@@ -84,16 +83,18 @@ var doubt_generation_timer: float = 0.0
 # Nostalgia crystallization state
 var nostalgia_age_tracker: Dictionary = {}
 
-# Resonance state
-var resonance_timer: float = 0.0
-var is_in_positive_resonance: bool = false
-var is_in_negative_resonance: bool = false
+# Resonance state (delegated to ResonanceComponent)
+var is_in_positive_resonance: bool:
+  get:
+    var comp := get_component("resonance") as ResonanceComponent
+    return comp.is_in_positive_resonance if comp else false
 
-# Saturation state
-var saturation_state: SaturationState = SaturationState.NONE
-var saturation_timer: float = 0.0
-var saturation_resource: String = ""
-var joy_numbness_level: float = 0.0
+var is_in_negative_resonance: bool:
+  get:
+    var comp := get_component("resonance") as ResonanceComponent
+    return comp.is_in_negative_resonance if comp else false
+
+# Saturation state (delegated to SaturationComponent)
 
 # Road emotional memory state
 var road_traffic_memory: Dictionary = {}
@@ -104,72 +105,92 @@ var road_imprinted: bool = false
 var cascade_boost_timer: float = 0.0
 var cascade_boost_active: bool = false
 
-# Emotional momentum state
-var momentum_level: float = 0.0
-var momentum_last_recipe: String = ""
-var momentum_starvation_timer: float = 0.0
-var momentum_break_penalty_timer: float = 0.0
+# Awakening state (delegated to AwakeningComponent)
+var awakening_experience: int:
+  get:
+    var comp := get_component("awakening") as AwakeningComponent
+    return comp.awakening_experience if comp else 0
 
-# Support network state
-var support_network: Array[Node] = []
-var support_network_transfer_timer: float = 0.0
+var is_awakened: bool:
+  get:
+    var comp := get_component("awakening") as AwakeningComponent
+    return comp.is_awakened if comp else false
 
-# Awakening state
-var awakening_experience: int = 0
-var is_awakened: bool = false
+# Fatigue state (delegated to FatigueComponent)
+var fatigue_level: float:
+  get:
+    var comp := get_component("fatigue") as FatigueComponent
+    return comp.fatigue_level if comp else 0.0
 
-# Fatigue state
-var fatigue_level: float = 0.0
+# Harmony state (delegated to HarmonyComponent)
+var harmony_partners: Array[Node]:
+  get:
+    var comp := get_component("harmony") as HarmonyComponent
+    return comp.harmony_partners if comp else []
 
-# Emotional echo state
-var emotional_echo: Dictionary = {}
-var dominant_echo: String = ""
-
-# Harmony state
-var harmony_partners: Array[Node] = []
-var is_in_harmony: bool = false
+var is_in_harmony: bool:
+  get:
+    var comp := get_component("harmony") as HarmonyComponent
+    return comp.is_in_harmony if comp else false
 
 # Resource purity state (resource_id -> purity level 0.0-1.0)
 var storage_purity: Dictionary = {}
 
-# Attunement state
-var attunement_levels: Dictionary = {}
-var attuned_partners: Array[Node] = []
-var attunement_timer: float = 0.0
+# Attunement state (delegated to AttunementComponent)
+var attuned_partners: Array[Node]:
+  get:
+    var comp := get_component("attunement") as AttunementComponent
+    return comp.attuned_partners if comp else []
 
-# Fragility state
-var fragility_level: float = 0.0
-var is_cracked: bool = false
-var fragility_leak_timer: float = 0.0
+# Fragility state (delegated to FragilityComponent)
+var fragility_level: float:
+  get:
+    var comp := get_component("fragility") as FragilityComponent
+    return comp.fragility_level if comp else 0.0
 
-# Stagnation state (resource_id -> {age: float, stagnation: float})
+var is_cracked: bool:
+  get:
+    var comp := get_component("fragility") as FragilityComponent
+    return comp.is_cracked if comp else false
+
+# Stagnation state (shared — components read/write directly)
 var resource_age_data: Dictionary = {}
-var stagnation_decay_timer: float = 0.0
 
 # Attention echo state
 var attention_echo_cooldown_timer: float = 0.0
 
-# Suppression field state
-var suppression_field_active: bool = false
-var suppression_field_timer: float = 0.0
+# Mastery state (delegated to MasteryComponent)
+var mastery_processed: Dictionary:
+  get:
+    var comp := get_component("mastery") as MasteryComponent
+    return comp.mastery_processed if comp else {}
 
-# Building mastery state (resource_type -> total processed)
-var mastery_processed: Dictionary = {}
-var mastery_levels: Dictionary = {}
-var dominant_mastery: String = ""
-var is_specialized: bool = false
+var mastery_levels: Dictionary:
+  get:
+    var comp := get_component("mastery") as MasteryComponent
+    return comp.mastery_levels if comp else {}
 
-# Resource velocity state
-var velocity_history: Array[Dictionary] = []
-var velocity_current: float = 0.0
-var velocity_momentum: float = 0.0
-var velocity_sustained_timer: float = 0.0
-var velocity_last_process_time: float = 0.0
+var dominant_mastery: String:
+  get:
+    var comp := get_component("mastery") as MasteryComponent
+    return comp.dominant_mastery if comp else ""
 
-# Legacy imprint state
-var is_legacy: bool = false
-var legacy_timer: float = 0.0
-var legacy_qualifying: bool = false
+var is_specialized: bool:
+  get:
+    var comp := get_component("mastery") as MasteryComponent
+    return comp.is_specialized if comp else false
+
+# Velocity state (delegated to VelocityComponent)
+var velocity_momentum: float:
+  get:
+    var comp := get_component("velocity") as VelocityComponent
+    return comp.velocity_momentum if comp else 0.0
+
+# Legacy state (delegated to LegacyComponent)
+var is_legacy: bool:
+  get:
+    var comp := get_component("legacy") as LegacyComponent
+    return comp.is_legacy if comp else false
 
 var adjacency_effects: Dictionary = {}
 var adjacency_efficiency_multiplier: float = 1.0
@@ -463,219 +484,16 @@ func _process(delta: float) -> void:
     if component.has_method("on_process"):
       component.on_process(delta)
 
-  _process_generation(delta)
   _update_storage_display()
-  _process_processing(delta)
-  _process_coping(delta)
   _process_anxiety_spreading(delta)
   _process_worry_compounding(delta)
   _process_doubt_generation(delta)
   _process_doubt_insight_combination()
   _process_nostalgia_crystallization(delta)
-  _process_resonance(delta)
-  _process_saturation(delta)
-  _process_saturation_effects(delta)
-  _process_road_memory_decay(delta)
   _process_cascade_boost(delta)
-  _process_emotional_momentum(delta)
-  _process_support_network()
-  _process_network_load_sharing(delta)
-  _process_fatigue(delta)
-  _process_emotional_echo_decay(delta)
-  _process_harmony()
-  _process_purity_decay(delta)
-  _process_attunement(delta)
-  _process_fragility(delta)
-  _process_stagnation(delta)
   _process_attention_echo_cooldown(delta)
-  _process_suppression_field(delta)
-  _process_mastery(delta)
-  _process_velocity(delta)
-  _process_legacy(delta)
   _update_status()
   _update_status_visual()
-
-func _process_generation(delta: float) -> void:
-  if has_component("generator"):
-    return
-
-  if not has_behavior(BuildingDefs.Behavior.GENERATOR):
-    return
-
-  if not road_connected:
-    return
-
-  var rate = definition.get("generation_rate", 0.0)
-  if rate <= 0:
-    return
-
-  var resource_id = definition.get("generates", "")
-  var is_positive = resource_id in Config.instance.resonance_positive_resources
-  var grief_multiplier = _get_grief_speed_multiplier()
-  var cascade_multiplier = 1.0 + (Config.instance.cascade_generator_boost_amount if cascade_boost_active else 0.0)
-  var weather_modifier = GameState.instance.get_weather_generation_modifier()
-  var belief_modifier = GameState.instance.get_belief_generation_modifier()
-  var awakening_multiplier = get_awakening_generator_rate_multiplier()
-  var harmony_multiplier = _get_harmony_speed_multiplier()
-  var flow_multiplier = GameState.instance.get_flow_state_multiplier()
-  var wellbeing_modifier = GameState.instance.get_wellbeing_generation_modifier(is_positive)
-  var adjacency_multiplier = get_adjacency_efficiency_multiplier()
-  var effective_delta = delta * grief_multiplier * cascade_multiplier * weather_modifier * belief_modifier * awakening_multiplier * harmony_multiplier * flow_multiplier * wellbeing_modifier * adjacency_multiplier
-
-  if resource_id == "anxiety":
-    var suppression = _get_calm_aura_suppression()
-    effective_delta *= (1.0 - suppression)
-
-  generation_timer += effective_delta
-  var interval = 1.0 / rate
-
-  if generation_timer >= interval:
-    generation_timer -= interval
-    var amount = definition.get("generation_amount", 1)
-    if resource_id != "":
-      _output_resource(resource_id, amount)
-
-func _process_processing(delta: float) -> void:
-  if has_component("processor"):
-    return
-
-  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
-    return
-
-  if not road_connected:
-    return
-
-  if not processing_active:
-    _try_start_processing()
-    return
-
-  var grief_multiplier = _get_grief_speed_multiplier()
-  var tension_multiplier = _get_tension_speed_multiplier()
-  var wisdom_multiplier = _get_wisdom_efficiency_multiplier()
-  var doubt_multiplier = _get_doubt_efficiency_multiplier()
-  var resonance_multiplier = _get_resonance_speed_multiplier()
-  var momentum_multiplier = _get_momentum_speed_multiplier()
-  var support_network_multiplier = _get_support_network_efficiency_multiplier()
-  var weather_modifier = GameState.instance.get_weather_processing_modifier()
-  var belief_modifier = GameState.instance.get_belief_processing_modifier()
-  var awakening_multiplier = get_awakening_speed_multiplier()
-  var breakthrough_modifier = GameState.instance.get_breakthrough_speed_modifier()
-  var fatigue_multiplier = _get_fatigue_speed_multiplier()
-  var echo_multiplier = _get_emotional_echo_multiplier()
-  var harmony_multiplier = _get_harmony_speed_multiplier()
-  var flow_multiplier = GameState.instance.get_flow_state_multiplier()
-  var purity_multiplier = _get_purity_speed_multiplier()
-  var attunement_multiplier = get_attunement_speed_multiplier()
-  var fragility_multiplier = _get_fragility_speed_multiplier()
-  var stagnation_multiplier = _get_stagnation_speed_multiplier()
-  var mastery_multiplier = get_mastery_speed_multiplier()
-  var velocity_multiplier = get_velocity_speed_multiplier()
-  var wellbeing_modifier = GameState.instance.get_wellbeing_processing_modifier()
-  var sync_chain_multiplier = _get_sync_chain_speed_multiplier()
-  var legacy_multiplier = get_legacy_speed_multiplier()
-  var adjacency_multiplier = get_adjacency_efficiency_multiplier()
-  process_timer -= delta * grief_multiplier * tension_multiplier * wisdom_multiplier * doubt_multiplier * resonance_multiplier * momentum_multiplier * support_network_multiplier * weather_modifier * belief_modifier * awakening_multiplier * breakthrough_modifier * fatigue_multiplier * echo_multiplier * harmony_multiplier * flow_multiplier * purity_multiplier * attunement_multiplier * fragility_multiplier * stagnation_multiplier * mastery_multiplier * velocity_multiplier * wellbeing_modifier * sync_chain_multiplier * legacy_multiplier * adjacency_multiplier
-  if process_timer <= 0:
-    _complete_processing()
-
-func _try_start_processing() -> void:
-  if definition.get("requires_worker", false) and not assigned_worker:
-    return
-
-  var inputs = definition.get("input", {})
-  if not _has_inputs(inputs):
-    return
-
-  _consume_inputs(inputs)
-  processing_active = true
-  process_timer = definition.get("process_time", 1.0)
-
-func _complete_processing() -> void:
-  processing_active = false
-
-  var inputs = definition.get("input", {})
-  var processed_negative = false
-  var processed_negative_types: Array[String] = []
-  for input_resource in inputs:
-    if input_resource == "grief":
-      GameState.instance.track_grief_processed(inputs[input_resource])
-      processed_negative = true
-      processed_negative_types.append("grief")
-    elif input_resource == "anxiety":
-      GameState.instance.track_anxiety_processed(inputs[input_resource])
-      processed_negative = true
-      processed_negative_types.append("anxiety")
-    elif input_resource in Config.instance.breakthrough_negative_types:
-      processed_negative_types.append(input_resource)
-
-  for neg_type in processed_negative_types:
-    GameState.instance.record_negative_processed(neg_type, inputs.get(neg_type, 1))
-
-  if processed_negative:
-    _output_resource("tension", Config.instance.tension_from_processing)
-
-  _gain_fatigue()
-  _gain_fragility(inputs)
-  _build_emotional_echo(inputs)
-  _gain_awakening_experience()
-  _try_attention_echo_refund(inputs)
-  _gain_mastery(inputs)
-  _record_velocity_event(inputs)
-
-  for input_resource in inputs:
-    GameState.instance.record_processing_event(self, input_resource)
-
-  var has_fresh = false
-  for input_resource in inputs:
-    if is_resource_fresh(input_resource):
-      has_fresh = true
-      EventBus.instance.fresh_resource_bonus.emit(self, input_resource)
-    reset_resource_age(input_resource)
-
-  var recipe_key = _get_recipe_key(inputs)
-  _build_momentum(recipe_key)
-
-  var awakening_bonus = get_awakening_output_bonus()
-  var harmony_bonus = get_harmony_output_bonus()
-  var purity_bonus = get_purity_output_bonus()
-  var attunement_bonus = get_attunement_output_bonus()
-  var mastery_bonus = get_mastery_output_bonus()
-  var legacy_bonus = get_legacy_output_bonus()
-  var adjacency_bonus = get_adjacency_output_bonus()
-  var total_bonus = awakening_bonus + harmony_bonus + purity_bonus + attunement_bonus + mastery_bonus + legacy_bonus + adjacency_bonus
-
-  var spillover = get_adjacency_spillover()
-  for spillover_resource in spillover:
-    _output_resource(spillover_resource, spillover[spillover_resource])
-
-  var synergy = try_attunement_synergy()
-  if synergy.get("triggered", false):
-    if synergy.has("output_type"):
-      _output_resource(synergy["output_type"], synergy.get("amount", 1))
-    if synergy.has("calm_bonus"):
-      _output_resource("calm", synergy["calm_bonus"])
-    if synergy.has("energy_bonus"):
-      GameState.instance.add_energy(synergy["energy_bonus"])
-
-  var produced: Dictionary = {}
-  var conditional_outputs = definition.get("conditional_outputs", {})
-  if not conditional_outputs.is_empty():
-    for condition_resource in conditional_outputs:
-      if storage.get(condition_resource, 0) > 0:
-        var output_data = conditional_outputs[condition_resource]
-        var amount = output_data["amount"] + total_bonus
-        _track_output_resource(output_data["output"], amount)
-        _cascade_output_resource(output_data["output"], amount)
-        produced[output_data["output"]] = amount
-        _show_processing_feedback(produced)
-        return
-  var outputs = definition.get("output", {})
-  for resource_id in outputs:
-    var amount = outputs[resource_id] + total_bonus
-    _track_output_resource(resource_id, amount)
-    _cascade_output_resource(resource_id, amount)
-    produced[resource_id] = amount
-  _show_processing_feedback(produced)
 
 func _show_processing_feedback(produced: Dictionary) -> void:
   if produced.is_empty():
@@ -712,8 +530,8 @@ func _track_output_resource(resource_id: String, amount: int) -> void:
     GameState.instance.track_insight_generated(amount)
 
 func _complete_processing_effects() -> void:
-  var inputs = definition.get("input", {})
-  var processed_negative = false
+  var inputs := definition.get("input", {})
+  var processed_negative := false
   var processed_negative_types: Array[String] = []
   for input_resource in inputs:
     if input_resource == "grief":
@@ -733,13 +551,7 @@ func _complete_processing_effects() -> void:
   if processed_negative:
     _output_resource("tension", Config.instance.tension_from_processing)
 
-  _gain_fatigue()
-  _gain_fragility(inputs)
-  _build_emotional_echo(inputs)
-  _gain_awakening_experience()
   _try_attention_echo_refund(inputs)
-  _gain_mastery(inputs)
-  _record_velocity_event(inputs)
 
   for input_resource in inputs:
     GameState.instance.record_processing_event(self, input_resource)
@@ -749,46 +561,49 @@ func _complete_processing_effects() -> void:
       EventBus.instance.fresh_resource_bonus.emit(self, input_resource)
     reset_resource_age(input_resource)
 
-  var recipe_key = _get_recipe_key(inputs)
-  _build_momentum(recipe_key)
+  var produced: Dictionary = {}
+  for component in _components.values():
+    component.on_processing_complete(inputs, produced)
 
-  var awakening_bonus = get_awakening_output_bonus()
-  var harmony_bonus = get_harmony_output_bonus()
-  var purity_bonus = get_purity_output_bonus()
-  var attunement_bonus = get_attunement_output_bonus()
-  var mastery_bonus = get_mastery_output_bonus()
-  var legacy_bonus = get_legacy_output_bonus()
-  var adjacency_bonus = get_adjacency_output_bonus()
-  var total_bonus = awakening_bonus + harmony_bonus + purity_bonus + attunement_bonus + mastery_bonus + legacy_bonus + adjacency_bonus
+  var total_bonus := 0
+  for component in _components.values():
+    total_bonus += component.get_output_bonus()
+  total_bonus += get_adjacency_output_bonus()
 
-  var spillover = get_adjacency_spillover()
+  var spillover := get_adjacency_spillover()
   for spillover_resource in spillover:
     _output_resource(spillover_resource, spillover[spillover_resource])
 
-  var synergy = try_attunement_synergy()
-  if synergy.get("triggered", false):
-    if synergy.has("output_type"):
-      _output_resource(synergy["output_type"], synergy.get("amount", 1))
-    if synergy.has("calm_bonus"):
-      _output_resource("calm", synergy["calm_bonus"])
-    if synergy.has("energy_bonus"):
-      GameState.instance.add_energy(synergy["energy_bonus"])
+  var attunement_comp := get_component("attunement") as AttunementComponent
+  if attunement_comp:
+    var synergy := attunement_comp.try_synergy()
+    if synergy.get("triggered", false):
+      if synergy.has("output_type"):
+        _output_resource(synergy["output_type"], synergy.get("amount", 1))
+      if synergy.has("calm_bonus"):
+        _output_resource("calm", synergy["calm_bonus"])
+      if synergy.has("energy_bonus"):
+        GameState.instance.add_energy(synergy["energy_bonus"])
 
-  var conditional_outputs = definition.get("conditional_outputs", {})
+  var conditional_outputs := definition.get("conditional_outputs", {})
   if not conditional_outputs.is_empty():
     for condition_resource in conditional_outputs:
       if storage.get(condition_resource, 0) > 0:
-        var output_data = conditional_outputs[condition_resource]
-        var amount = output_data["amount"] + total_bonus
+        var output_data := conditional_outputs[condition_resource] as Dictionary
+        var amount := output_data["amount"] + total_bonus
         _track_output_resource(output_data["output"], amount)
         _cascade_output_resource(output_data["output"], amount)
+        produced[output_data["output"]] = amount
+        _show_processing_feedback(produced)
         return
 
-  var outputs = definition.get("output", {})
+  var outputs := definition.get("output", {})
   for resource_id in outputs:
-    var amount = outputs[resource_id] + total_bonus
+    var amount := outputs[resource_id] + total_bonus
     _track_output_resource(resource_id, amount)
     _cascade_output_resource(resource_id, amount)
+    produced[resource_id] = amount
+  _show_processing_feedback(produced)
 
 func _get_recipe_key(inputs: Dictionary) -> String:
   var sorted_keys = inputs.keys()
@@ -797,32 +612,6 @@ func _get_recipe_key(inputs: Dictionary) -> String:
   for key in sorted_keys:
     parts.append("%s:%d" % [key, inputs[key]])
   return ":".join(parts)
-
-func _process_coping(delta: float) -> void:
-  if has_component("coping"):
-    return
-
-  if not has_behavior(BuildingDefs.Behavior.COPING):
-    return
-
-  if coping_cooldown_timer > 0:
-    coping_cooldown_timer -= delta
-    return
-
-  # Check trigger condition (simplified - just checks total amounts)
-  # Full implementation would parse the condition string
-  var trigger = definition.get("coping_trigger", "")
-  if not _evaluate_trigger(trigger):
-    return
-
-  # Activate coping
-  var inputs = definition.get("coping_input", {})
-  if _has_inputs(inputs):
-    _consume_inputs(inputs)
-    var outputs = definition.get("coping_output", {})
-    for resource_id in outputs:
-      _output_resource(resource_id, outputs[resource_id])
-    coping_cooldown_timer = definition.get("coping_cooldown", 30.0)
 
 func _process_anxiety_spreading(delta: float) -> void:
   if not has_behavior(BuildingDefs.Behavior.STORAGE):
@@ -1418,164 +1207,6 @@ func _count_nearby_resource(resource_id: String) -> int:
 
   return total
 
-func _process_resonance(delta: float) -> void:
-  if has_component("resonance"):
-    return
-
-  if storage_capacity <= 0:
-    return
-
-  is_in_positive_resonance = false
-  is_in_negative_resonance = false
-
-  for resource_id in storage:
-    if storage[resource_id] < Config.instance.resonance_resource_threshold:
-      continue
-
-    var resonating_buildings = _find_resonating_buildings(resource_id)
-    if resonating_buildings.size() >= Config.instance.resonance_min_buildings:
-      if resource_id in Config.instance.resonance_positive_resources:
-        is_in_positive_resonance = true
-      elif resource_id in Config.instance.resonance_negative_resources:
-        is_in_negative_resonance = true
-        _process_negative_resonance_amplification(delta, resource_id)
-
-func _find_resonating_buildings(resource_id: String) -> Array[Node]:
-  var result: Array[Node] = [self]
-  if not grid:
-    return result
-
-  var radius = Config.instance.resonance_radius
-  for x in range(-radius, size.x + radius):
-    for y in range(-radius, size.y + radius):
-      if x >= 0 and x < size.x and y >= 0 and y < size.y:
-        continue
-      var check = grid_coord + Vector2i(x, y)
-      if grid.is_valid_coord(check):
-        var occupant = grid.get_occupant(check)
-        if occupant and occupant != self and occupant.has_method("get_storage_amount"):
-          if occupant.get_storage_amount(resource_id) >= Config.instance.resonance_resource_threshold:
-            result.append(occupant)
-
-  return result
-
-func _process_negative_resonance_amplification(delta: float, resource_id: String) -> void:
-  resonance_timer += delta
-  if resonance_timer < Config.instance.resonance_negative_amplification_interval:
-    return
-
-  resonance_timer = 0.0
-  var amount = Config.instance.resonance_negative_amplification_amount
-  _output_resource(resource_id, amount)
-  EventBus.instance.resonance_amplification.emit(self, resource_id, amount)
-
-func _get_resonance_speed_multiplier() -> float:
-  if is_in_positive_resonance:
-    return 1.0 + Config.instance.resonance_positive_speed_bonus
-  return 1.0
-
-func _process_saturation(delta: float) -> void:
-  if has_component("saturation"):
-    return
-
-  var effective_capacity = get_effective_storage_capacity()
-  if effective_capacity <= 0:
-    saturation_state = SaturationState.NONE
-    saturation_timer = 0.0
-    return
-
-  var saturated_resource = ""
-  var highest_ratio = 0.0
-
-  for resource_id in ["joy", "calm", "grief", "anxiety", "wisdom"]:
-    var amount = storage.get(resource_id, 0)
-    var ratio = float(amount) / float(effective_capacity)
-    if ratio >= Config.instance.saturation_threshold and ratio > highest_ratio:
-      highest_ratio = ratio
-      saturated_resource = resource_id
-
-  if saturated_resource == "":
-    saturation_state = SaturationState.NONE
-    saturation_timer = 0.0
-    saturation_resource = ""
-    return
-
-  if saturated_resource != saturation_resource:
-    saturation_timer = 0.0
-    saturation_resource = saturated_resource
-
-  saturation_timer += delta
-
-  if saturation_timer >= Config.instance.saturation_time_required:
-    match saturation_resource:
-      "joy":
-        saturation_state = SaturationState.JOY_SATURATED
-      "calm":
-        saturation_state = SaturationState.CALM_SATURATED
-      "grief":
-        saturation_state = SaturationState.GRIEF_SATURATED
-      "anxiety":
-        saturation_state = SaturationState.ANXIETY_SATURATED
-      "wisdom":
-        saturation_state = SaturationState.WISDOM_SATURATED
-  else:
-    saturation_state = SaturationState.NONE
-
-func _process_saturation_effects(delta: float) -> void:
-  if has_component("saturation"):
-    return
-
-  match saturation_state:
-    SaturationState.JOY_SATURATED:
-      _process_joy_saturation(delta)
-    SaturationState.CALM_SATURATED:
-      pass
-    SaturationState.GRIEF_SATURATED:
-      _process_grief_saturation(delta)
-    SaturationState.ANXIETY_SATURATED:
-      _process_anxiety_saturation(delta)
-    SaturationState.WISDOM_SATURATED:
-      pass
-    SaturationState.NONE:
-      joy_numbness_level = maxf(0.0, joy_numbness_level - delta * 0.1)
-
-func _process_joy_saturation(delta: float) -> void:
-  joy_numbness_level = minf(1.0, joy_numbness_level + delta * Config.instance.saturation_joy_numbness_factor * 0.1)
-
-  if not grid:
-    return
-
-  var spread_amount = int(Config.instance.saturation_joy_spread_rate * delta)
-  if spread_amount <= 0 and randf() < Config.instance.saturation_joy_spread_rate * delta:
-    spread_amount = 1
-
-  if spread_amount <= 0:
-    return
-
-  var neighbors = _get_adjacent_buildings()
-  if neighbors.is_empty():
-    return
-
-  var target = neighbors[randi() % neighbors.size()]
-  var removed = remove_from_storage("joy", spread_amount)
-  if removed > 0:
-    target.add_to_storage("joy", removed)
-
-func _process_grief_saturation(delta: float) -> void:
-  if randf() < Config.instance.saturation_grief_wisdom_rate * delta:
-    _output_resource("wisdom", 1)
-
-func _process_anxiety_saturation(delta: float) -> void:
-  if randf() >= Config.instance.saturation_anxiety_panic_chance * delta:
-    return
-
-  if not grid:
-    return
-
-  var neighbors = _get_adjacent_buildings()
-  for neighbor in neighbors:
-    neighbor.add_to_storage("anxiety", Config.instance.saturation_anxiety_panic_spread)
-
 func _get_adjacent_buildings() -> Array[Node]:
   var result: Array[Node] = []
   if not grid:
@@ -1595,17 +1226,20 @@ func _get_adjacent_buildings() -> Array[Node]:
   return result
 
 func get_calm_saturation_multiplier() -> float:
-  if saturation_state == SaturationState.CALM_SATURATED:
+  var comp := get_component("saturation") as SaturationComponent
+  if comp and comp.saturation_state == SaturationComponent.State.CALM_SATURATED:
     return Config.instance.saturation_calm_aura_multiplier
   return 1.0
 
 func get_wisdom_saturation_bonus() -> float:
-  if saturation_state == SaturationState.WISDOM_SATURATED:
+  var comp := get_component("saturation") as SaturationComponent
+  if comp and comp.saturation_state == SaturationComponent.State.WISDOM_SATURATED:
     return Config.instance.saturation_wisdom_efficiency_bonus
   return 0.0
 
 func get_joy_numbness_factor() -> float:
-  return 1.0 - joy_numbness_level
+  var comp := get_component("saturation") as SaturationComponent
+  return 1.0 - (comp.joy_numbness_level if comp else 0.0)
 
 func record_road_traffic(emotion: String, amount: float) -> void:
   if not is_road():
@@ -1626,27 +1260,6 @@ func get_road_speed_modifier() -> float:
     return 1.0 - Config.instance.road_imprint_speed_penalty
 
   return 1.0
-
-func _process_road_memory_decay(delta: float) -> void:
-  if has_component("infrastructure"):
-    return
-
-  if not is_road():
-    return
-
-  var decay = Config.instance.road_memory_decay_rate * delta
-  var any_remaining = false
-  for emotion in road_traffic_memory.keys():
-    road_traffic_memory[emotion] = maxf(0.0, road_traffic_memory[emotion] - decay)
-    if road_traffic_memory[emotion] > 0:
-      any_remaining = true
-
-  if any_remaining:
-    _update_road_dominant_emotion()
-    _update_road_visual()
-  else:
-    road_imprinted = false
-    road_dominant_emotion = ""
 
 func _update_road_dominant_emotion() -> void:
   var max_value = 0.0
@@ -1723,659 +1336,9 @@ func _try_cascade_output(resource_id: String, amount: int) -> int:
 
   return remaining
 
-func _process_emotional_momentum(delta: float) -> void:
-  if has_component("momentum"):
-    return
-
-  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
-    return
-
-  if momentum_break_penalty_timer > 0:
-    momentum_break_penalty_timer -= delta
-
-  if not processing_active:
-    momentum_starvation_timer += delta
-    if momentum_starvation_timer >= Config.instance.momentum_starvation_timeout and momentum_level > 0:
-      _break_momentum()
-    return
-
-  momentum_starvation_timer = 0.0
-
-func _build_momentum(recipe_key: String) -> void:
-  if momentum_last_recipe != "" and momentum_last_recipe != recipe_key:
-    _break_momentum()
-    return
-
-  momentum_last_recipe = recipe_key
-  momentum_level = minf(momentum_level + Config.instance.momentum_gain_per_cycle, Config.instance.momentum_max_level)
-
-func _break_momentum() -> void:
-  momentum_level = maxf(0.0, momentum_level - Config.instance.momentum_decay_on_break)
-  momentum_break_penalty_timer = Config.instance.momentum_break_penalty_duration
-  if momentum_level <= 0:
-    momentum_last_recipe = ""
-
-func _get_momentum_speed_multiplier() -> float:
-  if momentum_break_penalty_timer > 0:
-    return 1.0 - Config.instance.momentum_break_penalty_amount
-  var momentum_ratio = momentum_level / Config.instance.momentum_max_level
-  return 1.0 + (momentum_ratio * Config.instance.momentum_speed_bonus_at_max)
-
-func _process_support_network() -> void:
-  if has_component("network"):
-    return
-  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
-    support_network.clear()
-    return
-
-  if not grid:
-    support_network.clear()
-    return
-
-  support_network = _find_connected_buildings_of_same_type()
-
-func _find_connected_buildings_of_same_type() -> Array[Node]:
-  var result: Array[Node] = []
-  var visited: Dictionary = {}
-  var to_visit: Array[Vector2i] = []
-
-  for x in range(-1, size.x + 1):
-    for y in range(-1, size.y + 1):
-      if x >= 0 and x < size.x and y >= 0 and y < size.y:
-        continue
-      var check = grid_coord + Vector2i(x, y)
-      if grid.is_valid_coord(check) and grid.is_road_at(check):
-        to_visit.append(check)
-        visited[check] = true
-
-  while to_visit.size() > 0:
-    var current = to_visit.pop_front()
-    var occupant = grid.get_occupant(current)
-
-    if occupant and occupant != self and occupant.building_id == building_id:
-      if occupant not in result:
-        result.append(occupant)
-
-    if grid.is_road_at(current):
-      for neighbor in grid.get_neighbors(current):
-        if not visited.has(neighbor):
-          visited[neighbor] = true
-          to_visit.append(neighbor)
-
-  return result
-
-func _process_network_load_sharing(delta: float) -> void:
-  if has_component("network"):
-    return
-  if support_network.size() < Config.instance.support_network_min_size:
-    return
-
-  var effective_capacity = get_effective_storage_capacity()
-  if effective_capacity <= 0:
-    return
-
-  var fill_ratio = float(_get_total_stored()) / float(effective_capacity)
-  if fill_ratio < Config.instance.support_network_load_share_threshold:
-    support_network_transfer_timer = 0.0
-    return
-
-  support_network_transfer_timer += delta
-  if support_network_transfer_timer < Config.instance.support_network_transfer_interval:
-    return
-
-  support_network_transfer_timer = 0.0
-
-  var best_target: Node = null
-  var lowest_fill: float = 1.0
-
-  for member in support_network:
-    var member_capacity = member.get_effective_storage_capacity()
-    if member_capacity <= 0:
-      continue
-    var member_fill = float(member._get_total_stored()) / float(member_capacity)
-    if member_fill < lowest_fill:
-      lowest_fill = member_fill
-      best_target = member
-
-  if best_target and lowest_fill < fill_ratio - 0.1:
-    for resource_id in storage:
-      if storage[resource_id] > 0:
-        var to_transfer = mini(storage[resource_id], Config.instance.support_network_transfer_amount)
-        var removed = remove_from_storage(resource_id, to_transfer)
-        if removed > 0:
-          best_target.add_to_storage(resource_id, removed)
-          break
-
-func _get_support_network_efficiency_multiplier() -> float:
-  if support_network.size() < Config.instance.support_network_min_size:
-    return 1.0
-  var bonus = support_network.size() * Config.instance.support_network_efficiency_per_member
-  bonus = minf(bonus, Config.instance.support_network_max_efficiency_bonus)
-  return 1.0 + bonus
-
-func _gain_awakening_experience() -> void:
-  if is_awakened:
-    return
-  awakening_experience += Config.instance.awakening_experience_per_process
-  if awakening_experience >= Config.instance.awakening_threshold:
-    _awaken()
-
-func _awaken() -> void:
-  is_awakened = true
-  storage_capacity += Config.instance.awakening_storage_bonus
-  EventBus.instance.building_awakened.emit(self)
-
-func get_awakening_speed_multiplier() -> float:
-  if is_awakened:
-    return 1.0 + Config.instance.awakening_speed_bonus
-  return 1.0
-
-func get_awakening_output_bonus() -> int:
-  if is_awakened:
-    return Config.instance.awakening_output_bonus
-  return 0
-
-func get_awakening_generator_rate_multiplier() -> float:
-  if is_awakened:
-    return 1.0 + Config.instance.awakening_generator_rate_bonus
-  return 1.0
-
-func _gain_fatigue() -> void:
-  var gain_modifier = 1.0
-  if is_legacy:
-    gain_modifier = 1.0 - Config.instance.legacy_resilience_factor
-  fatigue_level = minf(fatigue_level + Config.instance.fatigue_gain_per_process * gain_modifier, Config.instance.fatigue_max_level)
-
-func _process_fatigue(delta: float) -> void:
-  if has_component("fatigue"):
-    return
-
-  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
-    return
-
-  if processing_active:
-    return
-
-  var base_recovery = Config.instance.fatigue_recovery_rate * delta
-  var calm_bonus = _get_nearby_calm_for_fatigue() * Config.instance.fatigue_calm_recovery_bonus * delta
-  var total_recovery = base_recovery + calm_bonus
-
-  fatigue_level = maxf(0.0, fatigue_level - total_recovery)
-
-func _get_nearby_calm_for_fatigue() -> int:
-  var total_calm = storage.get("calm", 0)
-  if not grid:
-    return total_calm
-
-  var radius = Config.instance.fatigue_calm_radius
-  for x in range(-radius, size.x + radius):
-    for y in range(-radius, size.y + radius):
-      if x >= 0 and x < size.x and y >= 0 and y < size.y:
-        continue
-      var check = grid_coord + Vector2i(x, y)
-      if grid.is_valid_coord(check):
-        var occupant = grid.get_occupant(check)
-        if occupant and occupant != self and occupant.has_method("get_storage_amount"):
-          total_calm += occupant.get_storage_amount("calm")
-
-  return total_calm
-
-func _get_fatigue_speed_multiplier() -> float:
-  if fatigue_level < Config.instance.fatigue_onset_threshold:
-    return 1.0
-  var effective_fatigue = (fatigue_level - Config.instance.fatigue_onset_threshold) / (Config.instance.fatigue_max_level - Config.instance.fatigue_onset_threshold)
-  var penalty = effective_fatigue * Config.instance.fatigue_speed_penalty_at_max
-  return 1.0 - penalty
-
-func _build_emotional_echo(inputs: Dictionary) -> void:
-  for resource_id in inputs:
-    var current = emotional_echo.get(resource_id, 0.0)
-    emotional_echo[resource_id] = minf(current + Config.instance.echo_gain_per_process, Config.instance.echo_max_level)
-
-  _update_dominant_echo()
-
-func _process_emotional_echo_decay(delta: float) -> void:
-  if has_component("emotional_echo"):
-    return
-
-  if emotional_echo.is_empty():
-    return
-
-  var decay = Config.instance.echo_decay_rate * delta
-  for resource_id in emotional_echo.keys():
-    emotional_echo[resource_id] = maxf(0.0, emotional_echo[resource_id] - decay)
-
-  _update_dominant_echo()
-
-func _update_dominant_echo() -> void:
-  var max_value = 0.0
-  dominant_echo = ""
-
-  for resource_id in emotional_echo:
-    if emotional_echo[resource_id] > max_value:
-      max_value = emotional_echo[resource_id]
-      dominant_echo = resource_id
-
-func _get_emotional_echo_multiplier() -> float:
-  if dominant_echo == "" or emotional_echo.get(dominant_echo, 0.0) < Config.instance.echo_threshold:
-    return 1.0
-
-  var inputs = definition.get("input", {})
-  if inputs.is_empty():
-    return 1.0
-
-  var primary_input = ""
-  var max_amount = 0
-  for resource_id in inputs:
-    if inputs[resource_id] > max_amount:
-      max_amount = inputs[resource_id]
-      primary_input = resource_id
-
-  if primary_input == "":
-    return 1.0
-
-  var echo_strength = emotional_echo.get(dominant_echo, 0.0) / Config.instance.echo_max_level
-
-  if primary_input == dominant_echo:
-    return 1.0 + (echo_strength * Config.instance.echo_same_type_bonus)
-  else:
-    return 1.0 - (echo_strength * Config.instance.echo_different_type_penalty)
-
-func _process_harmony() -> void:
-  if has_component("harmony"):
-    return
-
-  var was_in_harmony = is_in_harmony
-  var was_attuned_count = attuned_partners.size()
-  harmony_partners.clear()
-  is_in_harmony = false
-
-  if not grid:
-    return
-
-  var my_pairs = Config.instance.harmony_pairs.get(building_id, [])
-  var neighbors = _get_adjacent_buildings()
-
-  for neighbor in neighbors:
-    if neighbor.building_id in my_pairs:
-      harmony_partners.append(neighbor)
-
-    var neighbor_pairs = Config.instance.harmony_pairs.get(neighbor.building_id, [])
-    if building_id in neighbor_pairs and neighbor not in harmony_partners:
-      harmony_partners.append(neighbor)
-
-  is_in_harmony = harmony_partners.size() > 0
-
-  var visual_changed = is_in_harmony != was_in_harmony or attuned_partners.size() != was_attuned_count
-  if visual_changed:
-    _update_connection_visual()
-    if is_in_harmony and not was_in_harmony:
-      EventBus.instance.harmony_formed.emit(self, harmony_partners)
-
-func _get_harmony_speed_multiplier() -> float:
-  if not is_in_harmony:
-    return 1.0
-  var bonus = Config.instance.harmony_speed_bonus
-  if harmony_partners.size() > 1:
-    bonus += (harmony_partners.size() - 1) * Config.instance.harmony_mutual_bonus
-  return 1.0 + bonus
-
-func get_harmony_output_bonus() -> int:
-  if is_in_harmony:
-    return Config.instance.harmony_output_bonus
-  return 0
-
-func _process_purity_decay(delta: float) -> void:
-  if has_component("purity"):
-    return
-  if storage_capacity <= 0:
-    return
-
-  var decay = Config.instance.purity_decay_rate * delta
-  for resource_id in storage_purity.keys():
-    if storage.get(resource_id, 0) <= 0:
-      storage_purity.erase(resource_id)
-      continue
-    var old_purity = storage_purity[resource_id]
-    storage_purity[resource_id] = maxf(old_purity - decay, Config.instance.purity_min_level)
-    if old_purity >= Config.instance.purity_output_bonus_threshold and storage_purity[resource_id] < Config.instance.purity_output_bonus_threshold:
-      EventBus.instance.resource_purity_degraded.emit(self, resource_id, storage_purity[resource_id])
-
-  if is_awakened and has_behavior(BuildingDefs.Behavior.PROCESSOR):
-    _try_refine_resources(delta)
-
-func _try_refine_resources(delta: float) -> void:
-  for resource_id in storage:
-    if storage[resource_id] <= 0:
-      continue
-    var purity = storage_purity.get(resource_id, Config.instance.purity_initial_level)
-    if purity < Config.instance.purity_refine_threshold:
-      var refine_gain = Config.instance.purity_refine_gain + Config.instance.purity_awakened_refine_bonus
-      storage_purity[resource_id] = minf(purity + refine_gain * delta, Config.instance.purity_initial_level)
-      if storage_purity[resource_id] >= Config.instance.purity_refine_threshold and purity < Config.instance.purity_refine_threshold:
-        EventBus.instance.resource_refined.emit(self, resource_id, storage_purity[resource_id])
-
-func _get_purity_speed_multiplier() -> float:
-  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
-    return 1.0
-  var inputs = definition.get("input", {})
-  if inputs.is_empty():
-    return 1.0
-  var total_purity = 0.0
-  var count = 0
-  for resource_id in inputs:
-    total_purity += storage_purity.get(resource_id, Config.instance.purity_min_level)
-    count += 1
-  if count == 0:
-    return 1.0
-  var avg_purity = total_purity / count
-  if avg_purity >= Config.instance.purity_output_bonus_threshold:
-    return 1.0 + Config.instance.purity_speed_bonus_at_pure * (avg_purity - Config.instance.purity_output_bonus_threshold) / (1.0 - Config.instance.purity_output_bonus_threshold)
-  elif avg_purity <= Config.instance.purity_diluted_threshold:
-    var dilution_ratio = (Config.instance.purity_diluted_threshold - avg_purity) / (Config.instance.purity_diluted_threshold - Config.instance.purity_min_level)
-    return 1.0 - Config.instance.purity_diluted_penalty * dilution_ratio
-  return 1.0
-
-func get_purity_output_bonus() -> int:
-  var inputs = definition.get("input", {})
-  if inputs.is_empty():
-    return 0
-  var all_pure = true
-  for resource_id in inputs:
-    if storage_purity.get(resource_id, Config.instance.purity_min_level) < Config.instance.purity_output_bonus_threshold:
-      all_pure = false
-      break
-  if all_pure:
-    EventBus.instance.pure_resource_processed.emit(self, inputs.keys()[0], Config.instance.purity_output_bonus_amount)
-    return Config.instance.purity_output_bonus_amount
-  return 0
-
-func _process_attunement(delta: float) -> void:
-  if has_component("attunement"):
-    return
-
-  var old_attuned = attuned_partners.duplicate()
-
-  if not is_in_harmony:
-    for partner_id in attunement_levels.keys():
-      var was_above_threshold = attunement_levels[partner_id] >= Config.instance.attunement_threshold
-      attunement_levels[partner_id] = maxf(0.0, attunement_levels[partner_id] - Config.instance.attunement_decay_on_break * delta)
-      var is_above_threshold = attunement_levels[partner_id] >= Config.instance.attunement_threshold
-      if was_above_threshold and not is_above_threshold:
-        for old_partner in old_attuned:
-          if old_partner.get_instance_id() == partner_id:
-            EventBus.instance.attunement_broken.emit(self, old_partner)
-            break
-      if attunement_levels[partner_id] <= 0:
-        attunement_levels.erase(partner_id)
-    _update_attuned_partners()
-    return
-
-  for partner in harmony_partners:
-    var partner_id = partner.get_instance_id()
-    var current = attunement_levels.get(partner_id, 0.0)
-    var new_level = minf(current + Config.instance.attunement_gain_rate * delta, Config.instance.attunement_max_level)
-    var was_attuned = current >= Config.instance.attunement_threshold
-    var is_attuned = new_level >= Config.instance.attunement_threshold
-    attunement_levels[partner_id] = new_level
-    if not was_attuned and is_attuned:
-      EventBus.instance.attunement_achieved.emit(self, partner)
-    if new_level > current and int(new_level * 10) > int(current * 10):
-      EventBus.instance.attunement_progress.emit(self, partner, new_level)
-
-  _update_attuned_partners()
-
-func _update_attuned_partners() -> void:
-  attuned_partners.clear()
-  for partner in harmony_partners:
-    var partner_id = partner.get_instance_id()
-    if attunement_levels.get(partner_id, 0.0) >= Config.instance.attunement_threshold:
-      attuned_partners.append(partner)
-
-func is_attuned_with(partner: Node) -> bool:
-  return partner in attuned_partners
-
-func get_attunement_speed_multiplier() -> float:
-  if attuned_partners.is_empty():
-    return 1.0
-  return 1.0 + Config.instance.attunement_speed_bonus * attuned_partners.size()
-
-func get_attunement_output_bonus() -> int:
-  if attuned_partners.is_empty():
-    return 0
-  return Config.instance.attunement_output_bonus * attuned_partners.size()
-
 func get_attunement_storage_bonus() -> int:
-  if attuned_partners.is_empty():
-    return 0
-  return Config.instance.attunement_storage_bonus * attuned_partners.size()
-
-func try_attunement_synergy() -> Dictionary:
-  var result = {"triggered": false}
-  if attuned_partners.is_empty():
-    return result
-  for partner in attuned_partners:
-    var pair_key = "%s+%s" % [building_id, partner.building_id]
-    var reverse_key = "%s+%s" % [partner.building_id, building_id]
-    var synergy = Config.instance.attunement_synergy_bonuses.get(pair_key, Config.instance.attunement_synergy_bonuses.get(reverse_key, {}))
-    if synergy.is_empty():
-      continue
-    if synergy.has("output_type") and synergy.has("chance"):
-      if randf() < synergy["chance"]:
-        result["triggered"] = true
-        result["output_type"] = synergy["output_type"]
-        result["amount"] = 1
-        EventBus.instance.attunement_synergy_triggered.emit(self, partner, synergy["output_type"])
-    if synergy.has("tension_reduction"):
-      var reduced = remove_from_storage("tension", synergy["tension_reduction"])
-      if reduced > 0:
-        result["triggered"] = true
-        EventBus.instance.attunement_synergy_triggered.emit(self, partner, "tension_reduction")
-    if synergy.has("calm_bonus"):
-      result["triggered"] = true
-      result["calm_bonus"] = synergy["calm_bonus"]
-      EventBus.instance.attunement_synergy_triggered.emit(self, partner, "calm_bonus")
-    if synergy.has("energy_bonus"):
-      result["triggered"] = true
-      result["energy_bonus"] = synergy["energy_bonus"]
-      EventBus.instance.attunement_synergy_triggered.emit(self, partner, "energy_bonus")
-  return result
-
-func _process_fragility(delta: float) -> void:
-  if has_component("fragility"):
-    return
-  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
-    return
-
-  var was_cracked = is_cracked
-  is_cracked = fragility_level >= Config.instance.fragility_crack_threshold
-
-  if is_cracked and not was_cracked:
-    EventBus.instance.building_cracked.emit(self, fragility_level)
-
-  if is_cracked:
-    _process_fragility_leak(delta)
-
-  _heal_fragility(delta)
-
-func _gain_fragility(inputs: Dictionary) -> void:
-  var negative_count = 0
-  for resource_id in inputs:
-    if resource_id in Config.instance.fragility_negative_emotions:
-      negative_count += inputs[resource_id]
-
-  if negative_count > 0:
-    var gain_modifier = 1.0
-    if is_legacy:
-      gain_modifier = 1.0 - Config.instance.legacy_resilience_factor
-    var old_level = fragility_level
-    fragility_level = minf(fragility_level + negative_count * Config.instance.fragility_gain_per_negative * gain_modifier, Config.instance.fragility_max_level)
-    if old_level < Config.instance.fragility_crack_threshold and fragility_level >= Config.instance.fragility_crack_threshold:
-      is_cracked = true
-      EventBus.instance.building_cracked.emit(self, fragility_level)
-
-func _process_fragility_leak(delta: float) -> void:
-  if has_component("fragility"):
-    return
-  if not grid:
-    return
-
-  fragility_leak_timer += delta
-  if fragility_leak_timer < Config.instance.fragility_leak_interval:
-    return
-
-  fragility_leak_timer = 0.0
-
-  var leak_candidates: Array[String] = []
-  for resource_id in storage:
-    if storage[resource_id] > 0:
-      leak_candidates.append(resource_id)
-
-  if leak_candidates.is_empty():
-    return
-
-  var leak_resource = leak_candidates[randi() % leak_candidates.size()]
-  var neighbors = _get_adjacent_buildings()
-
-  if neighbors.is_empty():
-    return
-
-  var target = neighbors[randi() % neighbors.size()]
-  var leaked = remove_from_storage(leak_resource, Config.instance.fragility_leak_amount)
-  if leaked > 0:
-    target.add_to_storage(leak_resource, leaked)
-    EventBus.instance.building_leaked.emit(self, leak_resource, target)
-
-func _heal_fragility(delta: float) -> void:
-  if fragility_level <= 0:
-    return
-
-  var base_heal = Config.instance.fragility_heal_rate * delta
-  var calm_heal = _get_nearby_calm_for_fragility() * Config.instance.fragility_calm_heal_bonus * delta
-  var total_heal = base_heal + calm_heal
-
-  var old_level = fragility_level
-  fragility_level = maxf(0.0, fragility_level - total_heal)
-
-  if is_cracked and fragility_level < Config.instance.fragility_crack_threshold:
-    is_cracked = false
-    EventBus.instance.building_healed.emit(self, fragility_level)
-
-func _get_nearby_calm_for_fragility() -> int:
-  var total_calm = storage.get("calm", 0)
-  if not grid:
-    return total_calm
-
-  var radius = Config.instance.fragility_calm_heal_radius
-  for x in range(-radius, size.x + radius):
-    for y in range(-radius, size.y + radius):
-      if x >= 0 and x < size.x and y >= 0 and y < size.y:
-        continue
-      var check = grid_coord + Vector2i(x, y)
-      if grid.is_valid_coord(check):
-        var occupant = grid.get_occupant(check)
-        if occupant and occupant != self and occupant.has_method("get_storage_amount"):
-          total_calm += occupant.get_storage_amount("calm")
-
-  return total_calm
-
-func _get_fragility_speed_multiplier() -> float:
-  if fragility_level <= 0:
-    return 1.0
-  var penalty = fragility_level * Config.instance.fragility_speed_penalty_at_max
-  return 1.0 - penalty
-
-func _process_stagnation(delta: float) -> void:
-  if has_component("stagnation"):
-    return
-  if storage_capacity <= 0:
-    return
-
-  for resource_id in storage:
-    if storage[resource_id] <= 0:
-      resource_age_data.erase(resource_id)
-      continue
-
-    if not resource_age_data.has(resource_id):
-      resource_age_data[resource_id] = {"age": 0.0, "stagnation": 0.0}
-
-    var data = resource_age_data[resource_id]
-    data["age"] += delta
-
-    if data["age"] >= Config.instance.stagnation_time_threshold:
-      var old_stagnation = data["stagnation"]
-      data["stagnation"] = minf(data["stagnation"] + Config.instance.stagnation_gain_rate * delta, Config.instance.stagnation_max_level)
-      if old_stagnation < 0.5 and data["stagnation"] >= 0.5:
-        EventBus.instance.resource_stagnated.emit(self, resource_id, data["stagnation"])
-
-  _process_stagnation_decay(delta)
-
-func _process_stagnation_decay(delta: float) -> void:
-  stagnation_decay_timer += delta
-  if stagnation_decay_timer < Config.instance.stagnation_decay_interval:
-    return
-
-  stagnation_decay_timer = 0.0
-
-  for resource_id in resource_age_data:
-    var data = resource_age_data[resource_id]
-    if data["stagnation"] < Config.instance.stagnation_max_level * 0.8:
-      continue
-
-    if randf() >= Config.instance.stagnation_decay_chance:
-      continue
-
-    var transform_to = Config.instance.stagnation_decay_transforms.get(resource_id, "")
-    if transform_to == "":
-      continue
-
-    var amount = storage.get(resource_id, 0)
-    if amount <= 0:
-      continue
-
-    var decay_amount = mini(amount, 2)
-    remove_from_storage(resource_id, decay_amount)
-    _output_resource(transform_to, decay_amount)
-    EventBus.instance.resource_decayed_to_severe.emit(self, resource_id, transform_to)
-    resource_age_data.erase(resource_id)
-
-func _get_stagnation_speed_multiplier() -> float:
-  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
-    return 1.0
-
-  var inputs = definition.get("input", {})
-  if inputs.is_empty():
-    return 1.0
-
-  var total_stagnation = 0.0
-  var total_freshness = 0.0
-  var count = 0
-
-  for resource_id in inputs:
-    if not resource_age_data.has(resource_id):
-      total_freshness += 1.0
-      count += 1
-      continue
-
-    var data = resource_age_data[resource_id]
-    if data["age"] < Config.instance.stagnation_fresh_threshold:
-      total_freshness += 1.0
-    else:
-      total_stagnation += data["stagnation"]
-    count += 1
-
-  if count == 0:
-    return 1.0
-
-  var avg_stagnation = total_stagnation / count
-  var avg_freshness = total_freshness / count
-
-  if avg_freshness > 0.5:
-    return 1.0 + Config.instance.stagnation_fresh_bonus * avg_freshness
-  elif avg_stagnation > 0:
-    return 1.0 - Config.instance.stagnation_process_penalty * avg_stagnation
-
-  return 1.0
+  var comp := get_component("attunement") as AttunementComponent
+  return comp.get_storage_bonus() if comp else 0
 
 func reset_resource_age(resource_id: String) -> void:
   if resource_age_data.has(resource_id):
@@ -2465,7 +1428,10 @@ func _scan_nearby_resources_for_transmutation() -> Dictionary:
   var result: Dictionary = {}
   var radius = Config.instance.transmutation_radius
 
-  result[saturation_resource] = storage.get(saturation_resource, 0) if saturation_resource != "" else 0
+  var sat_comp := get_component("saturation") as SaturationComponent
+  var sat_resource := sat_comp.saturation_resource if sat_comp else ""
+  if sat_resource != "":
+    result[sat_resource] = storage.get(sat_resource, 0)
 
   for resource_id in storage:
     result[resource_id] = result.get(resource_id, 0) + storage.get(resource_id, 0)
@@ -2501,45 +1467,13 @@ func _output_transmuted_resource(resource_id: String, amount: int) -> void:
   EventBus.instance.resource_overflow.emit(resource_id, amount, self, spawn_pos)
 
 func _create_suppression_field() -> void:
-  suppression_field_active = true
-  suppression_field_timer = Config.instance.transmutation_suppression_duration
-  var tile_size = Config.instance.tile_size
-  var field_position = position + Vector2(size) * tile_size * 0.5
-  EventBus.instance.suppression_field_created.emit(self, field_position, Config.instance.transmutation_suppression_radius, Config.instance.transmutation_suppression_duration)
-
-func _process_suppression_field(delta: float) -> void:
-  if has_component("suppression"):
-    return
-  if not suppression_field_active:
-    return
-
-  suppression_field_timer -= delta
-  if suppression_field_timer <= 0:
-    suppression_field_active = false
-    return
-
-  if not grid:
-    return
-
-  var radius = Config.instance.transmutation_suppression_radius
-  for x in range(-radius, size.x + radius):
-    for y in range(-radius, size.y + radius):
-      if x >= 0 and x < size.x and y >= 0 and y < size.y:
-        continue
-      var check = grid_coord + Vector2i(x, y)
-      if grid.is_valid_coord(check):
-        var occupant = grid.get_occupant(check)
-        if occupant and occupant != self and occupant.has_method("get_storage_amount"):
-          var anxiety = occupant.get_storage_amount("anxiety")
-          if anxiety > 0:
-            var suppress_amount = int(anxiety * Config.instance.transmutation_suppression_strength * delta)
-            if suppress_amount > 0:
-              occupant.remove_from_storage("anxiety", suppress_amount)
+  var comp := get_component("suppression") as SuppressionComponent
+  if comp:
+    comp.create_suppression_field()
 
 func get_suppression_field_strength() -> float:
-  if not suppression_field_active:
-    return 0.0
-  return Config.instance.transmutation_suppression_strength
+  var comp := get_component("suppression") as SuppressionComponent
+  return comp.get_suppression_field_strength() if comp else 0.0
 
 func is_affected_by_suppression_field() -> bool:
   if not grid:
@@ -2556,119 +1490,35 @@ func is_affected_by_suppression_field() -> bool:
             return true
   return false
 
-func _process_mastery(delta: float) -> void:
-  if has_component("mastery"):
-    return
-
-  if mastery_processed.is_empty():
-    return
-
-  var decay_modifier = 1.0
-  if is_legacy:
-    decay_modifier = 1.0 - Config.instance.legacy_decay_protection
-
-  for resource_id in mastery_processed.keys():
-    if resource_id != dominant_mastery:
-      mastery_processed[resource_id] = maxf(0.0, mastery_processed[resource_id] - Config.instance.mastery_decay_rate * decay_modifier * delta)
-
-  _update_dominant_mastery()
-
-func _gain_mastery(inputs: Dictionary) -> void:
-  for resource_id in inputs:
-    var amount = inputs[resource_id]
-    var current = mastery_processed.get(resource_id, 0.0)
-    mastery_processed[resource_id] = current + amount
-
-    var old_level = mastery_levels.get(resource_id, 0)
-    var new_level = _calculate_mastery_level(resource_id)
-
-    if new_level > old_level:
-      mastery_levels[resource_id] = new_level
-      EventBus.instance.mastery_level_gained.emit(self, resource_id, new_level)
-
-  _update_dominant_mastery()
-
-func _calculate_mastery_level(resource_id: String) -> int:
-  var processed = mastery_processed.get(resource_id, 0.0)
-  var level = 0
-  for threshold in Config.instance.mastery_thresholds:
-    if processed >= threshold:
-      level += 1
-    else:
-      break
-  return mini(level, Config.instance.mastery_max_level)
-
-func _update_dominant_mastery() -> void:
-  var max_processed = 0.0
-  var total_processed = 0.0
-  var new_dominant = ""
-
-  for resource_id in mastery_processed:
-    total_processed += mastery_processed[resource_id]
-    if mastery_processed[resource_id] > max_processed:
-      max_processed = mastery_processed[resource_id]
-      new_dominant = resource_id
-
-  var old_specialized = is_specialized
-  dominant_mastery = new_dominant
-
-  if total_processed > 0:
-    is_specialized = (max_processed / total_processed) >= Config.instance.mastery_specialization_threshold
-  else:
-    is_specialized = false
-
-  if is_specialized and not old_specialized and dominant_mastery != "":
-    EventBus.instance.mastery_specialization_achieved.emit(self, dominant_mastery)
-
 func get_mastery_level(resource_id: String) -> int:
-  return mastery_levels.get(resource_id, 0)
-
-func get_mastery_speed_multiplier() -> float:
-  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
-    return 1.0
-
-  var inputs = definition.get("input", {})
-  if inputs.is_empty():
-    return 1.0
-
-  var total_bonus = 0.0
-  var total_penalty = 0.0
-  var count = 0
-
-  for resource_id in inputs:
-    var level = get_mastery_level(resource_id)
-    total_bonus += level * Config.instance.mastery_speed_bonus_per_level
-
-    if is_specialized and resource_id != dominant_mastery:
-      total_penalty += Config.instance.mastery_cross_penalty
-    count += 1
-
-  if count == 0:
-    return 1.0
-
-  return 1.0 + (total_bonus / count) - total_penalty
-
-func get_mastery_output_bonus() -> int:
-  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
-    return 0
-
-  var inputs = definition.get("input", {})
-  for resource_id in inputs:
-    if get_mastery_level(resource_id) >= Config.instance.mastery_max_level:
-      return Config.instance.mastery_output_bonus_at_max
-
-  return 0
+  var comp := get_component("mastery") as MasteryComponent
+  return comp.get_level(resource_id) if comp else 0
 
 func get_speed_multiplier_breakdown() -> Dictionary:
   if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
     return {}
 
+  var _awakening := get_component("awakening") as AwakeningComponent
+  var _fatigue := get_component("fatigue") as FatigueComponent
+  var _fragility := get_component("fragility") as FragilityComponent
+  var _harmony := get_component("harmony") as HarmonyComponent
+  var _resonance := get_component("resonance") as ResonanceComponent
+  var _attunement := get_component("attunement") as AttunementComponent
+  var _purity := get_component("purity")
+  var _stagnation := get_component("stagnation")
+  var _echo := get_component("emotional_echo") as EmotionalEchoComponent
+  var _momentum := get_component("momentum") as MomentumComponent
+  var _velocity := get_component("velocity") as VelocityComponent
+  var _mastery := get_component("mastery") as MasteryComponent
+  var _legacy := get_component("legacy") as LegacyComponent
+  var _network := get_component("network") as NetworkComponent
+
   var categories: Dictionary = {}
 
   categories["building_state"] = {
-    "awakened": get_awakening_speed_multiplier(),
-    "fatigue": _get_fatigue_speed_multiplier(),
-    "fragility": _get_fragility_speed_multiplier(),
+    "awakened": _awakening.get_speed_multiplier() if _awakening else 1.0,
+    "fatigue": _fatigue.get_speed_multiplier() if _fatigue else 1.0,
+    "fragility": _fragility.get_speed_multiplier() if _fragility else 1.0,
   }
 
   categories["environment"] = {
@@ -2680,109 +1530,39 @@ func get_speed_multiplier_breakdown() -> Dictionary:
   }
 
   categories["synergy"] = {
-    "harmony": _get_harmony_speed_multiplier(),
-    "resonance": _get_resonance_speed_multiplier(),
-    "attunement": get_attunement_speed_multiplier(),
+    "harmony": _harmony.get_speed_multiplier() if _harmony else 1.0,
+    "resonance": _resonance.get_speed_multiplier() if _resonance else 1.0,
+    "attunement": _attunement.get_speed_multiplier() if _attunement else 1.0,
     "adjacency": get_adjacency_efficiency_multiplier(),
     "sync_chain": _get_sync_chain_speed_multiplier(),
   }
 
   categories["resource"] = {
-    "purity": _get_purity_speed_multiplier(),
-    "stagnation": _get_stagnation_speed_multiplier(),
+    "purity": _purity.get_speed_multiplier() if _purity else 1.0,
+    "stagnation": _stagnation.get_speed_multiplier() if _stagnation else 1.0,
     "wisdom": _get_wisdom_efficiency_multiplier(),
-    "echo": _get_emotional_echo_multiplier(),
+    "echo": _echo.get_speed_multiplier() if _echo else 1.0,
   }
 
   categories["momentum"] = {
     "flow": GameState.instance.get_flow_state_multiplier(),
-    "momentum": _get_momentum_speed_multiplier(),
-    "velocity": get_velocity_speed_multiplier(),
-    "mastery": get_mastery_speed_multiplier(),
-    "legacy": get_legacy_speed_multiplier(),
-    "support": _get_support_network_efficiency_multiplier(),
+    "momentum": _momentum.get_speed_multiplier() if _momentum else 1.0,
+    "velocity": _velocity.get_speed_multiplier() if _velocity else 1.0,
+    "mastery": _mastery.get_speed_multiplier() if _mastery else 1.0,
+    "legacy": _legacy.get_speed_multiplier() if _legacy else 1.0,
+    "support": _network.get_speed_multiplier() if _network else 1.0,
   }
 
-  var total = 1.0
+  var total := 1.0
   for category in categories:
     for mod_name in categories[category]:
       total *= categories[category][mod_name]
 
   return {"total": total, "categories": categories}
 
-func _process_velocity(delta: float) -> void:
-  if has_component("velocity"):
-    return
-
-  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
-    return
-
-  var current_time = Time.get_ticks_msec() / 1000.0
-  _cleanup_velocity_history(current_time)
-  _calculate_velocity()
-
-  if velocity_current >= Config.instance.velocity_high_threshold:
-    velocity_sustained_timer += delta
-    velocity_momentum = minf(velocity_momentum + Config.instance.velocity_momentum_gain * delta, Config.instance.velocity_momentum_max)
-
-    if velocity_sustained_timer >= Config.instance.velocity_sustained_threshold:
-      if velocity_momentum >= 0.5:
-        EventBus.instance.velocity_burst_triggered.emit(self, velocity_current)
-  else:
-    velocity_sustained_timer = maxf(0.0, velocity_sustained_timer - delta * 2.0)
-    velocity_momentum = maxf(0.0, velocity_momentum - Config.instance.velocity_momentum_decay * delta)
-
-func _record_velocity_event(inputs: Dictionary) -> void:
-  var current_time = Time.get_ticks_msec() / 1000.0
-  var total_amount = 0
-  for resource_id in inputs:
-    total_amount += inputs[resource_id]
-
-  velocity_history.append({
-    "time": current_time,
-    "amount": total_amount
-  })
-  velocity_last_process_time = current_time
-
-func _cleanup_velocity_history(current_time: float) -> void:
-  var cutoff_time = current_time - Config.instance.velocity_sample_window
-  while velocity_history.size() > 0 and velocity_history[0]["time"] < cutoff_time:
-    velocity_history.pop_front()
-
-func _calculate_velocity() -> void:
-  if velocity_history.size() < 2:
-    velocity_current = 0.0
-    return
-
-  var total_amount = 0.0
-  for entry in velocity_history:
-    total_amount += entry["amount"]
-
-  velocity_current = total_amount / Config.instance.velocity_sample_window
-
-func get_velocity_speed_multiplier() -> float:
-  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
-    return 1.0
-
-  var base_multiplier = 1.0
-
-  if velocity_current >= Config.instance.velocity_high_threshold:
-    var excess = velocity_current - Config.instance.velocity_high_threshold
-    var normalized = minf(excess / Config.instance.velocity_high_threshold, 1.0)
-    base_multiplier += Config.instance.velocity_high_speed_bonus * normalized
-  elif velocity_current < Config.instance.velocity_low_threshold and velocity_history.size() > 0:
-    var deficit = Config.instance.velocity_low_threshold - velocity_current
-    var normalized = minf(deficit / Config.instance.velocity_low_threshold, 1.0)
-    base_multiplier -= Config.instance.velocity_low_speed_penalty * normalized
-
-  var momentum_bonus = velocity_momentum * Config.instance.velocity_burst_bonus
-  return base_multiplier + momentum_bonus
-
 func get_velocity() -> float:
-  return velocity_current
-
-func get_velocity_momentum() -> float:
-  return velocity_momentum
+  var comp := get_component("velocity") as VelocityComponent
+  return comp.get_velocity() if comp else 0.0
 
 func _get_sync_chain_speed_multiplier() -> float:
   if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
@@ -2804,52 +1584,12 @@ func _is_in_any_sync_chain() -> bool:
       return true
   return false
 
-func _process_legacy(delta: float) -> void:
-  if has_component("legacy"):
-    return
-  if not has_behavior(BuildingDefs.Behavior.PROCESSOR):
-    return
-
-  if is_legacy:
-    return
-
-  var meets_mastery = false
-  for resource_type in mastery_levels:
-    if mastery_levels[resource_type] >= Config.instance.legacy_mastery_threshold:
-      meets_mastery = true
-      break
-
-  var meets_awakening = not Config.instance.legacy_awakening_required or is_awakened
-
-  legacy_qualifying = meets_mastery and meets_awakening
-
-  if legacy_qualifying:
-    legacy_timer += delta
-    if legacy_timer >= Config.instance.legacy_time_required:
-      is_legacy = true
-      EventBus.instance.legacy_status_achieved.emit(self)
-  else:
-    legacy_timer = maxf(0.0, legacy_timer - delta * Config.instance.legacy_resilience_factor)
-
-func get_legacy_speed_multiplier() -> float:
-  if not is_legacy:
-    return 1.0
-  return 1.0 + Config.instance.legacy_speed_bonus
-
-func get_legacy_output_bonus() -> int:
-  if not is_legacy:
-    return 0
-  return Config.instance.legacy_output_bonus
-
 func is_legacy_building() -> bool:
   return is_legacy
 
 func get_legacy_timer_progress() -> float:
-  if is_legacy:
-    return 1.0
-  if not legacy_qualifying:
-    return 0.0
-  return legacy_timer / Config.instance.legacy_time_required
+  var comp := get_component("legacy") as LegacyComponent
+  return comp.get_timer_progress() if comp else 0.0
 
 func _on_building_placed(placed_building: Node, _coord: Vector2i) -> void:
   if has_component("adjacency"):

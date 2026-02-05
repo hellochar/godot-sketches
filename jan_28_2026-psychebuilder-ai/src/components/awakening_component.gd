@@ -33,3 +33,6 @@ func get_generator_rate_multiplier() -> float:
   if is_awakened:
     return 1.0 + config.awakening_generator_rate_bonus
   return 1.0
+
+func get_generation_multiplier() -> float:
+  return get_generator_rate_multiplier()
