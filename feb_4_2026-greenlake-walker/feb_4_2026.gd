@@ -1,15 +1,24 @@
 @tool
 extends Control
 
-func _ready() -> void:
-  if Engine.is_editor_hint():
-    var polygon = %"green-lake-boundary"
-    var path = %Path2D
-    var curve = Curve2D.new()
-    for point in polygon.polygon:
-      curve.add_point(point)
-    path.curve = curve
-    print("Converted ", polygon.polygon.size(), " polygon points to Path2D curve")
+@export var set_curve: bool:
+  set(value):
+    doit()
 
-func _process(delta: float) -> void:
+func doit() -> void:
+  var polygon: Polygon2D = %"green-lake-boundary"
+
+  var p0 := polygon.polygon[0]
+  # reposition polygon to origin
+  for i in polygon.polygon.size():
+    polygon.polygon[i] = polygon.polygon[i] - p0
+
+  var path: Path2D = %Path2D
+  var curve := Curve2D.new()
+  for point in polygon.polygon:
+    curve.add_point(point - p0)
+  path.curve = curve
+  print("Converted ", polygon.polygon.size(), " polygon points to Path2D curve")
+
+func _ready() -> void:
   pass
