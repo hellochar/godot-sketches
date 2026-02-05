@@ -289,6 +289,44 @@ static var rules: Dictionary = {
       "efficiency": 1.1,
       "description": "Hope sustains positive emotions"
     }
+  },
+
+  "quick_cache": {
+    "mourning_chapel": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Fast storage accelerates processing"
+    },
+    "anxiety_diffuser": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Fast storage accelerates processing"
+    },
+    "memory_processor": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Fast storage accelerates processing"
+    },
+    "grounding_station": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Fast storage accelerates processing"
+    },
+    "reflection_pool": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Fast storage accelerates processing"
+    },
+    "anger_forge": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Fast storage accelerates processing"
+    },
+    "tension_release": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Fast storage accelerates processing"
+    }
   }
 }
 
