@@ -709,13 +709,32 @@ The config.gd has 480+ parameters with no player-facing descriptions. Players ca
 - [x] Quick Cache: processors_priority, +20% speed for adjacent processors
 - [x] Memory Archive: prevents stagnation, +50% purity decay
 
+#### Phase 6: Bidirectional Synergy Rules
+- [x] Added 20+ bidirectional adjacency rules ensuring symmetric synergy effects
+- [x] Key bidirectional pairs:
+  - meditation_garden ↔ reflection_pool, integration_temple, meaning_radiator, anxiety_diffuser
+  - curiosity_garden ↔ reflection_pool, excitement_channeler, boredom_alchemist
+  - love_shrine ↔ social_connection_hub
+  - comfort_hearth ↔ contentment_garden, comfort_den
+  - sleep_chamber ↔ rest_sanctuary
+  - mourning_chapel ↔ integration_temple
+  - gratitude_practice ↔ integration_temple, contentment_garden
+  - creative_studio ↔ excitement_channeler, curiosity_garden
+  - journaling_corner ↔ integration_temple, reflection_pool
+  - resilience_monument ↔ self_belief_forge, hope_beacon
+
 #### Testing
-- [x] Added 6 new test functions:
+- [x] Added 10 new test functions:
   - test_adjacency_stacking_multiplier_diminishes
   - test_global_effect_buildings_are_unique
   - test_new_orphan_resource_buildings_exist
   - test_quick_cache_has_processor_adjacencies
   - test_integration_temple_has_adjacencies
+  - test_coping_buildings_have_adjacencies
+  - test_new_orphan_buildings_have_adjacencies
+  - test_all_buildings_have_valid_behaviors
+  - test_key_bidirectional_adjacencies_exist
+  - test_creative_studio_has_adjacencies
 
 ### Remaining Work (Phase 5: UI)
 - [ ] Add efficiency breakdown tooltip showing contributing factors
@@ -727,8 +746,9 @@ The config.gd has 480+ parameters with no player-facing descriptions. Players ca
 | Metric | Before | After | Change |
 |--------|--------|-------|--------|
 | Buildings | 48 | 55 | +7 |
-| Adjacency Rules | ~20 | ~80 | +60 |
-| Orphan Resources | 9 | 2 | -7 |
+| Adjacency Rules | ~20 | 95 | +75 |
+| Orphan Resources | 9 | 0 | -9 |
 | Global Effects with Conditions | 0 | 4 | +4 |
 | Coping Buildings with Adjacencies | 0 | 6 | +6 |
-| Tests | 25 | 31 | +6 |
+| Bidirectional Rule Pairs | 0 | 15+ | +15 |
+| Tests | 25 | 35 | +10 |
