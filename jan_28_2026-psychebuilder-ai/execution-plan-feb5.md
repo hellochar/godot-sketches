@@ -431,15 +431,20 @@ Icons to add:
 9. ✅ Task 3.3: Add lenticular depth to flat buildings
 
 ### Session 3 (Completed)
-10. ✅ Task 4.2: Add processing chains for orphans (4 new buildings)
+10. ✅ Task 4.2: Add processing chains for orphans (7 new buildings total)
 11. ✅ Add quick_cache adjacency rules for processors
 12. ✅ Add adjacency rules for new buildings
 13. ✅ Add tests for new functionality
 
+### Session 4 (Completed)
+14. ✅ Add bidirectional adjacency rules (20+ pairs)
+15. ✅ Add tests for bidirectional rules
+16. ✅ Update analysis with final statistics (95 rules total)
+
 ### Remaining (Phase 5 - UI)
-14. Task 5.1: Add efficiency breakdown UI
-15. Task 5.2: Add keyword status icons
-16. Final testing and polish
+17. Task 5.1: Add efficiency breakdown UI
+18. Task 5.2: Add keyword status icons
+19. Final testing and polish
 
 ---
 
