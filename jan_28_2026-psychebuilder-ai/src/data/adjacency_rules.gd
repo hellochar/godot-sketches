@@ -423,6 +423,71 @@ static var rules: Dictionary = {
       "efficiency": 0.8,
       "description": "Worry disrupts rest"
     }
+  },
+
+  "emergency_calm_center": {
+    "anxiety_diffuser": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Calm flows between crisis and processing"
+    },
+    "grounding_station": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Grounding reinforces emergency calm"
+    }
+  },
+
+  "anger_vent": {
+    "anger_forge": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.25,
+      "description": "Vented anger flows to the forge"
+    },
+    "comfort_hearth": {
+      "type": EffectType.CONFLICT,
+      "efficiency": 0.8,
+      "description": "Anger venting disturbs comfort"
+    }
+  },
+
+  "comfort_den": {
+    "comfort_hearth": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Comfort flows freely between sources"
+    },
+    "rest_sanctuary": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Comfort aids rest"
+    }
+  },
+
+  "support_hotline": {
+    "social_connection_hub": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Connection strengthens support"
+    },
+    "love_shrine": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Love flows through support"
+    }
+  },
+
+  "grounding_chamber": {
+    "grounding_station": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.25,
+      "description": "Grounding deepens grounding"
+    },
+    "meditation_garden": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Meditation enhances grounding"
+    }
   }
 }
 
