@@ -379,6 +379,50 @@ static var rules: Dictionary = {
       "efficiency": 1.15,
       "description": "Comfort nurtures contentment"
     }
+  },
+
+  "confidence_anchor": {
+    "reflection_pool": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Reflection crystallizes confidence"
+    },
+    "self_belief_forge": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Self-belief reinforces confidence"
+    }
+  },
+
+  "boredom_alchemist": {
+    "curiosity_garden": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Curiosity transforms boredom"
+    },
+    "distraction_station": {
+      "type": EffectType.CONFLICT,
+      "efficiency": 0.85,
+      "description": "Distraction prevents alchemical transformation"
+    }
+  },
+
+  "rest_sanctuary": {
+    "sleep_chamber": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.25,
+      "description": "Sleep deepens rest"
+    },
+    "comfort_hearth": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Comfort aids recovery"
+    },
+    "worry_loop": {
+      "type": EffectType.CONFLICT,
+      "efficiency": 0.8,
+      "description": "Worry disrupts rest"
+    }
   }
 }
 

@@ -219,7 +219,8 @@ func test_global_effect_buildings_are_unique() -> void:
 func test_new_orphan_resource_buildings_exist() -> void:
   var all_defs = BuildingDefs.get_all_definitions()
   var new_buildings = ["self_belief_forge", "meaning_radiator",
-    "excitement_channeler", "contentment_garden"]
+    "excitement_channeler", "contentment_garden", "confidence_anchor",
+    "boredom_alchemist", "rest_sanctuary"]
   for building_id in new_buildings:
     assert_bool(all_defs.has(building_id)).is_true()
 
