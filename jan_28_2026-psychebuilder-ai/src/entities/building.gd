@@ -657,6 +657,7 @@ func _complete_processing() -> void:
     if synergy.has("energy_bonus"):
       GameState.instance.add_energy(synergy["energy_bonus"])
 
+  var produced: Dictionary = {}
   var conditional_outputs = definition.get("conditional_outputs", {})
   if not conditional_outputs.is_empty():
     for condition_resource in conditional_outputs:
@@ -665,12 +666,44 @@ func _complete_processing() -> void:
         var amount = output_data["amount"] + total_bonus
         _track_output_resource(output_data["output"], amount)
         _cascade_output_resource(output_data["output"], amount)
+        produced[output_data["output"]] = amount
+        _show_processing_feedback(produced)
         return
   var outputs = definition.get("output", {})
   for resource_id in outputs:
     var amount = outputs[resource_id] + total_bonus
     _track_output_resource(resource_id, amount)
     _cascade_output_resource(resource_id, amount)
+    produced[resource_id] = amount
+  _show_processing_feedback(produced)
+
+func _show_processing_feedback(produced: Dictionary) -> void:
+  if produced.is_empty():
+    return
+  var parts: Array[String] = []
+  for res_id in produced:
+    parts.append("+%d %s" % [produced[res_id], res_id.capitalize()])
+  var text := ", ".join(parts)
+  var center := position + sprite.size * 0.5
+  _spawn_feedback_text(center, text, Color(0.5, 1.0, 0.5))
+  var tween := create_tween()
+  tween.tween_property(sprite, "modulate", Color(2.0, 2.0, 2.0, 1.0), 0.05)
+  tween.tween_property(sprite, "modulate", Color.WHITE, 0.2)
+
+func _spawn_feedback_text(world_pos: Vector2, text: String, color: Color) -> void:
+  var feedback := Label.new()
+  feedback.text = text
+  feedback.position = world_pos - Vector2(50, 10)
+  feedback.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+  feedback.add_theme_font_size_override("font_size", 11)
+  feedback.add_theme_color_override("font_color", color)
+  feedback.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
+  feedback.add_theme_constant_override("outline_size", 2)
+  get_parent().add_child(feedback)
+  var tween := create_tween().set_parallel(true)
+  tween.tween_property(feedback, "position:y", world_pos.y - 50, 1.5)
+  tween.tween_property(feedback, "modulate:a", 0.0, 1.5).set_delay(0.3)
+  tween.chain().tween_callback(feedback.queue_free)
 
 func _track_output_resource(resource_id: String, amount: int) -> void:
   if resource_id == "wisdom":
@@ -1011,6 +1044,17 @@ func trigger_habit() -> void:
   if energy_bonus > 0:
     var bonus_amount = int(energy_bonus * total_multiplier)
     GameState.instance.add_energy(bonus_amount)
+
+  var habit_parts: Array[String] = []
+  for resource_id in generates:
+    var amount = int(generates[resource_id] * total_multiplier)
+    if amount > 0:
+      habit_parts.append("+%d %s" % [amount, resource_id.capitalize()])
+  if energy_bonus > 0:
+    habit_parts.append("+%d Energy" % int(energy_bonus * total_multiplier))
+  if habit_parts.size() > 0:
+    var center := position + sprite.size * 0.5
+    _spawn_feedback_text(center, ", ".join(habit_parts), Color(0.5, 0.9, 0.8))
 
 func _update_status() -> void:
   if is_road():

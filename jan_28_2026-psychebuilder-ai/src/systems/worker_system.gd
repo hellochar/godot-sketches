@@ -20,11 +20,13 @@ func setup(p_grid: Node, p_attention_pool: int, p_thresholds: Array, p_costs: Ar
 
 func _sync_attention() -> void:
   GameState.instance.attention_used = float(attention_used)
-  GameState.instance.attention_available = float(attention_pool)
-  EventBus.instance.attention_changed.emit(float(attention_used), float(attention_pool))
+  var total_pool := attention_pool + GameState.instance.get_global_attention_bonus()
+  GameState.instance.attention_available = float(total_pool)
+  EventBus.instance.attention_changed.emit(float(attention_used), float(total_pool))
 
 func get_available_attention() -> int:
-  return attention_pool - attention_used
+  var total_pool := attention_pool + GameState.instance.get_global_attention_bonus()
+  return total_pool - attention_used
 
 func spawn_worker(world_position: Vector2) -> Node:
   var worker = WorkerScene.instantiate()
@@ -70,6 +72,8 @@ func unassign_worker(worker: Node) -> void:
   worker.unassign()
 
 func _calculate_attention_cost(worker: Node, job_type: String, target_a: Node, target_b: Node, resource_type: String) -> int:
+  if GameState.instance.is_habituation_disabled():
+    return ceili(Config.instance.habituation_costs[0])
   var job_id = _make_job_id(job_type, target_a, target_b, resource_type)
   var gs = GameState.instance
   var completions = gs.habituation_progress.get(job_id, 0)

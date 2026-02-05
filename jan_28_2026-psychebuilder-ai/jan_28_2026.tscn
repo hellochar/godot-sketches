@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd" id="7_game_state"]
 [ext_resource type="Script" path="res://jan_28_2026-psychebuilder-ai/src/autoload/meta_progression.gd" id="8_meta_progression"]
 [ext_resource type="Script" path="res://jan_28_2026-psychebuilder-ai/src/systems/event_system.gd" id="9_event_system"]
+[ext_resource type="Script" path="res://jan_28_2026-psychebuilder-ai/src/autoload/audio_feedback.gd" id="10_audio_feedback"]
 
 [node name="PsycheBuilder" type="Control" unique_id=173724855]
 layout_mode = 3
@@ -34,6 +35,9 @@ script = ExtResource("8_meta_progression")
 
 [node name="EventSystem" type="Node" parent="."]
 script = ExtResource("9_event_system")
+
+[node name="AudioFeedback" type="Node" parent="."]
+script = ExtResource("10_audio_feedback")
 
 [node name="GameWorld" type="Node2D" parent="." unique_id=931979143]
 unique_name_in_owner = true
