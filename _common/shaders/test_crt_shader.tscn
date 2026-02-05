@@ -1,0 +1,58 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Shader" path="res://_common/shaders/crt_vhs.gdshader" id="1_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_crt"]
+shader = ExtResource("1_shader")
+
+[sub_resource type="GDScript" id="GDScript_test"]
+script/source = "extends Node2D
+
+func _process(_delta: float) -> void:
+  queue_redraw()
+
+func _draw() -> void:
+  var center := get_viewport_rect().size / 2.0
+
+  # Draw colorful shapes to demonstrate the shader
+  draw_rect(Rect2(100, 100, 200, 150), Color.CORNFLOWER_BLUE)
+  draw_rect(Rect2(350, 150, 180, 200), Color.CORAL)
+  draw_circle(center, 80, Color.LIME_GREEN)
+  draw_circle(center + Vector2(150, -100), 60, Color.YELLOW)
+
+  # Draw some text
+  var font := ThemeDB.fallback_font
+  draw_string(font, Vector2(120, 80), \"CRT/VHS Shader Test\", HORIZONTAL_ALIGNMENT_LEFT, -1, 32, Color.WHITE)
+  draw_string(font, Vector2(100, 400), \"Downloaded from godotshaders.com\", HORIZONTAL_ALIGNMENT_LEFT, -1, 24, Color.WHITE)
+
+  # Animated element
+  var t := Time.get_ticks_msec() / 1000.0
+  var offset := Vector2(sin(t * 2.0) * 50, cos(t * 1.5) * 30)
+  draw_circle(center + offset + Vector2(-200, 100), 40, Color.MAGENTA)
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0.1, 0.1, 0.15, 1)
+
+[node name="TestCRTShader" type="Node2D"]
+script = SubResource("GDScript_test")
+
+[node name="Background" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+
+[node name="CRTOverlay" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="CRTEffect" type="ColorRect" parent="CRTOverlay"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+material = SubResource("ShaderMaterial_crt")
