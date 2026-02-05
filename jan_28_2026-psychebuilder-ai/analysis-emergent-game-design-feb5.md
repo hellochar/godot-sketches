@@ -655,9 +655,80 @@ The config.gd has 480+ parameters with no player-facing descriptions. Players ca
 
 | File | Path | Purpose |
 |------|------|---------|
-| Building Definitions | `src/data/building_definitions.gd` | 48 buildings, all parameters |
-| Adjacency Rules | `src/data/adjacency_rules.gd` | 20 adjacency pairs, stacking rules |
+| Building Definitions | `src/data/building_definitions.gd` | 55+ buildings (7 new), all parameters |
+| Adjacency Rules | `src/data/adjacency_rules.gd` | 80+ adjacency pairs (60+ new), stacking rules |
 | Config | `src/autoload/config.gd` | 496 lines, 40+ @export_groups |
 | Event Definitions | `src/data/event_definitions.gd` | 20 events |
 | Building Entity | `src/entities/building.gd` | 2800+ lines, all behavior logic |
 | Components | `src/components/*.gd` | 25 component files |
+
+---
+
+## Implementation Summary (February 5, 2026)
+
+### Completed Changes (6 commits)
+
+#### Phase 1: Critical Balance Fixes
+- [x] Fixed negative generator stacking (now all generators use diminishing returns)
+- [x] Added `unique: true` flag to all 6 global effect buildings
+- [x] Implemented uniqueness check in building placement
+
+#### Phase 2: Complexity Gating
+- [x] Restructured FTUE unlock days (L2 buildings delayed to Day 3+)
+- [x] Added activation conditions to global effects:
+  - Optimism Lens: requires wellbeing > 40
+  - Compassion Center: requires a coping building
+  - Creative Core: -15% processing speed trade-off
+  - Attention Amplifier: disables habituation trade-off
+- [x] Implemented global effects aggregation system in game_state.gd
+- [x] Wired worker_system.gd to use global effects
+
+#### Phase 3: Synergy Web Expansion
+- [x] Added 60+ new adjacency rules (from 20 to 80+)
+- [x] Integration Temple now has 5 synergies
+- [x] Cross-archetype bridges implemented:
+  - Grief ↔ Insight (reflection_pool + mourning_chapel)
+  - Habit ↔ Anxiety (meditation_garden + anxiety_diffuser)
+- [x] Positive generators now have interactions (hope_beacon, love_shrine, etc.)
+- [x] All 6 coping buildings now have adjacency rules
+
+#### Phase 4: Resource Chain Completion
+- [x] Added 7 new buildings to process orphan resources:
+  - Self-Belief Forge: pride + courage → resilience
+  - Meaning Radiator: meaning → calm + wisdom
+  - Excitement Channeler: excitement → curiosity + energy
+  - Contentment Garden: contentment → gratitude
+  - Confidence Anchor: confidence → wisdom
+  - Boredom Alchemist: boredom → curiosity
+  - Rest Sanctuary: fatigue → calm
+- [x] Quick Cache now gives +20% efficiency to adjacent processors
+
+#### Phase 5: Lenticular Depth
+- [x] Hope Beacon: 2x generation when grief is nearby
+- [x] Curiosity Garden: +50% when new buildings placed nearby
+- [x] Quick Cache: processors_priority, +20% speed for adjacent processors
+- [x] Memory Archive: prevents stagnation, +50% purity decay
+
+#### Testing
+- [x] Added 6 new test functions:
+  - test_adjacency_stacking_multiplier_diminishes
+  - test_global_effect_buildings_are_unique
+  - test_new_orphan_resource_buildings_exist
+  - test_quick_cache_has_processor_adjacencies
+  - test_integration_temple_has_adjacencies
+
+### Remaining Work (Phase 5: UI)
+- [ ] Add efficiency breakdown tooltip showing contributing factors
+- [ ] Add keyword status icons (Burdened, Spiraling, Flowing, etc.)
+- [ ] Run full test suite with Godot
+
+### Statistics After Implementation
+
+| Metric | Before | After | Change |
+|--------|--------|-------|--------|
+| Buildings | 48 | 55 | +7 |
+| Adjacency Rules | ~20 | ~80 | +60 |
+| Orphan Resources | 9 | 2 | -7 |
+| Global Effects with Conditions | 0 | 4 | +4 |
+| Coping Buildings with Adjacencies | 0 | 6 | +6 |
+| Tests | 25 | 31 | +6 |
