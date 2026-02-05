@@ -42,6 +42,11 @@ func get_placement_failure_reason(building_id: String, coord: Vector2i) -> Strin
   if def.is_empty():
     return "Unknown building type"
 
+  if def.get("unique", false):
+    for building in game_state.active_buildings:
+      if building.building_id == building_id:
+        return "Only one %s allowed" % def.get("name", building_id)
+
   var size = def.get("size", Vector2i(1, 1))
 
   var area_result = _check_area_placement(coord, size)

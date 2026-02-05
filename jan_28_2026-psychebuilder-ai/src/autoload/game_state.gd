@@ -664,3 +664,82 @@ func add_discovered_building(building_id: String) -> void:
 
 func has_discovered_building(building_id: String) -> bool:
   return building_id in discovered_buildings
+
+func get_active_global_effects() -> Dictionary:
+  var effects = {
+    "positive_generation_multiplier": 1.0,
+    "negative_impact_multiplier": 1.0,
+    "habit_bonus_multiplier": 1.0,
+    "processing_speed_multiplier": 1.0,
+    "processing_efficiency_multiplier": 1.0,
+    "negative_decay_multiplier": 1.0,
+    "attention_bonus": 0,
+    "habituation_disabled": false
+  }
+  var BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
+  for building in active_buildings:
+    var def = BuildingDefs.get_definition(building.building_id)
+    if not def.has("global_effect"):
+      continue
+    if not _check_global_effect_condition(def):
+      continue
+    var ge = def["global_effect"]
+    for key in ge:
+      if key == "attention_bonus":
+        effects[key] += ge[key]
+      elif key == "habituation_disabled":
+        effects[key] = effects[key] or ge[key]
+      elif effects.has(key):
+        effects[key] *= ge[key]
+  return effects
+
+func _check_global_effect_condition(def: Dictionary) -> bool:
+  if not def.has("activation_condition"):
+    return true
+  var condition = def["activation_condition"]
+  var parts = condition.split(" ")
+  if parts.size() != 3:
+    return true
+  var metric = parts[0]
+  var op = parts[1]
+  var value = float(parts[2])
+  var actual = 0.0
+  match metric:
+    "wellbeing":
+      actual = wellbeing
+    "coping_buildings":
+      actual = _count_coping_buildings()
+    _:
+      return true
+  match op:
+    ">": return actual > value
+    "<": return actual < value
+    ">=": return actual >= value
+    "<=": return actual <= value
+    "==": return actual == value
+  return true
+
+func _count_coping_buildings() -> int:
+  var count = 0
+  var BuildingDefs = preload("res://jan_28_2026-psychebuilder-ai/src/data/building_definitions.gd")
+  for building in active_buildings:
+    var def = BuildingDefs.get_definition(building.building_id)
+    var behaviors = def.get("behaviors", [])
+    if BuildingDefs.Behavior.COPING in behaviors:
+      count += 1
+  return count
+
+func get_global_positive_gen_multiplier() -> float:
+  return get_active_global_effects()["positive_generation_multiplier"]
+
+func get_global_processing_speed_multiplier() -> float:
+  return get_active_global_effects()["processing_speed_multiplier"]
+
+func get_global_habit_bonus_multiplier() -> float:
+  return get_active_global_effects()["habit_bonus_multiplier"]
+
+func is_habituation_disabled() -> bool:
+  return get_active_global_effects()["habituation_disabled"]
+
+func get_global_attention_bonus() -> int:
+  return get_active_global_effects()["attention_bonus"]
