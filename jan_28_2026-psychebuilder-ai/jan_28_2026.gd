@@ -579,10 +579,13 @@ func spawn_worker_at(coord: Vector2i) -> Node:
 func _on_phase_changed(_is_day: bool) -> void:
   _update_energy_display()
   _update_visual_effects()
+  if not _is_day:
+    _update_instructions("Night Phase - Plan your next moves!\nBuild, rearrange, assign workers.\nClick 'End Night' when ready.")
 
 func _on_day_started(day_number: int) -> void:
   resource_system.process_decay()
-  show_toast("Day %d begins" % day_number, "info")
+  var energy_gained := energy_regen_per_day + GameState.instance.get_wellbeing_energy_bonus()
+  show_toast("Day %d begins (+%d Energy)" % [day_number, energy_gained], "info")
   game_flow_manager.check_tutorial_hint(day_number)
 
 func _process(delta: float) -> void:

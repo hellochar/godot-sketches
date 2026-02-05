@@ -36,6 +36,7 @@ var selected_building_node: Node = null
 var toast_queue: Array = []
 var active_toasts: Array = []
 var danger_warnings_shown: Dictionary = {}  # resource_id -> bool (to avoid spam)
+var fatigue_warning_shown: bool = false
 
 func _ready() -> void:
   EventBus.instance.resource_total_changed.connect(_on_resource_total_changed)
@@ -50,6 +51,7 @@ func _ready() -> void:
   EventBus.instance.wellbeing_tier_changed.connect(_on_wellbeing_tier_changed)
   EventBus.instance.belief_unlocked.connect(_on_belief_unlocked)
   EventBus.instance.breakthrough_triggered.connect(_on_breakthrough_triggered)
+  EventBus.instance.worker_fatigued.connect(_on_worker_fatigued)
   %WellbeingToggle.pressed.connect(_on_wellbeing_toggle_pressed)
 
 func setup(p_resource_system: Node, p_building_system: Node, p_worker_system: Node, p_time_system: Node) -> void:
@@ -699,11 +701,29 @@ func _create_toast(message: String, toast_type: String) -> void:
 func update_instructions(text: String) -> void:
   %InstructionsLabel.text = text
 
+var speed_buttons: Array[Button] = []
+@export var speed_active_color: Color = Color(0.5, 1.0, 0.5)
+
 func connect_time_controls(p_time_system: Node) -> void:
-  %Speed1xBtn.pressed.connect(func(): p_time_system.set_speed(1.0))
-  %Speed2xBtn.pressed.connect(func(): p_time_system.set_speed(2.0))
-  %Speed3xBtn.pressed.connect(func(): p_time_system.set_speed(3.0))
+  speed_buttons = [%Speed1xBtn, %Speed2xBtn, %Speed3xBtn]
+  %Speed1xBtn.pressed.connect(func():
+    p_time_system.set_speed(1.0)
+    _update_speed_highlight(0)
+  )
+  %Speed2xBtn.pressed.connect(func():
+    p_time_system.set_speed(2.0)
+    _update_speed_highlight(1)
+  )
+  %Speed3xBtn.pressed.connect(func():
+    p_time_system.set_speed(3.0)
+    _update_speed_highlight(2)
+  )
   %EndNightBtn.pressed.connect(func(): p_time_system.end_night())
+  _update_speed_highlight(0)
+
+func _update_speed_highlight(active_index: int) -> void:
+  for i in speed_buttons.size():
+    speed_buttons[i].modulate = speed_active_color if i == active_index else Color.WHITE
 
 func _on_assign_worker_pressed() -> void:
   if selected_building_node:
@@ -984,3 +1004,9 @@ func _on_belief_unlocked(belief: int) -> void:
 
 func _on_breakthrough_triggered(insight_reward: int, wisdom_reward: int) -> void:
   show_toast("Breakthrough! +%d Insight, +%d Wisdom" % [insight_reward, wisdom_reward], "success")
+
+func _on_worker_fatigued(_worker: Node, _fatigue_level: float) -> void:
+  if fatigue_warning_shown:
+    return
+  fatigue_warning_shown = true
+  show_toast("A worker is fatigued. Speed reduced. Workers recover at night.", "warning")
