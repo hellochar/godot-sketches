@@ -19,6 +19,11 @@ static var rules: Dictionary = {
       "type": EffectType.CONFLICT,
       "efficiency": 0.7,
       "description": "Rumination interferes with mourning"
+    },
+    "integration_temple": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Grief processing deepens when meaning is nearby"
     }
   },
 
@@ -38,6 +43,16 @@ static var rules: Dictionary = {
       "type": EffectType.SYNERGY,
       "efficiency": 1.2,
       "description": "Meditation accelerates anxiety diffusion"
+    },
+    "integration_temple": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Meditation deepens when meaning flows nearby"
+    },
+    "meaning_radiator": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Meditation absorbs radiated meaning"
     }
   },
 
@@ -52,6 +67,11 @@ static var rules: Dictionary = {
       "type": EffectType.SYNERGY,
       "efficiency": 1.15,
       "description": "Reflection on grief yields deeper insight"
+    },
+    "curiosity_garden": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.1,
+      "description": "Reflection fuels deeper curiosity"
     }
   },
 
@@ -78,6 +98,11 @@ static var rules: Dictionary = {
       "type": EffectType.CONFLICT,
       "efficiency": 0.8,
       "description": "Worry keeps the mind awake"
+    },
+    "rest_sanctuary": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.25,
+      "description": "Rest enhances sleep quality"
     }
   },
 
@@ -143,6 +168,16 @@ static var rules: Dictionary = {
       "type": EffectType.SYNERGY,
       "efficiency": 1.1,
       "description": "Comfort enhances daily rituals"
+    },
+    "contentment_garden": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Contentment flourishes near comfort"
+    },
+    "comfort_den": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Comfort reinforces nearby comfort"
     }
   },
 
@@ -156,6 +191,11 @@ static var rules: Dictionary = {
       "type": EffectType.SYNERGY,
       "efficiency": 1.1,
       "description": "Grounding supports calm"
+    },
+    "meditation_garden": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Meditation deepens anxiety diffusion"
     }
   },
 
@@ -280,6 +320,16 @@ static var rules: Dictionary = {
       "type": EffectType.SYNERGY,
       "efficiency": 1.15,
       "description": "Curiosity drives deeper reflection"
+    },
+    "excitement_channeler": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Curiosity sparks excitement"
+    },
+    "boredom_alchemist": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Curiosity accelerates boredom transformation"
     }
   },
 
@@ -487,6 +537,71 @@ static var rules: Dictionary = {
       "type": EffectType.SYNERGY,
       "efficiency": 1.15,
       "description": "Meditation enhances grounding"
+    }
+  },
+
+  "social_connection_hub": {
+    "love_shrine": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.25,
+      "description": "Love deepens connection"
+    },
+    "support_hotline": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Support flows through connection"
+    }
+  },
+
+  "gratitude_practice": {
+    "integration_temple": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Integration deepens gratitude"
+    },
+    "contentment_garden": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Contentment nourishes gratitude"
+    }
+  },
+
+  "creative_studio": {
+    "excitement_channeler": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Excitement sparks creativity"
+    },
+    "curiosity_garden": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Curiosity inspires creation"
+    }
+  },
+
+  "journaling_corner": {
+    "integration_temple": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.1,
+      "description": "Integration deepens journaling"
+    },
+    "reflection_pool": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Reflection informs written thought"
+    }
+  },
+
+  "resilience_monument": {
+    "self_belief_forge": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Self-belief builds resilience"
+    },
+    "hope_beacon": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Hope sustains resilience"
     }
   }
 }
