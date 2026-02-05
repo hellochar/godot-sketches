@@ -270,3 +270,47 @@ func test_all_buildings_have_valid_behaviors() -> void:
     var def = all_defs[building_id]
     var behaviors = def.get("behaviors", [])
     assert_int(behaviors.size()).is_greater(0)
+
+
+func test_key_bidirectional_adjacencies_exist() -> void:
+  var bidirectional_pairs = [
+    ["meditation_garden", "reflection_pool"],
+    ["meditation_garden", "anxiety_diffuser"],
+    ["curiosity_garden", "reflection_pool"],
+    ["curiosity_garden", "excitement_channeler"],
+    ["love_shrine", "social_connection_hub"],
+    ["sleep_chamber", "rest_sanctuary"],
+    ["comfort_hearth", "contentment_garden"],
+    ["integration_temple", "mourning_chapel"],
+    ["gratitude_practice", "integration_temple"],
+  ]
+  for pair in bidirectional_pairs:
+    var a = pair[0]
+    var b = pair[1]
+    var effect_a_to_b = AdjacencyRules.get_adjacency_effect(a, b)
+    var effect_b_to_a = AdjacencyRules.get_adjacency_effect(b, a)
+    assert_bool(effect_a_to_b.is_empty()).is_false()
+    assert_bool(effect_b_to_a.is_empty()).is_false()
+
+
+func test_creative_studio_has_adjacencies() -> void:
+  assert_bool(AdjacencyRules.rules.has("creative_studio")).is_true()
+  var effect = AdjacencyRules.get_adjacency_effect("creative_studio", "excitement_channeler")
+  assert_bool(effect.is_empty()).is_false()
+  assert_int(effect["type"]).is_equal(AdjacencyRules.EffectType.SYNERGY)
+
+
+func test_resilience_monument_has_adjacencies() -> void:
+  assert_bool(AdjacencyRules.rules.has("resilience_monument")).is_true()
+  var effect = AdjacencyRules.get_adjacency_effect("resilience_monument", "self_belief_forge")
+  assert_bool(effect.is_empty()).is_false()
+  assert_int(effect["type"]).is_equal(AdjacencyRules.EffectType.SYNERGY)
+
+
+func test_journaling_corner_has_adjacencies() -> void:
+  assert_bool(AdjacencyRules.rules.has("journaling_corner")).is_true()
+  var synergies = ["integration_temple", "reflection_pool"]
+  for building_id in synergies:
+    var effect = AdjacencyRules.get_adjacency_effect("journaling_corner", building_id)
+    assert_bool(effect.is_empty()).is_false()
+    assert_int(effect["type"]).is_equal(AdjacencyRules.EffectType.SYNERGY)
