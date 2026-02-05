@@ -33,6 +33,11 @@ static var rules: Dictionary = {
       "type": EffectType.CONFLICT,
       "efficiency": 0.8,
       "description": "Worry disrupts meditation"
+    },
+    "anxiety_diffuser": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Meditation accelerates anxiety diffusion"
     }
   },
 
@@ -42,6 +47,11 @@ static var rules: Dictionary = {
       "efficiency": 1.15,
       "output_bonus": 1,
       "description": "Meditation enhances reflection"
+    },
+    "mourning_chapel": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Reflection on grief yields deeper insight"
     }
   },
 
@@ -73,15 +83,6 @@ static var rules: Dictionary = {
 
   "worry_loop": {
     "hope_beacon": {
-      "type": EffectType.CONFLICT,
-      "efficiency": 0.8,
-      "output_penalty": -1,
-      "description": "Worry and hope diminish each other"
-    }
-  },
-
-  "hope_beacon": {
-    "worry_loop": {
       "type": EffectType.CONFLICT,
       "efficiency": 0.8,
       "output_penalty": -1,
@@ -217,16 +218,87 @@ static var rules: Dictionary = {
       "efficiency": 0.85,
       "description": "Grounding resists criticism"
     }
+  },
+
+  "integration_temple": {
+    "mourning_chapel": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Processed grief enriches meaning"
+    },
+    "reflection_pool": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.2,
+      "description": "Insight flows into integration"
+    },
+    "gratitude_practice": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Gratitude grounds meaning"
+    },
+    "meditation_garden": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Stillness allows integration"
+    },
+    "journaling_corner": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.1,
+      "description": "Written reflection aids synthesis"
+    }
+  },
+
+  "hope_beacon": {
+    "worry_loop": {
+      "type": EffectType.CONFLICT,
+      "efficiency": 0.8,
+      "output_penalty": -1,
+      "description": "Worry and hope diminish each other"
+    },
+    "wound": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.3,
+      "description": "Hope shines brighter near darkness"
+    },
+    "despair_alchemist": {
+      "type": EffectType.SYNERGY,
+      "output_bonus": 1,
+      "description": "Hope fuels the transformation"
+    }
+  },
+
+  "love_shrine": {
+    "social_connection_hub": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.25,
+      "description": "Connection deepens love"
+    }
+  },
+
+  "curiosity_garden": {
+    "reflection_pool": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.15,
+      "description": "Curiosity drives deeper reflection"
+    }
+  },
+
+  "emotion_fountain": {
+    "hope_beacon": {
+      "type": EffectType.SYNERGY,
+      "efficiency": 1.1,
+      "description": "Hope sustains positive emotions"
+    }
   }
 }
 
 static var generator_stacking: Dictionary = {
   "memory_well": 0.85,
   "comfort_hearth": 0.9,
-  "worry_loop": 1.1,
-  "wound": 1.05,
-  "rumination_spiral": 1.15,
-  "inner_critic": 1.1
+  "worry_loop": 0.9,
+  "wound": 0.9,
+  "rumination_spiral": 0.85,
+  "inner_critic": 0.9
 }
 
 static func get_adjacency_effect(building_id: String, neighbor_id: String) -> Dictionary:

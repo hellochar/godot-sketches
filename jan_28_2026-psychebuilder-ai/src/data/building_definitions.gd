@@ -68,7 +68,7 @@ static var definitions: Dictionary = {
     "requires_worker": true,
     "storage_capacity": 12,
     "unlocked_by_default": true,
-    "ftue_unlock_day": 1,
+    "ftue_unlock_day": 3,
   },
 
   "morning_routine": {
@@ -83,7 +83,7 @@ static var definitions: Dictionary = {
     "habit_energy_bonus": 1,
     "storage_capacity": 10,
     "unlocked_by_default": true,
-    "ftue_unlock_day": 3,
+    "ftue_unlock_day": 2,
   },
 
   "comfort_hearth": {
@@ -164,7 +164,7 @@ static var definitions: Dictionary = {
     "habit_generates": {"calm": 1},
     "storage_capacity": 5,
     "unlocked_by_default": true,
-    "ftue_unlock_day": 5,
+    "ftue_unlock_day": 3,
   },
 
   "wound": {
@@ -180,7 +180,7 @@ static var definitions: Dictionary = {
     "generation_amount": 1,
     "storage_capacity": 6,
     "unlocked_by_default": true,
-    "ftue_unlock_day": 7,
+    "ftue_unlock_day": 5,
   },
 
   "worry_loop": {
@@ -196,7 +196,7 @@ static var definitions: Dictionary = {
     "generation_amount": 1,
     "storage_capacity": 6,
     "unlocked_by_default": true,
-    "ftue_unlock_day": 7,
+    "ftue_unlock_day": 5,
   },
 
   "memory_processor": {
@@ -217,7 +217,7 @@ static var definitions: Dictionary = {
     "requires_worker": false,
     "storage_capacity": 12,
     "unlocked_by_default": true,
-    "ftue_unlock_day": 5,
+    "ftue_unlock_day": 7,
   },
 
   "rumination_spiral": {
@@ -250,7 +250,7 @@ static var definitions: Dictionary = {
     "requires_worker": false,
     "storage_capacity": 10,
     "unlocked_by_default": true,
-    "ftue_unlock_day": 5,
+    "ftue_unlock_day": 7,
   },
 
   "inner_critic": {
@@ -266,7 +266,7 @@ static var definitions: Dictionary = {
     "generation_amount": 1,
     "storage_capacity": 8,
     "unlocked_by_default": true,
-    "ftue_unlock_day": 7,
+    "ftue_unlock_day": 9,
   },
 
   # === GENERATION BUILDINGS ===
@@ -396,7 +396,7 @@ static var definitions: Dictionary = {
     "requires_worker": true,
     "storage_capacity": 12,
     "unlocked_by_default": true,
-    "ftue_unlock_day": 7,
+    "ftue_unlock_day": 9,
   },
 
   "fear_processing_plant": {
@@ -798,6 +798,7 @@ static var definitions: Dictionary = {
     "size": Vector2i(2, 2),
     "color": Color(0.85, 0.85, 0.4),
     "global_effect": {"attention_bonus": 3},
+    "unique": true,
     "unlocked_by_default": false,
     "unlock_condition": {"insight": 4},
   },
@@ -813,6 +814,7 @@ static var definitions: Dictionary = {
     "size": Vector2i(2, 2),
     "color": Color(1.0, 0.9, 0.5),
     "global_effect": {"positive_generation_multiplier": 1.25},
+    "unique": true,
     "unlocked_by_default": false,
     "unlock_condition": {"insight": 4},
   },
@@ -826,6 +828,7 @@ static var definitions: Dictionary = {
     "size": Vector2i(2, 2),
     "color": Color(0.5, 0.55, 0.6),
     "global_effect": {"negative_impact_multiplier": 0.75},
+    "unique": true,
     "unlocked_by_default": false,
     "unlock_condition": {"insight": 4},
   },
@@ -839,6 +842,7 @@ static var definitions: Dictionary = {
     "size": Vector2i(2, 2),
     "color": Color(0.95, 0.75, 0.55),
     "global_effect": {"habit_bonus_multiplier": 1.5},
+    "unique": true,
     "unlocked_by_default": false,
     "unlock_condition": {"insight": 5},
   },
@@ -852,6 +856,7 @@ static var definitions: Dictionary = {
     "size": Vector2i(2, 2),
     "color": Color(0.9, 0.6, 0.7),
     "global_effect": {"processing_speed_multiplier": 1.3},
+    "unique": true,
     "unlocked_by_default": false,
     "unlock_condition": {"insight": 5},
   },
@@ -882,6 +887,7 @@ static var definitions: Dictionary = {
     "size": Vector2i(2, 2),
     "color": Color(0.75, 0.8, 0.85),
     "global_effect": {"processing_efficiency_multiplier": 1.2},
+    "unique": true,
     "unlocked_by_default": false,
     "unlock_condition": {"insight": 4},
   },
