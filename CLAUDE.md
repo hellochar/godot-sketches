@@ -1,4 +1,5 @@
 # General
+- Take advantage of static typing and compiler features as much as possible.
 - Do NOT add defensive null and valid checks unless the variable is used in a way that requires it.
 - Do not add comments, but don't delete existing comments.
 - Be short and concise in your language.
@@ -9,12 +10,9 @@
 - Do not invent abbreviations or acronyms for user facing text. Reuse terminology already established in the codebase and presented to the player. Optimize for understandability over brevity.
 
 # Godot
-## Input Actions
-- WASD is mapped to `camera_left`, `camera_right`, `camera_up`, `camera_down` (NOT `ui_left/right/up/down`)
-- Use `camera_*` actions for player movement
-
 ## Overall guidance
 - ALWAYS use two spaces for indentation, never tabs
+- Add static types to GDScript variables, declarations, return values, etc. Greatly prefer using := to give a variable a type, except in situations where we need to be more generic, or must explicitly assign a type.
 - Do not ever delete the .godot folder unless I explicitly ask.
 - Avoid hardcoding magic numbers and values, and expose them as human editable in the editor.
 - Avoid hardcoding UIs in code, preferring to create nodes for them in the .tscn.
@@ -27,6 +25,11 @@
 - Prefer `@export var` over `const` for tunable values. Use `@export_group()` to organize related exports.
 - Use components and other elements in `_common/`.
 - Use methods from `_common/utils.gd` (autoload `Utils`).
+
+## Input Actions
+- WASD is mapped to `camera_left`, `camera_right`, `camera_up`, `camera_down` (NOT `ui_left/right/up/down`)
+- Use `camera_*` actions for player movement
+
 
 ## Documentation
 - **Docs & API reference:** `C:\Users\hello\godot\godot-docs-html-master`
