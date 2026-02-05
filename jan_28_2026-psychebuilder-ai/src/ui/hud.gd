@@ -47,6 +47,9 @@ func _ready() -> void:
   EventBus.instance.weather_changed.connect(_on_weather_changed)
   EventBus.instance.flow_state_entered.connect(_on_flow_state_entered)
   EventBus.instance.flow_state_exited.connect(_on_flow_state_exited)
+  EventBus.instance.wellbeing_tier_changed.connect(_on_wellbeing_tier_changed)
+  EventBus.instance.belief_unlocked.connect(_on_belief_unlocked)
+  EventBus.instance.breakthrough_triggered.connect(_on_breakthrough_triggered)
   %WellbeingToggle.pressed.connect(_on_wellbeing_toggle_pressed)
 
 func setup(p_resource_system: Node, p_building_system: Node, p_worker_system: Node, p_time_system: Node) -> void:
@@ -127,7 +130,10 @@ func _create_building_button(building_id: String) -> Button:
 
   btn.add_child(vbox)
   btn.tooltip_text = _get_building_tooltip(def)
-  btn.pressed.connect(func(): building_selected.emit(building_id))
+  btn.pressed.connect(func():
+    AudioFeedback.instance.play_sfx("ui_click")
+    building_selected.emit(building_id)
+  )
   return btn
 
 func _get_behavior_icon(behavior: int) -> String:
@@ -921,3 +927,60 @@ func _update_building_mastery_display(building: Node) -> void:
     if level >= Config.instance.mastery_max_level:
       label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.4))
     container.add_child(label)
+
+func _get_tier_name(tier: int) -> String:
+  var GS := preload("res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd")
+  match tier:
+    GS.WellbeingTier.STRUGGLING: return "Struggling"
+    GS.WellbeingTier.BASELINE: return "Baseline"
+    GS.WellbeingTier.STABLE: return "Stable"
+    GS.WellbeingTier.THRIVING: return "Thriving"
+    GS.WellbeingTier.FLOURISHING: return "Flourishing"
+  return "Unknown"
+
+func _get_tier_feedback_color(tier: int) -> Color:
+  var GS := preload("res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd")
+  match tier:
+    GS.WellbeingTier.STRUGGLING: return Color(0.9, 0.3, 0.3)
+    GS.WellbeingTier.BASELINE: return Color(0.7, 0.7, 0.7)
+    GS.WellbeingTier.STABLE: return Color(0.9, 0.9, 0.3)
+    GS.WellbeingTier.THRIVING: return Color(0.5, 0.8, 0.3)
+    GS.WellbeingTier.FLOURISHING: return Color(0.2, 0.9, 0.4)
+  return Color.WHITE
+
+func _on_wellbeing_tier_changed(old_tier: int, new_tier: int) -> void:
+  var improving := new_tier > old_tier
+  var tier_name := _get_tier_name(new_tier)
+  var direction := "improved" if improving else "declined"
+  var toast_type := "success" if improving else "warning"
+  show_toast("Wellbeing %s: %s" % [direction, tier_name], toast_type)
+
+  var wellbeing_value := %WellbeingValue
+  var tier_color := _get_tier_feedback_color(new_tier)
+  var tween := create_tween()
+  tween.tween_property(wellbeing_value, "scale", Vector2(1.3, 1.3), 0.15)
+  tween.parallel().tween_property(wellbeing_value, "modulate", tier_color, 0.15)
+  tween.tween_property(wellbeing_value, "scale", Vector2.ONE, 0.25).set_ease(Tween.EASE_OUT)
+  tween.parallel().tween_property(wellbeing_value, "modulate", Color.WHITE, 0.4)
+
+func _get_belief_info(belief: int) -> Dictionary:
+  var GS := preload("res://jan_28_2026-psychebuilder-ai/src/autoload/game_state.gd")
+  match belief:
+    GS.Belief.HANDLE_DIFFICULTY:
+      return {"name": "I Can Handle Difficulty", "effect": "+20% processing speed for grief/anxiety"}
+    GS.Belief.JOY_RESILIENT:
+      return {"name": "Joy is Resilient", "effect": "+15% positive emotion generation"}
+    GS.Belief.CALM_FOUNDATION:
+      return {"name": "Calm is My Foundation", "effect": "+15% processing speed"}
+    GS.Belief.GROWTH_ADVERSITY:
+      return {"name": "Growth Through Adversity", "effect": "+20% habit effectiveness"}
+    GS.Belief.MINDFUL_AWARENESS:
+      return {"name": "Mindful Awareness", "effect": "+10% habit effectiveness"}
+  return {"name": "Unknown Belief", "effect": ""}
+
+func _on_belief_unlocked(belief: int) -> void:
+  var info := _get_belief_info(belief)
+  show_toast("Belief unlocked: %s\n%s" % [info["name"], info["effect"]], "success")
+
+func _on_breakthrough_triggered(insight_reward: int, wisdom_reward: int) -> void:
+  show_toast("Breakthrough! +%d Insight, +%d Wisdom" % [insight_reward, wisdom_reward], "success")

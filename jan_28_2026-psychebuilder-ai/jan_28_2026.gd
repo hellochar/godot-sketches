@@ -299,6 +299,7 @@ func _try_place_building() -> void:
   else:
     show_toast(failure_reason, "error")
     _show_placement_failure(failure_reason)
+    AudioFeedback.instance.play_sfx("place_fail")
 
 func _handle_click() -> void:
   var coord = game_world.hover_coord
