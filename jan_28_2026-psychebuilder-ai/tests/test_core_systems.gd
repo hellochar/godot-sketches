@@ -241,3 +241,32 @@ func test_integration_temple_has_adjacencies() -> void:
     var effect = AdjacencyRules.get_adjacency_effect("integration_temple", building_id)
     assert_bool(effect.is_empty()).is_false()
     assert_int(effect["type"]).is_equal(AdjacencyRules.EffectType.SYNERGY)
+
+
+func test_coping_buildings_have_adjacencies() -> void:
+  var coping_buildings = ["emergency_calm_center", "anger_vent", "comfort_den",
+    "support_hotline", "grounding_chamber"]
+  for coping_id in coping_buildings:
+    var effect_count = 0
+    for source_id in AdjacencyRules.rules:
+      if AdjacencyRules.rules[source_id].has(coping_id):
+        effect_count += 1
+    if AdjacencyRules.rules.has(coping_id):
+      effect_count += AdjacencyRules.rules[coping_id].size()
+    assert_int(effect_count).is_greater(0)
+
+
+func test_new_orphan_buildings_have_adjacencies() -> void:
+  var new_buildings = ["meaning_radiator", "self_belief_forge", "excitement_channeler",
+    "contentment_garden", "confidence_anchor", "boredom_alchemist", "rest_sanctuary"]
+  for building_id in new_buildings:
+    assert_bool(AdjacencyRules.rules.has(building_id)).is_true()
+    assert_int(AdjacencyRules.rules[building_id].size()).is_greater(0)
+
+
+func test_all_buildings_have_valid_behaviors() -> void:
+  var all_defs = BuildingDefs.get_all_definitions()
+  for building_id in all_defs:
+    var def = all_defs[building_id]
+    var behaviors = def.get("behaviors", [])
+    assert_int(behaviors.size()).is_greater(0)
