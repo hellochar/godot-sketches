@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://undgxl648bmd" path="res://aug-9-2025-3d-explorations/path_follow_3d.gd" id="1_28qa7"]
 [ext_resource type="Curve3D" uid="uid://c47y0kum3lrj8" path="res://aug-9-2025-3d-explorations/path_curve3d.tres" id="1_qpnnw"]
-[ext_resource type="Script" uid="uid://ce8gbarpemo5o" path="res://aug-9-2025-3d-explorations/camera_3d.gd" id="1_r8hkk"]
+[ext_resource type="Script" uid="uid://ce8gbarpemo5o" path="res://_common/freelook_camera.gd" id="1_r8hkk"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_3e2i6"]
 radius = 0.1
