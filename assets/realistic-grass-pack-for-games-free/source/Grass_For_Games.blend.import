@@ -34,17 +34,45 @@ animation/trimming=false
 animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
 import_script/path=""
-materials/extract=0
-materials/extract_format=0
-materials/extract_path=""
-_subresources={}
+materials/extract=1
+materials/extract_format=2
+materials/extract_path="res://assets/realistic-grass-pack-for-games-free/source/materials"
+_subresources={
+"materials": {
+"Grass_A": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://assets/realistic-grass-pack-for-games-free/source/materials/Grass_A.material",
+"use_external/path": "uid://vfcxfgatf87g"
+},
+"Grass_B": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://assets/realistic-grass-pack-for-games-free/source/materials/Grass_B.material",
+"use_external/path": "uid://b5gxg743jp0gt"
+},
+"Grass_C": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://assets/realistic-grass-pack-for-games-free/source/materials/Grass_C.material",
+"use_external/path": "uid://wosax05toqoc"
+},
+"WheatGrass_Low": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://assets/realistic-grass-pack-for-games-free/source/materials/WheatGrass_Low.material",
+"use_external/path": "uid://d38w5mgsnhsh2"
+},
+"Wheatgrass_Mat": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://assets/realistic-grass-pack-for-games-free/source/materials/Wheatgrass_Mat.material",
+"use_external/path": "uid://b7ao3h7bps5ws"
+}
+}
+}
 blender/nodes/visible=0
 blender/nodes/active_collection_only=false
 blender/nodes/punctual_lights=true
 blender/nodes/cameras=true
 blender/nodes/custom_properties=true
 blender/nodes/modifiers=1
-blender/meshes/colors=false
+blender/meshes/colors=true
 blender/meshes/uvs=true
 blender/meshes/normals=true
 blender/meshes/export_geometry_nodes_instances=false
