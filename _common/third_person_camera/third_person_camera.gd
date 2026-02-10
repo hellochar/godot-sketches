@@ -8,7 +8,7 @@ var target: Node3D
 @export_group("Distance")
 @export var min_distance: float = 1.5
 @export var max_distance: float = 6.0
-@export var default_distance: float = 3.5
+@export var default_distance: float = 4.0
 @export var zoom_speed: float = 0.5
 
 @export_group("Rotation")
@@ -22,13 +22,13 @@ var target: Node3D
 @export var y_tracking_smoothing: float = 5.0
 
 @export_group("Framing")
-@export var framing_style: FramingStyle = FramingStyle.OVER_SHOULDER_RIGHT
+@export var framing_style: FramingStyle = FramingStyle.OVER_SHOULDER_LEFT
 @export var shoulder_offset: float = 0.5
-@export var vertical_offset: float = 0.8
+@export var vertical_offset: float = 1.4
 
 @export_group("Auto-Recenter")
-@export var auto_recenter_enabled: bool = false
-@export var auto_recenter_delay: float = 2.0
+@export var auto_recenter_enabled: bool = true
+@export var auto_recenter_delay: float = 1.5
 @export var auto_recenter_speed: float = 2.0
 
 @export_group("Dynamic FOV")

@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://c63jhh3y7dj5q" path="res://feb_4_2026-greenlake-walker/feb_4_2026.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://cryktbdip53cs" path="res://feb_4_2026-greenlake-walker/greenlake.png" id="2_nc0db"]
 [ext_resource type="Material" uid="uid://dci3vssaaaqb6" path="res://_materials/water/water.material" id="3_lt0sr"]
-[ext_resource type="Script" uid="uid://bpthmx2l4g2dt" path="res://feb_4_2026-greenlake-walker/character_body_3d.gd" id="5_q8beh"]
+[ext_resource type="PackedScene" uid="uid://bvst2k00b4mwf" path="res://_common/character_body_3d.tscn" id="4_1r6mq"]
 [ext_resource type="PackedScene" path="res://_common/third_person_camera/third_person_camera.tscn" id="6_camera"]
 [ext_resource type="AudioStream" uid="uid://ci7w0ym1icha5" path="res://feb_4_2026-greenlake-walker/assets/audio/background_music.wav" id="7_bgm"]
 
@@ -24,13 +24,6 @@ _data = {
 "points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, -62, 0, 0, 0, 0, -1, -89, 0, 0, 0, 0, -26, -83, 0, 0, 0, 0, -64, -64, 0, 0, 0, 0, -196, -119, 0, 0, 0, 0, -200, -148, 0, 0, 0, 0, -219, -163, 0, 0, 0, 0, -228, -210, 0, 0, 0, 0, -242, -222, 0, 0, 0, 0, -278, -239, 0, 0, 0, 0, -316, -248, 0, 0, 0, 0, -342, -241, 0, 0, 0, 0, -355, -213, 0, 0, 0, 0, -363, -186, 0, 0, 0, 0, -378, -157, 0, 0, 0, 0, -375, -138, 0, 0, 0, 0, -371, -131, 0, 0, 0, 0, -375, -104, 0, 0, 0, 0, -373, -92, 0, 0, 0, 0, -379, -73, 0, 0, 0, 0, -397, -58, 0, 0, 0, 0, -400, -40, 0, 0, 0, 0, -412, -23, 0, 0, 0, 0, -428, -20, 0, 0, 0, 0, -440, -25, 0, 0, 0, 0, -439, -13, 0, 0, 0, 0, -448, 5, 0, 0, 0, 0, -461, 15, 0, 0, 0, 0, -472, 10, 0, 0, 0, 0, -479, -12, 0, 0, 0, 0, -488, -14, 0, 0, 0, 0, -515, -8, 0, 0, 0, 0, -528, -24, 0, 0, 0, 0, -550, -14, 0, 0, 0, 0, -573, 20, 0, 0, 0, 0, -578, 59, 0, 0, 0, 0, -583, 71, 0, 0, 0, 0, -586, 98, 0, 0, 0, 0, -589, 134, 0, 0, 0, 0, -603, 182, 0, 0, 0, 0, -617, 214, 0, 0, 0, 0, -635, 251, 0, 0, 0, 0, -634, 271, 0, 0, 0, 0, -633, 287, 0, 0, 0, 0, -596, 338, 0, 0, 0, 0, -592, 352, 0, 0, 0, 0, -546, 414, 0, 0, 0, 0, -526, 464, 0, 0, 0, 0, -520, 463, 0, 0, 0, 0, -517, 476, 0, 0, 0, 0, -522, 479, 0, 0, 0, 0, -513, 503, 0, 0, 0, 0, -504, 507, 0, 0, 0, 0, -493, 503, 0, 0, 0, 0, -467, 503, 0, 0, 0, 0, -448, 487, 0, 0, 0, 0, -401, 487, 0, 0, 0, 0, -384, 479, 0, 0, 0, 0, -358, 474, 0, 0, 0, 0, -345, 463, 0, 0, 0, 0, -329, 452, 0, 0, 0, 0, -315, 442, 0, 0, 0, 0, -294, 417, 0, 0, 0, 0, -264, 392, 0, 0, 0, 0, -229, 350, 0, 0, 0, 0, -207, 313, 0, 0, 0, 0, -201, 312, 0, 0, 0, 0, -191, 289, 0, 0, 0, 0, -179, 279, 0, 0, 0, 0, -172, 277, 0, 0, 0, 0, -157, 257, 0, 0, 0, 0, -138, 234, 0, 0, 0, 0, -135, 214, 0, 0, 0, 0, -124, 178, 0, 0, 0, 0, -106, 140, 0, 0, 0, 0, -86, 112, 0, 0, 0, 0, -48, 88, 0, 0, 0, 0, -35, 88, 0, 0, 0, 0, -22, 94, 0, 0, 0, 0, -8, 91, 0, 0, 0, 0, 3, 78, 0, 0, 0, 0, 7, 59, 0, 0, 0, 0, 5, 41)
 }
 point_count = 84
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_lt0sr"]
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_q8beh"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_q8beh"]
-size = Vector3(0.1, 0.1, 0.5)
 
 [node name="Control" type="Control" unique_id=2129129386]
 layout_mode = 3
@@ -76,26 +69,13 @@ environment = SubResource("Environment_env01")
 unique_name_in_owner = true
 curve = SubResource("Curve2D_1r6mq")
 
-[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=88346919]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2062569, 0)
-script = ExtResource("5_q8beh")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=1358467006]
-shape = SubResource("CapsuleShape3D_lt0sr")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="CharacterBody3D" unique_id=1248640758]
-mesh = SubResource("CapsuleMesh_q8beh")
-
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="CharacterBody3D" unique_id=1519664177]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.698, 0.55829763)
-mesh = SubResource("BoxMesh_q8beh")
+[node name="CharacterBody3D" parent="." unique_id=2122298387 node_paths=PackedStringArray("camera_pivot") instance=ExtResource("4_1r6mq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+camera_pivot = NodePath("../ThirdPersonCamera")
 
 [node name="ThirdPersonCamera" parent="." unique_id=883461533 instance=ExtResource("6_camera")]
 unique_name_in_owner = true
 target_path = NodePath("../CharacterBody3D")
-framing_style = 1
-vertical_offset = 0.0
-auto_recenter_enabled = true
 
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="." unique_id=1603578934]
 unique_name_in_owner = true

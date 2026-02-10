@@ -3,8 +3,7 @@ extends CharacterBody3D
 @export var speed: float = 5.0
 @export var jump_velocity: float = 4.5
 @export var rotation_speed: float = 10.0
-
-@onready var camera_pivot: Node3D = %ThirdPersonCamera
+@export var camera_pivot: Node3D
 
 func _physics_process(delta: float) -> void:
   if not is_on_floor():
