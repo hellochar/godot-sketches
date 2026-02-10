@@ -42,7 +42,7 @@ window/vsync/vsync_mode=0
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/daily_sketch/plugin.cfg", "res://addons/gdUnit4/plugin.cfg", "res://addons/htags/plugin.cfg")
+enabled=PackedStringArray("res://addons/daily_sketch/plugin.cfg", "res://addons/gdUnit4/plugin.cfg", "res://addons/htags/plugin.cfg", "res://addons/terrain_3d/plugin.cfg")
 
 [gdunit4]
 
