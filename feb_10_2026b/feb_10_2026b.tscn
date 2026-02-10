@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://7g2pkk2x8ddg"]
 
-[ext_resource type="PackedScene" path="res://_common/third_person_camera/third_person_camera.tscn" id="1_b345d"]
+[ext_resource type="Script" uid="uid://g1sdaxeo53jd" path="res://_common/freelook_camera.gd" id="1_b345d"]
 
 [sub_resource type="Gradient" id="Gradient_e4d2r"]
 offsets = PackedFloat32Array(0.2, 1)
@@ -78,9 +78,11 @@ show_checkered = true
 top_level = true
 metadata/_edit_lock_ = true
 
-[node name="ThirdPersonCamera" parent="." unique_id=2101529333 instance=ExtResource("1_b345d")]
+[node name="FreelookCamera" type="Camera3D" parent="." unique_id=1315296470]
+transform = Transform3D(0.77551895, -0.36569488, 0.51462376, 0, 0.8151496, 0.57925045, -0.6313243, -0.4492197, 0.63216394, 41.60846, 47.68709, 50.30744)
+script = ExtResource("1_b345d")
+speed = 50.0
+metadata/_custom_type_script = "uid://g1sdaxeo53jd"
 
-[node name="Camera3D" parent="ThirdPersonCamera/SpringArm3D" index="0"]
-transform = Transform3D(0.775519, -0.36569482, 0.5146238, 0, 0.81514966, 0.57925045, -0.6313243, -0.44921967, 0.63216406, 25.778212, 29.868874, 30.861559)
-
-[editable path="ThirdPersonCamera"]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1689581096]
+transform = Transform3D(1, 0, 0, 0, 0.40421593, 0.9146636, 0, -0.9146636, 0.40421593, 0, 0, 0)
