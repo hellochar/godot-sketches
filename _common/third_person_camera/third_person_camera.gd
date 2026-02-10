@@ -2,44 +2,68 @@ extends Node3D
 
 enum FramingStyle { CENTERED, OVER_SHOULDER_LEFT, OVER_SHOULDER_RIGHT }
 
+## The Node3D that the camera follows and orbits around.
 @export_node_path("Node3D") var target_path: NodePath
 var target: Node3D
 
 @export_group("Distance")
+## The closest the camera can zoom in (meters). Scroll wheel up zooms toward this limit.
 @export var min_distance: float = 1.5
+## The farthest the camera can zoom out (meters). Scroll wheel down zooms toward this limit.
 @export var max_distance: float = 6.0
+## The camera distance when the scene starts (meters).
 @export var default_distance: float = 4.0
+## How many meters the camera moves per mouse scroll tick.
 @export var zoom_speed: float = 0.5
 
 @export_group("Rotation")
+## Rotation per pixel of mouse movement (radians). At 0.003, moving 333 pixels rotates ~1 radian (~57 degrees).
 @export var mouse_sensitivity: float = 0.003
+## The lowest pitch angle in degrees. Negative values look upward. -80 lets you look almost straight up.
 @export var pitch_min: float = -80.0
+## The highest pitch angle in degrees. Positive values look downward. 60 lets you look steeply down.
 @export var pitch_max: float = 60.0
+## The pitch angle when the scene starts (degrees). -20 gives a slightly elevated view behind the character.
 @export var default_pitch: float = -20.0
 
 @export_group("Smoothing")
+## Lerp factor for camera rotation (multiplied by delta). At 15, the camera covers ~63% of the gap to its target rotation each 1/15th of a second. Lower values feel floatier; higher values feel snappier.
 @export var rotation_smoothing: float = 15.0
+## Lerp factor for vertical position tracking (multiplied by delta). Controls how quickly the camera follows the target's Y position. Lower values create a trailing effect when jumping or falling.
 @export var y_tracking_smoothing: float = 5.0
 
 @export_group("Framing")
+## Where the camera positions itself horizontally relative to the target. Over-shoulder places the character to one side, giving better forward visibility.
 @export var framing_style: FramingStyle = FramingStyle.OVER_SHOULDER_LEFT
+## How far to offset the camera horizontally for over-shoulder framing (meters). Only applies when framing_style is not CENTERED.
 @export var shoulder_offset: float = 0.5
+## Height above the target's origin that the camera orbits around (meters). Set this to roughly shoulder/head height for the character.
 @export var vertical_offset: float = 1.4
 
 @export_group("Auto-Recenter")
+## When enabled, the camera gradually rotates to face the direction the target is facing after the player stops moving the mouse.
 @export var auto_recenter_enabled: bool = true
+## How long the player must not touch the mouse before auto-recenter kicks in (seconds).
 @export var auto_recenter_delay: float = 1.5
+## Lerp factor for auto-recenter rotation (multiplied by delta). At 2.0, recentering feels gentle and cinematic. Higher values snap behind the player faster.
 @export var auto_recenter_speed: float = 2.0
 
 @export_group("Dynamic FOV")
+## The field of view when the player is stationary (degrees).
 @export var base_fov: float = 75.0
+## Additional FOV added at maximum speed (degrees). Creates a sense of velocity. Total FOV at max speed is base_fov + max_fov_boost.
 @export var max_fov_boost: float = 10.0
+## The horizontal speed in m/s at which the full FOV boost is applied. Speeds above this value don't increase FOV further.
 @export var fov_speed_threshold: float = 8.0
+## Lerp factor for FOV transitions (multiplied by delta). At 5.0, FOV changes feel smooth. Higher values make the FOV react more immediately to speed changes.
 @export var fov_smoothing: float = 5.0
 
 @export_group("Screen Shake")
+## How much trauma decreases per second. At 5.0, full trauma (1.0) decays to zero in 0.2 seconds.
 @export var shake_decay: float = 5.0
+## Maximum camera position offset at full trauma (meters). The actual offset is random within this range, scaled by trauma squared.
 @export var shake_max_offset: float = 0.5
+## Maximum camera roll at full trauma (radians). ~0.1 radians is about 6 degrees of tilt.
 @export var shake_max_roll: float = 0.1
 
 var target_yaw: float = 0.0
