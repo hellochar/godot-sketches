@@ -530,7 +530,7 @@ func _track_output_resource(resource_id: String, amount: int) -> void:
     GameState.instance.track_insight_generated(amount)
 
 func _complete_processing_effects() -> void:
-  var inputs := definition.get("input", {})
+  var inputs: Dictionary = definition.get("input", {})
   var processed_negative := false
   var processed_negative_types: Array[String] = []
   for input_resource in inputs:
@@ -585,21 +585,21 @@ func _complete_processing_effects() -> void:
       if synergy.has("energy_bonus"):
         GameState.instance.add_energy(synergy["energy_bonus"])
 
-  var conditional_outputs := definition.get("conditional_outputs", {})
+  var conditional_outputs: Dictionary = definition.get("conditional_outputs", {})
   if not conditional_outputs.is_empty():
     for condition_resource in conditional_outputs:
       if storage.get(condition_resource, 0) > 0:
         var output_data := conditional_outputs[condition_resource] as Dictionary
-        var amount := output_data["amount"] + total_bonus
+        var amount: int = int(output_data["amount"]) + total_bonus
         _track_output_resource(output_data["output"], amount)
         _cascade_output_resource(output_data["output"], amount)
         produced[output_data["output"]] = amount
         _show_processing_feedback(produced)
         return
 
-  var outputs := definition.get("output", {})
+  var outputs: Dictionary = definition.get("output", {})
   for resource_id in outputs:
-    var amount := outputs[resource_id] + total_bonus
+    var amount: int = int(outputs[resource_id]) + total_bonus
     _track_output_resource(resource_id, amount)
     _cascade_output_resource(resource_id, amount)
     produced[resource_id] = amount

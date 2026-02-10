@@ -1,4 +1,4 @@
-class_name GameState
+class_name MotivationGameState
 extends RefCounted
 
 const CardData = preload("res://jan_24_2026b-motivation-cards/card_data.gd")

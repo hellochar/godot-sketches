@@ -5,7 +5,7 @@ const GameState = preload("res://jan_24_2026b-motivation-cards/game_state.gd")
 const StarterDeckResourceScript = preload("res://jan_24_2026b-motivation-cards/starter_deck_resource.gd")
 const MotivationCardRes = preload("res://jan_24_2026b-motivation-cards/motivation_card_resource.gd")
 const ValueCardRes = preload("res://jan_24_2026b-motivation-cards/value_card_resource.gd")
-const GenericCardScene = preload("res://common/generic_card.tscn")
+const GenericCardScene = preload("res://_common/generic_card.tscn")
 
 @export_group("Game Settings")
 @export var cards_per_draw: int = 5
