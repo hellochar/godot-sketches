@@ -12,9 +12,9 @@ func _process(delta):
 		direction -= Vector3.RIGHT
 	if Input.is_action_pressed("camera_right"):
 		direction += Vector3.RIGHT
-	if Input.is_action_pressed("interact"):
+	if Input.is_action_pressed("camera_ascend"):
 		direction += Vector3.UP
-	if Input.is_action_pressed("ui_cancel"):
+	if Input.is_action_pressed("camera_descend"):
 		direction -= Vector3.UP
 
 	if direction != Vector3.ZERO:
