@@ -3,7 +3,7 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://djvvctynfa1c1"
+uid="uid://c5rwd57s0i5ju"
 path="res://.godot/imported/Wood_branch_S_pcyeE.fbx-132058eb3ed465f33cad031bc5864ada.scn"
 
 [deps]
@@ -41,8 +41,8 @@ _subresources={
 "materials": {
 "Wood_Branch_S_pcyeE": {
 "use_external/enabled": true,
-"use_external/fallback_path": "res://assets/Wood_Branch_S_pcyeE/Wood_Branch_S_pcyeE.tres",
-"use_external/path": "uid://b24jdv5um738f"
+"use_external/fallback_path": "res://assets/Wood_Branch_S_pcyeE/Materials/Wood_branch_S_pcyeE_mat.tres",
+"use_external/path": "res://assets/Wood_Branch_S_pcyeE/Materials/Wood_branch_S_pcyeE_mat.tres"
 }
 }
 }

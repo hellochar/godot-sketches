@@ -1,0 +1,15 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://bm7eybn22yvck"]
+
+[ext_resource type="Texture2D" uid="uid://bq20bvk4bh2li" path="res://assets/Wood_Branch_S_pcyeE/Materials/Wood_branch_S_pcyeE_Albedo.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://cks1uukhcsxsm" path="res://assets/Wood_Branch_S_pcyeE/Materials/Wood_branch_S_pcyeE_Normal_OS.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://bt8wrmpw83ms6" path="res://assets/Wood_Branch_S_pcyeE/Materials/Wood_branch_S_pcyeE_MaskMap.png" id="3"]
+
+[resource]
+resource_name = "Wood_branch_S_pcyeE_mat"
+albedo_texture = ExtResource("1")
+roughness = 0.5
+normal_enabled = true
+normal_texture = ExtResource("2")
+ao_enabled = true
+ao_texture = ExtResource("3")
+ao_texture_channel = 1

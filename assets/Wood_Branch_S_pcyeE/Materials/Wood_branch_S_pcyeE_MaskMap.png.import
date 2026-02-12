@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c1kspenh7f8f8"
+uid="uid://bt8wrmpw83ms6"
 path.s3tc="res://.godot/imported/Wood_branch_S_pcyeE_MaskMap.png-8be4fc165b4690ece4d74f030b4334fd.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
@@ -26,8 +26,8 @@ compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=0
-roughness/src_normal=""
+roughness/mode=8
+roughness/src_normal="res://assets/Wood_Branch_S_pcyeE/Materials/Wood_branch_S_pcyeE_Normal_OS.png"
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

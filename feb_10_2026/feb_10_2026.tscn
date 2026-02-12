@@ -14,7 +14,7 @@
 [ext_resource type="Script" uid="uid://c54m4ym2tjoll" path="res://feb_10_2026/rotating_directional_light.gd" id="8_km4ns"]
 [ext_resource type="Material" uid="uid://wosax05toqoc" path="res://assets/realistic-grass-pack-for-games-free/source/materials/Grass_C.material" id="8_qxk38"]
 [ext_resource type="PackedScene" uid="uid://ci14guci6m043" path="res://feb_10_2026/yggrassil_02.tscn" id="14_v0i30"]
-[ext_resource type="PackedScene" uid="uid://djvvctynfa1c1" path="res://assets/Wood_Branch_S_pcyeE/Wood_branch_S_pcyeE.fbx" id="17_nojsj"]
+[ext_resource type="PackedScene" uid="uid://c5rwd57s0i5ju" path="res://assets/Wood_Branch_S_pcyeE/Wood_branch_S_pcyeE.fbx" id="17_nojsj"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qxk38"]
 albedo_color = Color(0.22, 0.13563, 0.09020001, 1)
@@ -637,5 +637,5 @@ fov_smoothing = 1.0
 [node name="yggrassil_02" parent="." unique_id=1190689432 instance=ExtResource("14_v0i30")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.989707, 1.2877412, -8.80036)
 
-[node name="Wood_branch_S_pcyeE" parent="." unique_id=2064173163 instance=ExtResource("17_nojsj")]
-transform = Transform3D(4.630555, -1.0728791, -3.103198, 1.2812841, 5.5300326, 0, 3.023114, -0.70044214, 4.7532206, 0.14541578, -0.551216, -13.033282)
+[node name="Wood_branch_S_pcyeE" parent="." unique_id=1902746900 instance=ExtResource("17_nojsj")]
+transform = Transform3D(3.8706079, -1.0091556, 0, 1.0091556, 3.8706079, 0, 0, 0, 4, -3.6700866, -1.4073646, -15.292048)
