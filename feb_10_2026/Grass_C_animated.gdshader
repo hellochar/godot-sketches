@@ -25,6 +25,8 @@ uniform vec3 uv2_scale;
 uniform vec3 uv2_offset;
 
 uniform vec3 player_world_position;
+uniform float camera_fade_min : hint_range(0.0, 10.0) = 0.5;
+uniform float camera_fade_max : hint_range(0.0, 10.0) = 3.0;
 
 void vertex() {
 	UV = UV * uv1_scale.xy + uv1_offset.xy;
@@ -76,5 +78,7 @@ void fragment() {
 	// Normal Map: Enabled
 	NORMAL_MAP = texture(texture_normal, base_uv).rgb;
 	NORMAL_MAP_DEPTH = normal_scale;
-	ALPHA *= albedo.a * albedo_tex.a;
+	float camera_dist = length(VERTEX);
+	float camera_fade = smoothstep(camera_fade_min, camera_fade_max, camera_dist);
+	ALPHA *= albedo.a * albedo_tex.a * camera_fade;
 }
