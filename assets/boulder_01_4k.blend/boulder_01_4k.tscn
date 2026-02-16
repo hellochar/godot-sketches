@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://b0meb8g3mkmc8"]
+
+[ext_resource type="PackedScene" uid="uid://bqedqx4uxxs4h" path="res://assets/boulder_01_4k.blend/boulder_01_4k.blend" id="1_cjhvi"]
+[ext_resource type="ArrayMesh" uid="uid://dsp0eifra72nk" path="res://assets/boulder_01_4k.blend/lod0_mesh.res" id="2_7xpr8"]
+
+[node name="boulder_01_4k" unique_id=1867278851 instance=ExtResource("1_cjhvi")]
+
+[node name="boulder_01_LOD0" parent="." index="0" unique_id=1299799564]
+mesh = ExtResource("2_7xpr8")
