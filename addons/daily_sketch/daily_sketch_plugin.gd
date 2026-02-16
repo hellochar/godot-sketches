@@ -34,12 +34,10 @@ func _create_daily_sketch() -> void:
 
   dir.make_dir(folder_name)
 
-  var script_content := """extends Control
-
+  var script_content := """extends Node
 
 func _ready() -> void:
   pass
-
 
 func _process(delta: float) -> void:
   pass
