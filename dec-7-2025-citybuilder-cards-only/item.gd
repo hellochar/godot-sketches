@@ -43,5 +43,5 @@ enum ETag {
 
 @export var pickupable: bool = true
 
-func tick(_inventory: World.Inventory, _amount: int, _ticks: int) -> Dictionary[Item, int]:
+func tick(_inventory: World.Inventory, _amount: int, _ticks: int) -> Dictionary:
   return {}

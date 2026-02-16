@@ -24,7 +24,7 @@ func on_process(delta: float) -> void:
       output_resource(resource_id, amount)
 
 func _get_effective_multiplier(resource_id: String) -> float:
-  var is_positive := resource_id in config.resonance_positive_resources
+  var is_positive: bool = resource_id in config.resonance_positive_resources
   var mult := 1.0
 
   mult *= building._get_grief_speed_multiplier()
@@ -39,7 +39,7 @@ func _get_effective_multiplier(resource_id: String) -> float:
   mult *= building.get_adjacency_efficiency_multiplier()
 
   if resource_id == "anxiety":
-    var suppression := building._get_calm_aura_suppression()
+    var suppression: float = building._get_calm_aura_suppression()
     mult *= (1.0 - suppression)
 
   return mult

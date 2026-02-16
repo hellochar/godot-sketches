@@ -43,7 +43,7 @@ func get_placement_failure_reason(building_id: String, coord: Vector2i) -> Strin
     return "Unknown building type"
 
   if def.get("unique", false):
-    for building in game_state.active_buildings:
+    for building in GameState.instance.active_buildings:
       if building.building_id == building_id:
         return "Only one %s allowed" % def.get("name", building_id)
 

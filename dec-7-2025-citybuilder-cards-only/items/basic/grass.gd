@@ -2,9 +2,9 @@ extends Item
 class_name Grass
 
 const FOOD = preload("res://dec-7-2025-citybuilder-cards-only/items/basic/food.tres")
-func tick(_inventory: World.Inventory, grass: int, ticks: int) -> Dictionary[Item, int]:
+func tick(_inventory: World.Inventory, grass: int, ticks: int) -> Dictionary:
   # every 10 grass produces one grass
-  var changes: Dictionary[Item, int] = {}
+  var changes: Dictionary = {}
   var food_produced = 0 # int((grass * ticks) / 10.0)
   var grass_produced = int((grass * ticks) / 10.0)
   if food_produced > 0:

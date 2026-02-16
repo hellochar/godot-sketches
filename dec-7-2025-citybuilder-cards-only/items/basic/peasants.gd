@@ -9,8 +9,8 @@ const STONE = preload("res://dec-7-2025-citybuilder-cards-only/items/basic/stone
 const WOOD = preload("res://dec-7-2025-citybuilder-cards-only/items/basic/wood.tres")
 const LIVESTOCK = preload("res://dec-7-2025-citybuilder-cards-only/items/basic/livestock.tres")
 
-func tick(inventory: World.Inventory, _amount: int, _ticks: int) -> Dictionary[Item, int]:
-  var changes: Dictionary[Item, int] = {}
+func tick(inventory: World.Inventory, _amount: int, _ticks: int) -> Dictionary:
+  var changes: Dictionary = {}
   # iteration 2: eat one food per five peasants. Gain 1 peasant if fully fed.
   # Lose 1 peasant if not.
   
@@ -25,7 +25,7 @@ func tick(inventory: World.Inventory, _amount: int, _ticks: int) -> Dictionary[I
     changes[BONES] = 1
   return changes
 
-func tickv1(inventory: World.Inventory, peasants: int, _ticks: int) -> Dictionary[Item, int]:
+func tickv1(inventory: World.Inventory, peasants: int, _ticks: int) -> Dictionary:
   # separate peasants into housed and unhoused:
   # housed = min(peasants, huts * 2)
   # unhoused = peasants - housed
@@ -42,7 +42,7 @@ func tickv1(inventory: World.Inventory, peasants: int, _ticks: int) -> Dictionar
   # peasants automatically slaughter livestock if able:
   # one livestock is 5 food
 
-  var changes: Dictionary[Item, int] = {}
+  var changes: Dictionary = {}
   
   const HOUSING_PER_HUT = 2
   var huts = inventory.num(HUT)
