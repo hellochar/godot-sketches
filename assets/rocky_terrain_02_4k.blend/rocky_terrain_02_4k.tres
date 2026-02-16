@@ -1,0 +1,16 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://u6r3c16h42js"]
+
+[ext_resource type="Texture2D" uid="uid://bfdohpwlfnugb" path="res://assets/rocky_terrain_02_4k.blend/rocky_terrain_02_diff_4k.jpg" id="1_strga"]
+[ext_resource type="Texture2D" uid="uid://cgoe3bnihvqqd" path="res://assets/rocky_terrain_02_4k.blend/rocky_terrain_02_disp_4k.png" id="2_v5u82"]
+[ext_resource type="Texture2D" uid="uid://b6b4gb85rbh3c" path="res://assets/rocky_terrain_02_4k.blend/rocky_terrain_02_nor_gl_4k.exr" id="4_2dvvy"]
+[ext_resource type="Texture2D" uid="uid://2mvc1ltilex8" path="res://assets/rocky_terrain_02_4k.blend/rocky_terrain_02_rough_4k.exr" id="5_tu6kx"]
+
+[resource]
+albedo_texture = ExtResource("1_strga")
+roughness_texture = ExtResource("5_tu6kx")
+normal_enabled = true
+normal_texture = ExtResource("4_2dvvy")
+heightmap_enabled = true
+heightmap_scale = 1.0
+heightmap_texture = ExtResource("2_v5u82")
+uv1_scale = Vector3(8, 8, 8)
