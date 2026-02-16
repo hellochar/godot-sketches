@@ -1549,3 +1549,6 @@ metadata/_custom_type_script = "uid://g1sdaxeo53jd"
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1120332298]
 environment = SubResource("Environment_wtc6f")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2037470808]
+transform = Transform3D(1, 0, 0, 0, -0.110462844, 0.9938803, 0, -0.9938803, -0.110462844, 0, 0, 0)
