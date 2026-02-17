@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://btxjgrdc0lhld"]
 
-[ext_resource type="Script" uid="uid://cpsd7u6rhhny5" path="res://feb_16_2026-mirror-and-reflections/feb_16_2026.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://cb7v8yf4pxv0b" path="res://assets/citrus_orchard_road_puresky_4k.hdr" id="2_eiqgl"]
 [ext_resource type="Material" uid="uid://u6r3c16h42js" path="res://assets/rocky_terrain_02_4k.blend/rocky_terrain_02_4k.tres" id="2_sb3yk"]
 [ext_resource type="LightmapGIData" uid="uid://5r4mm2d5vn23" path="res://feb_16_2026-mirror-and-reflections/feb_16_2026.lmbake" id="4_sn2h8"]
 [ext_resource type="PackedScene" uid="uid://bvst2k00b4mwf" path="res://_common/character_body_3d.tscn" id="6_epgvc"]
 [ext_resource type="PackedScene" path="res://_common/third_person_camera/third_person_camera.tscn" id="6_ntu50"]
+[ext_resource type="PackedScene" path="res://_common/mirror_3d.tscn" id="7_mirror"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_0wtcg"]
 lightmap_size_hint = Vector2i(62, 62)
@@ -55,25 +55,7 @@ roughness = 0.0
 material = SubResource("StandardMaterial3D_eiqgl")
 size = Vector2(1.6, 1.6)
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_epgvc"]
-viewport_path = NodePath("SubViewport")
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_epgvc"]
-resource_local_to_scene = true
-disable_ambient_light = true
-disable_fog = true
-disable_specular_occlusion = true
-emission_enabled = true
-emission_texture = SubResource("ViewportTexture_epgvc")
-uv1_scale = Vector3(-1, 1, 1)
-
-[sub_resource type="QuadMesh" id="QuadMesh_ntu50"]
-resource_local_to_scene = true
-material = SubResource("StandardMaterial3D_epgvc")
-size = Vector2(1.6, 1.6)
-
 [node name="World" type="Node3D" unique_id=284640369]
-script = ExtResource("1_script")
 
 [node name="ground" type="MeshInstance3D" parent="." unique_id=1182436818]
 mesh = SubResource("PlaneMesh_0wtcg")
@@ -134,18 +116,7 @@ shoulder_offset = 0.25
 vertical_offset = 0.6
 auto_recenter_enabled = false
 
-[node name="SubViewport" type="SubViewport" parent="." unique_id=573224214]
-handle_input_locally = false
-size = Vector2i(1024, 1024)
-
-[node name="Mirror2Camera" type="Camera3D" parent="SubViewport" unique_id=2047688313]
-unique_name_in_owner = true
-transform = Transform3D(-0.9998882, 0, -0.014957022, 0, 1, 0, 0.014957022, 0, -0.9998882, 1.7635132, 0.74568117, 0)
-current = true
-
-[node name="Mirror2" type="MeshInstance3D" parent="." unique_id=1055239339]
-unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6753258, 0.7169702, 0.059957027)
-mesh = SubResource("QuadMesh_ntu50")
+[node name="Mirror" parent="." unique_id=2036559471 instance=ExtResource("7_mirror")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1086191, 0.7169702, 0.059957027)
 
 [editable path="ThirdPersonCamera"]
