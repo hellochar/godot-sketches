@@ -171,7 +171,7 @@ static func dict_trim_zero(me: Dictionary) -> void:
 
 class Inventory:
   var name: String = "Inventory"
-  var dict: Dictionary[Item, int] = {} # Resource and its amount
+  var dict: Dictionary = {} # Resource and its amount
   var cap: int
   var prefix: bool = false
   var max_entries: int = -1
@@ -204,7 +204,7 @@ class Inventory:
     return out
   
   func tick(ticks: int):
-    var total_diff: Dictionary[Item, int] = {}
+    var total_diff: Dictionary = {}
     for item: Item in dict.keys():
       var diff := item.tick(self, dict[item], ticks)
       World.dict_add_all(total_diff, diff)
@@ -228,7 +228,7 @@ class Inventory:
     return num(item) - prev
   
   func add_all(other: Variant) -> void:
-    var other_dict: Dictionary[Item, int]
+    var other_dict: Dictionary
     if other is Dictionary:
       other_dict = other
     if other is Inventory:

@@ -1,8 +1,8 @@
 extends Item
 class_name Structure
 
-@export var ingredients: Dictionary[Item, int] = {}
-@export var production: Dictionary[Item, int] = {}
+@export var ingredients: Dictionary = {}
+@export var production: Dictionary = {}
 @export var production_time: int = 0
 @export var workers_needed: int = 1
 
