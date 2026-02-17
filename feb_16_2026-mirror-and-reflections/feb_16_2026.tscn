@@ -1,0 +1,151 @@
+[gd_scene format=3 uid="uid://btxjgrdc0lhld"]
+
+[ext_resource type="Script" uid="uid://cpsd7u6rhhny5" path="res://feb_16_2026-mirror-and-reflections/feb_16_2026.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cb7v8yf4pxv0b" path="res://assets/citrus_orchard_road_puresky_4k.hdr" id="2_eiqgl"]
+[ext_resource type="Material" uid="uid://u6r3c16h42js" path="res://assets/rocky_terrain_02_4k.blend/rocky_terrain_02_4k.tres" id="2_sb3yk"]
+[ext_resource type="LightmapGIData" uid="uid://5r4mm2d5vn23" path="res://feb_16_2026-mirror-and-reflections/feb_16_2026.lmbake" id="4_sn2h8"]
+[ext_resource type="PackedScene" uid="uid://bvst2k00b4mwf" path="res://_common/character_body_3d.tscn" id="6_epgvc"]
+[ext_resource type="PackedScene" path="res://_common/third_person_camera/third_person_camera.tscn" id="6_ntu50"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_0wtcg"]
+lightmap_size_hint = Vector2i(62, 62)
+material = ExtResource("2_sb3yk")
+add_uv2 = true
+size = Vector2(12, 12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sb3yk"]
+size = Vector3(12, 0.1, 12)
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_3c144"]
+panorama = ExtResource("2_eiqgl")
+
+[sub_resource type="Sky" id="Sky_3c144"]
+sky_material = SubResource("PanoramaSkyMaterial_3c144")
+
+[sub_resource type="Environment" id="Environment_sn2h8"]
+background_mode = 2
+background_energy_multiplier = 0.5
+sky = SubResource("Sky_3c144")
+ssr_enabled = true
+ssr_max_steps = 128
+ssao_enabled = true
+ssao_intensity = 1.62
+glow_enabled = true
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.0371
+
+[sub_resource type="TorusMesh" id="TorusMesh_epgvc"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_sb3yk"]
+lightmap_size_hint = Vector2i(14, 51)
+add_uv2 = true
+size = Vector3(1, 4, 1)
+
+[sub_resource type="MultiMesh" id="MultiMesh_epgvc"]
+transform_format = 1
+instance_count = 40
+mesh = SubResource("BoxMesh_sb3yk")
+buffer = PackedFloat32Array(-0.13091041, -0.12961915, -0.87265, -3.2796755, 0.025451021, 0.8812829, -0.13471948, 0, 0.88185686, -0.044676244, -0.12565558, 4.650758, -0.2997431, -0.24097058, -1.7199123, -2.222639, 0.1986679, 1.7291261, -0.27688497, 0, 1.7253104, -0.24097177, -0.26692218, 4.60227, -0.9764705, -0.108123645, 0.009224761, -3.7089484, -0.10664734, 0.9716124, 0.09932886, 0, -0.020054003, 0.09771979, -0.9774043, 3.423652, -0.05291699, -0.07621769, -1.4591144, 5.8924847, 0.008191087, 1.4600327, -0.0765627, 0, 1.4610808, -0.0109456405, -0.052416544, -3.148338, -1.824634, 0.22826251, -0.17049031, -5.7131233, 0.24784671, 1.8167449, -0.22015795, 0, 0.14050877, -0.24040334, -1.8256295, -5.888918, -0.68197215, -0.060798712, -0.054123823, 3.723896, -0.06812361, 0.6762595, 0.09871248, 0, 0.04455385, 0.10338518, -0.67752373, -4.8300095, -1.3435898, -0.027848832, 0.13739748, 2.219942, -0.045923397, 1.3383427, -0.177812, 0, -0.13245629, -0.18152273, -1.3320631, -3.292483, -1.5842103, 0.12629664, 0.17844808, -4.8665247, 0.11770813, 1.5927614, -0.082298204, 0, -0.18422635, -0.068391226, -1.5871043, 2.5106869, 0.00961876, 0.16577056, -1.2641804, 4.6758757, -0.013586453, 1.2641579, 0.16566424, 0, 1.2749302, 0.012220992, 0.011303078, 1.1331525, -0.02774239, 0.0245749, -0.16675615, 4.633498, 0.015863076, 0.16863027, 0.02221203, 0, 0.16780913, -0.011877949, -0.029668022, -0.66071105, -0.008647915, 0.010482122, -0.40643176, -2.793007, 0.00046189653, 0.4065237, 0.010474664, 0, 0.40656665, -0.00023888674, -0.008656945, 2.8875628, -0.55986917, -0.048857544, 0.047772087, -0.45563316, -0.048555247, 0.5619017, 0.00562152, 0, -0.04807931, 0.0014675455, -0.5619688, -0.83795166, 0.12282498, -0.19100544, -1.9388156, 3.3656063, -0.2601036, 1.9236655, -0.2059906, 0, 1.9307603, 0.27129862, 0.09558726, -1.1783655, -1.1899712, 0.14401498, -0.20256618, 1.3859966, 0.1513875, 1.20576, -0.0320845, 0, 0.19711724, -0.05663276, -1.1982248, -2.5656497, -0.04333828, 0.0024200277, -0.3540562, 2.9899178, -0.05287429, 0.3526546, 0.008882529, 0, 0.35009423, 0.05356056, -0.04248722, 3.2861292, -1.8292439, -0.2782118, -0.31171677, -4.8670063, -0.31582153, 1.8372086, 0.21359603, 0, 0.2735432, 0.2607004, -1.8379095, 2.4395468, -0.052890167, 0.0063443584, 0.0013987616, -3.8337564, 0.0062104776, 0.052742098, -0.004390731, 0, -0.0019071948, -0.0041949567, -0.05308806, -0.69725657, -1.8575429, -0.015153493, 0.041335393, -4.708953, -0.018669043, 1.8510368, -0.16036794, 0, -0.039871164, -0.16073824, -1.8506695, 3.5444777, -1.6077118, 0.19958848, -0.14309967, -2.1910496, 0.19457594, 1.6134008, 0.0642504, 0, 0.14984418, 0.046393376, -1.6187787, -5.598848, -0.05489122, -0.06034952, -0.39139935, 4.248855, -0.056941826, 0.39223802, -0.05249311, 0, 0.39190966, 0.04853693, -0.062446654, 3.0346315, 0.008616933, -0.007866575, -0.073130764, 0.20738876, 0.012328526, 0.07274369, -0.006372279, 0, 0.07251206, -0.011433086, 0.009773872, 5.259346, 0.06539278, 0.022834955, -1.0012612, 4.321594, -0.13823442, 0.9939955, 0.013641102, 0, 0.9919359, 0.13701606, 0.06790854, -3.2719846, 0.06008657, 0.00027085515, -0.3335461, -2.904728, 0.012871823, 0.33866066, 0.0025937997, 0, 0.33329773, -0.013127767, 0.06003117, 4.0642166, -0.44840303, 0.036599316, 0.027294025, -3.9567142, 0.033634014, 0.44701573, -0.04685553, 0, -0.03087437, -0.044577766, -0.44744763, -3.078196, 0.049104605, 0.00905021, -0.31709275, -2.9755766, 0.001336201, 0.32086056, 0.009364671, 0, 0.31721908, -0.0027524866, 0.049045607, 3.5988905, -0.06609695, 0.111966096, -1.126979, 2.577752, 0.15540704, 1.1191144, 0.102070175, 0, 1.121814, -0.14843605, -0.08054123, 3.1998453, -0.105593815, 0.0025681325, 0.0096779475, 0.89525867, 0.0017291268, 0.10565614, -0.009170732, 0, -0.009862459, -0.008972007, -0.10522617, -5.211544, -1.5458189, 0.20337033, 0.061523583, -5.476259, 0.19276659, 1.5323951, -0.22205243, 0, -0.08936268, -0.21238346, -1.5432462, 2.3585863, -0.42677507, -0.01816924, 0.020080162, -1.7387738, -0.020768303, 0.42309394, -0.058570165, 0, -0.017378485, -0.05942782, -0.42312714, -3.8350558, -1.7263839, -0.06725172, -0.25456896, -5.4566407, -0.04554765, 1.7392466, -0.15058625, 0, 0.25933293, -0.14222522, -1.7211182, -3.1869807, -0.020573597, 0.06686736, -0.46161053, 5.64607, -0.00866714, 0.4619248, 0.06729917, 0, 0.46634793, 0.011534884, -0.019113837, -4.1411724, -0.062087465, 0.10003361, -1.6269193, -1.0603907, 0.058342032, 1.6271921, 0.09782391, 0, 1.6289473, -0.05446638, -0.065513805, 5.903341, -0.008985923, -0.09184444, -0.87382793, -2.5112915, -0.0281311, 0.8734557, -0.09151604, 0, 0.87819093, 0.027039634, -0.011872813, 5.271678, 0.01888284, -0.071984, -0.48996243, 5.661001, 0.05811596, 0.4872526, -0.06934614, 0, 0.49180016, -0.054814726, 0.027006902, 0.8034096, -0.794049, 0.046584338, -0.093069084, 1.0691428, 0.05209493, 0.7978707, -0.045102526, 0, 0.09010035, -0.0507742, -0.79413456, -1.4135551, -0.46307844, -0.031142546, 0.043505825, -5.389244, -0.036680147, 0.46074373, -0.060613804, 0, -0.038951017, -0.06363654, -0.4601494, 0.67029965, -0.14515789, -0.0012373748, 0.015284138, 4.4663324, -0.0032690067, 0.14464214, -0.01933675, 0, -0.0149816405, -0.019572053, -0.1438695, -5.206547, 0.055496253, 0.12748279, -1.7427768, 1.6110353, 0.07200547, 1.7420077, 0.12971944, 0, 1.745949, -0.075895056, 0.050045602, 2.9800587, 0.048212025, 0.010995517, -0.3145763, 4.6913805, 0.043863498, 0.31490508, 0.017729538, 0, 0.3116972, -0.04601566, 0.046162367, 4.3409176, -1.2905623, 0.15056421, 0.22351032, -1.0863547, 0.114005774, 1.2958072, -0.21462387, 0, -0.24419077, -0.1907646, -1.2814667, -4.4193316)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eiqgl"]
+metallic = 1.0
+roughness = 0.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_3c144"]
+material = SubResource("StandardMaterial3D_eiqgl")
+size = Vector2(1.6, 1.6)
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_epgvc"]
+viewport_path = NodePath("SubViewport")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_epgvc"]
+resource_local_to_scene = true
+disable_ambient_light = true
+disable_fog = true
+disable_specular_occlusion = true
+emission_enabled = true
+emission_texture = SubResource("ViewportTexture_epgvc")
+uv1_scale = Vector3(-1, 1, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_ntu50"]
+resource_local_to_scene = true
+material = SubResource("StandardMaterial3D_epgvc")
+size = Vector2(1.6, 1.6)
+
+[node name="World" type="Node3D" unique_id=284640369]
+script = ExtResource("1_script")
+
+[node name="ground" type="MeshInstance3D" parent="." unique_id=1182436818]
+mesh = SubResource("PlaneMesh_0wtcg")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="ground" unique_id=2081016955]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ground/StaticBody3D" unique_id=166764321]
+shape = SubResource("BoxShape3D_sb3yk")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2133430060]
+environment = SubResource("Environment_sn2h8")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=40333441]
+transform = Transform3D(1, 0, 0, 0, 0.8398096, 0.54288137, 0, -0.54288137, 0.8398096, 0, 0, 0)
+light_color = Color(1, 0.85078865, 0.66589916, 1)
+light_energy = 0.914
+shadow_enabled = true
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=1326842479]
+transform = Transform3D(-0.675326, -0.6772539, 0.29199654, -0.59310573, 0.26339006, -0.7608228, 0.4383611, -0.68698823, -0.57955736, 2.126447, 0.5519956, 1.9197273)
+mesh = SubResource("TorusMesh_epgvc")
+skeleton = NodePath("../ground")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1801385369]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4633536, 0)
+visible = false
+mesh = SubResource("BoxMesh_sb3yk")
+
+[node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="." unique_id=1875128120]
+multimesh = SubResource("MultiMesh_epgvc")
+
+[node name="MirrorBad" type="MeshInstance3D" parent="." unique_id=308281951]
+transform = Transform3D(1, 0, 0, 0, 0.99423546, 0.10721852, 0, -0.10721852, 0.99423546, -1.7369374, 0.7169702, -0.5071831)
+mesh = SubResource("QuadMesh_3c144")
+
+[node name="LightmapGI" type="LightmapGI" parent="." unique_id=1165823057]
+light_data = ExtResource("4_sn2h8")
+
+[node name="ReflectionProbe" type="ReflectionProbe" parent="." unique_id=1332282549]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6931498, 0.86787426, -0.5287086)
+update_mode = 1
+size = Vector3(12.613281, 5.0479736, 13.511017)
+enable_shadows = true
+
+[node name="CharacterBody3D" parent="." unique_id=2122298387 node_paths=PackedStringArray("camera_pivot") instance=ExtResource("6_epgvc")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -1.6721534, 0.053874277, 0.52730834)
+speed = 2.0
+jump_velocity = 2.5
+camera_pivot = NodePath("../ThirdPersonCamera")
+
+[node name="ThirdPersonCamera" parent="." unique_id=544608072 instance=ExtResource("6_ntu50")]
+unique_name_in_owner = true
+target_path = NodePath("../CharacterBody3D")
+min_distance = 1.0
+max_distance = 3.0
+default_distance = 2.0
+shoulder_offset = 0.25
+vertical_offset = 0.6
+auto_recenter_enabled = false
+
+[node name="SubViewport" type="SubViewport" parent="." unique_id=573224214]
+handle_input_locally = false
+size = Vector2i(1024, 1024)
+
+[node name="Mirror2Camera" type="Camera3D" parent="SubViewport" unique_id=2047688313]
+unique_name_in_owner = true
+transform = Transform3D(-0.9998882, 0, -0.014957022, 0, 1, 0, 0.014957022, 0, -0.9998882, 1.7635132, 0.74568117, 0)
+current = true
+
+[node name="Mirror2" type="MeshInstance3D" parent="." unique_id=1055239339]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6753258, 0.7169702, 0.059957027)
+mesh = SubResource("QuadMesh_ntu50")
+
+[editable path="ThirdPersonCamera"]
