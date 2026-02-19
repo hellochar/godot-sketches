@@ -81,6 +81,7 @@ var game_flow_manager: Node
 var event_popup: PanelContainer
 var discovery_popup: PanelContainer
 var tutorial_hint_popup: PanelContainer
+var tutorial_hint_label: Label
 var main_menu: Control
 var end_screen: Control
 var event_completion_timer: float = 0.0
@@ -690,12 +691,12 @@ func _create_tutorial_hint_popup() -> void:
   vbox.add_theme_constant_override("separation", 10)
   margin.add_child(vbox)
 
-  var hint_label = Label.new()
-  hint_label.name = "HintLabel"
-  hint_label.add_theme_font_size_override("font_size", 13)
-  hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-  hint_label.custom_minimum_size.x = 360
-  vbox.add_child(hint_label)
+  tutorial_hint_label = Label.new()
+  tutorial_hint_label.name = "HintLabel"
+  tutorial_hint_label.add_theme_font_size_override("font_size", 13)
+  tutorial_hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+  tutorial_hint_label.custom_minimum_size.x = 360
+  vbox.add_child(tutorial_hint_label)
 
   var dismiss_btn = Button.new()
   dismiss_btn.name = "DismissBtn"
@@ -760,8 +761,7 @@ func _on_tutorial_hint_requested(hint_text: String) -> void:
     return
   if _is_any_popup_active():
     return
-  var hint_label = tutorial_hint_popup.get_node("MarginContainer/VBoxContainer/HintLabel")
-  hint_label.text = hint_text
+  tutorial_hint_label.text = hint_text
   tutorial_hint_popup.visible = true
   time_system.set_paused(true)
 

@@ -140,7 +140,7 @@ var storage_purity: Dictionary = {}
 var attuned_partners: Array[Node]:
   get:
     var comp := get_component("attunement") as AttunementComponent
-    return comp.attuned_partners if comp else []
+    return comp.attuned_partners if comp else ([] as Array[Node])
 
 # Fragility state (delegated to FragilityComponent)
 var fragility_level: float:
