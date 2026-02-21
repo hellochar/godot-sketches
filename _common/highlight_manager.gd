@@ -26,6 +26,12 @@ var _active_is_control: bool
 
 
 func register(node: Node, style: int, color: Color, width: float, pattern: int) -> void:
+  call_deferred("_register_impl", node, style, color, width, pattern)
+
+
+func _register_impl(node: Node, style: int, color: Color, width: float, pattern: int) -> void:
+  if not is_instance_valid(node) or not node.is_inside_tree():
+    return
   if _entries.has(node):
     unregister(node)
   var entry := HighlightEntry.new()
@@ -68,6 +74,10 @@ func unregister(node: Node) -> void:
 func _ensure_hover_node(node: Node, entry: HighlightEntry) -> Node:
   if node is CollisionObject2D or node is Control:
     return node
+  # Prefer hover areas created by tooltip/highlight systems for consistent triggering
+  for child in node.get_children():
+    if child is Area2D and (child.name == "_TooltipHoverArea" or child.name == "_HighlightHoverArea"):
+      return child
   for child in node.get_children():
     if child is Area2D:
       return child
