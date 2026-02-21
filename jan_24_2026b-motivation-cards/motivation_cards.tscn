@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://djdbsow0rg5ol"]
+[gd_scene format=3 uid="uid://djdbsow0rg5ol"]
 
 [ext_resource type="Script" uid="uid://cvxkgmerrohu7" path="res://jan_24_2026b-motivation-cards/motivation_cards.gd" id="1_main"]
 [ext_resource type="Resource" uid="uid://bhaj16o6ydydq" path="res://jan_24_2026b-motivation-cards/data/starter_deck.tres" id="2_deck"]
@@ -11,7 +11,7 @@
 [ext_resource type="AudioStream" uid="uid://h72lh8rx27op" path="res://assets/inteface_sfx_pack_1_wav/Wav/Error_tones/style2/error_style_2_001.wav" id="9_willpower_low"]
 [ext_resource type="AudioStream" uid="uid://d04om3j1mlxa3" path="res://assets/ChillLofiR.mp3" id="10_pv113"]
 
-[node name="MotivationCards" type="Control"]
+[node name="MotivationCards" type="Control" unique_id=272580360]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -30,7 +30,7 @@ click_sound = ExtResource("7_pv113")
 deck_add_sound = ExtResource("8_deck_add")
 willpower_low_sound = ExtResource("9_willpower_low")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=520020833]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -39,7 +39,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.12, 0.12, 0.15, 1)
 
-[node name="MainContainer" type="VBoxContainer" parent="."]
+[node name="MainContainer" type="VBoxContainer" parent="." unique_id=1055191317]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -52,126 +52,126 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 15
 
-[node name="TopBar" type="HBoxContainer" parent="MainContainer"]
+[node name="TopBar" type="HBoxContainer" parent="MainContainer" unique_id=1918169686]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 30
 
-[node name="DayLabel" type="Label" parent="MainContainer/TopBar"]
+[node name="DayLabel" type="Label" parent="MainContainer/TopBar" unique_id=673743940]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Day 1"
 
-[node name="ScoreLabel" type="Label" parent="MainContainer/TopBar"]
+[node name="ScoreLabel" type="Label" parent="MainContainer/TopBar" unique_id=1789430881]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Score: 0"
 
-[node name="MomentumLabel" type="Label" parent="MainContainer/TopBar"]
+[node name="MomentumLabel" type="Label" parent="MainContainer/TopBar" unique_id=146392359]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.8, 0.5, 1)
 theme_override_font_sizes/font_size = 20
 text = "Momentum: 0"
 
-[node name="StreakLabel" type="Label" parent="MainContainer/TopBar"]
+[node name="StreakLabel" type="Label" parent="MainContainer/TopBar" unique_id=735780904]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.9, 0.6, 1)
 theme_override_font_sizes/font_size = 20
 text = "Streak: 0"
 
-[node name="BonusTagLabel" type="Label" parent="MainContainer/TopBar"]
+[node name="BonusTagLabel" type="Label" parent="MainContainer/TopBar" unique_id=587921149]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.75, 0.4, 1)
 theme_override_font_sizes/font_size = 20
 text = "Bonus: Health"
 
-[node name="DeckInfoLabel" type="Label" parent="MainContainer/TopBar"]
+[node name="DeckInfoLabel" type="Label" parent="MainContainer/TopBar" unique_id=1702820520]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.8, 1)
 theme_override_font_sizes/font_size = 16
 text = "Deck: 65"
 
-[node name="Spacer" type="Control" parent="MainContainer/TopBar"]
+[node name="Spacer" type="Control" parent="MainContainer/TopBar" unique_id=848683484]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="WillpowerContainer" type="HBoxContainer" parent="MainContainer/TopBar"]
+[node name="WillpowerContainer" type="HBoxContainer" parent="MainContainer/TopBar" unique_id=1816826501]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="WillpowerTitle" type="Label" parent="MainContainer/TopBar/WillpowerContainer"]
+[node name="WillpowerTitle" type="Label" parent="MainContainer/TopBar/WillpowerContainer" unique_id=378885152]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Willpower:"
 
-[node name="WillpowerBar" type="ProgressBar" parent="MainContainer/TopBar/WillpowerContainer"]
+[node name="WillpowerBar" type="ProgressBar" parent="MainContainer/TopBar/WillpowerContainer" unique_id=395417308]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 value = 100.0
 show_percentage = false
 
-[node name="WillpowerLabel" type="Label" parent="MainContainer/TopBar/WillpowerContainer"]
+[node name="WillpowerLabel" type="Label" parent="MainContainer/TopBar/WillpowerContainer" unique_id=1157755923]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "100/100"
 
-[node name="ActionSelectionScreen" type="VBoxContainer" parent="MainContainer"]
+[node name="ActionSelectionScreen" type="VBoxContainer" parent="MainContainer" unique_id=2058194654]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 15
 
-[node name="YouSection" type="BoxContainer" parent="MainContainer/ActionSelectionScreen"]
+[node name="YouSection" type="BoxContainer" parent="MainContainer/ActionSelectionScreen" unique_id=1240989884]
 layout_mode = 2
 theme_override_constants/separation = 100
 
-[node name="ValuesSection" type="VBoxContainer" parent="MainContainer/ActionSelectionScreen/YouSection"]
+[node name="ValuesSection" type="VBoxContainer" parent="MainContainer/ActionSelectionScreen/YouSection" unique_id=774828597]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ValuesTitle" type="Label" parent="MainContainer/ActionSelectionScreen/YouSection/ValuesSection"]
+[node name="ValuesTitle" type="Label" parent="MainContainer/ActionSelectionScreen/YouSection/ValuesSection" unique_id=925433197]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Your Values"
 horizontal_alignment = 1
 
-[node name="ValuesCardsContainer" type="HBoxContainer" parent="MainContainer/ActionSelectionScreen/YouSection/ValuesSection"]
+[node name="ValuesCardsContainer" type="HBoxContainer" parent="MainContainer/ActionSelectionScreen/YouSection/ValuesSection" unique_id=300073485]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="MoodSection" type="VBoxContainer" parent="MainContainer/ActionSelectionScreen/YouSection"]
+[node name="MoodSection" type="VBoxContainer" parent="MainContainer/ActionSelectionScreen/YouSection" unique_id=1469906651]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="MoodTitle" type="Label" parent="MainContainer/ActionSelectionScreen/YouSection/MoodSection"]
+[node name="MoodTitle" type="Label" parent="MainContainer/ActionSelectionScreen/YouSection/MoodSection" unique_id=9304967]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Today's Mood"
 horizontal_alignment = 1
 
-[node name="MoodCardsContainer" type="HBoxContainer" parent="MainContainer/ActionSelectionScreen/YouSection/MoodSection"]
+[node name="MoodCardsContainer" type="HBoxContainer" parent="MainContainer/ActionSelectionScreen/YouSection/MoodSection" unique_id=279851382]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="MoodWorldLabel" type="Label" parent="MainContainer/ActionSelectionScreen/YouSection"]
+[node name="MoodWorldLabel" type="Label" parent="MainContainer/ActionSelectionScreen/YouSection" unique_id=535289322]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 
-[node name="SynergyLabel" type="Label" parent="MainContainer/ActionSelectionScreen/YouSection"]
+[node name="SynergyLabel" type="Label" parent="MainContainer/ActionSelectionScreen/YouSection" unique_id=911878465]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
@@ -179,95 +179,95 @@ theme_override_colors/font_color = Color(0.6, 0.9, 0.7, 1)
 theme_override_font_sizes/font_size = 14
 autowrap_mode = 2
 
-[node name="Title" type="Label" parent="MainContainer/ActionSelectionScreen"]
+[node name="Title" type="Label" parent="MainContainer/ActionSelectionScreen" unique_id=1230908662]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "What would you like to do?"
 horizontal_alignment = 1
 
-[node name="ActionScrollContainer" type="ScrollContainer" parent="MainContainer/ActionSelectionScreen"]
+[node name="ActionScrollContainer" type="ScrollContainer" parent="MainContainer/ActionSelectionScreen" unique_id=1967558562]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_scroll_mode = 2
 vertical_scroll_mode = 0
 
-[node name="ActionGrid" type="BoxContainer" parent="MainContainer/ActionSelectionScreen/ActionScrollContainer"]
+[node name="ActionGrid" type="BoxContainer" parent="MainContainer/ActionSelectionScreen/ActionScrollContainer" unique_id=1816257016]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 theme_override_constants/separation = 15
 
-[node name="MotivationPhaseScreen" type="VBoxContainer" parent="MainContainer"]
+[node name="MotivationPhaseScreen" type="VBoxContainer" parent="MainContainer" unique_id=639092473]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 15
 
-[node name="SelectedActionPanel" type="PanelContainer" parent="MainContainer/MotivationPhaseScreen"]
+[node name="SelectedActionPanel" type="PanelContainer" parent="MainContainer/MotivationPhaseScreen" unique_id=10792834]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="ActionInfo" type="VBoxContainer" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel"]
+[node name="ActionInfo" type="VBoxContainer" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel" unique_id=1196709640]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ActionTitle" type="Label" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo"]
+[node name="ActionTitle" type="Label" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo" unique_id=1638319666]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Action Title"
 horizontal_alignment = 1
 
-[node name="ActionDetails" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo"]
+[node name="ActionDetails" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo" unique_id=990344226]
 layout_mode = 2
 theme_override_constants/separation = 30
 alignment = 1
 
-[node name="CostLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo/ActionDetails"]
+[node name="CostLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo/ActionDetails" unique_id=1929357168]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Cost: 75"
 
-[node name="SuccessLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo/ActionDetails"]
+[node name="SuccessLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo/ActionDetails" unique_id=1101665062]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Success: 80%"
 
-[node name="TagsContainer" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo"]
+[node name="TagsContainer" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo" unique_id=518986747]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="MotivationSection" type="VBoxContainer" parent="MainContainer/MotivationPhaseScreen"]
+[node name="MotivationSection" type="VBoxContainer" parent="MainContainer/MotivationPhaseScreen" unique_id=22822342]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 10
 
-[node name="MotivationTitle" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSection"]
+[node name="MotivationTitle" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSection" unique_id=790073184]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Your Motivations"
 horizontal_alignment = 1
 
-[node name="DrawnCardsContainer" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen/MotivationSection"]
+[node name="DrawnCardsContainer" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen/MotivationSection" unique_id=1067601932]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="WorldModifierLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSection"]
+[node name="WorldModifierLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSection" unique_id=790935949]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 
-[node name="DiscardLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSection"]
+[node name="DiscardLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSection" unique_id=2061393778]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.8, 1, 1)
@@ -275,117 +275,117 @@ theme_override_font_sizes/font_size = 14
 text = "Click a card to discard and redraw (2 remaining)"
 horizontal_alignment = 1
 
-[node name="MotivationSummary" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen"]
+[node name="MotivationSummary" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen" unique_id=71281956]
 layout_mode = 2
 theme_override_constants/separation = 30
 alignment = 1
 
-[node name="TotalMotivation" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSummary"]
+[node name="TotalMotivation" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSummary" unique_id=367446872]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Total Motivation: 0 / 75"
 
-[node name="GapLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSummary"]
+[node name="GapLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSummary" unique_id=954723891]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Gap: 75"
 
-[node name="WillpowerCostLabel" type="Label" parent="MainContainer/MotivationPhaseScreen"]
+[node name="WillpowerCostLabel" type="Label" parent="MainContainer/MotivationPhaseScreen" unique_id=1408059053]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Willpower cost: 0"
 horizontal_alignment = 1
 
-[node name="ActionButtons" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen"]
+[node name="ActionButtons" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen" unique_id=1722536402]
 layout_mode = 2
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="BackButton" type="Button" parent="MainContainer/MotivationPhaseScreen/ActionButtons"]
+[node name="BackButton" type="Button" parent="MainContainer/MotivationPhaseScreen/ActionButtons" unique_id=240546262]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 text = "Back"
 
-[node name="AttemptButton" type="Button" parent="MainContainer/MotivationPhaseScreen/ActionButtons"]
+[node name="AttemptButton" type="Button" parent="MainContainer/MotivationPhaseScreen/ActionButtons" unique_id=821512600]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 40)
 layout_mode = 2
 text = "Attempt Action"
 
-[node name="ResultPanel" type="PanelContainer" parent="MainContainer"]
+[node name="ResultPanel" type="PanelContainer" parent="MainContainer" unique_id=359477050]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="ResultContent" type="VBoxContainer" parent="MainContainer/ResultPanel"]
+[node name="ResultContent" type="VBoxContainer" parent="MainContainer/ResultPanel" unique_id=1661794709]
 layout_mode = 2
 theme_override_constants/separation = 15
 
-[node name="ResultTitle" type="Label" parent="MainContainer/ResultPanel/ResultContent"]
+[node name="ResultTitle" type="Label" parent="MainContainer/ResultPanel/ResultContent" unique_id=1808266108]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "Success!"
 horizontal_alignment = 1
 
-[node name="ResultDetails" type="Label" parent="MainContainer/ResultPanel/ResultContent"]
+[node name="ResultDetails" type="Label" parent="MainContainer/ResultPanel/ResultContent" unique_id=865179314]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "You gained 25 points!"
 horizontal_alignment = 1
 
-[node name="CardsAddedContainer" type="HBoxContainer" parent="MainContainer/ResultPanel/ResultContent"]
+[node name="CardsAddedContainer" type="HBoxContainer" parent="MainContainer/ResultPanel/ResultContent" unique_id=615437630]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="ResultButtons" type="HBoxContainer" parent="MainContainer/ResultPanel/ResultContent"]
+[node name="ResultButtons" type="HBoxContainer" parent="MainContainer/ResultPanel/ResultContent" unique_id=2014620665]
 layout_mode = 2
 theme_override_constants/separation = 15
 alignment = 1
 
-[node name="ForgetCardButton" type="Button" parent="MainContainer/ResultPanel/ResultContent/ResultButtons"]
+[node name="ForgetCardButton" type="Button" parent="MainContainer/ResultPanel/ResultContent/ResultButtons" unique_id=627889552]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(140, 40)
 layout_mode = 2
 text = "Forget a Card"
 
-[node name="ContinueButton" type="Button" parent="MainContainer/ResultPanel/ResultContent/ResultButtons"]
+[node name="ContinueButton" type="Button" parent="MainContainer/ResultPanel/ResultContent/ResultButtons" unique_id=421974652]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 text = "Continue"
 
-[node name="EndGamePanel" type="PanelContainer" parent="MainContainer"]
+[node name="EndGamePanel" type="PanelContainer" parent="MainContainer" unique_id=306217425]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="EndGameContent" type="VBoxContainer" parent="MainContainer/EndGamePanel"]
+[node name="EndGameContent" type="VBoxContainer" parent="MainContainer/EndGamePanel" unique_id=2060286270]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="EndTitle" type="Label" parent="MainContainer/EndGamePanel/EndGameContent"]
+[node name="EndTitle" type="Label" parent="MainContainer/EndGamePanel/EndGameContent" unique_id=556922575]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Week Complete!"
 horizontal_alignment = 1
 
-[node name="FinalScore" type="Label" parent="MainContainer/EndGamePanel/EndGameContent"]
+[node name="FinalScore" type="Label" parent="MainContainer/EndGamePanel/EndGameContent" unique_id=184573498]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Final Score: 0"
 horizontal_alignment = 1
 
-[node name="ActionsSummary" type="Label" parent="MainContainer/EndGamePanel/EndGameContent"]
+[node name="ActionsSummary" type="Label" parent="MainContainer/EndGamePanel/EndGameContent" unique_id=184916204]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
@@ -393,88 +393,88 @@ text = "Actions taken:"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="PlayAgainButton" type="Button" parent="MainContainer/EndGamePanel/EndGameContent"]
+[node name="PlayAgainButton" type="Button" parent="MainContainer/EndGamePanel/EndGameContent" unique_id=639559398]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Play Again"
 
-[node name="CardRemovalPanel" type="PanelContainer" parent="MainContainer"]
+[node name="CardRemovalPanel" type="PanelContainer" parent="MainContainer" unique_id=403093929]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="CardRemovalContent" type="VBoxContainer" parent="MainContainer/CardRemovalPanel"]
+[node name="CardRemovalContent" type="VBoxContainer" parent="MainContainer/CardRemovalPanel" unique_id=1059414924]
 layout_mode = 2
 theme_override_constants/separation = 15
 
-[node name="RemovalTitle" type="Label" parent="MainContainer/CardRemovalPanel/CardRemovalContent"]
+[node name="RemovalTitle" type="Label" parent="MainContainer/CardRemovalPanel/CardRemovalContent" unique_id=1789376350]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Choose a card to forget"
 horizontal_alignment = 1
 
-[node name="RemovalHint" type="Label" parent="MainContainer/CardRemovalPanel/CardRemovalContent"]
+[node name="RemovalHint" type="Label" parent="MainContainer/CardRemovalPanel/CardRemovalContent" unique_id=2093922520]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 14
 text = "Removing a card makes your deck more focused"
 horizontal_alignment = 1
 
-[node name="CardRemovalScroll" type="ScrollContainer" parent="MainContainer/CardRemovalPanel/CardRemovalContent"]
+[node name="CardRemovalScroll" type="ScrollContainer" parent="MainContainer/CardRemovalPanel/CardRemovalContent" unique_id=1518900438]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 2
 vertical_scroll_mode = 0
 
-[node name="CardRemovalContainer" type="HBoxContainer" parent="MainContainer/CardRemovalPanel/CardRemovalContent/CardRemovalScroll"]
+[node name="CardRemovalContainer" type="HBoxContainer" parent="MainContainer/CardRemovalPanel/CardRemovalContent/CardRemovalScroll" unique_id=1317720289]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 theme_override_constants/separation = 10
 
-[node name="SkipRemovalButton" type="Button" parent="MainContainer/CardRemovalPanel/CardRemovalContent"]
+[node name="SkipRemovalButton" type="Button" parent="MainContainer/CardRemovalPanel/CardRemovalContent" unique_id=1815634658]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Keep All"
 
-[node name="ValueSelectionPanel" type="PanelContainer" parent="MainContainer"]
+[node name="ValueSelectionPanel" type="PanelContainer" parent="MainContainer" unique_id=428292306]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="ValueSelectionContent" type="VBoxContainer" parent="MainContainer/ValueSelectionPanel"]
+[node name="ValueSelectionContent" type="VBoxContainer" parent="MainContainer/ValueSelectionPanel" unique_id=1765258965]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="ValueSelectionTitle" type="Label" parent="MainContainer/ValueSelectionPanel/ValueSelectionContent"]
+[node name="ValueSelectionTitle" type="Label" parent="MainContainer/ValueSelectionPanel/ValueSelectionContent" unique_id=908362101]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Choose Your Starting Value"
 horizontal_alignment = 1
 
-[node name="ValueSelectionHint" type="Label" parent="MainContainer/ValueSelectionPanel/ValueSelectionContent"]
+[node name="ValueSelectionHint" type="Label" parent="MainContainer/ValueSelectionPanel/ValueSelectionContent" unique_id=448778555]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 14
 text = "This value determines how you earn points"
 horizontal_alignment = 1
 
-[node name="ValueSelectionContainer" type="HBoxContainer" parent="MainContainer/ValueSelectionPanel/ValueSelectionContent"]
+[node name="ValueSelectionContainer" type="HBoxContainer" parent="MainContainer/ValueSelectionPanel/ValueSelectionContent" unique_id=167194133]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
+[node name="AudioPlayer" type="AudioStreamPlayer" parent="." unique_id=91550769]
 unique_name_in_owner = true
 
-[node name="ScreenOverlay" type="ColorRect" parent="."]
+[node name="ScreenOverlay" type="ColorRect" parent="." unique_id=595000567]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -486,7 +486,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0.5)
 
-[node name="BGMusic" type="AudioStreamPlayer" parent="."]
+[node name="BGMusic" type="AudioStreamPlayer" parent="." unique_id=703951466]
 stream = ExtResource("10_pv113")
 volume_db = -12.0
 autoplay = true
