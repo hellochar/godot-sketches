@@ -2,6 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://dfxm6q8g3l241" path="res://assets/32rogues-0.5.0/rogues.png" id="1_t12jb"]
 [ext_resource type="Script" uid="uid://dj764hgeujaki" path="res://feb_20_2026-walker-spawner/walker.gd" id="2_wa8qy"]
+[ext_resource type="Script" uid="uid://b06xcx32tpfu6" path="res://_common/tooltip.gd" id="3_tooltip"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_1wm3h"]
 atlas = ExtResource("1_t12jb")
@@ -20,3 +21,9 @@ script = ExtResource("2_wa8qy")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=672979373]
 position = Vector2(0, -8)
 shape = SubResource("CircleShape2D_rwko5")
+
+[node name="TooltipComponent" type="Node" parent="." unique_id=1955861709]
+script = ExtResource("3_tooltip")
+show_highlight = true
+outline_color = Color(1, 1, 0, 1)
+outline_width = 2.0

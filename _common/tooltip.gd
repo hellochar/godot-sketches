@@ -11,9 +11,9 @@ extends Node
 @export_group("Positioning")
 ## When true, computes attachment_offset from the parent's bounding box automatically.
 @export var auto_attachment_offset: bool = true
-## World-space offset from parent origin to the tooltip attachment point.
-## Only used when auto_attachment_offset is false.
-@export var attachment_offset: Vector2 = Vector2(48.0, 0.0)
+## Screen-space pixel offset added after the attachment point.
+## When auto_attachment_offset is true, this is extra padding beyond the bounding box edge.
+@export var attachment_offset: Vector2 = Vector2(8.0, 0.0)
 ## Which corner of the tooltip panel aligns to the attachment point.
 @export_enum("Top Left", "Top Center", "Top Right", "Center Left", "Center Right",
     "Bottom Left", "Bottom Center", "Bottom Right")
@@ -35,11 +35,12 @@ var _registered_parent: Node
 
 func _ready() -> void:
   _registered_parent = get_parent()
-  var offset := _compute_offset(_registered_parent) if auto_attachment_offset else attachment_offset
+  var world_off := _compute_offset(_registered_parent) if auto_attachment_offset else Vector2.ZERO
+  var screen_off := attachment_offset
   if custom_content:
-    Tooltip.register_custom(_registered_parent, custom_content, offset, panel_anchor, edge_behavior)
+    Tooltip.register_custom(_registered_parent, custom_content, world_off, screen_off, panel_anchor, edge_behavior)
   elif title or description:
-    Tooltip.register(_registered_parent, title, description, offset, panel_anchor, edge_behavior)
+    Tooltip.register(_registered_parent, title, description, world_off, screen_off, panel_anchor, edge_behavior)
   if show_highlight:
     Highlight.register(_registered_parent, highlight_style, outline_color, outline_width, outline_pattern)
 
@@ -56,7 +57,7 @@ func _compute_offset(node: Node) -> Vector2:
   var right_x := _node_right_edge(node)
   if node is Node2D:
     right_x *= absf((node as Node2D).global_scale.x)
-  return Vector2(right_x + 8.0, 0.0)
+  return Vector2(right_x, 0.0)
 
 
 func _node_right_edge(node: Node) -> float:

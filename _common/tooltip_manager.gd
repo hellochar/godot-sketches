@@ -17,7 +17,8 @@ class TooltipEntry:
   var content_scene: PackedScene
   var title: String
   var description: String
-  var attachment_offset: Vector2
+  var world_offset: Vector2
+  var screen_offset: Vector2
   var panel_anchor: int
   var edge_behavior: int
   var enter_callable: Callable
@@ -47,7 +48,7 @@ func _process(_delta: float) -> void:
   if not is_instance_valid(node):
     hide()
     return
-  var attach_screen := _get_screen_pos(node, _active_entry.attachment_offset)
+  var attach_screen := _get_screen_pos(node, _active_entry.world_offset) + _active_entry.screen_offset
   var pos := _anchor_panel(attach_screen, _active_entry.panel_anchor)
   pos = _apply_edge(pos, attach_screen, _active_entry)
   _current_content.position = pos
@@ -102,7 +103,7 @@ func _apply_edge(pos: Vector2, attach: Vector2, entry: TooltipEntry) -> Vector2:
 
 
 func _register_internal(node: Node, content_scene: PackedScene, title: String, description: String,
-    attachment_offset: Vector2, panel_anchor: int, edge_behavior: int) -> void:
+    world_offset: Vector2, screen_offset: Vector2, panel_anchor: int, edge_behavior: int) -> void:
   if _entries.has(node):
     unregister(node)
   var entry := TooltipEntry.new()
@@ -110,7 +111,8 @@ func _register_internal(node: Node, content_scene: PackedScene, title: String, d
   entry.content_scene = content_scene
   entry.title = title
   entry.description = description
-  entry.attachment_offset = attachment_offset
+  entry.world_offset = world_offset
+  entry.screen_offset = screen_offset
   entry.panel_anchor = panel_anchor
   entry.edge_behavior = edge_behavior
   entry.enter_callable = _on_enter.bind(node)
@@ -178,17 +180,19 @@ static func _shape_half_size(shape: Shape2D) -> Vector2:
 
 
 func register(node: Node, title: String, description: String = "",
-    attachment_offset: Vector2 = Vector2(48.0, 0.0),
+    world_offset: Vector2 = Vector2.ZERO,
+    screen_offset: Vector2 = Vector2(8.0, 0.0),
     panel_anchor: int = PanelAnchor.CENTER_LEFT,
     edge_behavior: int = EdgeBehavior.FLIP) -> void:
-  _register_internal(node, null, title, description, attachment_offset, panel_anchor, edge_behavior)
+  _register_internal(node, null, title, description, world_offset, screen_offset, panel_anchor, edge_behavior)
 
 
 func register_custom(node: Node, content_scene: PackedScene,
-    attachment_offset: Vector2 = Vector2(48.0, 0.0),
+    world_offset: Vector2 = Vector2.ZERO,
+    screen_offset: Vector2 = Vector2(8.0, 0.0),
     panel_anchor: int = PanelAnchor.CENTER_LEFT,
     edge_behavior: int = EdgeBehavior.FLIP) -> void:
-  _register_internal(node, content_scene, "", "", attachment_offset, panel_anchor, edge_behavior)
+  _register_internal(node, content_scene, "", "", world_offset, screen_offset, panel_anchor, edge_behavior)
 
 
 func unregister(node: Node) -> void:
@@ -220,11 +224,12 @@ func _on_enter(node: Node) -> void:
   if not entry.content_scene and content is DefaultTooltipContent:
     (content as DefaultTooltipContent).title = entry.title
     (content as DefaultTooltipContent).description = entry.description
-  show_at(content, node, entry.attachment_offset, entry.panel_anchor, entry.edge_behavior)
+  show_at(content, node, entry.world_offset, entry.screen_offset, entry.panel_anchor, entry.edge_behavior)
 
 
 func show_at(content: Control, world_pos_source: Node,
-    attachment_offset: Vector2 = Vector2(48.0, 0.0),
+    world_offset: Vector2 = Vector2.ZERO,
+    screen_offset: Vector2 = Vector2(8.0, 0.0),
     panel_anchor: int = PanelAnchor.CENTER_LEFT,
     edge_behavior: int = EdgeBehavior.FLIP) -> void:
   _get_layer()
@@ -235,7 +240,8 @@ func show_at(content: Control, world_pos_source: Node,
   _layer.add_child(content)
   var entry := TooltipEntry.new()
   entry.source_node = world_pos_source
-  entry.attachment_offset = attachment_offset
+  entry.world_offset = world_offset
+  entry.screen_offset = screen_offset
   entry.panel_anchor = panel_anchor
   entry.edge_behavior = edge_behavior
   _active_entry = entry

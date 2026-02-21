@@ -45,6 +45,17 @@ terrain = NodePath("../roads")
 to_spawn = ExtResource("3_btt5y")
 time_between_spawns = 1.0
 
+[node name="TooltipComponent" type="Node" parent="Spawner" unique_id=1110113329]
+script = ExtResource("8_k8xem")
+title = "Title"
+description = "Description"
+attachment_offset = Vector2(0, 0)
+show_highlight = true
+highlight_style = 1
+outline_color = Color(1, 1, 0, 1)
+outline_width = 2.0
+metadata/_custom_type_script = "uid://b06xcx32tpfu6"
+
 [node name="SmoothCamera" type="Camera2D" parent="." unique_id=1956898693]
 zoom = Vector2(6, 6)
 script = ExtResource("5_btt5y")
@@ -67,6 +78,11 @@ shape = SubResource("CircleShape2D_p8bk3")
 script = ExtResource("8_k8xem")
 title = "Title"
 description = "Description"
+attachment_offset = Vector2(0, 0)
+show_highlight = true
+highlight_style = 1
+outline_color = Color(1, 1, 0, 1)
+outline_width = 2.0
 metadata/_custom_type_script = "uid://b06xcx32tpfu6"
 
 [connection signal="area_entered" from="door/Interactable" to="door" method="_on_interactable_area_entered"]
