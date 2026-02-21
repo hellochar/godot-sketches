@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=3 uid="uid://b2h7jptosloe7"]
+
+[ext_resource type="Texture2D" path="res://nov-15-2025-grid-autobattler-gobbo/assets/ai-gen/asian_mid30s_faces.png" id="1_11jcu"]
+[ext_resource type="Script" uid="uid://quqec0qo44gu" path="res://nov-15-2025-grid-autobattler-gobbo/player.gd" id="1_86l0o"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_feb5d"]
+atlas = ExtResource("1_11jcu")
+region = Rect2(3.7942963, 3.7942638, 39.808624, 58.779922)
+
+[node name="Player" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_top = 260.0
+offset_right = 40.0
+offset_bottom = 300.0
+script = ExtResource("1_86l0o")
+health = 20
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Human
+hp 20/20"
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -80.0
+offset_right = -40.0
+offset_bottom = 58.0
+grow_horizontal = 0
+texture = SubResource("AtlasTexture_feb5d")
+expand_mode = 3
+stretch_mode = 4

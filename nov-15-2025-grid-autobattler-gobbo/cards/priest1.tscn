@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://cycwpp2mjhn3y"]
+
+[ext_resource type="PackedScene" uid="uid://byqhfi16icse8" path="res://nov-15-2025-grid-autobattler-gobbo/card.tscn" id="1_7g5b2"]
+
+[node name="Card" instance=ExtResource("1_7g5b2")]
+display_name = "Priest"
+types = Array[String](["creature"])
+mana_given = 1
+base_damage = 1
+hp = 3
+attacks = true
+
+[node name="Name" parent="." index="0"]
+text = "Gobbo"

@@ -1,0 +1,257 @@
+[gd_scene load_steps=15 format=3 uid="uid://m151qioe2k28"]
+
+[ext_resource type="Script" uid="uid://dhqnu2tf20mkn" path="res://nov-15-2025-grid-autobattler-gobbo/game.gd" id="1_80nbo"]
+[ext_resource type="Script" uid="uid://cn1oawl0bjtme" path="res://nov-15-2025-grid-autobattler-gobbo/camera_2d.gd" id="2_e2o6t"]
+[ext_resource type="PackedScene" uid="uid://cd4bo4fshfabo" path="res://nov-15-2025-grid-autobattler-gobbo/cell.tscn" id="3_feb5d"]
+[ext_resource type="PackedScene" uid="uid://cryrnnpg3yld4" path="res://nov-15-2025-grid-autobattler-gobbo/cards/goblin1.tscn" id="4_eow3j"]
+[ext_resource type="PackedScene" uid="uid://b2h7jptosloe7" path="res://nov-15-2025-grid-autobattler-gobbo/player.tscn" id="4_fc0e3"]
+[ext_resource type="Texture2D" path="res://nov-15-2025-grid-autobattler-gobbo/assets/oryx_tiny_dungeon/td_sliced/td_portraits/td_portrait_archer_2m.png" id="5_7jktm"]
+[ext_resource type="PackedScene" uid="uid://c47cg8kxkn51d" path="res://nov-15-2025-grid-autobattler-gobbo/cards/tower.tscn" id="5_j5wjh"]
+[ext_resource type="Script" uid="uid://doc3pf0p163vl" path="res://nov-15-2025-grid-autobattler-gobbo/draggable_container.gd" id="8_j5wjh"]
+[ext_resource type="PackedScene" uid="uid://cycwpp2mjhn3y" path="res://nov-15-2025-grid-autobattler-gobbo/cards/priest1.tscn" id="9_hve3p"]
+[ext_resource type="PackedScene" uid="uid://dquhhq81g6p7v" path="res://nov-15-2025-grid-autobattler-gobbo/cards/mesa.tscn" id="10_mfdv2"]
+[ext_resource type="PackedScene" path="res://nov-15-2025-grid-autobattler-gobbo/game_over_screen.tscn" id="11_abcde"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mfdv2"]
+bg_color = Color(1.00111965e-05, 0.65575576, 0.8660557, 1)
+
+[sub_resource type="InputEventKey" id="InputEventKey_hve3p"]
+device = -1
+keycode = 32
+unicode = 32
+
+[sub_resource type="Shortcut" id="Shortcut_mfdv2"]
+events = [SubResource("InputEventKey_hve3p")]
+
+[node name="Game" type="Node2D" node_paths=PackedStringArray("human", "npc", "grid")]
+script = ExtResource("1_80nbo")
+human = NodePath("World/Human")
+npc = NodePath("World/NPC")
+grid = NodePath("World/GridContainer")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(-75, 0)
+limit_enabled = false
+limit_left = -1000
+limit_top = -400
+limit_right = 1000
+limit_bottom = 400
+position_smoothing_speed = 35.0
+editor_draw_limits = true
+editor_draw_drag_margin = true
+script = ExtResource("2_e2o6t")
+pan_speed = 600.0
+
+[node name="World" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="GridContainer" type="GridContainer" parent="World"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -258.0
+offset_top = -258.0
+offset_right = 258.0
+offset_bottom = 258.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/h_separation = -2
+theme_override_constants/v_separation = -2
+columns = 5
+
+[node name="CellUI" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="Card" parent="World/GridContainer/CellUI" node_paths=PackedStringArray("_owner") instance=ExtResource("4_eow3j")]
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 90.0
+offset_bottom = 90.0
+grow_horizontal = 1
+grow_vertical = 1
+mana_given = 0
+_owner = NodePath("../../../NPC")
+
+[node name="CellUI2" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI3" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI4" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI5" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI6" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI7" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI8" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI9" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI10" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI11" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI12" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI13" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI14" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI15" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI16" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI17" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI18" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI19" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI20" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI21" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="Card" parent="World/GridContainer/CellUI21" instance=ExtResource("5_j5wjh")]
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 90.0
+offset_bottom = 90.0
+grow_horizontal = 1
+grow_vertical = 1
+mana_given = 0
+
+[node name="CellUI22" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI23" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI24" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="CellUI25" parent="World/GridContainer" instance=ExtResource("3_feb5d")]
+layout_mode = 2
+
+[node name="Human" parent="World" node_paths=PackedStringArray("deck") instance=ExtResource("4_fc0e3")]
+layout_mode = 0
+offset_top = 256.0
+offset_bottom = 296.0
+forward = Vector2i(0, -1)
+deck = NodePath("../Panel/MarginContainer/Deck")
+
+[node name="NPC" parent="World" instance=ExtResource("4_fc0e3")]
+layout_mode = 0
+offset_top = -319.0
+offset_bottom = -279.0
+forward = Vector2i(0, 1)
+
+[node name="Label" parent="World/NPC" index="0"]
+text = "NPC
+hp 20/20"
+
+[node name="TextureRect" parent="World/NPC" index="1"]
+texture = ExtResource("5_7jktm")
+
+[node name="Panel" type="PanelContainer" parent="World"]
+layout_mode = 0
+offset_left = -610.0
+offset_top = 250.0
+offset_right = -332.0
+offset_bottom = 340.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_mfdv2")
+
+[node name="MarginContainer" type="MarginContainer" parent="World/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Deck" type="BoxContainer" parent="World/Panel/MarginContainer"]
+layout_mode = 2
+mouse_default_cursor_shape = 13
+script = ExtResource("8_j5wjh")
+
+[node name="Card" parent="World/Panel/MarginContainer/Deck" instance=ExtResource("9_hve3p")]
+layout_mode = 2
+
+[node name="Card2" parent="World/Panel/MarginContainer/Deck" instance=ExtResource("10_mfdv2")]
+layout_mode = 2
+mana_given = 0
+base_damage = 0
+
+[node name="Card3" parent="World/Panel/MarginContainer/Deck" instance=ExtResource("5_j5wjh")]
+layout_mode = 2
+mana_given = 0
+
+[node name="Card4" parent="World/Panel/MarginContainer/Deck" instance=ExtResource("4_eow3j")]
+layout_mode = 2
+mana_given = 0
+
+[node name="StepOne" type="Button" parent="World"]
+layout_mode = 0
+offset_left = 267.0
+offset_top = -29.0
+offset_right = 371.0
+offset_bottom = 24.0
+theme_override_font_sizes/font_size = 32
+shortcut = SubResource("Shortcut_mfdv2")
+text = "Step 1"
+
+[node name="PlayFromDeck" type="Button" parent="World"]
+layout_mode = 0
+offset_left = 272.0
+offset_top = 36.0
+offset_right = 435.0
+offset_bottom = 89.0
+theme_override_font_sizes/font_size = 32
+shortcut = SubResource("Shortcut_mfdv2")
+text = "Play From Deck"
+
+[node name="GameOverScreen" parent="." instance=ExtResource("11_abcde")]
+
+[connection signal="died" from="World/Human" to="GameOverScreen" method="on_player_died"]
+[connection signal="pressed" from="World/StepOne" to="." method="take_turn"]
+[connection signal="pressed" from="World/PlayFromDeck" to="World/Human" method="play_next_card_from_deck"]
+[connection signal="pressed" from="World/PlayFromDeck" to="World/NPC" method="play_next_card_from_deck"]
+
+[editable path="World/NPC"]
