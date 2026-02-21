@@ -9,6 +9,7 @@ extends Camera2D
 
 @export_group("Panning")
 @export var pan_speed: float = 200.0
+@export var drag_pan_enabled: bool = false
 
 @export_group("Zoom")
 @export var zoom_enabled: bool = true
@@ -18,6 +19,7 @@ extends Camera2D
 
 var _min_zoom: float
 var _max_zoom: float
+var _drag_panning: bool = false
 
 func _validate_property(property: Dictionary) -> void:
   if property.name in ["pan_speed"] and target:
@@ -60,7 +62,15 @@ func _pan_process(delta: float) -> void:
     input_vector = input_vector.normalized()
     global_position += input_vector * pan_speed * delta
 
-func _unhandled_input(event):
+func _unhandled_input(event: InputEvent) -> void:
+  if drag_pan_enabled and event is InputEventMouseButton:
+    if event.button_index == MOUSE_BUTTON_RIGHT:
+      _drag_panning = event.pressed
+
+  if drag_pan_enabled and event is InputEventMouseMotion and _drag_panning:
+    global_position -= event.relative / zoom
+    get_viewport().set_input_as_handled()
+
   if not zoom_enabled:
     return
   if event is InputEventMouseButton:
