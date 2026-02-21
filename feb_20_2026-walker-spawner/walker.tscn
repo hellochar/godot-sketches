@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://bfj51u2aphwfs"]
+
+[ext_resource type="Texture2D" uid="uid://dfxm6q8g3l241" path="res://assets/32rogues-0.5.0/rogues.png" id="1_t12jb"]
+[ext_resource type="Script" uid="uid://dj764hgeujaki" path="res://feb_20_2026-walker-spawner/walker.gd" id="2_wa8qy"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1wm3h"]
+atlas = ExtResource("1_t12jb")
+region = Rect2(32, 0, 32, 32)
+
+[node name="walker" type="Sprite2D" unique_id=177916261]
+scale = Vector2(0.5, 0.5)
+texture = SubResource("AtlasTexture_1wm3h")
+offset = Vector2(0, -12)
+region_rect = Rect2(0, 0, 16, 0)
+script = ExtResource("2_wa8qy")

@@ -1,0 +1,44 @@
+[gd_scene format=4 uid="uid://dtfq355dfjk20"]
+
+[ext_resource type="Script" uid="uid://e7yajtn584wd" path="res://feb_20_2026-walker-spawner/feb_20_2026.gd" id="1_script"]
+[ext_resource type="TileSet" uid="uid://dveppprypqhm2" path="res://feb_1_2026-tilesetter-test/tilesetter_test_tileset.tres" id="2_krnue"]
+[ext_resource type="PackedScene" uid="uid://bfj51u2aphwfs" path="res://feb_20_2026-walker-spawner/walker.tscn" id="3_btt5y"]
+[ext_resource type="Script" uid="uid://fhxe371yyytc" path="res://feb_20_2026-walker-spawner/spawner.gd" id="4_1wm3h"]
+[ext_resource type="Texture2D" uid="uid://u65fqfmk577j" path="res://assets/32rogues-0.5.0/tiles.png" id="4_l62v6"]
+[ext_resource type="Script" uid="uid://cll2ewhxarmmd" path="res://_common/smooth_camera.gd" id="5_btt5y"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_btt5y"]
+size = Vector2(2048, 2048)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ftx8e"]
+atlas = ExtResource("4_l62v6")
+region = Rect2(96, 736, 32, 32)
+
+[node name="Control" type="Node2D" unique_id=382117903]
+script = ExtResource("1_script")
+
+[node name="Sprite2D2" type="Sprite2D" parent="." unique_id=969923121]
+modulate = Color(0.04755766, 0.047557645, 0.047557645, 1)
+texture = SubResource("PlaceholderTexture2D_btt5y")
+
+[node name="roads" type="TileMapLayer" parent="." unique_id=1271277811 groups=["road"]]
+tile_map_data = PackedByteArray("AAAAAP//AQADAAEAAAAAAP7/AQADAAEAAAAAAP3/AQAHAAQAAAAAAPz/AQAEAAEAAAAAAPv/AQAEAAIAAAABAPv/AQAFAAAAAAACAPv/AQABAAMAAAADAPv/AQABAAMAAAAEAPv/AQACAAMAAAAAAPr/AQADAAEAAAAAAPn/AQAHAAQAAAAAAPj/AQADAAEAAAD///n/AQABAAMAAAD+//n/AQABAAMAAAD9//n/AQAAAAMAAAD///3/AQABAAMAAAD+//3/AQABAAMAAAD9//3/AQABAAMAAAD8//3/AQAIAAAAAAD7//3/AQABAAMAAAD6//3/AQAIAAMAAAD5//3/AQAAAAMAAAD6//z/AQADAAEAAAD6//v/AQAIAAEAAAD6//r/AQAJAAQAAAD7//r/AQACAAEAAAD8//7/AQADAAEAAAD8////AQADAAEAAAD8/wAAAQADAAIAAAAAAAAAAQADAAEAAAAAAAEAAQADAAIAAAABAPz/AQACAAIAAAD7//v/AQACAAIAAAAAAPf/AQAEAAEAAAABAPf/AQABAAIAAAACAPb/AQACAAAAAAABAPb/AQABAAAAAAAAAPb/AQAAAAAAAAACAPf/AQACAAIAAAD7//n/AQACAAEAAAD6//n/AQABAAEAAAD5//n/AQAKAAQAAAD5//r/AQABAAEAAAD5//v/AQABAAIAAAD6//j/AQABAAAAAAD7//j/AQACAAAAAAD5//j/AQABAAAAAAD4//j/AQABAAAAAAD3//j/AQAAAAAAAAD4//n/AQAKAAQAAAD4//r/AQAKAAEAAAD4//v/AQABAAIAAAD3//n/AQAAAAEAAAD3//r/AQAAAAEAAAD3//v/AQAAAAIAAAA=")
+tile_set = ExtResource("2_krnue")
+
+[node name="walker" parent="." unique_id=177916261 instance=ExtResource("3_btt5y")]
+position = Vector2(8, 24)
+
+[node name="Spawner" type="Sprite2D" parent="." unique_id=548444249 node_paths=PackedStringArray("terrain")]
+position = Vector2(-56, 24)
+texture = SubResource("AtlasTexture_ftx8e")
+script = ExtResource("4_1wm3h")
+terrain = NodePath("../roads")
+to_spawn = ExtResource("3_btt5y")
+time_between_spawns = 1.0
+
+[node name="SmoothCamera" type="Camera2D" parent="." unique_id=1956898693]
+zoom = Vector2(6, 6)
+script = ExtResource("5_btt5y")
+min_zoom_multiplier = 0.01
+max_zoom_multiplier = 100.0
+metadata/_custom_type_script = "uid://cll2ewhxarmmd"
