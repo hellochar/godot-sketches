@@ -7,9 +7,16 @@
 atlas = ExtResource("1_t12jb")
 region = Rect2(32, 0, 32, 32)
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_rwko5"]
+
 [node name="walker" type="Sprite2D" unique_id=177916261]
 scale = Vector2(0.5, 0.5)
 texture = SubResource("AtlasTexture_1wm3h")
 offset = Vector2(0, -12)
-region_rect = Rect2(0, 0, 16, 0)
 script = ExtResource("2_wa8qy")
+
+[node name="StaticBody2D" type="Area2D" parent="." unique_id=795300206]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=672979373]
+position = Vector2(0, -8)
+shape = SubResource("CircleShape2D_rwko5")

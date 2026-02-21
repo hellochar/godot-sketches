@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://fhxe371yyytc" path="res://feb_20_2026-walker-spawner/spawner.gd" id="4_1wm3h"]
 [ext_resource type="Texture2D" uid="uid://u65fqfmk577j" path="res://assets/32rogues-0.5.0/tiles.png" id="4_l62v6"]
 [ext_resource type="Script" uid="uid://cll2ewhxarmmd" path="res://_common/smooth_camera.gd" id="5_btt5y"]
+[ext_resource type="Script" uid="uid://btnhrrhaxv01r" path="res://feb_20_2026-walker-spawner/door.gd" id="7_p8bk3"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_btt5y"]
 size = Vector2(2048, 2048)
@@ -13,6 +14,13 @@ size = Vector2(2048, 2048)
 [sub_resource type="AtlasTexture" id="AtlasTexture_ftx8e"]
 atlas = ExtResource("4_l62v6")
 region = Rect2(96, 736, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ehgji"]
+atlas = ExtResource("4_l62v6")
+region = Rect2(64, 512, 32, 32)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_p8bk3"]
+radius = 24.0
 
 [node name="Control" type="Node2D" unique_id=382117903]
 script = ExtResource("1_script")
@@ -42,3 +50,17 @@ script = ExtResource("5_btt5y")
 min_zoom_multiplier = 0.01
 max_zoom_multiplier = 100.0
 metadata/_custom_type_script = "uid://cll2ewhxarmmd"
+
+[node name="door" type="Sprite2D" parent="." unique_id=224033929]
+position = Vector2(88, -72)
+scale = Vector2(0.75, 0.75)
+texture = SubResource("AtlasTexture_ehgji")
+script = ExtResource("7_p8bk3")
+
+[node name="Interactable" type="Area2D" parent="door" unique_id=386532576]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="door/Interactable" unique_id=1057169686]
+shape = SubResource("CircleShape2D_p8bk3")
+
+[connection signal="area_entered" from="door/Interactable" to="door" method="_on_interactable_area_entered"]
+[connection signal="body_entered" from="door/Interactable" to="door" method="_on_interactable_body_entered"]

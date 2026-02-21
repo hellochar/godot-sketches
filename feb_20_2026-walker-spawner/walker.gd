@@ -3,11 +3,14 @@ class_name Walker
 
 @export var terrain: TileMapLayer
 @export var forward: Vector2i = Vector2i(0, -1)
+@export var lifetime: float = 30
 
 func _ready() -> void:
   if !terrain:
     terrain = get_parent().get_node("roads") as TileMapLayer
   async_loop()
+  if lifetime >= 0:
+    create_tween().tween_callback(queue_free).set_delay(lifetime)
 
 func async_loop() -> void:
   # maze-walk the road tiles in terrain.
@@ -23,7 +26,7 @@ func async_loop() -> void:
     var right_tile := terrain.get_cell_tile_data(right_coord)
     # print_debug("curr: ", curr, ", right_coord:", right_coord, ": ", right_tile, ". right is ", right)
     if right_tile:
-      # var tween := get_tree().create_tween()
+      # var tween := create_tween()
       # tween.tween_property(self, "rotation_degrees", rotation_degrees + 90, 0.5)
       # await tween.finished
       await tween_move_to(right_coord)
@@ -38,13 +41,13 @@ func async_loop() -> void:
 
     # turn left
     var left := Vector2i(forward.y, -forward.x)
-    # var tween := get_tree().create_tween()
+    # var tween := create_tween()
     # tween.tween_property(self, "rotation_degrees", rotation_degrees - 90, 0.5)
     # await tween.finished
     forward = left
 
 func tween_move_to(coord: Vector2i) -> void:
-  var tween := get_tree().create_tween()
+  var tween := create_tween()
   var pos := terrain.to_global(terrain.map_to_local(coord))
   tween.tween_property(self, "global_position", pos, 0.5)
   await tween.finished
