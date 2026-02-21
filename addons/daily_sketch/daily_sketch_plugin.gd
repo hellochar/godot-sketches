@@ -39,7 +39,7 @@ func _create_daily_sketch() -> void:
 func _ready() -> void:
   pass
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
   pass
 """
 

@@ -23,18 +23,22 @@ var panel_anchor: int = Tooltip.PanelAnchor.CENTER_LEFT
 @export_enum("Clamp", "Flip", "Allow Offscreen")
 var edge_behavior: int = Tooltip.EdgeBehavior.FLIP
 
+var _registered_parent: Node
+
 
 func _ready() -> void:
-  var parent := get_parent()
-  var offset := _compute_offset(parent) if auto_attachment_offset else attachment_offset
+  _registered_parent = get_parent()
+  var offset := _compute_offset(_registered_parent) if auto_attachment_offset else attachment_offset
   if custom_content:
-    Tooltip.register_custom(parent, custom_content, offset, panel_anchor, edge_behavior)
+    Tooltip.register_custom(_registered_parent, custom_content, offset, panel_anchor, edge_behavior)
   else:
-    Tooltip.register(parent, title, description, offset, panel_anchor, edge_behavior)
+    Tooltip.register(_registered_parent, title, description, offset, panel_anchor, edge_behavior)
 
 
 func _exit_tree() -> void:
-  Tooltip.unregister(get_parent())
+  if _registered_parent:
+    Tooltip.unregister(_registered_parent)
+    _registered_parent = null
 
 
 func _compute_offset(node: Node) -> Vector2:

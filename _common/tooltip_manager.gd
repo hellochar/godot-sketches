@@ -35,7 +35,8 @@ func _get_layer() -> CanvasLayer:
   _layer = CanvasLayer.new()
   _layer.layer = 50
   _layer.name = "TooltipLayer"
-  get_tree().current_scene.add_child(_layer)
+  var parent := get_tree().current_scene if get_tree().current_scene else get_tree().root
+  parent.add_child(_layer)
   return _layer
 
 
@@ -95,6 +96,8 @@ func _apply_edge(pos: Vector2, attach: Vector2, entry: TooltipEntry) -> Vector2:
         pos.y = attach.y - ps.y
       if pos.y < 0.0:
         pos.y = attach.y
+      pos.x = clampf(pos.x, 0.0, vp.x - ps.x)
+      pos.y = clampf(pos.y, 0.0, vp.y - ps.y)
   return pos
 
 
@@ -148,7 +151,7 @@ func _get_local_rect(node: Node) -> Rect2:
   var combined := Rect2()
   var found := false
   for child in node.get_children():
-    if child.has_method("get_rect"):
+    if child.has_method("get_rect") and child is Node2D:
       var r: Rect2 = child.call("get_rect")
       r.position += (child as Node2D).position
       combined = r if not found else combined.merge(r)
