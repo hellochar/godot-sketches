@@ -1,4 +1,4 @@
-[gd_resource type="Resource" format=3]
+[gd_resource type="Resource" format=3 uid="uid://bwtanbo5cckq5"]
 
 [ext_resource type="Script" uid="uid://0mjty1r6a1u5" path="res://jan_28_2026-psychebuilder-ai/resources/resource_types/resource_type.gd" id="1_script"]
 
@@ -8,9 +8,7 @@ id = "grief"
 display_name = "Grief"
 description = "Deep sorrow that persists until properly processed. Slows nearby activity."
 color = Color(0.3, 0.35, 0.6, 1)
-tags = ["emotion.negative", "persistent"]
-decay_rate = 0.0
+tags = Array[String](["emotion.negative", "persistent"])
 stack_size = 15
-spawn_amount = 1
 danger_threshold = 5
 danger_warning = "Grief slows nearby buildings when it accumulates. Process it at a Mourning Chapel."
