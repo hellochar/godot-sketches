@@ -25,7 +25,12 @@
 - Prefer `@export var` over `const` for tunable values. Use `@export_group()` to organize related exports.
 - Use components and other elements in `_common/`.
 - Use methods from `_common/utils.gd` (autoload `Utils`).
-- Use larger font sizes. For body, prefer 20px. Scale other elements according to that. Never go below 16px.
+
+## Fonts
+- **Hard minimum: 20px. Nothing below 20.**
+- Typographic hierarchy: headings/titles 28+, subheadings/section headers/names 24, body/description/caption/all other text 20.
+- For programmatically created labels, set `.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART` to handle overflow via word wrapping instead of shrinking text.
+- Avoid adding colors unnecessarily to UI elements and text. Especially avoid super basic and overly loud colors like pure red or pure green.
 
 ## Input Actions
 - WASD is mapped to `camera_left`, `camera_right`, `camera_up`, `camera_down` (NOT `ui_left/right/up/down`)
