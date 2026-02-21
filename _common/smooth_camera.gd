@@ -25,6 +25,7 @@ extends Camera2D
 var _min_zoom: float
 var _max_zoom: float
 var _drag_panning: bool = false
+var _edge_pan_active: bool = true
 
 func _validate_property(property: Dictionary) -> void:
   if property.name in ["pan_speed"] and target:
@@ -78,7 +79,7 @@ func _pan_process(delta: float) -> void:
     global_position += input_vector * pan_speed * delta
 
 func _edge_pan_process(delta: float) -> void:
-  if not edge_pan_enabled:
+  if not edge_pan_enabled or not _edge_pan_active:
     return
   var viewport := get_viewport()
   var mouse_pos := viewport.get_mouse_position()
@@ -104,8 +105,11 @@ func _release_mouse() -> void:
 func _on_focus_entered() -> void:
   if clamp_mouse_to_viewport and edge_pan_enabled:
     _confine_mouse()
+  _edge_pan_active = false
+  get_tree().create_timer(0.1).timeout.connect(func() -> void: _edge_pan_active = true)
 
 func _on_focus_exited() -> void:
+  _edge_pan_active = false
   if clamp_mouse_to_viewport:
     _release_mouse()
 
