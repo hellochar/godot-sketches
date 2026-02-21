@@ -25,6 +25,7 @@ GodotMCPInput="*uid://djeriu2380rj2"
 HTags="*uid://dfuf7asc72fs2"
 Utils="*res://_common/utils.gd"
 Tooltip="*res://_common/tooltip_manager.gd"
+Highlight="*res://_common/highlight_manager.gd"
 
 [debug]
 

@@ -23,6 +23,13 @@ var panel_anchor: int = Tooltip.PanelAnchor.CENTER_LEFT
 @export_enum("Clamp", "Flip", "Allow Offscreen")
 var edge_behavior: int = Tooltip.EdgeBehavior.FLIP
 
+@export_group("Highlight")
+@export var show_highlight: bool = false
+@export_enum("Outline", "Silhouette") var highlight_style: int = 0
+@export var outline_color: Color = Color.WHITE
+@export var outline_width: float = 1.5
+@export_enum("Diamond", "Circle", "Square") var outline_pattern: int = 1
+
 var _registered_parent: Node
 
 
@@ -31,13 +38,17 @@ func _ready() -> void:
   var offset := _compute_offset(_registered_parent) if auto_attachment_offset else attachment_offset
   if custom_content:
     Tooltip.register_custom(_registered_parent, custom_content, offset, panel_anchor, edge_behavior)
-  else:
+  elif title or description:
     Tooltip.register(_registered_parent, title, description, offset, panel_anchor, edge_behavior)
+  if show_highlight:
+    Highlight.register(_registered_parent, highlight_style, outline_color, outline_width, outline_pattern)
 
 
 func _exit_tree() -> void:
   if _registered_parent:
     Tooltip.unregister(_registered_parent)
+    if show_highlight:
+      Highlight.unregister(_registered_parent)
     _registered_parent = null
 
 
