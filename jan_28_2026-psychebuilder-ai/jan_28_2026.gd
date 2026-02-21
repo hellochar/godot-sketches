@@ -585,6 +585,7 @@ func _on_phase_changed(_is_day: bool) -> void:
 
 func _on_day_started(day_number: int) -> void:
   resource_system.process_decay()
+  game_flow_manager.spawn_day_buildings(day_number)
   var energy_gained := energy_regen_per_day + GameState.instance.get_wellbeing_energy_bonus()
   show_toast("Day %d begins (+%d Energy)" % [day_number, energy_gained], "info")
   game_flow_manager.check_tutorial_hint(day_number)

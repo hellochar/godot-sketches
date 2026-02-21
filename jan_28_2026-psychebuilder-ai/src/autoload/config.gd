@@ -10,7 +10,7 @@ func _init(): instance = self
 @export var total_days: int = 20
 
 @export_group("Energy")
-@export var starting_energy: int = 8
+@export var starting_energy: int = 10
 @export var max_energy: int = 20
 @export var energy_regen_per_day: int = 4
 
@@ -448,19 +448,18 @@ func _init(): instance = self
 
 @export_group("Starting Conditions - Striver Archetype")
 @export var starting_buildings: Array[Dictionary] = [
+  {"id": "tension_release", "coord": Vector2i(14, 10)},
   {"id": "memory_well", "coord": Vector2i(10, 10)},
-  {"id": "emotional_reservoir", "coord": Vector2i(14, 10)},
-  {"id": "mourning_chapel", "coord": Vector2i(10, 14)},
   {"id": "road", "coord": Vector2i(12, 10)},
-  {"id": "road", "coord": Vector2i(12, 11)},
-  {"id": "road", "coord": Vector2i(12, 12)},
-  {"id": "road", "coord": Vector2i(12, 13)},
-  {"id": "road", "coord": Vector2i(12, 14)},
+  {"id": "road", "coord": Vector2i(13, 10)},
 ]
 @export var starting_resources: Dictionary = {
-  "calm": 5,
-  "tension": 3,
-  "worry": 2,
+  "tension": 5,
+}
+@export var day_spawned_buildings: Dictionary = {
+  3: [
+    {"id": "wound", "coord": Vector2i(16, 10)},
+  ],
 }
 @export var archetype_productivity_bonus: float = 0.1
 @export var archetype_rest_penalty: float = 0.1
@@ -469,11 +468,12 @@ func _init(): instance = self
 
 @export_group("Tutorial Hints")
 @export var tutorial_enabled: bool = true
-@export var hint_day_1_roads: String = "Tip: Roads connect your buildings. Workers travel along roads to transport resources between buildings."
+@export var hint_day_1_processing: String = "Your Tension Release is converting tension into calm. Build Comfort Hearth or Morning Routine to generate more calm and strengthen your emotional toolkit."
 @export var hint_day_1_phases: String = "During the Day, buildings work automatically. During the Night, time pauses - plan your next moves!"
-@export var hint_day_2_buildings: String = "Tip: Click a building in the toolbar at the bottom, then click on the grid to place it. Each building has different functions."
+@export var hint_day_2_buildings: String = "New buildings available! Exercise Yard reduces tension through movement. Build more Tension Release for extra processing capacity."
 @export var hint_day_2_speed: String = "Use the 1x/2x/3x buttons to control game speed. Slow down when things get overwhelming!"
-@export var hint_day_3_workers: String = "Tip: To assign a worker: (1) Click a building with resources, (2) Click 'Assign', (3) Click a destination building. Workers transport resources automatically."
+@export var hint_day_3_wound: String = "An old wound has surfaced, generating grief. Build a Mourning Chapel nearby and assign a worker to process grief into wisdom."
+@export var hint_day_3_workers: String = "To assign a worker: (1) Click a building with resources, (2) Click 'Assign', (3) Click a destination building. Workers transport resources between buildings."
 @export var hint_day_4_events: String = "Challenging events may arrive soon. Build some processing capacity to handle the emotions they bring."
 @export var hint_day_5_unlocks: String = "New buildings are now available! Check the toolbar for more options to build your emotional toolkit."
 @export var hint_day_5_weather: String = "Weather patterns now affect your buildings. Joy brings Clear Skies (bonuses), while Anxiety can cause Storms (penalties)."

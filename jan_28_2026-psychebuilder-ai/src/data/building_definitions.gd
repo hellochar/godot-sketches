@@ -85,7 +85,7 @@ static var definitions: Dictionary = {
     "habit_energy_bonus": 1,
     "storage_capacity": 10,
     "unlocked_by_default": true,
-    "ftue_unlock_day": 2,
+    "ftue_unlock_day": 1,
     "synergy_hints": ["exercise_yard", "comfort_hearth"],
   },
 
@@ -102,7 +102,7 @@ static var definitions: Dictionary = {
     "generation_amount": 1,
     "storage_capacity": 5,
     "unlocked_by_default": true,
-    "ftue_unlock_day": 3,
+    "ftue_unlock_day": 1,
     "synergy_hints": ["morning_routine", "exercise_yard"],
   },
 
@@ -171,7 +171,7 @@ static var definitions: Dictionary = {
     "habit_generates": {"calm": 1},
     "storage_capacity": 5,
     "unlocked_by_default": true,
-    "ftue_unlock_day": 3,
+    "ftue_unlock_day": 2,
     "synergy_hints": ["morning_routine", "comfort_hearth"],
   },
 
@@ -187,8 +187,7 @@ static var definitions: Dictionary = {
     "generation_rate": 0.12,
     "generation_amount": 1,
     "storage_capacity": 6,
-    "unlocked_by_default": true,
-    "ftue_unlock_day": 5,
+    "unlocked_by_default": false,
     "synergy_hints": ["mourning_chapel"],
   },
 
@@ -500,7 +499,7 @@ static var definitions: Dictionary = {
     "requires_worker": false,
     "storage_capacity": 12,
     "unlocked_by_default": true,
-    "ftue_unlock_day": 5,
+    "ftue_unlock_day": 2,
   },
 
   "rumination_recycler": {

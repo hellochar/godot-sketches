@@ -51,12 +51,26 @@ func _spawn_starting_resources() -> void:
 
     for building in GameState.instance.active_buildings:
       if building.storage_capacity > 0:
-        var added = building.add_to_storage(resource_type, amount)
-        if added > 0:
-          GameState.instance.update_resource_total(resource_type, added)
-          amount -= added
+        var overflow: int = building.add_to_storage(resource_type, amount)
+        var stored: int = amount - overflow
+        if stored > 0:
+          GameState.instance.update_resource_total(resource_type, stored)
+          amount -= stored
           if amount <= 0:
             break
+
+func spawn_day_buildings(day_number: int) -> void:
+  var day_key := day_number
+  var spawns: Array = Config.instance.day_spawned_buildings.get(day_key, [])
+  for building_data in spawns:
+    var building_id: String = building_data.get("id", "")
+    var coord: Vector2i = building_data.get("coord", Vector2i(0, 0))
+    if building_id == "" or not grid.is_valid_coord(coord):
+      continue
+    var old_energy := GameState.instance.current_energy
+    GameState.instance.current_energy = 999
+    building_system.place_building(building_id, coord)
+    GameState.instance.current_energy = old_energy
 
 func _process(delta: float) -> void:
   _update_worry_generation(delta)
@@ -83,13 +97,14 @@ func check_tutorial_hint(day_number: int) -> void:
 
   match day_number:
     1:
-      _show_hint_if_new("day_1_roads", Config.instance.hint_day_1_roads)
+      _show_hint_if_new("day_1_processing", Config.instance.hint_day_1_processing)
       _show_hint_if_new("day_1_phases", Config.instance.hint_day_1_phases)
     2:
       _show_hint_if_new("day_2_buildings", Config.instance.hint_day_2_buildings)
       _show_hint_if_new("day_2_speed", Config.instance.hint_day_2_speed)
       _show_hint_if_new("hint_wellbeing", Config.instance.hint_wellbeing)
     3:
+      _show_hint_if_new("day_3_wound", Config.instance.hint_day_3_wound)
       _show_hint_if_new("day_3_workers", Config.instance.hint_day_3_workers)
     4:
       _show_hint_if_new("day_4_events", Config.instance.hint_day_4_events)
