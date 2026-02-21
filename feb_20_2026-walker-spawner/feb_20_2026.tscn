@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://u65fqfmk577j" path="res://assets/32rogues-0.5.0/tiles.png" id="4_l62v6"]
 [ext_resource type="Script" uid="uid://cll2ewhxarmmd" path="res://_common/smooth_camera.gd" id="5_btt5y"]
 [ext_resource type="Script" uid="uid://btnhrrhaxv01r" path="res://feb_20_2026-walker-spawner/door.gd" id="7_p8bk3"]
+[ext_resource type="Script" uid="uid://b06xcx32tpfu6" path="res://_common/tooltip.gd" id="8_k8xem"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_btt5y"]
 size = Vector2(2048, 2048)
@@ -61,6 +62,12 @@ script = ExtResource("7_p8bk3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="door/Interactable" unique_id=1057169686]
 shape = SubResource("CircleShape2D_p8bk3")
+
+[node name="TooltipComponent" type="Node" parent="door" unique_id=2113257956]
+script = ExtResource("8_k8xem")
+title = "Title"
+description = "Description"
+metadata/_custom_type_script = "uid://b06xcx32tpfu6"
 
 [connection signal="area_entered" from="door/Interactable" to="door" method="_on_interactable_area_entered"]
 [connection signal="body_entered" from="door/Interactable" to="door" method="_on_interactable_body_entered"]
