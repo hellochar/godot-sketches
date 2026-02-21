@@ -291,7 +291,7 @@ func draw_generator(center: Vector2, s: float, color: Color, heat_buildup: int, 
   var half := generator_half_size * s
   draw_rect(Rect2(center - Vector2(half, half), Vector2(half * 2, half * 2)), color)
   if heat_buildup > 0 and not shutdown:
-    draw_string(ThemeDB.fallback_font, center + Vector2(-5, 5), str(heat_buildup), HORIZONTAL_ALIGNMENT_CENTER, -1, 14, Color.WHITE)
+    draw_string(ThemeDB.fallback_font, center + Vector2(-5, 5), str(heat_buildup), HORIZONTAL_ALIGNMENT_CENTER, -1, 20, Color.WHITE)
 
 func draw_radiator(center: Vector2, s: float, color: Color, heat_capacity: int) -> void:
   var rs := radiator_size * s
@@ -301,14 +301,14 @@ func draw_radiator(center: Vector2, s: float, color: Color, heat_capacity: int) 
     center + Vector2(-rs, rs),
   ])
   draw_colored_polygon(points, color)
-  draw_string(ThemeDB.fallback_font, center + Vector2(-5, 15), str(heat_capacity), HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.WHITE)
+  draw_string(ThemeDB.fallback_font, center + Vector2(-5, 15), str(heat_capacity), HORIZONTAL_ALIGNMENT_CENTER, -1, 20, Color.WHITE)
 
 func draw_heat_sink(center: Vector2, s: float, color: Color, heat_capacity: int) -> void:
   var outer := heat_sink_outer * s
   var inner := heat_sink_inner * s
   draw_rect(Rect2(center - Vector2(outer, outer), Vector2(outer * 2, outer * 2)), color)
   draw_rect(Rect2(center - Vector2(inner, inner), Vector2(inner * 2, inner * 2)), color.darkened(0.3))
-  draw_string(ThemeDB.fallback_font, center + Vector2(-5, 5), str(heat_capacity), HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color.WHITE)
+  draw_string(ThemeDB.fallback_font, center + Vector2(-5, 5), str(heat_capacity), HORIZONTAL_ALIGNMENT_CENTER, -1, 20, Color.WHITE)
 
 func draw_flow_dots(from_pos: Vector2, to_pos: Vector2, color: Color) -> void:
   for i in range(pipe_dot_count):
@@ -383,7 +383,7 @@ func draw_placement_reason(pos: Vector2i) -> void:
   var reason := get_placement_reason(pos, selected_building)
   if reason != "":
     var reason_pos := grid_to_pixel(pos) + Vector2(0, 35)
-    draw_string(ThemeDB.fallback_font, reason_pos, reason, HORIZONTAL_ALIGNMENT_CENTER, -1, 12, Color(1, 0.5, 0.5))
+    draw_string(ThemeDB.fallback_font, reason_pos, reason, HORIZONTAL_ALIGNMENT_CENTER, -1, 20, Color(1, 0.5, 0.5))
 
 func draw_score_popups() -> void:
   for popup in score_popups:

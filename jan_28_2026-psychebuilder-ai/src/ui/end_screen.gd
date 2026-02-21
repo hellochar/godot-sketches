@@ -11,8 +11,8 @@ signal main_menu_pressed()
 @export_group("Fonts")
 @export var title_font_size: int = 32
 @export var tier_font_size: int = 40
-@export var description_font_size: int = 14
-@export var stats_font_size: int = 13
+@export var description_font_size: int = 20
+@export var stats_font_size: int = 20
 @export var wellbeing_font_size: int = 24
 
 @export_group("Colors")
@@ -108,7 +108,7 @@ func _build_ui(ending_tier: String, final_wellbeing: float, stats: Dictionary) -
 
     var tips_header = Label.new()
     tips_header.text = "Tips for Next Run:"
-    tips_header.add_theme_font_size_override("font_size", 14)
+    tips_header.add_theme_font_size_override("font_size", 24)
     tips_header.add_theme_color_override("font_color", Color(0.6, 0.8, 0.9))
     tips_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     vbox.add_child(tips_header)
@@ -118,7 +118,7 @@ func _build_ui(ending_tier: String, final_wellbeing: float, stats: Dictionary) -
     for tip in tips.slice(0, 3):
       tip_lines.append("• " + tip)
     tips_label.text = "\n".join(tip_lines)
-    tips_label.add_theme_font_size_override("font_size", 12)
+    tips_label.add_theme_font_size_override("font_size", 20)
     tips_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     tips_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
     vbox.add_child(tips_label)

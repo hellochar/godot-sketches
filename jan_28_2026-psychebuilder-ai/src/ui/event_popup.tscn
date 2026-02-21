@@ -31,7 +31,7 @@ theme_override_constants/separation = 12
 [node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 text = "Event Title"
 horizontal_alignment = 1
 
@@ -42,7 +42,7 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 custom_minimum_size = Vector2(360, 0)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 20
 text = "Event description goes here. This can be multiple lines and will wrap automatically."
 autowrap_mode = 2
 

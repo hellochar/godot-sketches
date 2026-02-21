@@ -142,7 +142,7 @@ func _create_option_panel(building_id: String, def: Dictionary, _index: int) -> 
     var rec_label = Label.new()
     rec_label.text = "★ Recommended"
     rec_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    rec_label.add_theme_font_size_override("font_size", 10)
+    rec_label.add_theme_font_size_override("font_size", 20)
     rec_label.add_theme_color_override("font_color", Color(0.3, 0.9, 0.4))
     inner_vbox.add_child(rec_label)
 
@@ -155,13 +155,13 @@ func _create_option_panel(building_id: String, def: Dictionary, _index: int) -> 
   var name_label = Label.new()
   name_label.text = def.get("name", building_id)
   name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-  name_label.add_theme_font_size_override("font_size", 14)
+  name_label.add_theme_font_size_override("font_size", 24)
   inner_vbox.add_child(name_label)
 
   var desc_label = Label.new()
   desc_label.text = def.get("description", "")
   desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-  desc_label.add_theme_font_size_override("font_size", 11)
+  desc_label.add_theme_font_size_override("font_size", 20)
   desc_label.custom_minimum_size.y = 40
   inner_vbox.add_child(desc_label)
 
@@ -169,7 +169,7 @@ func _create_option_panel(building_id: String, def: Dictionary, _index: int) -> 
   if stats_text != "":
     var stats_label = Label.new()
     stats_label.text = stats_text
-    stats_label.add_theme_font_size_override("font_size", 10)
+    stats_label.add_theme_font_size_override("font_size", 20)
     stats_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.9))
     inner_vbox.add_child(stats_label)
 
@@ -178,7 +178,7 @@ func _create_option_panel(building_id: String, def: Dictionary, _index: int) -> 
     var hint_label = Label.new()
     hint_label.text = hint_text
     hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    hint_label.add_theme_font_size_override("font_size", 10)
+    hint_label.add_theme_font_size_override("font_size", 20)
     hint_label.add_theme_color_override("font_color", Color(0.6, 0.8, 0.6))
     inner_vbox.add_child(hint_label)
 

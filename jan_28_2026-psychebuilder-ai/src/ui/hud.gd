@@ -101,7 +101,7 @@ func _create_building_button(building_id: String) -> Button:
   var name_label = Label.new()
   name_label.text = def.get("name", building_id)
   name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-  name_label.add_theme_font_size_override("font_size", 11)
+  name_label.add_theme_font_size_override("font_size", 20)
   name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
   vbox.add_child(name_label)
 
@@ -112,7 +112,7 @@ func _create_building_button(building_id: String) -> Button:
     behavior_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
     for behavior in behaviors:
       var icon_label = Label.new()
-      icon_label.add_theme_font_size_override("font_size", 10)
+      icon_label.add_theme_font_size_override("font_size", 20)
       icon_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
       icon_label.text = _get_behavior_icon(behavior)
       icon_label.add_theme_color_override("font_color", _get_behavior_color(behavior))
@@ -125,7 +125,7 @@ func _create_building_button(building_id: String) -> Button:
     var cost_label = Label.new()
     cost_label.text = "%d Energy" % energy
     cost_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    cost_label.add_theme_font_size_override("font_size", 9)
+    cost_label.add_theme_font_size_override("font_size", 20)
     cost_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
     cost_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
     vbox.add_child(cost_label)
@@ -223,7 +223,7 @@ func _update_all_resource_labels() -> void:
 
     var label = Label.new()
     label.text = "%s: %d" % [res_type.display_name, amount]
-    label.add_theme_font_size_override("font_size", 12)
+    label.add_theme_font_size_override("font_size", 20)
     label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
     if res_type.is_positive_emotion():
@@ -353,7 +353,7 @@ func _update_wellbeing_breakdown() -> void:
     var label = Label.new()
     var contribution = positive_details[res_id] * 2.0
     label.text = "+ %.1f from %s (%d)" % [contribution, res_type.display_name if res_type else res_id, positive_details[res_id]]
-    label.add_theme_font_size_override("font_size", 10)
+    label.add_theme_font_size_override("font_size", 20)
     label.add_theme_color_override("font_color", positive_resource_color)
     list.add_child(label)
 
@@ -362,20 +362,20 @@ func _update_wellbeing_breakdown() -> void:
     var label = Label.new()
     var contribution = negative_details[res_id] * 1.5
     label.text = "- %.1f from %s (%d)" % [contribution, res_type.display_name if res_type else res_id, negative_details[res_id]]
-    label.add_theme_font_size_override("font_size", 10)
+    label.add_theme_font_size_override("font_size", 20)
     label.add_theme_color_override("font_color", negative_resource_color)
     list.add_child(label)
 
   if habit_count > 0:
     var label = Label.new()
     label.text = "+ %.1f from %d habit buildings" % [habit_count * 3.0, habit_count]
-    label.add_theme_font_size_override("font_size", 10)
+    label.add_theme_font_size_override("font_size", 20)
     label.add_theme_color_override("font_color", Color(0.6, 0.8, 0.9))
     list.add_child(label)
 
   var base_label = Label.new()
   base_label.text = "  Base: 35"
-  base_label.add_theme_font_size_override("font_size", 10)
+  base_label.add_theme_font_size_override("font_size", 20)
   base_label.add_theme_color_override("font_color", neutral_resource_color)
   list.add_child(base_label)
 
@@ -473,7 +473,7 @@ func _update_building_storage_display(building: Node) -> void:
   if building.storage_capacity <= 0:
     var label = Label.new()
     label.text = "No storage"
-    label.add_theme_font_size_override("font_size", 11)
+    label.add_theme_font_size_override("font_size", 20)
     storage_container.add_child(label)
     return
 
@@ -483,13 +483,13 @@ func _update_building_storage_display(building: Node) -> void:
 
   var header = Label.new()
   header.text = "Storage (%d/%d):" % [total, building.storage_capacity]
-  header.add_theme_font_size_override("font_size", 12)
+  header.add_theme_font_size_override("font_size", 24)
   storage_container.add_child(header)
 
   if building.storage.is_empty() or total == 0:
     var empty_label = Label.new()
     empty_label.text = "  Empty"
-    empty_label.add_theme_font_size_override("font_size", 11)
+    empty_label.add_theme_font_size_override("font_size", 20)
     empty_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
     storage_container.add_child(empty_label)
   else:
@@ -498,7 +498,7 @@ func _update_building_storage_display(building: Node) -> void:
       if amount > 0:
         var item_label = Label.new()
         item_label.text = "  %s: %d" % [res_id.capitalize(), amount]
-        item_label.add_theme_font_size_override("font_size", 11)
+        item_label.add_theme_font_size_override("font_size", 20)
         storage_container.add_child(item_label)
 
 func _update_building_workers_display(building: Node) -> void:
@@ -513,13 +513,13 @@ func _update_building_workers_display(building: Node) -> void:
 
   var header = Label.new()
   header.text = "Workers (%d):" % assigned_workers.size()
-  header.add_theme_font_size_override("font_size", 12)
+  header.add_theme_font_size_override("font_size", 24)
   workers_container.add_child(header)
 
   if assigned_workers.is_empty():
     var none_label = Label.new()
     none_label.text = "  None assigned"
-    none_label.add_theme_font_size_override("font_size", 11)
+    none_label.add_theme_font_size_override("font_size", 20)
     none_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
     workers_container.add_child(none_label)
   else:
@@ -527,7 +527,7 @@ func _update_building_workers_display(building: Node) -> void:
       var worker_label = Label.new()
       var desc = _get_worker_short_description(worker, building)
       worker_label.text = "  " + desc
-      worker_label.add_theme_font_size_override("font_size", 11)
+      worker_label.add_theme_font_size_override("font_size", 20)
       workers_container.add_child(worker_label)
 
       var job_id = worker.get_job_id() if worker.has_method("get_job_id") else ""
@@ -539,7 +539,7 @@ func _update_building_workers_display(building: Node) -> void:
 
         var hab_label = Label.new()
         hab_label.text = "    Habituation Lv%d (%d/%d) Cost: %.1f" % [hab_level, completions, next_threshold, cost]
-        hab_label.add_theme_font_size_override("font_size", 9)
+        hab_label.add_theme_font_size_override("font_size", 20)
         hab_label.add_theme_color_override("font_color", Color(0.6, 0.7, 0.8))
         workers_container.add_child(hab_label)
 
@@ -589,7 +589,7 @@ func _update_building_adjacency_display(building: Node) -> void:
 
   var header = Label.new()
   header.text = "Adjacency Effects:"
-  header.add_theme_font_size_override("font_size", 12)
+  header.add_theme_font_size_override("font_size", 24)
   container.add_child(header)
 
   var net_efficiency = 1.0
@@ -609,7 +609,7 @@ func _update_building_adjacency_display(building: Node) -> void:
     var neighbor_name = neighbor_def.get("name", neighbor_id) if not neighbor_def.is_empty() else neighbor_id
 
     var effect_label = Label.new()
-    effect_label.add_theme_font_size_override("font_size", 10)
+    effect_label.add_theme_font_size_override("font_size", 20)
 
     var effect_str = ""
     if efficiency != 1.0:
@@ -636,7 +636,7 @@ func _update_building_adjacency_display(building: Node) -> void:
 
   if descriptions.size() > 1:
     var total_label = Label.new()
-    total_label.add_theme_font_size_override("font_size", 10)
+    total_label.add_theme_font_size_override("font_size", 20)
     total_label.add_theme_color_override("font_color", Color(0.9, 0.9, 0.6))
     total_label.text = "  Net: x%.2f efficiency" % net_efficiency
     if net_output_bonus != 0:
@@ -672,7 +672,7 @@ func _create_toast(message: String, toast_type: String) -> void:
 
   var label = Label.new()
   label.text = message
-  label.add_theme_font_size_override("font_size", 12)
+  label.add_theme_font_size_override("font_size", 20)
 
   match toast_type:
     "success":
@@ -839,7 +839,7 @@ func _update_building_speed_breakdown(building: Node) -> void:
 
   var header = Label.new()
   header.text = "Speed: x%.2f" % total
-  header.add_theme_font_size_override("font_size", 12)
+  header.add_theme_font_size_override("font_size", 24)
   if total > 1.0:
     header.add_theme_color_override("font_color", Color(0.4, 0.9, 0.4))
   elif total < 1.0:
@@ -866,7 +866,7 @@ func _update_building_speed_breakdown(building: Node) -> void:
       var label = Label.new()
       var pct = int((value - 1.0) * 100)
       label.text = "  %s: %+d%%" % [mod_name.capitalize(), pct]
-      label.add_theme_font_size_override("font_size", 10)
+      label.add_theme_font_size_override("font_size", 20)
       if value > 1.0:
         label.add_theme_color_override("font_color", Color(0.5, 0.8, 0.5))
       else:
@@ -887,14 +887,14 @@ func _update_building_awakening_display(building: Node) -> void:
   if building.is_awakened:
     var badge = Label.new()
     badge.text = "✨ Awakened"
-    badge.add_theme_font_size_override("font_size", 11)
+    badge.add_theme_font_size_override("font_size", 20)
     badge.add_theme_color_override("font_color", Color(1.0, 0.9, 0.4))
     badge.tooltip_text = "This building has awakened!\n+%.0f%% speed\n+%d output per cycle\n+%d storage capacity" % [Config.instance.awakening_speed_bonus * 100, Config.instance.awakening_output_bonus, Config.instance.awakening_storage_bonus]
     container.add_child(badge)
   else:
     var header = Label.new()
     header.text = "Awakening: %d/%d" % [building.awakening_experience, Config.instance.awakening_threshold]
-    header.add_theme_font_size_override("font_size", 11)
+    header.add_theme_font_size_override("font_size", 20)
     container.add_child(header)
 
     var bar = ProgressBar.new()
@@ -921,7 +921,7 @@ func _update_building_mastery_display(building: Node) -> void:
 
   var header = Label.new()
   header.text = "Mastery:"
-  header.add_theme_font_size_override("font_size", 11)
+  header.add_theme_font_size_override("font_size", 20)
   container.add_child(header)
 
   for res_type in mastery_data:
@@ -943,7 +943,7 @@ func _update_building_mastery_display(building: Node) -> void:
 
     var label = Label.new()
     label.text = "  %s: %s (%d/%d)" % [res_type.capitalize(), stars, processed, next_threshold]
-    label.add_theme_font_size_override("font_size", 10)
+    label.add_theme_font_size_override("font_size", 20)
     if level >= Config.instance.mastery_max_level:
       label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.4))
     container.add_child(label)

@@ -21,7 +21,7 @@ extends Control
     line_width = value
     queue_redraw()
 
-@export var font_size := 8:
+@export var font_size := 20:
   set(value):
     font_size = value
     queue_redraw()

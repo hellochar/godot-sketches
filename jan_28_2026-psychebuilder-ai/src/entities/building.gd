@@ -513,7 +513,7 @@ func _spawn_feedback_text(world_pos: Vector2, text: String, color: Color) -> voi
   feedback.text = text
   feedback.position = world_pos - Vector2(50, 10)
   feedback.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-  feedback.add_theme_font_size_override("font_size", 11)
+  feedback.add_theme_font_size_override("font_size", 20)
   feedback.add_theme_color_override("font_color", color)
   feedback.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
   feedback.add_theme_constant_override("outline_size", 2)

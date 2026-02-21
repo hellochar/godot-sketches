@@ -127,10 +127,10 @@ var active_toasts: Array = []
 @export var neutral_resource_color: Color = Color(0.8, 0.8, 0.8)
 @export_group("Tooltip")
 @export var tooltip_offset: Vector2 = Vector2(15, 15)
-@export var tooltip_name_font_size: int = 14
-@export var tooltip_desc_font_size: int = 11
+@export var tooltip_name_font_size: int = 24
+@export var tooltip_desc_font_size: int = 20
 @export var tooltip_desc_color: Color = Color(0.7, 0.7, 0.7)
-@export var tooltip_status_font_size: int = 12
+@export var tooltip_status_font_size: int = 20
 @export var tooltip_min_width: float = 220.0
 
 @export_group("UI Toolbar")
@@ -141,7 +141,7 @@ var active_toasts: Array = []
 @export_group("Info Panel")
 @export var info_panel_size: Vector2 = Vector2(220, 220)
 @export var info_panel_margin: float = 10.0
-@export var instructions_font_size: int = 12
+@export var instructions_font_size: int = 20
 
 @export_group("Time Controls")
 @export var phase_label_min_width: float = 120.0
@@ -172,9 +172,9 @@ var active_toasts: Array = []
 @export var end_panel_margin: int = 20
 @export var end_title_font_size: int = 28
 @export var end_tier_font_size: int = 36
-@export var end_desc_font_size: int = 14
+@export var end_desc_font_size: int = 20
 @export var end_wellbeing_font_size: int = 20
-@export var end_stats_font_size: int = 14
+@export var end_stats_font_size: int = 20
 @export var end_button_size: Vector2 = Vector2(120, 40)
 @export var tier_flourishing_color: Color = Color(0.2, 0.9, 0.4)
 @export var tier_growing_color: Color = Color(0.5, 0.8, 0.3)
@@ -694,7 +694,7 @@ func _create_tutorial_hint_popup() -> void:
 
   tutorial_hint_label = Label.new()
   tutorial_hint_label.name = "HintLabel"
-  tutorial_hint_label.add_theme_font_size_override("font_size", 13)
+  tutorial_hint_label.add_theme_font_size_override("font_size", 20)
   tutorial_hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
   tutorial_hint_label.custom_minimum_size.x = 360
   vbox.add_child(tutorial_hint_label)

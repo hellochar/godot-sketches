@@ -49,7 +49,7 @@ alignment = 1
 
 [node name="ComputerLabel" type="Label" parent="VBoxContainer/GameArea/ComputerSection"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 20
 text = "Computer's Hand"
 horizontal_alignment = 1
 
@@ -78,7 +78,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 20
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -101,7 +101,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 20
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -112,7 +112,7 @@ alignment = 1
 
 [node name="PlayerLabel" type="Label" parent="VBoxContainer/GameArea/PlayerSection"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 20
 text = "Your Hand"
 horizontal_alignment = 1
 
@@ -131,4 +131,4 @@ offset_bottom = 197.0
 script = ExtResource("2_diagram")
 diagram_radius = 100.0
 node_radius = 24.0
-font_size = 14
+font_size = 20

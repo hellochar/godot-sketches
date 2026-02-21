@@ -309,11 +309,11 @@ func _draw():
     var x = 20 + i * 80
     var color = Color.GREEN if i == selected_component_type else Color.GRAY
     draw_rect(Rect2(x, 50, 70, 30), color, false, 2.0)
-    draw_string(ThemeDB.fallback_font, Vector2(x + 5, 72), "%d: %s" % [i + 1, comp_names[i]], HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color)
+    draw_string(ThemeDB.fallback_font, Vector2(x + 5, 72), "%d: %s" % [i + 1, comp_names[i]], HORIZONTAL_ALIGNMENT_LEFT, -1, 20, color)
 
   # Draw rotation indicator
   var dir_names = ["North ^", "East >", "South v", "West <"]
-  draw_string(ThemeDB.fallback_font, Vector2(500, 72), "Rotation (R): %s" % dir_names[placement_rotation], HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.CYAN)
+  draw_string(ThemeDB.fallback_font, Vector2(500, 72), "Rotation (R): %s" % dir_names[placement_rotation], HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color.CYAN)
 
   # Draw grid cells
   for x in range(grid_size):
@@ -333,7 +333,7 @@ func _draw():
 
       if grid[x][y] == ComponentType.NONE:
         if mana_abs > 0.01:
-          draw_string(ThemeDB.fallback_font, cell_rect.position + Vector2(5, 50), "%.1f" % mana_level, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(0.5, 0.5, 1.0))
+          draw_string(ThemeDB.fallback_font, cell_rect.position + Vector2(5, 50), "%.1f" % mana_level, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(0.5, 0.5, 1.0))
 
       # Grid lines
       draw_rect(cell_rect, Color.DARK_GRAY, false, 1.0)
@@ -405,7 +405,7 @@ func _draw_component(comp: Component, origin: Vector2):
     ComponentType.PULSE_GENERATOR: label = "PLS"
     ComponentType.POINT_CONVERTER: label = "PTS"
     ComponentType.MANA_AMPLIFIER: label = "AMP"
-  draw_string(ThemeDB.fallback_font, center - Vector2(15, -5), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)
+  draw_string(ThemeDB.fallback_font, center - Vector2(15, -5), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color.WHITE)
 
 func _input(event):
   if event is InputEventMouseMotion:

@@ -81,7 +81,7 @@ func _create_placement_reason_label() -> void:
   placement_reason_label = Label.new()
   placement_reason_label.name = "PlacementReasonLabel"
   placement_reason_label.visible = false
-  placement_reason_label.add_theme_font_size_override("font_size", 12)
+  placement_reason_label.add_theme_font_size_override("font_size", 20)
   placement_reason_label.add_theme_color_override("font_color", Color(1, 0.4, 0.4))
   placement_reason_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
   placement_reason_label.add_theme_constant_override("shadow_offset_x", 1)
@@ -450,7 +450,7 @@ func spawn_floating_text(world_pos: Vector2, text: String, color: Color = Color.
   label.text = text
   label.position = world_pos - Vector2(50, 10)
   label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-  label.add_theme_font_size_override("font_size", 12)
+  label.add_theme_font_size_override("font_size", 20)
   label.add_theme_color_override("font_color", color)
   label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
   label.add_theme_constant_override("outline_size", 2)
@@ -533,4 +533,4 @@ func _draw_placement_adjacency_preview() -> void:
     var efficiency_text = "x%.2f" % net_efficiency
     var text_pos = placement_center + Vector2(0, -tile_size - 10)
     var text_color = Color(0.3, 0.9, 0.3) if net_efficiency > 1.0 else Color(0.9, 0.5, 0.3)
-    draw_string(ThemeDB.fallback_font, text_pos, efficiency_text, HORIZONTAL_ALIGNMENT_CENTER, -1, 14, text_color)
+    draw_string(ThemeDB.fallback_font, text_pos, efficiency_text, HORIZONTAL_ALIGNMENT_CENTER, -1, 20, text_color)

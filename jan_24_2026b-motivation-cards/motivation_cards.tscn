@@ -94,7 +94,7 @@ text = "Bonus: Health"
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.8, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 20
 text = "Deck: 65"
 
 [node name="Spacer" type="Control" parent="MainContainer/TopBar" unique_id=848683484]
@@ -139,7 +139,7 @@ theme_override_constants/separation = 8
 
 [node name="ValuesTitle" type="Label" parent="MainContainer/ActionSelectionScreen/YouSection/ValuesSection" unique_id=925433197]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 20
 text = "Your Values"
 horizontal_alignment = 1
 
@@ -155,7 +155,7 @@ theme_override_constants/separation = 8
 
 [node name="MoodTitle" type="Label" parent="MainContainer/ActionSelectionScreen/YouSection/MoodSection" unique_id=9304967]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 20
 text = "Today's Mood"
 horizontal_alignment = 1
 
@@ -168,7 +168,7 @@ alignment = 1
 [node name="MoodWorldLabel" type="Label" parent="MainContainer/ActionSelectionScreen/YouSection" unique_id=535289322]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 20
 horizontal_alignment = 1
 
 [node name="SynergyLabel" type="Label" parent="MainContainer/ActionSelectionScreen/YouSection" unique_id=911878465]
@@ -176,7 +176,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.9, 0.7, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 20
 autowrap_mode = 2
 
 [node name="Title" type="Label" parent="MainContainer/ActionSelectionScreen" unique_id=1230908662]
@@ -228,13 +228,13 @@ alignment = 1
 [node name="CostLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo/ActionDetails" unique_id=1929357168]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 20
 text = "Cost: 75"
 
 [node name="SuccessLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo/ActionDetails" unique_id=1101665062]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 20
 text = "Success: 80%"
 
 [node name="TagsContainer" type="HBoxContainer" parent="MainContainer/MotivationPhaseScreen/SelectedActionPanel/ActionInfo" unique_id=518986747]
@@ -250,7 +250,7 @@ theme_override_constants/separation = 10
 
 [node name="MotivationTitle" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSection" unique_id=790073184]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 20
 text = "Your Motivations"
 horizontal_alignment = 1
 
@@ -264,14 +264,14 @@ alignment = 1
 [node name="WorldModifierLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSection" unique_id=790935949]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 20
 horizontal_alignment = 1
 
 [node name="DiscardLabel" type="Label" parent="MainContainer/MotivationPhaseScreen/MotivationSection" unique_id=2061393778]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.8, 1, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 20
 text = "Click a card to discard and redraw (2 remaining)"
 horizontal_alignment = 1
 
@@ -295,7 +295,7 @@ text = "Gap: 75"
 [node name="WillpowerCostLabel" type="Label" parent="MainContainer/MotivationPhaseScreen" unique_id=1408059053]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 20
 text = "Willpower cost: 0"
 horizontal_alignment = 1
 
@@ -335,7 +335,7 @@ horizontal_alignment = 1
 [node name="ResultDetails" type="Label" parent="MainContainer/ResultPanel/ResultContent" unique_id=865179314]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 20
 text = "You gained 25 points!"
 horizontal_alignment = 1
 
@@ -388,7 +388,7 @@ horizontal_alignment = 1
 [node name="ActionsSummary" type="Label" parent="MainContainer/EndGamePanel/EndGameContent" unique_id=184916204]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 20
 text = "Actions taken:"
 horizontal_alignment = 1
 autowrap_mode = 2
@@ -419,7 +419,7 @@ horizontal_alignment = 1
 [node name="RemovalHint" type="Label" parent="MainContainer/CardRemovalPanel/CardRemovalContent" unique_id=2093922520]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 20
 text = "Removing a card makes your deck more focused"
 horizontal_alignment = 1
 
@@ -461,7 +461,7 @@ horizontal_alignment = 1
 [node name="ValueSelectionHint" type="Label" parent="MainContainer/ValueSelectionPanel/ValueSelectionContent" unique_id=448778555]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 20
 text = "This value determines how you earn points"
 horizontal_alignment = 1
 

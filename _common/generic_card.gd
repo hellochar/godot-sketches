@@ -96,7 +96,7 @@ func set_corner_text(corner: Corner, text: String, color: Color = Color.WHITE) -
   clear_corner(corner)
   var label := Label.new()
   label.text = text
-  label.add_theme_font_size_override("font_size", 12)
+  label.add_theme_font_size_override("font_size", 20)
   label.mouse_filter = Control.MOUSE_FILTER_IGNORE
   if color != Color.WHITE:
     label.add_theme_color_override("font_color", color)
@@ -159,7 +159,7 @@ func clear_tags() -> void:
     child.queue_free()
 
 
-func add_content_label(text: String, font_size: int = 12, color: Color = Color.WHITE) -> Label:
+func add_content_label(text: String, font_size: int = 20, color: Color = Color.WHITE) -> Label:
   var label := Label.new()
   label.text = text
   label.add_theme_font_size_override("font_size", font_size)

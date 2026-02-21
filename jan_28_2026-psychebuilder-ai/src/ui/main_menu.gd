@@ -6,7 +6,7 @@ signal start_game_pressed()
 @export var title_text: String = "PsycheBuilder"
 @export var subtitle_text: String = "Build your inner world"
 @export var title_font_size: int = 48
-@export var subtitle_font_size: int = 18
+@export var subtitle_font_size: int = 24
 
 @export_group("Buttons")
 @export var button_size: Vector2 = Vector2(200, 50)
@@ -53,7 +53,7 @@ func _build_ui() -> void:
 
   var description = Label.new()
   description.text = "Manage your mental architecture.\nProcess emotions, build habits, find balance."
-  description.add_theme_font_size_override("font_size", 12)
+  description.add_theme_font_size_override("font_size", 20)
   description.add_theme_color_override("font_color", Color(0.5, 0.5, 0.6))
   description.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
   vbox.add_child(description)
