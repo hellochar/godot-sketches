@@ -1,4 +1,5 @@
 # General
+- **NEVER use Bash to read, search, or edit files. Use dedicated tools instead:** `find`/`ls` → Glob, `grep`/`rg` → Grep, `cat`/`head`/`tail` → Read, `sed`/`awk` → Edit, `echo >`/heredoc → Write. These handle Windows paths natively. Bash is still needed for file management (`cp`, `mv`, `rm`, `mkdir`).
 - Take advantage of static typing and compiler features as much as possible.
 - Do NOT add defensive null and valid checks unless the variable is used in a way that requires it.
 - Do not add comments, but don't delete existing comments.
