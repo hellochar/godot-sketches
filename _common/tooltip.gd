@@ -13,7 +13,7 @@ extends Node
 @export var auto_attachment_offset: bool = true
 ## Screen-space pixel offset added after the attachment point.
 ## When auto_attachment_offset is true, this is extra padding beyond the bounding box edge.
-@export var attachment_offset: Vector2 = Vector2(8.0, 0.0)
+@export var attachment_offset: Vector2 = Vector2(16.0, 0.0)
 ## Which corner of the tooltip panel aligns to the attachment point.
 @export_enum("Top Left", "Top Center", "Top Right", "Center Left", "Center Right",
     "Bottom Left", "Bottom Center", "Bottom Right")
