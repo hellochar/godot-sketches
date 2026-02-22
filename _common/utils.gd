@@ -70,15 +70,18 @@ class SpringHelper extends Node:
       queue_free()
 
 class FloatingLabel extends Label:
+  var world_pos: Vector2
   var velocity: Vector2
   var lifetime: float
   var elapsed: float = 0.0
+  var screen_offset: Vector2 = Vector2.ZERO
 
   func _process(delta: float) -> void:
     elapsed += delta
-    position += velocity * delta
-    var alpha := 1.0 - (elapsed / lifetime)
-    modulate.a = alpha
+    screen_offset += velocity * delta
+    var screen_pos := get_viewport().get_canvas_transform() * world_pos
+    position = screen_pos + screen_offset - Vector2(size.x / 2.0, size.y)
+    modulate.a = 1.0 - (elapsed / lifetime)
     if elapsed >= lifetime:
       queue_free()
 
@@ -159,16 +162,11 @@ func floating_text(global_pos: Vector2, text: String, color: Color = Color.WHITE
   var layer := _get_feedback_layer()
   var label := FloatingLabel.new()
   label.text = text
+  label.world_pos = global_pos
   label.velocity = velocity
   label.lifetime = lifetime
   label.add_theme_color_override("font_color", color)
-  label.add_theme_font_size_override("font_size", 20)
-  var camera := get_viewport().get_camera_2d()
-  if camera:
-    var screen_pos := get_viewport().get_visible_rect().size / 2.0 + (global_pos - camera.global_position)
-    label.position = screen_pos
-  else:
-    label.position = global_pos
+  label.add_theme_font_size_override("font_size", 32)
   layer.add_child(label)
   return label
 

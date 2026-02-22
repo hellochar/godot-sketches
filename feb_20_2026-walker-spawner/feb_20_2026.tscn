@@ -7,7 +7,9 @@
 [ext_resource type="Texture2D" uid="uid://u65fqfmk577j" path="res://assets/32rogues-0.5.0/tiles.png" id="4_l62v6"]
 [ext_resource type="Script" uid="uid://cll2ewhxarmmd" path="res://_common/smooth_camera.gd" id="5_btt5y"]
 [ext_resource type="Script" uid="uid://btnhrrhaxv01r" path="res://feb_20_2026-walker-spawner/door.gd" id="7_p8bk3"]
+[ext_resource type="Script" uid="uid://cu3sdxu3pd1hm" path="res://feb_20_2026-walker-spawner/converter.gd" id="8_bq4um"]
 [ext_resource type="Script" uid="uid://b06xcx32tpfu6" path="res://_common/tooltip.gd" id="8_k8xem"]
+[ext_resource type="PackedScene" uid="uid://q64llpa43m8j" path="res://feb_20_2026-walker-spawner/walker2.tscn" id="9_j1v5r"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_btt5y"]
 size = Vector2(2048, 2048)
@@ -15,6 +17,13 @@ size = Vector2(2048, 2048)
 [sub_resource type="AtlasTexture" id="AtlasTexture_ftx8e"]
 atlas = ExtResource("4_l62v6")
 region = Rect2(96, 736, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j1v5r"]
+atlas = ExtResource("4_l62v6")
+region = Rect2(96, 608, 32, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bq4um"]
+size = Vector2(32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ehgji"]
 atlas = ExtResource("4_l62v6")
@@ -26,13 +35,26 @@ radius = 24.0
 [node name="Control" type="Node2D" unique_id=382117903]
 script = ExtResource("1_script")
 
-[node name="Sprite2D2" type="Sprite2D" parent="." unique_id=969923121]
+[node name="BG" type="Sprite2D" parent="." unique_id=969923121]
 modulate = Color(0.04755766, 0.047557645, 0.047557645, 1)
 texture = SubResource("PlaceholderTexture2D_btt5y")
 
 [node name="roads" type="TileMapLayer" parent="." unique_id=1271277811 groups=["road"]]
 tile_map_data = PackedByteArray("AAAAAP//AQADAAEAAAAAAP7/AQADAAEAAAAAAP3/AQAHAAQAAAAAAPz/AQAEAAEAAAAAAPv/AQAEAAIAAAABAPv/AQAFAAAAAAACAPv/AQABAAMAAAADAPv/AQABAAMAAAAEAPv/AQACAAMAAAAAAPr/AQADAAEAAAAAAPn/AQAHAAQAAAAAAPj/AQADAAEAAAD///n/AQABAAMAAAD+//n/AQABAAMAAAD9//n/AQAAAAMAAAD///3/AQABAAMAAAD+//3/AQABAAMAAAD9//3/AQABAAMAAAD8//3/AQAIAAAAAAD7//3/AQABAAMAAAD6//3/AQAIAAMAAAD5//3/AQAAAAMAAAD6//z/AQADAAEAAAD6//v/AQAIAAEAAAD6//r/AQAJAAQAAAD7//r/AQACAAEAAAD8//7/AQADAAEAAAD8////AQADAAEAAAD8/wAAAQADAAIAAAAAAAAAAQADAAEAAAAAAAEAAQADAAIAAAABAPz/AQACAAIAAAD7//v/AQACAAIAAAAAAPf/AQAEAAEAAAABAPf/AQABAAIAAAACAPb/AQACAAAAAAABAPb/AQABAAAAAAAAAPb/AQAAAAAAAAACAPf/AQACAAIAAAD7//n/AQACAAEAAAD6//n/AQABAAEAAAD5//n/AQAKAAQAAAD5//r/AQABAAEAAAD5//v/AQABAAIAAAD6//j/AQABAAAAAAD7//j/AQACAAAAAAD5//j/AQABAAAAAAD4//j/AQABAAAAAAD3//j/AQAAAAAAAAD4//n/AQAKAAQAAAD4//r/AQAKAAEAAAD4//v/AQABAAIAAAD3//n/AQAAAAEAAAD3//r/AQAAAAEAAAD3//v/AQAAAAIAAAA=")
 tile_set = ExtResource("2_krnue")
+
+[node name="SmoothCamera" type="Camera2D" parent="." unique_id=1956898693]
+zoom = Vector2(6, 6)
+position_smoothing_enabled = true
+position_smoothing_speed = 25.0
+editor_draw_drag_margin = true
+script = ExtResource("5_btt5y")
+drag_pan_enabled = true
+edge_pan_enabled = true
+clamp_mouse_to_viewport = true
+min_zoom_multiplier = 0.01
+max_zoom_multiplier = 100.0
+metadata/_custom_type_script = "uid://cll2ewhxarmmd"
 
 [node name="walker" parent="." unique_id=177916261 instance=ExtResource("3_btt5y")]
 position = Vector2(8, 24)
@@ -55,18 +77,25 @@ outline_color = Color(1, 1, 0, 1)
 outline_width = 2.0
 metadata/_custom_type_script = "uid://b06xcx32tpfu6"
 
-[node name="SmoothCamera" type="Camera2D" parent="." unique_id=1956898693]
-zoom = Vector2(6, 6)
-position_smoothing_enabled = true
-position_smoothing_speed = 25.0
-editor_draw_drag_margin = true
-script = ExtResource("5_btt5y")
-drag_pan_enabled = true
-edge_pan_enabled = true
-clamp_mouse_to_viewport = true
-min_zoom_multiplier = 0.01
-max_zoom_multiplier = 100.0
-metadata/_custom_type_script = "uid://cll2ewhxarmmd"
+[node name="Converter" type="Sprite2D" parent="." unique_id=2055917275]
+position = Vector2(-24, -24)
+texture = SubResource("AtlasTexture_j1v5r")
+script = ExtResource("8_bq4um")
+to_turn_into = ExtResource("9_j1v5r")
+
+[node name="TooltipComponent" type="Node" parent="Converter" unique_id=1463403558]
+script = ExtResource("8_k8xem")
+title = "Converter"
+description = "Description"
+show_highlight = true
+outline_color = Color(1, 1, 0, 1)
+outline_width = 1.0
+metadata/_custom_type_script = "uid://b06xcx32tpfu6"
+
+[node name="Interactable" type="Area2D" parent="Converter" unique_id=213285255]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Converter/Interactable" unique_id=2044901281]
+shape = SubResource("RectangleShape2D_bq4um")
 
 [node name="door" type="Sprite2D" parent="." unique_id=224033929]
 position = Vector2(88, -72)
@@ -89,5 +118,6 @@ outline_color = Color(1, 1, 0, 1)
 outline_width = 2.0
 metadata/_custom_type_script = "uid://b06xcx32tpfu6"
 
+[connection signal="area_entered" from="Converter/Interactable" to="Converter" method="_on_interactable_area_entered"]
 [connection signal="area_entered" from="door/Interactable" to="door" method="_on_interactable_area_entered"]
 [connection signal="body_entered" from="door/Interactable" to="door" method="_on_interactable_body_entered"]
