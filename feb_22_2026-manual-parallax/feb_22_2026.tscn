@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://dt4wpb5tn6w3f"]
+
+[ext_resource type="Script" uid="uid://w6bb24f2k527" path="res://feb_22_2026/feb_22_2026.gd" id="1_script"]
+[ext_resource type="Shader" uid="uid://57lvuycscxnd" path="res://feb_22_2026/1d-mountain.gdshader" id="2_cl26i"]
+[ext_resource type="Script" uid="uid://cll2ewhxarmmd" path="res://_common/smooth_camera.gd" id="3_a6ot3"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_cl26i"]
+noise_type = 2
+frequency = 0.02
+domain_warp_enabled = true
+domain_warp_frequency = 0.035
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_cl26i"]
+noise = SubResource("FastNoiseLite_cl26i")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ener4"]
+shader = ExtResource("2_cl26i")
+shader_parameter/noise = SubResource("NoiseTexture2D_cl26i")
+shader_parameter/color_above = Color(0, 0, 0, 0)
+shader_parameter/color_below = Color(0.6431373, 0.47058824, 0.33333334, 1)
+shader_parameter/color_line = Color(0.77, 0.57057, 0.44660002, 0.4392157)
+shader_parameter/scale = 0.2
+shader_parameter/x_pos = 0.0
+shader_parameter/lift = -0.15
+shader_parameter/y_scale = 0.3
+shader_parameter/time_scale = 0.15
+shader_parameter/line_threshold = 0.01
+
+[sub_resource type="Gradient" id="Gradient_a6ot3"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ener4"]
+gradient = SubResource("Gradient_a6ot3")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_a6ot3"]
+shader = ExtResource("2_cl26i")
+shader_parameter/noise = SubResource("NoiseTexture2D_cl26i")
+shader_parameter/color_above = Color(0, 0, 0, 0)
+shader_parameter/color_below = Color(0.09803922, 0.11764706, 0.101960786, 1)
+shader_parameter/color_line = Color(0.15880412, 0.18593404, 0.1642249, 1)
+shader_parameter/scale = 0.05
+shader_parameter/x_pos = 0.0
+shader_parameter/lift = -0.4
+shader_parameter/y_scale = 0.2
+shader_parameter/time_scale = 0.3
+shader_parameter/line_threshold = 0.02
+
+[node name="Control" type="Node2D" unique_id=739429443]
+script = ExtResource("1_script")
+
+[node name="layer1" type="Sprite2D" parent="." unique_id=849078121]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_ener4")
+position = Vector2(1.9999695, 4.0000086)
+scale = Vector2(30.3125, 17.0625)
+texture = SubResource("GradientTexture2D_ener4")
+
+[node name="layer0" type="Sprite2D" parent="." unique_id=395844273]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_a6ot3")
+position = Vector2(1.9999695, 4.0000086)
+scale = Vector2(30.3125, 17.0625)
+texture = SubResource("GradientTexture2D_ener4")
+
+[node name="SmoothCamera" type="Camera2D" parent="." unique_id=1230385174]
+script = ExtResource("3_a6ot3")
+metadata/_custom_type_script = "uid://cll2ewhxarmmd"
