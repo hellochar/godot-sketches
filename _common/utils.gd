@@ -220,6 +220,15 @@ func vanish(target: CanvasItem, duration: float = 0.4) -> Tween:
   tween.tween_property(target, "self_modulate:a", 0.0, duration)
   return tween
 
+func pulse(target: CanvasItem, duration: float = 3.0, speed: float = 8.0, min_alpha: float = 0.3) -> Tween:
+  var tween := target.create_tween()
+  tween.tween_method(func(t: float) -> void:
+    var elapsed := t * duration
+    target.modulate.a = lerpf(min_alpha, 1.0, 0.5 + 0.5 * sin(elapsed * speed))
+  , 0.0, 1.0, duration)
+  tween.tween_property(target, "modulate:a", 1.0, 0.0)
+  return tween
+
 func get_random_point_in_polygon(polygon: Polygon2D) -> Vector2:
   return polygon.global_position + get_random_point_in_polygon_points(polygon.polygon)
 

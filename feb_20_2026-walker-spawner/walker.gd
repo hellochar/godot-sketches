@@ -4,6 +4,8 @@ class_name Walker
 @export var terrain: TileMapLayer
 @export var forward: Vector2i = Vector2i(0, -1)
 @export var lifetime: float = 30
+@export var warning_duration: float = 5.0
+
 var _is_dying: bool = false
 
 func _ready() -> void:
@@ -13,6 +15,8 @@ func _ready() -> void:
   Utils.appear(self)
   async_loop()
   if lifetime >= 0:
+    if warning_duration > 0 and lifetime > warning_duration:
+      create_tween().tween_callback(_start_warning).set_delay(lifetime - warning_duration)
     create_tween().tween_callback(die).set_delay(lifetime)
 
 func async_loop() -> void:
@@ -62,5 +66,5 @@ func die() -> void:
   await Utils.vanish(self).finished
   queue_free()
 
-func _process(_delta: float) -> void:
-  pass
+func _start_warning() -> void:
+  Utils.pulse(self, warning_duration, 10.0, 0.3)
