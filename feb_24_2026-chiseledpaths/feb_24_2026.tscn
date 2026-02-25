@@ -1,0 +1,138 @@
+[gd_scene format=3 uid="uid://b0fiok3w0p8vq"]
+
+[ext_resource type="Script" uid="uid://tdp3weawxyc6" path="res://feb_24_2026-chiseledpaths/feb_24_2026.gd" id="1_script"]
+[ext_resource type="TileSet" uid="uid://dveppprypqhm2" path="res://feb_1_2026-tilesetter-test/tilesetter_test_tileset.tres" id="2_tileset"]
+[ext_resource type="Script" uid="uid://cll2ewhxarmmd" path="res://_common/smooth_camera.gd" id="3_camera"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_marker"]
+size = Vector2(16, 16)
+
+[node name="ChiseledPaths" type="Node2D" unique_id=1235217298]
+script = ExtResource("1_script")
+
+[node name="OpenMap" type="TileMapLayer" parent="." unique_id=542189940]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.15)
+tile_set = ExtResource("2_tileset")
+
+[node name="TileMap" type="TileMapLayer" parent="." unique_id=514967405]
+unique_name_in_owner = true
+tile_set = ExtResource("2_tileset")
+
+[node name="WitnessMap" type="TileMapLayer" parent="." unique_id=282167158]
+unique_name_in_owner = true
+modulate = Color(0.5, 0.8, 1, 0.5)
+tile_set = ExtResource("2_tileset")
+
+[node name="StartMarker" type="Sprite2D" parent="." unique_id=281763444]
+unique_name_in_owner = true
+modulate = Color(0.2, 0.8, 0.3, 0.7)
+z_index = 1
+texture = SubResource("PlaceholderTexture2D_marker")
+
+[node name="EndMarker" type="Sprite2D" parent="." unique_id=832473810]
+unique_name_in_owner = true
+modulate = Color(0.9, 0.3, 0.2, 0.7)
+z_index = 1
+texture = SubResource("PlaceholderTexture2D_marker")
+
+[node name="SmoothCamera" type="Camera2D" parent="." unique_id=1386330435]
+unique_name_in_owner = true
+zoom = Vector2(3, 3)
+position_smoothing_enabled = true
+position_smoothing_speed = 25.0
+script = ExtResource("3_camera")
+drag_pan_enabled = true
+min_zoom_multiplier = 0.1
+max_zoom_multiplier = 20.0
+metadata/_custom_type_script = "uid://cll2ewhxarmmd"
+
+[node name="UILayer" type="CanvasLayer" parent="." unique_id=2079658328]
+layer = 10
+
+[node name="UI" type="MarginContainer" parent="UILayer" unique_id=26625115]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="UILayer/UI" unique_id=808162315]
+layout_mode = 2
+
+[node name="Instructions" type="Label" parent="UILayer/UI/VBox" unique_id=926012504]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "LMB: start  |  RMB: end  |  Z: animate  |  Space: play/pause  |  Arrows: step"
+
+[node name="WigglinessRow" type="HBoxContainer" parent="UILayer/UI/VBox" unique_id=1237217032]
+layout_mode = 2
+
+[node name="WigglinessLabel" type="Label" parent="UILayer/UI/VBox/WigglinessRow" unique_id=2034980709]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Wiggliness:"
+
+[node name="WigglinessSlider" type="HSlider" parent="UILayer/UI/VBox/WigglinessRow" unique_id=1381960998]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.1
+step = 0.1
+value = 2.0
+
+[node name="WigglinessValue" type="Label" parent="UILayer/UI/VBox/WigglinessRow" unique_id=466916475]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "2.0"
+
+[node name="SpeedRow" type="HBoxContainer" parent="UILayer/UI/VBox" unique_id=1220661632]
+layout_mode = 2
+
+[node name="SpeedLabel" type="Label" parent="UILayer/UI/VBox/SpeedRow" unique_id=1135678746]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Speed:"
+
+[node name="SpeedSlider" type="HSlider" parent="UILayer/UI/VBox/SpeedRow" unique_id=1529776531]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+value = 5.0
+
+[node name="SpeedValue" type="Label" parent="UILayer/UI/VBox/SpeedRow" unique_id=333612564]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "5"
+
+[node name="TimelineRow" type="HBoxContainer" parent="UILayer/UI/VBox" unique_id=397037477]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="TimelineLabel" type="Label" parent="UILayer/UI/VBox/TimelineRow" unique_id=1677196868]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Step 0 / 0"
+
+[node name="TimelineSlider" type="HSlider" parent="UILayer/UI/VBox/TimelineRow" unique_id=1703042594]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TooltipLabel" type="Label" parent="UILayer" unique_id=1027878746]
+unique_name_in_owner = true
+visible = false
+theme_override_colors/font_color = Color(1, 1, 1, 0.9)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 20
+text = "tooltip"

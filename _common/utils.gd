@@ -1,6 +1,7 @@
 extends Node
 
 const REWARD_PICKER_SCENE = preload("res://_common/reward_picker.tscn")
+const _ChiseledPaths := preload("res://_common/chiseled_paths.gd")
 
 static func create_reward_picker(parent: Node, options: Array[Node], title: String = "Select a Reward", skippable: bool = true) -> RewardPicker:
   var picker: RewardPicker = REWARD_PICKER_SCENE.instantiate()
@@ -228,6 +229,9 @@ func pulse(target: CanvasItem, duration: float = 3.0, speed: float = 8.0, min_al
   , 0.0, 1.0, duration)
   tween.tween_property(target, "modulate:a", 1.0, 0.0)
   return tween
+
+func chiseled_path(w: int, h: int, start: Vector2i, end: Vector2i, wiggliness: float = 1.0) -> Array[Vector2i]:
+  return _ChiseledPaths.path(w, h, start, end, wiggliness)
 
 func get_random_point_in_polygon(polygon: Polygon2D) -> Vector2:
   return polygon.global_position + get_random_point_in_polygon_points(polygon.polygon)
