@@ -84,6 +84,8 @@ func _edge_pan_process(delta: float) -> void:
   var viewport := get_viewport()
   var mouse_pos := viewport.get_mouse_position()
   var size := viewport.get_visible_rect().size
+  if clamp_mouse_to_viewport and Input.mouse_mode != Input.MOUSE_MODE_CONFINED:
+    return
   var direction := Vector2.ZERO
   if mouse_pos.x < edge_pan_margin:
     direction.x -= 1.0
@@ -112,6 +114,16 @@ func _on_focus_exited() -> void:
   _edge_pan_active = false
   if clamp_mouse_to_viewport:
     _release_mouse()
+
+func _input(event: InputEvent) -> void:
+  if not clamp_mouse_to_viewport or not edge_pan_enabled:
+    return
+  if event.is_action_pressed("ui_cancel") and Input.mouse_mode == Input.MOUSE_MODE_CONFINED:
+    _release_mouse()
+    get_viewport().set_input_as_handled()
+  elif event is InputEventMouseButton and event.pressed and Input.mouse_mode != Input.MOUSE_MODE_CONFINED:
+    _confine_mouse()
+    get_viewport().set_input_as_handled()
 
 func _unhandled_input(event: InputEvent) -> void:
   if drag_pan_enabled and event is InputEventMouseButton:
