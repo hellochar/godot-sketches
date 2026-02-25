@@ -4,17 +4,20 @@ class_name Walker
 @export var terrain: TileMapLayer
 @export var forward: Vector2i = Vector2i(0, -1)
 @export var lifetime: float = 30
+var _is_dying: bool = false
 
 func _ready() -> void:
   if !terrain:
     terrain = get_parent().get_node("roads") as TileMapLayer
+
+  Utils.appear(self)
   async_loop()
   if lifetime >= 0:
-    create_tween().tween_callback(queue_free).set_delay(lifetime)
+    create_tween().tween_callback(die).set_delay(lifetime)
 
 func async_loop() -> void:
   # maze-walk the road tiles in terrain.
-  while get_tree():
+  while get_tree() and not _is_dying:
     var curr := terrain.local_to_map(terrain.to_local(global_position))
 
     # turn right
@@ -51,6 +54,13 @@ func tween_move_to(coord: Vector2i) -> void:
   var pos := terrain.to_global(terrain.map_to_local(coord))
   tween.tween_property(self, "global_position", pos, 0.5)
   await tween.finished
+
+func die() -> void:
+  if _is_dying:
+    return
+  _is_dying = true
+  await Utils.vanish(self).finished
+  queue_free()
 
 func _process(_delta: float) -> void:
   pass

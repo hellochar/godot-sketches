@@ -197,6 +197,29 @@ func spring_pop(target: Node, overshoot: float = 1.3, duration: float = 0.3) -> 
   tween.tween_property(target, "scale", Vector2.ONE, duration).from(Vector2.ONE * overshoot).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
   return tween
 
+# Lifecycle animations use self_modulate so they don't conflict with
+# gameplay effects (damage flash, selection, highlight) which use modulate.
+# pulse() uses modulate.a so it composes with appear/vanish without conflict.
+
+func appear(target: CanvasItem, duration: float = 0.3) -> Tween:
+  var base_scale: Vector2 = target.scale
+  target.scale = Vector2.ZERO
+  target.self_modulate.a = 0.0
+  if target is Control:
+    target.pivot_offset = target.size / 2.0
+  var tween := target.create_tween().set_parallel()
+  tween.tween_property(target, "scale", base_scale, duration) \
+    .set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+  tween.tween_property(target, "self_modulate:a", 1.0, duration * 0.7)
+  return tween
+
+func vanish(target: CanvasItem, duration: float = 0.4) -> Tween:
+  var tween := target.create_tween().set_parallel()
+  tween.tween_property(target, "scale", Vector2.ZERO, duration) \
+    .set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+  tween.tween_property(target, "self_modulate:a", 0.0, duration)
+  return tween
+
 func get_random_point_in_polygon(polygon: Polygon2D) -> Vector2:
   return polygon.global_position + get_random_point_in_polygon_points(polygon.polygon)
 
