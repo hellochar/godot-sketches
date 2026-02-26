@@ -26,7 +26,7 @@ var points: Array[Vector2i] = [Vector2i(2, 10), Vector2i(27, 10)]
 var animation_steps: Array[Dictionary] = []
 var animation_index: int = -1
 var playing := false
-var steps_per_frame: float = 1.0
+var frame_interval: float = 0.1
 var step_accumulator: float = 0.0
 
 var current_states: Array[int] = []
@@ -43,13 +43,14 @@ var heatmap_enabled := false
 func _ready() -> void:
   @warning_ignore("integer_division")
   camera.global_position = tile_map.map_to_local(Vector2i(grid_width / 2, grid_height / 2))
+  camera.reset_smoothing()
   wiggliness_slider.value = wiggliness
-  wiggliness_value.text = "%.1f" % wiggliness
+  wiggliness_value.text = "%.2f" % wiggliness
   wiggliness_slider.value_changed.connect(_on_wiggliness_changed)
   speed_slider.value_changed.connect(_on_speed_changed)
   timeline_slider.value_changed.connect(_on_timeline_changed)
-  steps_per_frame = speed_slider.value
-  speed_value.text = "%d" % int(steps_per_frame)
+  frame_interval = speed_slider.value
+  speed_value.text = "%d ms" % int(frame_interval * 1000.0)
   timeline_row.visible = false
   _generate_and_render()
 
@@ -71,11 +72,12 @@ func _unhandled_input(event: InputEvent) -> void:
   elif event is InputEventKey and event.pressed:
     if event.keycode == KEY_SPACE:
       if animation_steps.is_empty():
-        _generate_and_render()
+        _start_animation()
       else:
         playing = not playing
-    elif event.keycode == KEY_Z:
-      _start_animation()
+    elif event.keycode == KEY_R:
+      _stop_animation()
+      _generate_and_render()
     elif event.keycode == KEY_H:
       heatmap_enabled = not heatmap_enabled
       queue_redraw()
@@ -91,9 +93,11 @@ func _process(delta: float) -> void:
   _update_tooltip()
   if not playing or animation_steps.is_empty():
     return
-  step_accumulator += steps_per_frame * delta * 60.0
-  var advance := int(step_accumulator)
-  step_accumulator -= advance
+  step_accumulator += delta
+  var advance := 0
+  while step_accumulator >= frame_interval:
+    step_accumulator -= frame_interval
+    advance += 1
   if advance > 0:
     _seek(animation_index + advance)
     if animation_index >= animation_steps.size() - 1:
@@ -280,14 +284,14 @@ func _update_tooltip() -> void:
 
 func _on_wiggliness_changed(value: float) -> void:
   wiggliness = value
-  wiggliness_value.text = "%.1f" % value
+  wiggliness_value.text = "%.2f" % value
   _stop_animation()
   _generate_and_render()
 
 
 func _on_speed_changed(value: float) -> void:
-  steps_per_frame = value
-  speed_value.text = "%d" % int(value)
+  frame_interval = value
+  speed_value.text = "%d ms" % int(value * 1000.0)
 
 
 func _on_timeline_changed(value: float) -> void:
