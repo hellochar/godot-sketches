@@ -19,7 +19,6 @@ const CP := preload("res://_common/chiseled_paths.gd")
 @onready var timeline_row: HBoxContainer = %TimelineRow
 @onready var speed_slider: HSlider = %SpeedSlider
 @onready var speed_value: Label = %SpeedValue
-@onready var ui_scaler: UIScaler = %UIScaler
 
 var points: Array[Vector2i] = [Vector2i(2, 10), Vector2i(27, 10)]
 
@@ -285,7 +284,7 @@ func _update_tooltip() -> void:
 
   tooltip_label.text = "\n".join(lines)
   var screen_pos := get_viewport().get_mouse_position()
-  tooltip_label.position = (screen_pos + Vector2(32, 0)) / ui_scaler.ui_scale
+  tooltip_label.position = (screen_pos + Vector2(32, 0))
 
 
 func _on_wiggliness_changed(value: float) -> void:
