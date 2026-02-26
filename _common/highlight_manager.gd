@@ -1,6 +1,6 @@
 extends Node
 
-const _OUTLINE_SHADER := preload("res://outline.gdshader")
+const _OUTLINE_SHADER := preload("res://_common/shaders/outline.gdshader")
 const _SILHOUETTE_SHADER := preload("res://_common/shaders/silhouette.gdshader")
 
 enum Style { OUTLINE, SILHOUETTE }
