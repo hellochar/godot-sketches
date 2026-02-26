@@ -32,7 +32,7 @@ var current_states: Array[int] = []
 var current_witness_set: Dictionary = {}
 var current_close_order: Array[int] = []
 var current_total_steps: int = 0
-var heatmap_enabled := true
+var heatmap_enabled := false
 
 var _marker_texture: PlaceholderTexture2D
 
