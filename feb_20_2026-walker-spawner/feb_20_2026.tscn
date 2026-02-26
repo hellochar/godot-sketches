@@ -1,7 +1,7 @@
 [gd_scene format=4 uid="uid://dtfq355dfjk20"]
 
 [ext_resource type="Script" uid="uid://e7yajtn584wd" path="res://feb_20_2026-walker-spawner/feb_20_2026.gd" id="1_script"]
-[ext_resource type="TileSet" uid="uid://dveppprypqhm2" path="res://feb_1_2026-tilesetter-test/tilesetter_test_tileset.tres" id="2_krnue"]
+[ext_resource type="TileSet" uid="uid://dveppprypqhm2" path="res://_common/tilesets/tilesetter_test_tileset.tres" id="2_krnue"]
 [ext_resource type="PackedScene" uid="uid://bfj51u2aphwfs" path="res://feb_20_2026-walker-spawner/walker.tscn" id="3_btt5y"]
 [ext_resource type="Script" uid="uid://fhxe371yyytc" path="res://feb_20_2026-walker-spawner/spawner.gd" id="4_1wm3h"]
 [ext_resource type="Texture2D" uid="uid://u65fqfmk577j" path="res://assets/32rogues-0.5.0/tiles.png" id="4_l62v6"]

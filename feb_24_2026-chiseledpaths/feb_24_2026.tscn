@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://b0fiok3w0p8vq"]
 
 [ext_resource type="Script" uid="uid://tdp3weawxyc6" path="res://feb_24_2026-chiseledpaths/feb_24_2026.gd" id="1_script"]
-[ext_resource type="TileSet" uid="uid://dveppprypqhm2" path="res://feb_1_2026-tilesetter-test/tilesetter_test_tileset.tres" id="2_tileset"]
+[ext_resource type="TileSet" uid="uid://dveppprypqhm2" path="res://_common/tilesets/tilesetter_test_tileset.tres" id="2_tileset"]
 [ext_resource type="Script" uid="uid://cll2ewhxarmmd" path="res://_common/smooth_camera.gd" id="3_camera"]
 
 [node name="ChiseledPaths" type="Node2D" unique_id=1235217298]
@@ -21,7 +21,7 @@ unique_name_in_owner = true
 modulate = Color(0.5, 0.8, 1, 0.5)
 tile_set = ExtResource("2_tileset")
 
-[node name="Markers" type="Node2D" parent="."]
+[node name="Markers" type="Node2D" parent="." unique_id=1680214658]
 unique_name_in_owner = true
 z_index = 1
 

@@ -1,7 +1,7 @@
 [gd_scene format=4 uid="uid://c30ee51clkr4r"]
 
 [ext_resource type="Script" uid="uid://cljnla4rh6tt8" path="res://feb_1_2026-tilesetter-test/feb_1_2026.gd" id="1_script"]
-[ext_resource type="TileSet" uid="uid://dveppprypqhm2" path="res://feb_1_2026-tilesetter-test/tilesetter_test_tileset.tres" id="2_u14d5"]
+[ext_resource type="TileSet" uid="uid://dveppprypqhm2" path="res://_common/tilesets/tilesetter_test_tileset.tres" id="2_u14d5"]
 [ext_resource type="Texture2D" uid="uid://y5sbuulbo3bl" path="res://assets/roads2W.png" id="4_04q33"]
 
 [sub_resource type="TileMapPattern" id="TileMapPattern_asfbr"]

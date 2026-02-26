@@ -1,7 +1,7 @@
 [gd_resource type="TileSet" format=3 uid="uid://dveppprypqhm2"]
 
-[ext_resource type="Texture2D" uid="uid://dgawerwpfjtg5" path="res://feb_1_2026-tilesetter-test/tilesetter test wang.png" id="1_sqelo"]
-[ext_resource type="Texture2D" uid="uid://db4swtbse47dl" path="res://feb_1_2026-tilesetter-test/tilesetter test.png" id="2_tajtf"]
+[ext_resource type="Texture2D" uid="uid://dgawerwpfjtg5" path="res://_common/tilesets/tilesetter test wang.png" id="1_sqelo"]
+[ext_resource type="Texture2D" uid="uid://db4swtbse47dl" path="res://_common/tilesets/tilesetter test.png" id="2_tajtf"]
 
 [sub_resource type="TileMapPattern" id="TileMapPattern_asfbr"]
 tile_data = PackedInt32Array(0, 1, 0, 65536, 1, 1, 131072, 1, 2, 1, 65537, 0, 65537, 655361, 4, 131073, 524289, 1, 196609, 196609, 1, 262145, 262145, 3, 2, 131073, 0, 65538, 131073, 1, 131074, 131073, 2, 262146, 65537, 3, 3, 1, 0, 65539, 1, 2, 131075, 1, 0, 196611, 262145, 1, 262147, 524289, 3, 4, 327681, 0, 65540, 327681, 3, 131076, 327681, 0, 196612, 458753, 1, 262148, 458753, 3, 5, 131073, 3, 65541, 458753, 0, 131077, 458753, 3)
