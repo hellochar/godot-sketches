@@ -27,7 +27,8 @@
 - Use components and other elements in `_common/`.
 - Use methods from `_common/utils.gd` (autoload `Utils`).
 
-## Fonts
+## UI and Fonts
+- Wrap UIs in a _common/ui_scalar Node so it can be easily scaled.
 - **Hard minimum: 20px. Nothing below 20.**
 - Typographic hierarchy: headings/titles 28+, subheadings/section headers/names 24, body/description/caption/all other text 20.
 - For programmatically created labels, set `.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART` to handle overflow via word wrapping instead of shrinking text.
