@@ -49,7 +49,7 @@ func _ready() -> void:
   wiggliness_slider.value_changed.connect(_on_wiggliness_changed)
   speed_slider.value_changed.connect(_on_speed_changed)
   timeline_slider.value_changed.connect(_on_timeline_changed)
-  frame_interval = speed_slider.value
+  frame_interval = speed_slider.min_value * speed_slider.max_value / speed_slider.value
   speed_value.text = "%d ms" % int(frame_interval * 1000.0)
   timeline_row.visible = false
   _generate_and_render()
@@ -73,11 +73,17 @@ func _unhandled_input(event: InputEvent) -> void:
     if event.keycode == KEY_SPACE:
       if animation_steps.is_empty():
         _start_animation()
+      elif animation_index >= animation_steps.size() - 1:
+        _seek(0)
+        playing = true
       else:
         playing = not playing
     elif event.keycode == KEY_R:
+      var was_animating := not animation_steps.is_empty()
       _stop_animation()
       _generate_and_render()
+      if was_animating:
+        _start_animation()
     elif event.keycode == KEY_H:
       heatmap_enabled = not heatmap_enabled
       queue_redraw()
@@ -290,8 +296,8 @@ func _on_wiggliness_changed(value: float) -> void:
 
 
 func _on_speed_changed(value: float) -> void:
-  frame_interval = value
-  speed_value.text = "%d ms" % int(value * 1000.0)
+  frame_interval = speed_slider.min_value * speed_slider.max_value / value
+  speed_value.text = "%d ms" % int(frame_interval * 1000.0)
 
 
 func _on_timeline_changed(value: float) -> void:
