@@ -39,29 +39,33 @@ class CellSet:
     return _cells
 
 
-static func path(w: int, h: int, start: Vector2i, end: Vector2i, wiggliness: float = 1.0) -> Array[Vector2i]:
-  var result := generate(w, h, start, end, wiggliness)
+static func path(w: int, h: int, points: Array[Vector2i], wiggliness: float = 1.0) -> Array[Vector2i]:
+  var result := generate(w, h, points, wiggliness)
   var forced: Array[Vector2i] = []
   forced.assign(result["forced"])
   return forced
 
 
-static func generate(w: int, h: int, start: Vector2i, end: Vector2i, wiggliness: float = 1.0) -> Dictionary:
+static func generate(w: int, h: int, points: Array[Vector2i], wiggliness: float = 1.0) -> Dictionary:
   var states: Array[int] = []
   states.resize(w * h)
   states.fill(CellState.OPEN)
+
+  var close_order: Array[int] = []
+  close_order.resize(w * h)
+  close_order.fill(-1)
 
   var open := CellSet.new()
   for x in w:
     for y in h:
       open.add(Vector2i(x, y))
 
-  open.remove(start)
-  open.remove(end)
-  states[start.x * h + start.y] = CellState.FORCED
-  states[end.x * h + end.y] = CellState.FORCED
+  for p in points:
+    open.remove(p)
+    states[p.x * h + p.y] = CellState.FORCED
 
-  var witness := _find_path(w, h, start, end, states)
+  var witness := _find_witness_tree(w, h, points, states)
+  var step := 0
 
   while open.size() > 0:
     var c: Vector2i
@@ -71,14 +75,16 @@ static func generate(w: int, h: int, start: Vector2i, end: Vector2i, wiggliness:
       c = _weighted_random_open_cell(open, witness, wiggliness)
 
     states[c.x * h + c.y] = CellState.BLOCKED
+    close_order[c.x * h + c.y] = step
     open.remove(c)
 
     if witness.contains(c):
-      var new_path := _find_path(w, h, start, end, states)
-      if new_path == null:
+      var new_witness := _find_witness_tree(w, h, points, states)
+      if new_witness == null:
         states[c.x * h + c.y] = CellState.FORCED
       else:
-        witness = new_path
+        witness = new_witness
+    step += 1
 
   var forced: Array[Vector2i] = []
   for x in w:
@@ -89,10 +95,12 @@ static func generate(w: int, h: int, start: Vector2i, end: Vector2i, wiggliness:
     "forced": forced,
     "states": states.duplicate(),
     "witness": witness.get_cells().duplicate(),
+    "close_order": close_order,
+    "total_steps": step,
   }
 
 
-static func generate_steps(w: int, h: int, start: Vector2i, end: Vector2i, wiggliness: float = 1.0) -> Array[Dictionary]:
+static func generate_steps(w: int, h: int, points: Array[Vector2i], wiggliness: float = 1.0) -> Array[Dictionary]:
   var steps: Array[Dictionary] = []
   var states: Array[int] = []
   states.resize(w * h)
@@ -103,12 +111,11 @@ static func generate_steps(w: int, h: int, start: Vector2i, end: Vector2i, wiggl
     for y in h:
       open.add(Vector2i(x, y))
 
-  open.remove(start)
-  open.remove(end)
-  states[start.x * h + start.y] = CellState.FORCED
-  states[end.x * h + end.y] = CellState.FORCED
+  for p in points:
+    open.remove(p)
+    states[p.x * h + p.y] = CellState.FORCED
 
-  var witness := _find_path(w, h, start, end, states)
+  var witness := _find_witness_tree(w, h, points, states)
   steps.append(_snapshot(w, h, states, witness))
 
   while open.size() > 0:
@@ -122,11 +129,11 @@ static func generate_steps(w: int, h: int, start: Vector2i, end: Vector2i, wiggl
     open.remove(c)
 
     if witness.contains(c):
-      var new_path := _find_path(w, h, start, end, states)
-      if new_path == null:
+      var new_witness := _find_witness_tree(w, h, points, states)
+      if new_witness == null:
         states[c.x * h + c.y] = CellState.FORCED
       else:
-        witness = new_path
+        witness = new_witness
 
     steps.append(_snapshot(w, h, states, witness))
 
@@ -154,11 +161,17 @@ static func state_name(state: int) -> String:
     _: return "UNKNOWN"
 
 
-static func _find_path(w: int, h: int, from: Vector2i, to: Vector2i, states: Array[int]) -> CellSet:
+static func _find_witness_tree(w: int, h: int, points: Array[Vector2i], states: Array[int]) -> CellSet:
+  if points.size() < 2:
+    var single := CellSet.new()
+    if points.size() == 1:
+      single.add(points[0])
+    return single
+
   var distances: Dictionary = {}
-  var current: Array[Vector2i] = [from]
+  var current: Array[Vector2i] = [points[0]]
+  distances[points[0]] = 0
   var current_dist := 0
-  distances[from] = 0
 
   while current.size() > 0:
     var next_cells: Array[Vector2i] = []
@@ -172,25 +185,35 @@ static func _find_path(w: int, h: int, from: Vector2i, to: Vector2i, states: Arr
         next_cells.append(neighbor)
     current = next_cells
     current_dist += 1
-    if distances.has(to):
-      break
 
-  if not distances.has(to):
-    return null
+  for i in range(1, points.size()):
+    if not distances.has(points[i]):
+      return null
 
-  var trace := CellSet.new()
-  var c := to
-  trace.add(c)
-  var d: int = distances[to]
-  while d > 0:
-    var candidates: Array[Vector2i] = []
-    for n in _neighbors(w, h, c):
-      if distances.has(n) and distances[n] == d - 1:
-        candidates.append(n)
-    c = candidates[randi() % candidates.size()]
-    trace.add(c)
-    d -= 1
-  return trace
+  var tree := CellSet.new()
+  tree.add(points[0])
+
+  for i in range(1, points.size()):
+    var c := points[i]
+    tree.add(c)
+    var d: int = distances[c]
+    while d > 0:
+      var candidates: Array[Vector2i] = []
+      var tree_candidates: Array[Vector2i] = []
+      for n in _neighbors(w, h, c):
+        if distances.has(n) and distances[n] == d - 1:
+          candidates.append(n)
+          if tree.contains(n):
+            tree_candidates.append(n)
+      if tree_candidates.size() > 0:
+        c = tree_candidates[randi() % tree_candidates.size()]
+        tree.add(c)
+        break
+      c = candidates[randi() % candidates.size()]
+      tree.add(c)
+      d -= 1
+
+  return tree
 
 
 static func _neighbors(w: int, h: int, cell: Vector2i) -> Array[Vector2i]:

@@ -4,9 +4,6 @@
 [ext_resource type="TileSet" uid="uid://dveppprypqhm2" path="res://feb_1_2026-tilesetter-test/tilesetter_test_tileset.tres" id="2_tileset"]
 [ext_resource type="Script" uid="uid://cll2ewhxarmmd" path="res://_common/smooth_camera.gd" id="3_camera"]
 
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_marker"]
-size = Vector2(16, 16)
-
 [node name="ChiseledPaths" type="Node2D" unique_id=1235217298]
 script = ExtResource("1_script")
 
@@ -24,17 +21,9 @@ unique_name_in_owner = true
 modulate = Color(0.5, 0.8, 1, 0.5)
 tile_set = ExtResource("2_tileset")
 
-[node name="StartMarker" type="Sprite2D" parent="." unique_id=281763444]
+[node name="Markers" type="Node2D" parent="."]
 unique_name_in_owner = true
-modulate = Color(0.2, 0.8, 0.3, 0.7)
 z_index = 1
-texture = SubResource("PlaceholderTexture2D_marker")
-
-[node name="EndMarker" type="Sprite2D" parent="." unique_id=832473810]
-unique_name_in_owner = true
-modulate = Color(0.9, 0.3, 0.2, 0.7)
-z_index = 1
-texture = SubResource("PlaceholderTexture2D_marker")
 
 [node name="SmoothCamera" type="Camera2D" parent="." unique_id=1386330435]
 unique_name_in_owner = true
@@ -67,7 +56,7 @@ layout_mode = 2
 [node name="Instructions" type="Label" parent="UILayer/UI/VBox" unique_id=926012504]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-text = "LMB: start  |  RMB: end  |  Z: animate  |  Space: play/pause  |  Arrows: step"
+text = "LMB: add/remove point  |  Z: animate  |  Space: play/pause  |  Arrows: step  |  H: heatmap"
 
 [node name="WigglinessRow" type="HBoxContainer" parent="UILayer/UI/VBox" unique_id=1237217032]
 layout_mode = 2

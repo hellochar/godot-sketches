@@ -230,8 +230,8 @@ func pulse(target: CanvasItem, duration: float = 3.0, speed: float = 8.0, min_al
   tween.tween_property(target, "modulate:a", 1.0, 0.0)
   return tween
 
-func chiseled_path(w: int, h: int, start: Vector2i, end: Vector2i, wiggliness: float = 1.0) -> Array[Vector2i]:
-  return _ChiseledPaths.path(w, h, start, end, wiggliness)
+func chiseled_path(w: int, h: int, points: Array[Vector2i], wiggliness: float = 1.0) -> Array[Vector2i]:
+  return _ChiseledPaths.path(w, h, points, wiggliness)
 
 func get_random_point_in_polygon(polygon: Polygon2D) -> Vector2:
   return polygon.global_position + get_random_point_in_polygon_points(polygon.polygon)
