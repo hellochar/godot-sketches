@@ -52,6 +52,7 @@ func _physics_process(delta: float) -> void:
   _follow_target_process(delta)
   _pan_process(delta)
   _edge_pan_process(delta)
+  _clamp_to_limits()
 
 func _follow_target_process(delta: float) -> void:
   if not target:
@@ -98,6 +99,12 @@ func _edge_pan_process(delta: float) -> void:
   if direction != Vector2.ZERO:
     global_position += direction.normalized() * edge_pan_speed * delta
 
+func _clamp_to_limits() -> void:
+  var viewport_size := get_viewport_rect().size / zoom
+  var half := viewport_size * 0.5
+  global_position.x = clampf(global_position.x, limit_left + half.x, limit_right - half.x)
+  global_position.y = clampf(global_position.y, limit_top + half.y, limit_bottom - half.y)
+
 func _confine_mouse() -> void:
   Input.mouse_mode = Input.MOUSE_MODE_CONFINED
 
@@ -132,6 +139,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
   if drag_pan_enabled and event is InputEventMouseMotion and _drag_panning:
     global_position -= event.relative / zoom
+    _clamp_to_limits()
     reset_smoothing()
     get_viewport().set_input_as_handled()
 

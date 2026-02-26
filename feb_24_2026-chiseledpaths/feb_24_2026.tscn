@@ -3,9 +3,34 @@
 [ext_resource type="Script" uid="uid://tdp3weawxyc6" path="res://feb_24_2026-chiseledpaths/feb_24_2026.gd" id="1_script"]
 [ext_resource type="TileSet" uid="uid://dveppprypqhm2" path="res://_common/tilesets/tilesetter_test_tileset.tres" id="2_tileset"]
 [ext_resource type="Script" uid="uid://cll2ewhxarmmd" path="res://_common/smooth_camera.gd" id="3_camera"]
+[ext_resource type="Script" uid="uid://c3kr0kdjim0k0" path="res://_common/ui_scaler.gd" id="4_scaler"]
+
+[sub_resource type="Gradient" id="Gradient_r77cr"]
+offsets = PackedFloat32Array(0, 0.6553525, 0.8603133, 1)
+colors = PackedColorArray(0.99991053, 0.45335346, 0.3885587, 1, 0.99991053, 0.45335346, 0.3885587, 1, 1, 1, 1, 0, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_nf42o"]
+gradient = SubResource("Gradient_r77cr")
+width = 24
+height = 24
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tooltip"]
+content_margin_left = 6.0
+content_margin_top = 3.0
+content_margin_right = 6.0
+content_margin_bottom = 3.0
+bg_color = Color(0.00784314, 0.00392157, 0.0745098, 0.5)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
 
 [node name="ChiseledPaths" type="Node2D" unique_id=1235217298]
 script = ExtResource("1_script")
+_marker_texture = SubResource("GradientTexture2D_nf42o")
 
 [node name="OpenMap" type="TileMapLayer" parent="." unique_id=542189940]
 unique_name_in_owner = true
@@ -39,7 +64,25 @@ metadata/_custom_type_script = "uid://cll2ewhxarmmd"
 [node name="UILayer" type="CanvasLayer" parent="." unique_id=2079658328]
 layer = 10
 
-[node name="UI" type="MarginContainer" parent="UILayer" unique_id=26625115]
+[node name="UIScaler" type="SubViewportContainer" parent="UILayer" unique_id=1405921921]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+script = ExtResource("4_scaler")
+ui_scale = 1.185
+
+[node name="SubViewport" type="SubViewport" parent="UILayer/UIScaler" unique_id=930331814]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(1920, 1080)
+size_2d_override_stretch = true
+render_target_update_mode = 4
+
+[node name="UI" type="MarginContainer" parent="UILayer/UIScaler/SubViewport" unique_id=220651130]
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
@@ -50,23 +93,23 @@ theme_override_constants/margin_left = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="VBox" type="VBoxContainer" parent="UILayer/UI" unique_id=808162315]
+[node name="VBox" type="VBoxContainer" parent="UILayer/UIScaler/SubViewport/UI" unique_id=877999199]
 layout_mode = 2
 
-[node name="Instructions" type="Label" parent="UILayer/UI/VBox" unique_id=926012504]
+[node name="Instructions" type="Label" parent="UILayer/UIScaler/SubViewport/UI/VBox" unique_id=941814089]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "LMB: add/remove point  |  Z: animate  |  Space: play/pause  |  Arrows: step  |  H: heatmap"
 
-[node name="WigglinessRow" type="HBoxContainer" parent="UILayer/UI/VBox" unique_id=1237217032]
+[node name="WigglinessRow" type="HBoxContainer" parent="UILayer/UIScaler/SubViewport/UI/VBox" unique_id=1727130154]
 layout_mode = 2
 
-[node name="WigglinessLabel" type="Label" parent="UILayer/UI/VBox/WigglinessRow" unique_id=2034980709]
+[node name="WigglinessLabel" type="Label" parent="UILayer/UIScaler/SubViewport/UI/VBox/WigglinessRow" unique_id=7092525]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Wiggliness:"
 
-[node name="WigglinessSlider" type="HSlider" parent="UILayer/UI/VBox/WigglinessRow" unique_id=1381960998]
+[node name="WigglinessSlider" type="HSlider" parent="UILayer/UIScaler/SubViewport/UI/VBox/WigglinessRow" unique_id=735490942]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -74,54 +117,55 @@ min_value = 0.1
 step = 0.1
 value = 2.0
 
-[node name="WigglinessValue" type="Label" parent="UILayer/UI/VBox/WigglinessRow" unique_id=466916475]
+[node name="WigglinessValue" type="Label" parent="UILayer/UIScaler/SubViewport/UI/VBox/WigglinessRow" unique_id=1975689688]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "2.0"
 
-[node name="SpeedRow" type="HBoxContainer" parent="UILayer/UI/VBox" unique_id=1220661632]
+[node name="SpeedRow" type="HBoxContainer" parent="UILayer/UIScaler/SubViewport/UI/VBox" unique_id=1047699177]
 layout_mode = 2
 
-[node name="SpeedLabel" type="Label" parent="UILayer/UI/VBox/SpeedRow" unique_id=1135678746]
+[node name="SpeedLabel" type="Label" parent="UILayer/UIScaler/SubViewport/UI/VBox/SpeedRow" unique_id=428590242]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Speed:"
 
-[node name="SpeedSlider" type="HSlider" parent="UILayer/UI/VBox/SpeedRow" unique_id=1529776531]
+[node name="SpeedSlider" type="HSlider" parent="UILayer/UIScaler/SubViewport/UI/VBox/SpeedRow" unique_id=1821179361]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 min_value = 1.0
 value = 5.0
 
-[node name="SpeedValue" type="Label" parent="UILayer/UI/VBox/SpeedRow" unique_id=333612564]
+[node name="SpeedValue" type="Label" parent="UILayer/UIScaler/SubViewport/UI/VBox/SpeedRow" unique_id=549663338]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "5"
 
-[node name="TimelineRow" type="HBoxContainer" parent="UILayer/UI/VBox" unique_id=397037477]
+[node name="TimelineRow" type="HBoxContainer" parent="UILayer/UIScaler/SubViewport/UI/VBox" unique_id=1975474428]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="TimelineLabel" type="Label" parent="UILayer/UI/VBox/TimelineRow" unique_id=1677196868]
+[node name="TimelineLabel" type="Label" parent="UILayer/UIScaler/SubViewport/UI/VBox/TimelineRow" unique_id=1006780317]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Step 0 / 0"
 
-[node name="TimelineSlider" type="HSlider" parent="UILayer/UI/VBox/TimelineRow" unique_id=1703042594]
+[node name="TimelineSlider" type="HSlider" parent="UILayer/UIScaler/SubViewport/UI/VBox/TimelineRow" unique_id=356723249]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TooltipLabel" type="Label" parent="UILayer" unique_id=1027878746]
+[node name="TooltipLabel" type="Label" parent="UILayer/UIScaler/SubViewport" unique_id=112019683]
 unique_name_in_owner = true
 visible = false
 theme_override_colors/font_color = Color(1, 1, 1, 0.9)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
 theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 1
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_tooltip")
 text = "tooltip"

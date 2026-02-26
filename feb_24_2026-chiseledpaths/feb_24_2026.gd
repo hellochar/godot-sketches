@@ -19,6 +19,7 @@ const CP := preload("res://_common/chiseled_paths.gd")
 @onready var timeline_row: HBoxContainer = %TimelineRow
 @onready var speed_slider: HSlider = %SpeedSlider
 @onready var speed_value: Label = %SpeedValue
+@onready var ui_scaler: UIScaler = %UIScaler
 
 var points: Array[Vector2i] = [Vector2i(2, 10), Vector2i(27, 10)]
 
@@ -34,12 +35,12 @@ var current_close_order: Array[int] = []
 var current_total_steps: int = 0
 var heatmap_enabled := false
 
-var _marker_texture: PlaceholderTexture2D
+@export var _marker_texture: Texture2D
+@export var grid_border_color := Color(1, 1, 1, 0.3)
+@export var grid_border_width := 2.0
 
 
 func _ready() -> void:
-  _marker_texture = PlaceholderTexture2D.new()
-  _marker_texture.size = Vector2(16, 16)
   @warning_ignore("integer_division")
   camera.global_position = tile_map.map_to_local(Vector2i(grid_width / 2, grid_height / 2))
   wiggliness_slider.value = wiggliness
@@ -125,8 +126,20 @@ func _generate_and_render() -> void:
   _update_markers()
   queue_redraw()
 
-
 func _draw() -> void:
+  _draw_grid_boundary()
+  _draw_heatmap()
+
+
+func _draw_grid_boundary() -> void:
+  var tile_size := Vector2(tile_map.tile_set.tile_size)
+  var top_left := tile_map.map_to_local(Vector2i.ZERO) - tile_size / 2.0
+  var bottom_right := tile_map.map_to_local(Vector2i(grid_width - 1, grid_height - 1)) + tile_size / 2.0
+  var rect := Rect2(top_left, bottom_right - top_left)
+  draw_rect(rect, grid_border_color, false, grid_border_width)
+
+
+func _draw_heatmap() -> void:
   if not heatmap_enabled or current_close_order.is_empty() or current_total_steps <= 0:
     return
   var tile_size := Vector2(tile_map.tile_set.tile_size)
@@ -229,7 +242,7 @@ func _update_markers() -> void:
   for p in points:
     var sprite := Sprite2D.new()
     sprite.texture = _marker_texture
-    sprite.modulate = Color(1.0, 0.85, 0.2, 0.8)
+    sprite.modulate = Color(1, 1, 1, 0.9)
     sprite.position = tile_map.map_to_local(p)
     markers.add_child(sprite)
 
@@ -262,7 +275,7 @@ func _update_tooltip() -> void:
 
   tooltip_label.text = "\n".join(lines)
   var screen_pos := get_viewport().get_mouse_position()
-  tooltip_label.position = screen_pos + Vector2(16, 16)
+  tooltip_label.position = (screen_pos + Vector2(32, 0)) / ui_scaler.ui_scale
 
 
 func _on_wiggliness_changed(value: float) -> void:
